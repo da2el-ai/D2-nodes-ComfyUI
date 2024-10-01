@@ -1,0 +1,27 @@
+{
+  "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "editor.tabSize": 4,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll": "explicit"
+  },
+  // eslint
+  // 適応するファイルタイプを決定
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue"
+  ],
+  // プロジェクト配下のeslintrc.jsを読み込み
+  "eslint.options": {
+    "overrideConfigFile": ".eslintrc.js"
+  },
+  "eslint.workingDirectories": ["./"],
+  "files.associations": {
+    "*.vue": "vue"
+  },
+}
