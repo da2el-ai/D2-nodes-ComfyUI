@@ -1,10 +1,4 @@
-<style>
-  .d2-details{
-    padding: 1rem;
-    border: 1px solid var(--borderColor-muted, #ccc);
-    border-radius: 6px;
-  }
-</style>
+
 
 
 # D2 Nodes ComfyUI
