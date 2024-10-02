@@ -5,12 +5,10 @@ import json
 import hashlib
 import folder_paths
 import comfy.sd
-import latent_preview
 import re
 import random
 
 import comfy.samplers
-from comfy.cli_args import args
 
 from nodes import common_ksampler, CLIPTextEncode, PreviewImage
 
@@ -49,40 +47,94 @@ class D2_KSampler:
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
-    RETURN_TYPES = ("IMAGE", "STRING", "STRING", )
-    RETURN_NAMES = ("IMAGE", "positive", "negative")
+    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative",)
     OUTPUT_NODE = True
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
-               preview_method, positive, negative, prompt=None, extra_pnginfo=None, my_unique_id=None):
 
-        self._set_preview_method(preview_method)
+    def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
+            preview_method, positive, negative, prompt=None, extra_pnginfo=None, my_unique_id=None,
+            add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular"):
+
+        print("Normal -----------------")
+        print(positive)
+
+        util.set_preview_method(preview_method)
 
         (positive_encoded,) = CLIPTextEncode().encode(clip, positive)
         (negative_encoded,) = CLIPTextEncode().encode(clip, negative)
 
-        sampler_result = common_ksampler(model, seed, steps, cfg, sampler_name, scheduler, positive_encoded, negative_encoded, latent_image, denoise=denoise)
-        latent = sampler_result[0]['samples']
-        samp_images = vae.decode(latent).cpu()
+        disable_noise = add_noise == "disable"
+        force_full_denoise = return_with_leftover_noise != "enable"
+
+        # KSampler実行
+        latent = common_ksampler(
+            model, seed, steps, cfg, sampler_name, scheduler, positive_encoded, negative_encoded, latent_image, denoise=denoise, 
+            disable_noise=disable_noise, start_step=start_at_step, last_step=end_at_step, force_full_denoise=force_full_denoise
+        )[0]
+
+        latent_samples = latent['samples']
+        samp_images = vae.decode(latent_samples).cpu()
         results_images = PreviewImage().save_images(samp_images, "d2", prompt, extra_pnginfo)['ui']['images']
-        
+
         return {
             "ui": {"images": results_images},
-            "result": (samp_images, positive, negative,)
+            "result": (samp_images, latent, positive, negative,)
         }
 
 
-    def _set_preview_method(self, method):
-        if method == 'auto' or method == 'LatentPreviewMethod.Auto':
-            args.preview_method = latent_preview.LatentPreviewMethod.Auto
-        elif method == 'latent2rgb' or method == 'LatentPreviewMethod.Latent2RGB':
-            args.preview_method = latent_preview.LatentPreviewMethod.Latent2RGB
-        elif method == 'taesd' or method == 'LatentPreviewMethod.TAESD':
-            args.preview_method = latent_preview.LatentPreviewMethod.TAESD
-        else:
-            args.preview_method = latent_preview.LatentPreviewMethod.NoPreviews
+
+"""
+
+D2 KSampler(Advanced)
+positive / negative 入力に文字列が使える KSampler Advanced
+
+"""
+class D2_KSamplerAdvanced(D2_KSampler):
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "model": ("MODEL",),
+                "clip": ("CLIP",),
+                "vae": ("VAE",),
+                "add_noise": (["enable", "disable"],),
+                "noise_seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
+                "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0}),
+                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, ),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, ),
+                "latent_image": ("LATENT",),
+                "start_at_step": ("INT", {"default": 0, "min": 0, "max": 10000}),
+                "end_at_step": ("INT", {"default": 10000, "min": 0, "max": 10000}),
+                "return_with_leftover_noise": (["disable", "enable"],),
+                "preview_method": (["auto", "latent2rgb", "taesd", "vae_decoded_only", "none"],),
+                "positive": ("STRING", {"default": "","multiline": True}),
+                "negative": ("STRING", {"default": "", "multiline": True}),
+            },
+            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
+        }
+
+    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative",)
+    OUTPUT_NODE = True
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 
+            start_at_step, end_at_step, return_with_leftover_noise,
+            preview_method, positive, negative, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
+
+        print("Advanced -----------------")
+        print(positive)
+
+        return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
+            preview_method, positive, negative, prompt, extra_pnginfo, my_unique_id,
+            add_noise, start_at_step, end_at_step, return_with_leftover_noise, sampler_type="advanced")
+
+
 
 
 
@@ -134,6 +186,12 @@ class D2_RegexSwitcher:
                 "text": (
                     "STRING", {"forceInput": True, "multiline": True, "default": ""},
                 ),
+                # 正規表現、出力テキストのペア
+                "regex_and_output": (
+                    "STRING", {"multiline": True, "default": "pony\n--\nscore_9,\n--\n--\nhighres, high quality,"},
+                ),
+            },
+            "optional": {
                 # 先頭に結合するテキスト
                 "prefix": (
                     "STRING", {"forceInput": True, "multiline": True, "default":"",},
@@ -141,10 +199,6 @@ class D2_RegexSwitcher:
                 # 最後に結合するテキスト
                 "suffix": (
                     "STRING", {"forceInput": True, "multiline": True, "default":"",},
-                ),
-                # 正規表現、出力テキストのペア
-                "regex_and_output": (
-                    "STRING", {"multiline": True, "default": "pony\n--\nscore_9,\n--\n--\nhighres, high quality,"},
                 ),
             },
         }
@@ -155,7 +209,7 @@ class D2_RegexSwitcher:
     CATEGORY = "D2"
 
     ######
-    def run(self, text, prefix, suffix, regex_and_output):
+    def run(self, text, regex_and_output, prefix="", suffix=""):
         """
         正規表現に基づいてテキストをマッチングし、結果を結合して返す関数。
 
@@ -467,6 +521,7 @@ class D2_RefinerStepsTester:
 
 NODE_CLASS_MAPPINGS = {
     "D2 KSampler": D2_KSampler,
+        "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Prompt SR": D2_PromptSR,
