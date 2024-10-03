@@ -298,6 +298,8 @@ In the custom_nodes folder, `git clone`
 
 ## :blossom: Changelog
 
+**2024.10.03**
+- D2 Regex Switcher: Fixed a bug where matches were being overlooked during search
+  
 **2024.10.02**
-
 - Created by integrating existing nodes

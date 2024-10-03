@@ -208,32 +208,55 @@ class D2_RegexSwitcher:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    ######
     def run(self, text, regex_and_output, prefix="", suffix=""):
         """
         正規表現に基づいてテキストをマッチングし、結果を結合して返す関数。
 
         Args:
             text (str): マッチング対象のテキスト
-                pony
-                --
-                score_9,
-                --
-                --
-                highres, high quality,
+            regex_and_output (str): 正規表現とその出力のペアを "--" で区切った文字列
             prefix (str): 結果の前に付加するテキスト
             suffix (str): 結果の後に付加するテキスト
-            regex_and_output (str): 正規表現とその出力のペアを "--" で区切った文字列
 
         Returns:
             dict: UI用のテキストと結果のタプルを含む辞書
         """
-        # regex_and_output を -- で分割し、ペアにする
-        pairs = regex_and_output.split('--')
+        regex_output_list, default_output = D2_RegexSwitcher.get_regex_list(regex_and_output)
+        match_text, match_index = D2_RegexSwitcher.get_mach_text(regex_output_list, default_output, text)
 
-        # ペアをリストに整理する
+        # 文字列を結合
+        combined_text = f"{prefix}{match_text}{suffix}"
+
+        return {
+            "ui": {"text": text}, 
+            "result": (combined_text, prefix, suffix, match_index)
+        }
+
+    """
+    該当文字列と該当indexを取得
+    """
+    @staticmethod
+    def get_mach_text(regex_output_list, default_output, text):
+        # 各正規表現をチェックし、マッチしたら対応する出力を返す
+        for index, item in enumerate(regex_output_list):
+            # match_text = re.sub(item["regex"], item["output"], text, flags=re.IGNORECASE)
+            # if match_text != text:
+            if re.search(item["regex"], text, re.IGNORECASE):
+                return item["output"], index
+
+        # マッチしなかった場合はデフォルト出力を返す
+        return default_output, -1
+
+    """
+    regex_and_output を -- で分割し、ペアにする
+    """    
+    @staticmethod
+    def get_regex_list(text:str):
+        pairs = text.split('--')
         regex_output_list = []
         default_output = None
+
+        # ペアをリストに整理する
         for i in range(0, len(pairs), 2):
             if i + 1 < len(pairs):
                 regex = pairs[i].strip()
@@ -246,27 +269,7 @@ class D2_RegexSwitcher:
                 else:
                     default_output = output
 
-        match_text = ""
-        match_index = -1
-
-        # 各正規表現をチェックし、マッチしたら対応する出力を返す
-        for index, item in enumerate(regex_output_list):
-            if re.search(item['regex'], text, re.IGNORECASE):
-                match_text = item['output']
-                match_index = index
-
-        # マッチしなかった場合はデフォルト出力を返す
-        if match_index == -1:
-                match_text = default_output
-
-        # 文字列を結合
-        combined_text = f"{prefix}{match_text}{suffix}"
-
-        return {
-            "ui": {"text": text}, 
-            "result": (combined_text, prefix, suffix, match_index)
-        }
-
+        return regex_output_list, default_output
 
 
 """

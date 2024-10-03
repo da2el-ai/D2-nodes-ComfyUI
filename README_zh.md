@@ -298,6 +298,8 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 ## :blossom: 更新日誌
 
-**2024.10.02**
+**2024.10.03**
+- D2 Regex Switcher: 修復了搜尋功能未在首次匹配時停止，導致忽略有效匹配項的錯誤
 
+**2024.10.02**
 - 整合現有節點創建

@@ -330,6 +330,8 @@ custom_nodes フォルダで `git clone` する
 
 ## :blossom: Changelog
 
-**2024.10.02**
+**2024.10.03**
+- D2 Regex Switcher: 検索にマッチしても素通りする不具合を修正
 
+**2024.10.02**
 - 既存のノードを統合して作成
