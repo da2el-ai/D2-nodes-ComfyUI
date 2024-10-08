@@ -170,6 +170,34 @@ I have consolidated the following custom nodes that I previously created, and ad
 
 </details>
 
+
+
+### D2 Load Image
+
+<img src="./img/load_image.png">
+
+  - Load Image node that can extract prompts from images
+  - Compatible with images created by StableDiffusion webui A1111 and NovelAI
+
+<details class="d2-details">
+  <summary><strong>Details</strong></summary>
+
+  #### Output
+  
+  - `IMAGE / MASK`
+    - Image and mask
+  - `width / height`
+    - Image size
+  - `positive` / `negative`
+    - Prompts
+
+  Note: Depending on the workflow configuration, it may not always be possible to retrieve prompts. For example, prompts cannot be retrieved without a node containing the word "KSampler" (e.g., Tiled KSampler).
+
+</details>
+
+
+
+
 ### D2 Size Selector
 
 <img src="./img/sizeselector.png">
@@ -297,6 +325,9 @@ In the custom_nodes folder, `git clone`
 ```
 
 ## :blossom: Changelog
+
+**2024.10.08**
+- D2 Load Image: Newly added
 
 **2024.10.03**
 - D2 Regex Switcher: Fixed a bug where matches were being overlooked during search

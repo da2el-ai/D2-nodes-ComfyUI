@@ -188,6 +188,31 @@
 
 
 
+### D2 Load Image
+
+<img src="./img/load_image.png">
+
+  - 画像からプロンプトを取得できる Load Image ノード
+  - StableDiffusion webui A1111、NovelAI で作成した画像にも対応
+
+<details class="d2-details">
+  <summary><strong>詳細</strong></summary>
+
+  #### Output
+  
+  - `IMAGE / MASK`
+    - 画像とマスク
+  - `width / height`
+    - 画像サイズ
+  - `positive` / `negative`
+    - プロンプト
+
+  ※ワークフローの構成によってはプロンプトを取得できない場合もあります。例えば「KSampler」という文字が含まれたノード（例：Tiled KSampler）が無いと取得できません。
+
+</details>
+
+
+
 
 ### D2 Size Slector
 
@@ -329,6 +354,9 @@ custom_nodes フォルダで `git clone` する
 ```
 
 ## :blossom: Changelog
+
+**2024.10.08**
+- D2 Load Image: 新規追加
 
 **2024.10.03**
 - D2 Regex Switcher: 検索にマッチしても素通りする不具合を修正

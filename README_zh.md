@@ -170,6 +170,34 @@
 
 </details>
 
+
+
+### D2 Load Image
+
+<img src="./img/load_image.png">
+
+  - 可從圖片中提取提示詞的載入圖片節點
+  - 支援由 StableDiffusion webui A1111 和 NovelAI 創建的圖片
+  
+<details class="d2-details">
+  <summary><strong>詳細信息</strong></summary>
+
+  #### Output
+  
+  - `IMAGE / MASK`
+    - 圖片和遮罩
+  - `width / height`
+    - 圖片尺寸
+  - `positive` / `negative`
+    - 提示詞
+
+  注意：根據工作流程的配置，有時可能無法獲取提示詞。例如，如果沒有包含「KSampler」字樣的節點（如 Tiled KSampler），就無法獲取提示詞。
+
+</details>
+
+
+
+
 ### D2 Size Selector
 
 <img src="./img/sizeselector.png">
@@ -297,6 +325,9 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 ```
 
 ## :blossom: 更新日誌
+
+**2024.10.08**
+- D2 Load Image：新增功能
 
 **2024.10.03**
 - D2 Regex Switcher: 修復了搜尋功能未在首次匹配時停止，導致忽略有效匹配項的錯誤

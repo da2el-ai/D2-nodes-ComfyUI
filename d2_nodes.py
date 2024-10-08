@@ -3,20 +3,50 @@ import math
 import os
 import json
 import hashlib
-import folder_paths
-import comfy.sd
 import re
 import random
+from PIL import Image, ImageOps, ImageSequence, ImageFile
+import numpy as np
 
+import folder_paths
+import comfy.sd
+import node_helpers
 import comfy.samplers
-
-from nodes import common_ksampler, CLIPTextEncode, PreviewImage
+from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage
 
 from .modules import util
 from .modules import checkpoint_util
+from .modules import pnginfo_util
 
 
 MAX_SEED = 2**32 - 1  # 4,294,967,295
+
+
+"""
+
+D2 Load Image
+プロンプト出力できる Load Image
+
+"""
+class D2_LoadImage(LoadImage):
+
+    RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING", "STRING" )
+    RETURN_NAMES = ("IMAGE", "MASK", "width", "height", "positive", "negative")
+    FUNCTION = "load_image"
+    CATEGORY = "D2"
+
+    def load_image(self, image):
+        # オリジナルのLoadImage処理
+        output_images, output_masks = super().load_image(image)
+
+        image_path = folder_paths.get_annotated_filepath(image)
+        
+        with Image.open(image_path) as img:
+            width = img.size[0]
+            height = img.size[1]
+            prompt = pnginfo_util.get_prompt(img)
+        
+        return (output_images, output_masks, width, height, prompt["positive"], prompt["negative"])
 
 
 """
@@ -57,9 +87,6 @@ class D2_KSampler:
     def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
             preview_method, positive, negative, prompt=None, extra_pnginfo=None, my_unique_id=None,
             add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular"):
-
-        print("Normal -----------------")
-        print(positive)
 
         util.set_preview_method(preview_method)
 
@@ -523,8 +550,9 @@ class D2_RefinerStepsTester:
 
 
 NODE_CLASS_MAPPINGS = {
+    "D2 Load Image": D2_LoadImage,
     "D2 KSampler": D2_KSampler,
-        "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
+    "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Prompt SR": D2_PromptSR,
