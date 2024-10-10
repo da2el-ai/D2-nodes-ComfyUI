@@ -230,16 +230,14 @@ class D2_RegexSwitcher:
                 "regex_and_output": (
                     "STRING", {"multiline": True, "default": "pony\n--\nscore_9,\n--\n--\nhighres, high quality,"},
                 ),
+                "pre_delim": (["Comma", "Line break", "None"],),
+                "suf_delim": (["Comma", "Line break", "None"],),
             },
             "optional": {
                 # 先頭に結合するテキスト
-                "prefix": (
-                    "STRING", {"forceInput": True, "multiline": True, "default":"",},
-                ),
+                "prefix": ("STRING", {"forceInput": True, "multiline": True, "default":"",},),
                 # 最後に結合するテキスト
-                "suffix": (
-                    "STRING", {"forceInput": True, "multiline": True, "default":"",},
-                ),
+                "suffix": ("STRING", {"forceInput": True, "multiline": True, "default":"",},),
             },
         }
 
@@ -248,7 +246,13 @@ class D2_RegexSwitcher:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, text, regex_and_output, prefix="", suffix=""):
+    DELIMITER = {
+        "Comma": ",",
+        "Line break": "\n",
+        "None": "",
+    }
+
+    def run(self, text, regex_and_output, pre_delim, suf_delim, prefix="", suffix=""):
         """
         正規表現に基づいてテキストをマッチングし、結果を結合して返す関数。
 
@@ -265,7 +269,16 @@ class D2_RegexSwitcher:
         match_text, match_index = D2_RegexSwitcher.get_mach_text(regex_output_list, default_output, text)
 
         # 文字列を結合
-        combined_text = f"{prefix}{match_text}{suffix}"
+        parts = []
+        if prefix:
+            parts.append(prefix)
+            parts.append(self.DELIMITER[pre_delim])
+        parts.append(match_text)
+        if suffix:
+            parts.append(self.DELIMITER[suf_delim])
+            parts.append(suffix)
+
+        combined_text = "".join(parts)
 
         return {
             "ui": {"text": text}, 

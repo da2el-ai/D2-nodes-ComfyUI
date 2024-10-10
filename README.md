@@ -45,6 +45,11 @@ I have consolidated the following custom nodes that I previously created, and ad
   - `regex_and_output`
     - List of search strings and output strings
     - Enter in the following format:
+  - `pre_delim`
+    - The character inserted between `prefix` and `regex_and_output` when connecting them
+    - `Comma`: `,` / `Line break`: newline / `None`: no character inserted
+  - `suf_delim`
+    - The character inserted between `suffix` and `regex_and_output` when connecting them
 
   ```
   Search string 1 (regex can be used)
@@ -326,6 +331,9 @@ In the custom_nodes folder, `git clone`
 ```
 
 ## :blossom: Changelog
+
+**2024.10.11**
+- D2 Regex Switcher: Added the ability to specify the character to be inserted when concatenating strings
 
 **2024.10.10**
 - D2 Load Image: An "Open Mask Editor" button has been added.

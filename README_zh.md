@@ -45,6 +45,11 @@
   - `regex_and_output`
     - 搜索字符串和輸出字符串的列表
     - 按以下格式填寫
+  - `pre_delim`
+    - 連接 `prefix` 和 `regex_and_output` 時插入的字符
+    - `Comma`：`,` / `Line break`：換行 / `None`：不插入任何字符
+  - `suf_delim`
+    - 連接 `suffix` 和 `regex_and_output` 時插入的字符
 
   ```
   搜索字符串 1（可以使用正則表達式）
@@ -326,6 +331,9 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 ```
 
 ## :blossom: 更新日誌
+
+**2024.10.11**
+- D2 Regex Switcher：新增指定連接字符串時插入的字符的功能
 
 **2024.10.10**
 - D2 Load Image: 已添加"打開遮罩編輯器"按鈕

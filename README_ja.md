@@ -47,6 +47,11 @@
   - `regex_and_output`
     - 検索文字列と出力文字列の一覧
     - 下記のフォーマットで記入する
+  - `pre_delim`
+    - `prefix` と `regex_and_output` を接続する時に挟む文字
+    - `Comma`: `,` / `Line break`: 改行 / `None`: 何も挟まない 
+  - `suf_delim`
+    - `suffix` と `regex_and_output` を接続する時に挟む文字
 
   ```
   検索文字 1（正規表現も使用可能）
@@ -355,6 +360,9 @@ custom_nodes フォルダで `git clone` する
 ```
 
 ## :blossom: Changelog
+
+**2024.10.11**
+- D2 Regex Switcher: 文字列を結合する時に挟む文字を指定できるようにした
 
 **2024.10.10**
 - D2 Load Image: "Open Mask Editor"ボタンを追加
