@@ -178,7 +178,8 @@
 
   - 可從圖片中提取提示詞的載入圖片節點
   - 支援由 StableDiffusion webui A1111 和 NovelAI 創建的圖片
-  
+  - 已添加打開遮罩編輯器的按鈕
+
 <details class="d2-details">
   <summary><strong>詳細信息</strong></summary>
 
@@ -325,6 +326,9 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 ```
 
 ## :blossom: 更新日誌
+
+**2024.10.10**
+- D2 Load Image: 已添加"打開遮罩編輯器"按鈕
 
 **2024.10.08**
 - D2 Load Image：新增功能

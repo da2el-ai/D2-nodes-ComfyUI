@@ -194,6 +194,7 @@
 
   - 画像からプロンプトを取得できる Load Image ノード
   - StableDiffusion webui A1111、NovelAI で作成した画像にも対応
+  - マスクエディターを開くボタンが付いてる
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
@@ -354,6 +355,9 @@ custom_nodes フォルダで `git clone` する
 ```
 
 ## :blossom: Changelog
+
+**2024.10.10**
+- D2 Load Image: "Open Mask Editor"ボタンを追加
 
 **2024.10.08**
 - D2 Load Image: 新規追加

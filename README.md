@@ -178,6 +178,7 @@ I have consolidated the following custom nodes that I previously created, and ad
 
   - Load Image node that can extract prompts from images
   - Compatible with images created by StableDiffusion webui A1111 and NovelAI
+  - A button to open the mask editor has been added
 
 <details class="d2-details">
   <summary><strong>Details</strong></summary>
@@ -325,6 +326,9 @@ In the custom_nodes folder, `git clone`
 ```
 
 ## :blossom: Changelog
+
+**2024.10.10**
+- D2 Load Image: An "Open Mask Editor" button has been added.
 
 **2024.10.08**
 - D2 Load Image: Newly added

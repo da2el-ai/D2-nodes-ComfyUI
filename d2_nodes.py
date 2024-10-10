@@ -30,6 +30,19 @@ D2 Load Image
 """
 class D2_LoadImage(LoadImage):
 
+    @classmethod
+    def INPUT_TYPES(s):
+        input_dir = folder_paths.get_input_directory()
+        files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+        return {
+            "required":{
+                "image": (sorted(files), {"image_upload": True})
+            },
+            "optional": {
+                "editor": ("D2MASKEDITOR", {})
+            }
+        }
+
     RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING", "STRING" )
     RETURN_NAMES = ("IMAGE", "MASK", "width", "height", "positive", "negative")
     FUNCTION = "load_image"
