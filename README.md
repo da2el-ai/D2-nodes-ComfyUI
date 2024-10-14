@@ -332,6 +332,9 @@ In the custom_nodes folder, `git clone`
 
 ## :blossom: Changelog
 
+**2024.10.14**
+- D2 Load Image: Fixed an error that occurred when loading images without Exif data (such as those pasted from clipboard)
+
 **2024.10.11**
 - D2 Regex Switcher: Added the ability to specify the character to be inserted when concatenating strings
 

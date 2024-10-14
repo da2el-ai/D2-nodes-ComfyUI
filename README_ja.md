@@ -361,6 +361,9 @@ custom_nodes フォルダで `git clone` する
 
 ## :blossom: Changelog
 
+**2024.10.14**
+- D2 Load Image: Exifデータのない画像（クリップボードからのペーストなど）の時にエラーになるのを修正
+
 **2024.10.11**
 - D2 Regex Switcher: 文字列を結合する時に挟む文字を指定できるようにした
 

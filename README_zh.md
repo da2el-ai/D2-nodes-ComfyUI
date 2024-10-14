@@ -332,6 +332,9 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 ## :blossom: 更新日誌
 
+**2024.10.14**
+- D2 Load Image：修復了在載入沒有Exif數據的圖片（例如從剪貼板貼上的圖片）時發生的錯誤
+
 **2024.10.11**
 - D2 Regex Switcher：新增指定連接字符串時插入的字符的功能
 

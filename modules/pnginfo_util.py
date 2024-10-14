@@ -12,13 +12,11 @@ import piexif.helper
 #
 # @return {positive:str, negative:str}
 #
-def get_prompt(img:Image.Image):
+def get_prompt(img:Image.Image) -> dict[str, str]:
 
-  items = (img.info or {}).copy()
   prompt = {'positive':'', 'negative':''}
-
+  items = (img.info or {}).copy()
   # print("items ///////////////")
-  # print(ppretty(items, seq_length=99))
   # print(items)
 
   if "exif" in items:
@@ -33,10 +31,16 @@ def get_prompt(img:Image.Image):
     # print(exif_data.get('Exif'))
 
     exif_comment = (exif_data or {}).get('Exif', {}).get(piexif.ExifIFD.UserComment, b'')
-    comment = piexif.helper.UserComment.load(exif_comment)
+    # print("exif_coment------")
+    # print(exif_comment)
 
-    # print("comment ///////////////")
-    # print(ppretty(comment, seq_length=99))
+    if exif_comment:
+        try:
+            comment = piexif.helper.UserComment.load(exif_comment)
+        except Exception as e:
+            return prompt
+    else:
+        return prompt
 
     if 'Script: Kohaku NAI Client' in comment:
       # print("TYPE: kohaku")
