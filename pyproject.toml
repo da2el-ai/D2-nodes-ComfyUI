@@ -1,7 +1,7 @@
 [project]
 name = "d2-nodes-comfyui"
 description = "This is a collection of custom nodes that make ComfyUI slightly more convenient."
-version = "1.3.1"
+version = "1.4.0"
 license = {file = "LICENSE"}
 
 [project.urls]

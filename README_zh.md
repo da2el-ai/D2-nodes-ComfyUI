@@ -206,28 +206,39 @@
 
 ### D2 Size Selector
 
-<img src="./img/sizeselector.png">
+<img src="./img/sizeselector_2.png">
 
   - 可以從預設中選擇圖像尺寸的節點
 
 <details class="d2-details">
   <summary><strong>詳細信息</strong></summary>
 
+  <img src="./img/sizeselector_3.png">
+  這是一個從圖像獲取尺寸，放大1.255倍，然後四捨五入結果的例子。
+
   #### 輸入
 
+  - `images`
+    - 用於從圖像獲取尺寸
+    - 需要將 `preset` 設置為 `custom`
   - `preset`
     - 尺寸預設
-    - 如果想更改預設，請編輯 `/custom_nodes/D2-nodes-ComfyUI/config/sizeselector_config.yaml`
+    - 使用 `width`、`height` 或 `images` 尺寸時需設置為 `custom`
+    - 要更改預設，請編輯 `/custom_nodes/D2-nodes-ComfyUI/config/sizeselector_config.yaml`
   - `width` / `height`
-    - 寬高尺寸
+    - 垂直和水平尺寸
+    - 需要將 `preset` 設置為 `custom`
   - `swap_dimensions`
-    - 交換 width / height
+    - 交換寬度和高度
   - `upscale_factor`
     - 傳遞給其他調整大小相關節點的值
   - `prescale_factor`
-    - 調整 width / height 的倍數
+    - 調整寬度/高度的倍數
+  - `round_method`
+    - `Round`：四捨五入
+    - `Floor`：向下取整
   - `batch_size`
-    - 設置 empty_latent 的 batch size
+    - 設置給 empty_latent 的批次大小
   
   #### 輸出
   
@@ -332,6 +343,10 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 ## :blossom: 更新日誌
 
+**2024.10.18**
+- D2 Size Selector：新增從圖像獲取尺寸的功能
+- D2 Size Selector：新增可選擇「四捨五入」和「向下取整」的調整大小方法
+  
 **2024.10.14**
 - D2 Load Image：修復了在載入沒有Exif數據的圖片（例如從剪貼板貼上的圖片）時發生的錯誤
 

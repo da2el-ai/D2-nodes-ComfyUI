@@ -222,26 +222,40 @@
 
 ### D2 Size Slector
 
-<img src="./img/sizeselector.png">
+<img src="./img/sizeselector_2.png">
 
   - 画像サイズをプリセットから選択できるノード
+  - 画像からサイズを取得することも可能
+  - 数値の丸め方を「切り落とし」「四捨五入」から選択可能
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
+  <img src="./img/sizeselector_3.png">
+  画像からサイズを取得して、1.255倍に拡大したものを四捨五入している例。
+
+
   #### Input
 
+  - `images`
+    - 画像からサイズを取得する時に使用
+    - `preset` を `custom` にする必要がある
   - `preset`
     - サイズのプリセット
+    - この下の `width` `height` や `images` のサイズを使う時は `custom` にする必要がある
     - プリセットを変更したい時は `/custom_nodes/D2-nodes-ComfyUI/config/sizeselector_config.yaml` を編集
   - `width` / `height`
     - 縦横サイズ
+    - `preset` を `custom` にする必要がある
   - `swap_dimensions`
     - width / height を入れ替える
   - `upscale_factor`
     - 他のリサイズ系ノードに渡す数値
   - `prescale_factor`
     - width / height をリサイズする倍数
+  - `round_method`
+    - `Round` : 四捨五入する
+    - `Floor` : 切り落とす
   - `batch_size`
     - empty_latent にセットする batch size
   
@@ -251,10 +265,10 @@
     - 入力された `width`、`height` に `prescale_factor` を乗算する
   - `upscale_factor` / `prescale_factor`
     - Input されたものをパススルーする
-  - `empty_latent`
-    - 指定されたサイズ、batch sizeで作成した latent を出力
   - `batch_size`
     - Input されたものをパススルーする
+  - `empty_latent`
+    - 指定されたサイズ、batch sizeで作成した latent を出力
 
 </details>
 
@@ -360,6 +374,10 @@ custom_nodes フォルダで `git clone` する
 ```
 
 ## :blossom: Changelog
+
+**2024.10.18**
+- D2 Size Selector: 画像からサイズ取得できる機能を追加
+- D2 Size Selector: リサイズの方法を「四捨五入」と「切り落とし」から選択可能にした
 
 **2024.10.14**
 - D2 Load Image: Exifデータのない画像（クリップボードからのペーストなど）の時にエラーになるのを修正

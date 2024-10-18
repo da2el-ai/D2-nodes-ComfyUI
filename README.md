@@ -206,28 +206,40 @@ I have consolidated the following custom nodes that I previously created, and ad
 
 ### D2 Size Selector
 
-<img src="./img/sizeselector.png">
+<img src="./img/sizeselector_2.png">
 
   - A node that allows selecting image size from presets
 
 <details class="d2-details">
   <summary><strong>Details</strong></summary>
 
+  <img src="./img/sizeselector_3.png">
+  This is an example of obtaining the size from an image, enlarging it by 1.255 times, and then rounding the result.
+
   #### Input
 
+  - `images`
+    - Used to obtain size from images
+    - Requires setting `preset` to `custom`
   - `preset`
-    - Size preset
+    - Size presets
+    - Must be set to `custom` when using `width`, `height`, or `images` size
     - To change presets, edit `/custom_nodes/D2-nodes-ComfyUI/config/sizeselector_config.yaml`
   - `width` / `height`
-    - Width and height dimensions
+    - Vertical and horizontal dimensions
+    - Requires setting `preset` to `custom`
   - `swap_dimensions`
     - Swaps width and height
   - `upscale_factor`
-    - Value to pass to other resize nodes
+    - Value passed to other resize-related nodes
   - `prescale_factor`
-    - Multiplier to resize width / height
+    - Multiplier for resizing width / height
+  - `round_method`
+    - `Round`: Rounds to the nearest integer
+    - `Floor`: Rounds down
   - `batch_size`
     - Batch size to set for empty_latent
+
   
   #### Output
   
@@ -331,6 +343,10 @@ In the custom_nodes folder, `git clone`
 ```
 
 ## :blossom: Changelog
+
+**2024.10.18**
+- D2 Size Selector: Added feature to obtain size from images
+- D2 Size Selector: Made it possible to choose between "rounding" and "flooring" for resizing methods
 
 **2024.10.14**
 - D2 Load Image: Fixed an error that occurred when loading images without Exif data (such as those pasted from clipboard)

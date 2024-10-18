@@ -167,9 +167,6 @@ class D2_KSamplerAdvanced(D2_KSampler):
             start_at_step, end_at_step, return_with_leftover_noise,
             preview_method, positive, negative, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
 
-        print("Advanced -----------------")
-        print(positive)
-
         return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
             preview_method, positive, negative, prompt, extra_pnginfo, my_unique_id,
             add_noise, start_at_step, end_at_step, return_with_leftover_noise, sampler_type="advanced")
@@ -452,10 +449,15 @@ class D2_SizeSelector:
                 "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
                 "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
                 "swap_dimensions": (["Off", "On"],),
-                "upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.1}),
-                "prescale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.1}),
+                "upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.001}),
+                "prescale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.001}),
+                "round_method": (["Floor", "Round"],),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 64})
-            }
+            },
+            "optional": {
+                "images": ("IMAGE",),
+            },
+            # "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
     RETURN_TYPES = ("INT", "INT", "FLOAT", "FLOAT", "INT", "LATENT",)
@@ -463,7 +465,12 @@ class D2_SizeSelector:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, preset, width, height, swap_dimensions, upscale_factor, prescale_factor, batch_size):
+    def run(self, preset, width, height, swap_dimensions, upscale_factor, prescale_factor, round_method, batch_size, images=None):
+
+
+        if(images != None):
+            width = images.shape[2]
+            height = images.shape[1]
 
         if(preset != "custom"):
             width = self.__class__.size_dict.get(preset).get("width", width)
@@ -475,10 +482,19 @@ class D2_SizeSelector:
         width = int(width*prescale_factor)
         height = int(height*prescale_factor)
 
+        width = D2_SizeSelector.adjust_to_8(width, round_method)
+        height = D2_SizeSelector.adjust_to_8(height, round_method)
+
         latent = torch.zeros([batch_size, 4, height // 8, width // 8])
 
         return(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent}, )
 
+    @staticmethod
+    def adjust_to_8(number, method='Floor'):
+        if method == 'Round':
+            return round(number / 8) * 8
+        else:
+            return (number // 8) * 8
 
 
 """
