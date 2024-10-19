@@ -18,6 +18,26 @@
 
 ## :tomato: 節點
 
+
+### D2 Queue Button
+
+  <img src="./img/queue_button.png">
+
+- 用於生成指定數量（Batch count）圖像的按鈕
+- 可以通過拖動調色板的左邊緣來移動
+
+<details class="d2-details">
+  <summary><strong>詳細資訊</strong></summary>
+
+  <img src="./img/queue_button_setting.png">
+
+- 要隱藏它，請在 ComfyUI 設置畫面的 "D2" 類別中進行配置
+- 圖像數量也可以在設置畫面中指定
+- 數字之間用逗號（,）分隔
+
+</details>
+
+
 ### D2 Regex Switcher
   <img src="./img/regex_switcher_1.png">
 
@@ -342,6 +362,9 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 ```
 
 ## :blossom: 更新日誌
+
+**2024.10.19**
+- 新增 D2 Queue Button
 
 **2024.10.18**
 - D2 Size Selector：新增從圖像獲取尺寸的功能

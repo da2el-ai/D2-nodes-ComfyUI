@@ -18,6 +18,26 @@ I have consolidated the following custom nodes that I previously created, and ad
 
 ## :tomato: Nodes
 
+### D2 Queue Button
+
+  <img src="./img/queue_button.png">
+
+- A button to generate a specified number of images (Batch count)
+- Can be moved by dragging the left edge of the palette
+
+<details class="d2-details">
+  <summary><strong>Details</strong></summary>
+
+  <img src="./img/queue_button_setting.png">
+
+- To hide it, configure in the "D2" category of the ComfyUI settings screen
+- The number of images can also be specified from the settings screen
+- Separate the numbers with commas (,)
+
+</details>
+
+
+
 ### D2 Regex Switcher
   <img src="./img/regex_switcher_1.png">
 
@@ -343,6 +363,9 @@ In the custom_nodes folder, `git clone`
 ```
 
 ## :blossom: Changelog
+
+**2024.10.19**
+- Added D2 Queue Button
 
 **2024.10.18**
 - D2 Size Selector: Added feature to obtain size from images

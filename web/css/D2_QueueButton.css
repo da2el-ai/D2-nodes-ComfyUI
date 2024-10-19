@@ -1,0 +1,12 @@
+.d2-queue-button {
+  position: fixed;
+  z-index: 1000;
+}
+
+.d2-queue-button__content {
+  padding: 0.25rem;
+}
+
+.d2-queue-button__button-container {
+  gap: 0.25rem;
+}

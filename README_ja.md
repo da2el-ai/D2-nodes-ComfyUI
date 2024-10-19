@@ -1,6 +1,3 @@
-
-
-
 # D2 Nodes ComfyUI
 
 [<a href="README.md">English</a>][日本語][<a href="README_zh.md">繁体中文</a>]
@@ -16,217 +13,217 @@
 - [ComfyUI-d2-steps](https://github.com/da2el-ai/ComfyUI-d2-steps)
 - [ComfyUI-d2-xyplot-utils](https://github.com/da2el-ai/ComfyUI-d2-xyplot-utils)
 
-
 ## :tomato: Nodes
 
-### D2 Regex Switcher
-  <img src="./img/regex_switcher_1.png">
+### D2 Queue Button
 
-  - 入力テキストを正規表現で検索し、該当したテキストを出力
-  - 文字列結合も行える
-  
+  <img src="./img/queue_button.png">
+
+- 指定した枚数（Batch count）を生成するボタン
+- パレットの左端をドラッグすると移動できる
+
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
+  <img src="./img/queue_button_setting.png">
 
-  - 主な目的は Checkpoint 毎のクオリティタグの切り替え
-  - 入力した `text` の中に合致する文字列を発見すると、対象文字列と、何番目に合致したか（0から開始）を出力する
-  - 上の画像では `ioliPonyMixV4.safetensors` を受け取り、検索条件 `pony` に合致したので `score_9` が出力されている
-  - 最初の検索条件に合致したので `index` は `0` が出力される
-  - 全ての条件に合致しないと `-1` が出力される
-  - 文字列の前方結合、後方結合もできる。
+- 非表示にするには ComfyUI の設定画面のカテゴリ `D2` から設定する
+- 枚数も設定画面から指定できる
+- 枚数はカンマ（,）で区切る
 
-  #### Input
+</details>
 
-  - `text`
+### D2 Regex Switcher
+
+  <img src="./img/regex_switcher_1.png">
+
+- 入力テキストを正規表現で検索し、該当したテキストを出力
+- 文字列結合も行える
+
+<details class="d2-details">
+  <summary><strong>詳細</strong></summary>
+
+- 主な目的は Checkpoint 毎のクオリティタグの切り替え
+- 入力した `text` の中に合致する文字列を発見すると、対象文字列と、何番目に合致したか（0 から開始）を出力する
+- 上の画像では `ioliPonyMixV4.safetensors` を受け取り、検索条件 `pony` に合致したので `score_9` が出力されている
+- 最初の検索条件に合致したので `index` は `0` が出力される
+- 全ての条件に合致しないと `-1` が出力される
+- 文字列の前方結合、後方結合もできる。
+
+#### Input
+
+- `text`
     - 検索対象文字列
-  - `prefix`
+- `prefix`
     - 前方に結合する文字列
-  - `suffix`
+- `suffix`
     - 後方に結合する文字列
-  - `regex_and_output`
+- `regex_and_output`
     - 検索文字列と出力文字列の一覧
     - 下記のフォーマットで記入する
-  - `pre_delim`
+- `pre_delim`
     - `prefix` と `regex_and_output` を接続する時に挟む文字
-    - `Comma`: `,` / `Line break`: 改行 / `None`: 何も挟まない 
-  - `suf_delim`
+    - `Comma`: `,` / `Line break`: 改行 / `None`: 何も挟まない
+- `suf_delim`
     - `suffix` と `regex_and_output` を接続する時に挟む文字
 
-  ```
-  検索文字 1（正規表現も使用可能）
-  --
-  出力文字列 1
-  --
-  検索文字 2（正規表現も使用可能）
-  --
-  出力文字列 2
-  --
-  --
-  合致するものが無い時に出力する文字
-  ```
+```
+検索文字 1（正規表現も使用可能）
+--
+出力文字列 1
+--
+検索文字 2（正規表現も使用可能）
+--
+出力文字列 2
+--
+--
+合致するものが無い時に出力する文字
+```
 
-  #### Output
+#### Output
 
-  - `combined_text`
+- `combined_text`
     - `prefix` + 出力文字列 + `suffix` を結合した文字列
-  - `prefix` / `suffix`
+- `prefix` / `suffix`
     - Input のパススルー
 
-
-  #### 使用例
+#### 使用例
 
   <img src="./img/regex_switcher_2.png">
 
-  この例では合致した番号（`index`）を [Easy Use](https://github.com/yolain/ComfyUI-Easy-Use) の Text Index Switch に渡して切り替えている。
+この例では合致した番号（`index`）を [Easy Use](https://github.com/yolain/ComfyUI-Easy-Use) の Text Index Switch に渡して切り替えている。
 
-  合致しないと `-1` になってしまうので、全ての文字列に合致する正規表現 `.+` を使ってデフォルト出力の代わりにしている。
+合致しないと `-1` になってしまうので、全ての文字列に合致する正規表現 `.+` を使ってデフォルト出力の代わりにしている。
+
 </details>
-
-
-
 
 ### D2 Prompt SR
 
   <img src="./img/prompt_sr.png">
 
-  - 入力テキストを検索・置換してリストで返すノード
-  - XY Plot で Prompt S/R を使うためのカスタムノード
-  - [qq-nodes-comfyui](https://github.com/kenjiqq/qq-nodes-comfyui) に対応
+- 入力テキストを検索・置換してリストで返すノード
+- XY Plot で Prompt S/R を使うためのカスタムノード
+- [qq-nodes-comfyui](https://github.com/kenjiqq/qq-nodes-comfyui) に対応
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
+#### Input
 
-  #### Input
-
-  - `prompt`
-    - プロンプト。改行を含めてもOK
-  - `search_txt`
-    - 検索対象テキスト。複数単語を含めてもOK。
+- `prompt`
+    - プロンプト。改行を含めても OK
+- `search_txt`
+    - 検索対象テキスト。複数単語を含めても OK。
     - 改行は使えない
-  - `replace`
+- `replace`
     - 置換用テキスト
-    - 改行で区切っているので「,」が含まれていてもOK
+    - 改行で区切っているので「,」が含まれていても OK
 
-  #### Output
+#### Output
 
-  - LIST
+- LIST
     - 置換後のテキストをリスト形式で出力
 
 </details>
-
-
-
 
 ### D2 Multi Output
 
   <img src="./img/multi.png">
 
-  - seed や cfg など汎用的なパラメータをリスト出力するノード
+- seed や cfg など汎用的なパラメータをリスト出力するノード
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
-  #### Input
-  - `type`
-    - `FLOAT`: 浮動小数点数。CFGなど
-    - `INT`: 整数。stepsなど
-    - `STRING`: 文字列。samplerなど
-    - `SEED`: 乱数生成ボタンで seed値を入力できる
-  - `Add Random`
+#### Input
+
+- `type`
+    - `FLOAT`: 浮動小数点数。CFG など
+    - `INT`: 整数。steps など
+    - `STRING`: 文字列。sampler など
+    - `SEED`: 乱数生成ボタンで seed 値を入力できる
+- `Add Random`
     - 入力欄に乱数を追加する
     - `type` が `SEED` の時だけ表示される
 
 </details>
 
-
-
-
 ### D2 Checkpoint Loader
 
 <img src="./img/checkpoint_loader.png">
 
-  - モデルファイルのフルパスを出力する Checkpoint Loader
+- モデルファイルのフルパスを出力する Checkpoint Loader
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
-  #### Output
-  
-  - `model` / `clip` / `vae`
-    - 従来の CheckpointLoader と同じ。
-  - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
-    - Checkpoint名、ハッシュ、フルパス。
+#### Output
 
-  実装はほとんど [mikey_nodes](https://github.com/bash-j/mikey_nodes) のコードを使わせていただきました。
+- `model` / `clip` / `vae`
+    - 従来の CheckpointLoader と同じ。
+- `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
+    - Checkpoint 名、ハッシュ、フルパス。
+
+実装はほとんど [mikey_nodes](https://github.com/bash-j/mikey_nodes) のコードを使わせていただきました。
 
 </details>
-
-
-
 
 ### D2 KSampler / D2 KSampler(Advanced)
 
 <img src="./img/ksampler.png">
 
-  - プロンプトを STRING で入力できる KSampler
+- プロンプトを STRING で入力できる KSampler
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
-  #### Input
+#### Input
 
-  - `model` / `clip` / `vae` / ..etc
+- `model` / `clip` / `vae` / ..etc
     - 標準の KSampler と同じ
-  - `negative` / `positive`
+- `negative` / `positive`
     - STRING 形式のプロンプト
 
-  #### Output
+#### Output
 
-  - `IMAGE`
+- `IMAGE`
     - 画像出力
-  - `positive` / `negative`
+- `positive` / `negative`
     - Input のパススルー
 
 </details>
-
-
 
 ### D2 Load Image
 
 <img src="./img/load_image.png">
 
-  - 画像からプロンプトを取得できる Load Image ノード
-  - StableDiffusion webui A1111、NovelAI で作成した画像にも対応
-  - マスクエディターを開くボタンが付いてる
+- 画像からプロンプトを取得できる Load Image ノード
+- StableDiffusion webui A1111、NovelAI で作成した画像にも対応
+- マスクエディターを開くボタンが付いてる
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
-  #### Output
-  
-  - `IMAGE / MASK`
+#### Output
+
+- `IMAGE / MASK`
     - 画像とマスク
-  - `width / height`
+- `width / height`
     - 画像サイズ
-  - `positive` / `negative`
+- `positive` / `negative`
     - プロンプト
 
-  ※ワークフローの構成によってはプロンプトを取得できない場合もあります。例えば「KSampler」という文字が含まれたノード（例：Tiled KSampler）が無いと取得できません。
+※ワークフローの構成によってはプロンプトを取得できない場合もあります。例えば「KSampler」という文字が含まれたノード（例：Tiled KSampler）が無いと取得できません。
 
 </details>
-
-
-
 
 ### D2 Size Slector
 
 <img src="./img/sizeselector_2.png">
 
-  - 画像サイズをプリセットから選択できるノード
-  - 画像からサイズを取得することも可能
-  - 数値の丸め方を「切り落とし」「四捨五入」から選択可能
+- 画像サイズをプリセットから選択できるノード
+- 画像からサイズを取得することも可能
+- 数値の丸め方を「切り落とし」「四捨五入」から選択可能
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
@@ -234,71 +231,67 @@
   <img src="./img/sizeselector_3.png">
   画像からサイズを取得して、1.255倍に拡大したものを四捨五入している例。
 
+#### Input
 
-  #### Input
-
-  - `images`
+- `images`
     - 画像からサイズを取得する時に使用
     - `preset` を `custom` にする必要がある
-  - `preset`
+- `preset`
     - サイズのプリセット
     - この下の `width` `height` や `images` のサイズを使う時は `custom` にする必要がある
     - プリセットを変更したい時は `/custom_nodes/D2-nodes-ComfyUI/config/sizeselector_config.yaml` を編集
-  - `width` / `height`
+- `width` / `height`
     - 縦横サイズ
     - `preset` を `custom` にする必要がある
-  - `swap_dimensions`
+- `swap_dimensions`
     - width / height を入れ替える
-  - `upscale_factor`
+- `upscale_factor`
     - 他のリサイズ系ノードに渡す数値
-  - `prescale_factor`
+- `prescale_factor`
     - width / height をリサイズする倍数
-  - `round_method`
+- `round_method`
     - `Round` : 四捨五入する
     - `Floor` : 切り落とす
-  - `batch_size`
+- `batch_size`
     - empty_latent にセットする batch size
-  
-  #### Output
-  
-  - `width / height`
+
+#### Output
+
+- `width / height`
     - 入力された `width`、`height` に `prescale_factor` を乗算する
-  - `upscale_factor` / `prescale_factor`
+- `upscale_factor` / `prescale_factor`
     - Input されたものをパススルーする
-  - `batch_size`
+- `batch_size`
     - Input されたものをパススルーする
-  - `empty_latent`
-    - 指定されたサイズ、batch sizeで作成した latent を出力
+- `empty_latent`
+    - 指定されたサイズ、batch size で作成した latent を出力
 
 </details>
-
-
-
 
 ### D2 Refiner Steps
 
 <img src="./img/refiner_steps.png">
 
-  - Refiner 用の steps を出力するノード
+- Refiner 用の steps を出力するノード
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
-  #### Input
+#### Input
 
-  - `steps`
-    - 総step数
-  - `start`
+- `steps`
+    - 総 step 数
+- `start`
     - 最初の KSampler の開始する steps
-  - `end`
+- `end`
     - 最初の KSampler の終了する steps
-  
-  #### Output
-  
-  - `steps` / `start` / `end`
+
+#### Output
+
+- `steps` / `start` / `end`
     - Input のパススルー
-  - `refiner_start`
-    - 2つめの KSampler の開始する steps
+- `refiner_start`
+    - 2 つめの KSampler の開始する steps
 
 </details>
 
@@ -306,44 +299,39 @@
 
 <img src="./img/refiner_a1111.png">
 
-  - img2img で Refiner するために denoise も指定できるノード
+- img2img で Refiner するために denoise も指定できるノード
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
 
-  #### Input
+#### Input
 
-  - `steps`
-    - 総step数
-  - `denoise`
+- `steps`
+    - 総 step 数
+- `denoise`
     - img2img の denoise を指定する
-  - `switch_at`
-    - 総steps数の何割で次の KSampler に切り替えるか
-  
-  #### Output
-  
-  - `steps` / 
+- `switch_at`
+    - 総 steps 数の何割で次の KSampler に切り替えるか
+
+#### Output
+
+- `steps` /
     - Input のパススルー
-  - `start`
+- `start`
     - 最初の KSampler の開始 steps
-  - `end`
+- `end`
     - 最初の KSampler の終了 steps
-  - `refiner_start`
-    - 2つめの KSampler の開始する steps
+- `refiner_start`
+    - 2 つめの KSampler の開始する steps
 
 </details>
 
 ### D2 Refiner Steps Tester
-  - steps を確認するためのノード
 
-
-
-
-
-
-
+- steps を確認するためのノード
 
 ## :card_index_dividers: Sample Workflow
+
 画像を ComfyUI にドロップするとワークフローを再現できます。
 
 **SDXL の XY Plot**
@@ -359,40 +347,51 @@
 **Refiner で Checkpoint を途中で切り替える**
 <a href="./workflow/Refiner_20241002.png"><img src="./workflow/Refiner_20241002.png"></a>
 
-
-
-
 ## :computer: Installation Options
 
 ### 1. ComfyUI Manager Installation
+
 ComfyUI Manager → Custom Node Manager → `D2 Nodes` を検索してインストール
 
 ### 2. Git Pull Method
+
 custom_nodes フォルダで `git clone` する
+
 ```
 > git clone https://github.com/da2el-ai/D2-nodes-ComfyUI.git
 ```
 
 ## :blossom: Changelog
 
+**2024.10.19**
+
+- D2 Queue Button を追加
+
 **2024.10.18**
+
 - D2 Size Selector: 画像からサイズ取得できる機能を追加
 - D2 Size Selector: リサイズの方法を「四捨五入」と「切り落とし」から選択可能にした
 
 **2024.10.14**
-- D2 Load Image: Exifデータのない画像（クリップボードからのペーストなど）の時にエラーになるのを修正
+
+- D2 Load Image: Exif データのない画像（クリップボードからのペーストなど）の時にエラーになるのを修正
 
 **2024.10.11**
+
 - D2 Regex Switcher: 文字列を結合する時に挟む文字を指定できるようにした
 
 **2024.10.10**
+
 - D2 Load Image: "Open Mask Editor"ボタンを追加
 
 **2024.10.08**
+
 - D2 Load Image: 新規追加
 
 **2024.10.03**
+
 - D2 Regex Switcher: 検索にマッチしても素通りする不具合を修正
 
 **2024.10.02**
+
 - 既存のノードを統合して作成
