@@ -1,6 +1,7 @@
 import torch
 import math
 import os
+import glob
 import json
 import hashlib
 import re
@@ -13,6 +14,8 @@ import comfy.sd
 import node_helpers
 import comfy.samplers
 from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage
+from server import PromptServer
+from aiohttp import web
 
 from .modules import util
 from .modules import checkpoint_util
@@ -65,6 +68,71 @@ class D2_LoadImage(LoadImage):
             prompt = pnginfo_util.get_prompt(img)
         
         return (output_images, output_masks, width, height, prompt["positive"], prompt["negative"])
+
+
+
+"""
+
+D2 Folder Image Queue
+フォルダ内画像の枚数分キューを送る
+
+"""
+class D2_FolderImageQueue:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required":{
+                "folder": ("STRING", {"default": ""}),
+                "extension": ("STRING", {"default": "*.*"}),
+                "start_at": ("INT", {"default": 0}),
+            },
+            "optional": {
+                "exec_queue": ("D2_FOLDER_IMAGE_QUEUE", {})
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("image_path",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    ######
+    def run(self, folder = "", extension="*.*", start_at=0):
+        files = D2_FolderImageQueue.get_files(folder, extension)
+        image_path = files[start_at]
+        image_count = len(files)
+
+        return {
+            "result": (image_path,)
+        }
+
+    @classmethod
+    def get_files(cls, folder, extension):
+        search_pattern = os.path.join(folder, extension)
+        file_list = glob.glob(search_pattern)
+        
+        # 絶対パスに変換
+        file_list = [os.path.abspath(file) for file in file_list]
+        return file_list
+
+"""
+対象画像枚数を取得
+D2/folder-image-queue/get_image_count?folder=****&extension=***
+という形式でリクエストが届く
+"""
+@PromptServer.instance.routes.get("/D2/folder-image-queue/get_image_count")
+async def route_d2_folder_image_get_image_count(request):
+    try:
+        folder = request.query.get('folder')
+        extension = request.query.get('extension')
+        files = D2_FolderImageQueue.get_files(folder, extension)
+        image_count = len(files)
+    except:
+        image_count = 0
+
+    # JSON応答を返す
+    json_data = json.dumps({"image_count":image_count})
+    return web.Response(text=json_data, content_type='application/json')
 
 
 """
@@ -710,6 +778,7 @@ class D2_RefinerStepsTester:
 
 NODE_CLASS_MAPPINGS = {
     "D2 Load Image": D2_LoadImage,
+    "D2 Folder Image Queue": D2_FolderImageQueue,
     "D2 KSampler": D2_KSampler,
     "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
