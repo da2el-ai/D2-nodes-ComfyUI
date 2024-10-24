@@ -85,6 +85,7 @@ class D2_FolderImageQueue:
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
                 "start_at": ("INT", {"default": 0}),
+                "batch_count": ("INT", {"default": 1}),
             },
             "optional": {
                 "exec_queue": ("D2_FOLDER_IMAGE_QUEUE", {})
@@ -97,10 +98,9 @@ class D2_FolderImageQueue:
     CATEGORY = "D2"
 
     ######
-    def run(self, folder = "", extension="*.*", start_at=0):
+    def run(self, folder = "", extension="*.*", start_at=0, batch_count=1):
         files = D2_FolderImageQueue.get_files(folder, extension)
         image_path = files[start_at]
-        image_count = len(files)
 
         return {
             "result": (image_path,)

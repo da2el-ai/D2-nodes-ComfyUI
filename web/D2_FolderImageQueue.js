@@ -7,6 +7,7 @@ class FolderImageQueue {
   folderWidget;
   extensionWidget;
   startAtWidget;
+  batchCountWidget;
   queueButton;
   imageCount = 0;
   startAt = 0;
@@ -65,7 +66,7 @@ class FolderImageQueue {
     this.refreshButtonText();
 
     for (let i = startAt; i < imageCount; i++) {
-      app.queuePrompt(0, 1);
+      app.queuePrompt(0, this.batchCountWidget.value);
       this.countUpStartAt();
       await this.sleep(100);
     }
@@ -75,11 +76,12 @@ class FolderImageQueue {
    * 入力フィールドのイベント設定
    * パス、拡張子が入力されたら枚数を取得する
    */
-  initWidget(id, folderWidget, extensionWidget, startAtWidget, queueButton) {
+  initWidget(id, folderWidget, extensionWidget, startAtWidget, batchCountWidget, queueButton) {
     this.id = id;
     this.folderWidget = folderWidget;
     this.extensionWidget = extensionWidget;
     this.startAtWidget = startAtWidget;
+    this.batchCountWidget = batchCountWidget;
     this.queueButton = queueButton;
 
     // イベント登録
@@ -132,8 +134,9 @@ app.registerExtension({
       const folderWidget = this.widgets?.find((w) => w.name === "folder");
       const extensionWidget = this.widgets?.find((w) => w.name === "extension");
       const startAtWidget = this.widgets?.find((w) => w.name === "start_at");
+      const batchCountWidget = this.widgets?.find((w) => w.name === "batch_count");
       const queueButton = this.widgets?.find((w) => w.type === "button");
-      folderImageQueue.initWidget(this.id, folderWidget, extensionWidget, startAtWidget, queueButton);
+      folderImageQueue.initWidget(this.id, folderWidget, extensionWidget, startAtWidget, batchCountWidget, queueButton);
       return r;
     };
   },
