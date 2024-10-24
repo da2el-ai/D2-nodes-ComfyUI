@@ -322,6 +322,118 @@ class D2_RegexSwitcher:
         return regex_output_list, default_output
 
 
+
+"""
+
+D2 RegexReplace
+正規表現で文字列置換
+
+"""
+class D2_RegexReplace:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text": (
+                    "STRING", {"forceInput": True, "multiline": True, "default": ""},
+                ),
+                "mode": (["Tag", "Advanced",],),
+                "regex_replace": (
+                    "STRING", {"multiline": True, "default": ""},
+                ),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, text, mode="Tag", regex_replace=""):
+        if not text or not regex_replace:
+            return { "result": (text,) }
+
+        replace_pairs = D2_RegexReplace._parse_regex_replace(regex_replace)
+
+        if mode == "Tag":
+            result_text = D2_RegexReplace._repalace_tag(text, replace_pairs)
+        else:
+            result_text = D2_RegexReplace._repalace_advanced(text, replace_pairs)
+        
+        return {"result": (result_text,)}
+
+
+    @classmethod
+    def _repalace_tag(cls, result_text, replace_pairs):
+        """
+        result_text をカンマまたは改行で分割し、分割した要素に対して置換を行う
+        置換後に空（または空白文字のみ）の要素は除外する
+        """
+        try:
+            # カンマまたは改行で分割して、各要素をトリム
+            tags = [tag.strip() for tag in re.split('[,\n]', result_text)]
+            # 空の要素を削除
+            tags = [tag for tag in tags if tag]
+            
+            # 各タグに対して正規表現による置換を適用
+            new_tags = []
+            for tag in tags:
+                new_tag = tag
+                for search_pattern, replace_pattern in replace_pairs:
+                    try:
+                        new_tag = re.sub(search_pattern, replace_pattern, new_tag)
+                    except re.error as e:
+                        return f"Regex error in tag '{tag}': {str(e)}"
+                
+                # 置換後のタグが空でない場合のみ追加
+                if new_tag.strip():
+                    new_tags.append(new_tag)
+            
+            # カンマ区切りで結合して返す
+            return ', '.join(new_tags)
+        
+        except Exception as e:
+            return f"Error during tag replacement: {str(e)}"
+        
+
+    @classmethod
+    def _repalace_advanced(cls, result_text, replace_pairs):
+        """
+        result_text 全体を正規表現で置換する
+        """
+        for search_pattern, replace_pattern in replace_pairs:
+            try:
+                result_text = re.sub(search_pattern, replace_pattern, result_text, flags=re.DOTALL | re.MULTILINE)
+            except re.error as e:
+                return {"result": (f"Regex error: {str(e)}",)}
+            except Exception as e:
+                return {"result": (f"Error during replacement: {str(e)}",)}
+            
+        return result_text
+
+
+    @classmethod
+    def _parse_regex_replace(cls, regex_replace):
+        """
+        検索条件と置換文字のペアを作成
+        """
+        if not regex_replace.strip():
+            return []
+        
+        parts = [p.strip() for p in regex_replace.split('--')]
+        pairs = []
+
+        for i in range(0, len(parts), 2):
+            search = parts[i].strip()
+            if search:  # 検索文字があれば
+                replace = parts[i + 1].strip() if i + 1 < len(parts) else ""
+                pairs.append((search, replace))
+        
+        return pairs
+
+
+
 """
 
 D2 PromptSR
@@ -597,6 +709,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
     "D2 Regex Switcher": D2_RegexSwitcher,
+    "D2 Regex Replace": D2_RegexReplace,
     "D2 Prompt SR": D2_PromptSR,
     "D2 Multi Output": D2_MultiOutput,
     "D2 Size Slector": D2_SizeSelector,

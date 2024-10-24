@@ -100,6 +100,54 @@ I have consolidated the following custom nodes that I previously created, and ad
   Since it becomes `-1` when there's no match, we use the regular expression `.+` that matches all strings as a default output.
 </details>
 
+
+
+### D2 Regex Replace
+
+  <img src="./img/regex_replace.png">
+
+- Replace input text
+- Multiple conditions can be specified
+
+<details class="d2-details">
+  <summary><strong>Details</strong></summary>
+
+- Supports regular expression replacement
+- Supports reuse of regex match strings (using \1, \2, etc.)
+- Can process target strings in "tag units" or "as a whole"
+
+#### Input
+
+- `text`
+    - Target string for searching
+- `mode`
+  - `Tag`: Splits `text` by newlines and commas, then replaces individually
+  - `Advanced`: Replaces the entire `text` as a whole
+- `regex_and_output`
+    - List of search patterns and output strings
+    - Enter in the format below
+    - When output string is empty, matched parts will be deleted
+    - No limit on the number of patterns
+
+```
+Search pattern 1
+--
+Output string 1
+--
+Search pattern 2
+--
+Output string 2
+```
+
+#### Output
+
+- `text`
+    - Text after replacement processing
+
+</details>
+
+
+
 ### D2 Prompt SR
 
   <img src="./img/prompt_sr.png">
@@ -363,6 +411,10 @@ In the custom_nodes folder, `git clone`
 ```
 
 ## :blossom: Changelog
+
+**2024.10.24**
+
+- Added D2 Regex Replace
 
 **2024.10.19**
 - Added D2 Queue Button

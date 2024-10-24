@@ -33,6 +33,7 @@
 
 </details>
 
+
 ### D2 Regex Switcher
 
   <img src="./img/regex_switcher_1.png">
@@ -96,6 +97,53 @@
 合致しないと `-1` になってしまうので、全ての文字列に合致する正規表現 `.+` を使ってデフォルト出力の代わりにしている。
 
 </details>
+
+
+### D2 Regex Replace
+
+  <img src="./img/regex_replace.png">
+
+- 入力テキストを置換する
+- 複数の条件を指定できる
+
+<details class="d2-details">
+  <summary><strong>詳細</strong></summary>
+
+- 正規表現を使って置換ができる
+- 正規表現によるマッチ文字列の再利用ができる（\1、\2 など）
+- 対象文字列を「タグ単位」と「全体」で指定できる
+
+#### Input
+
+- `text`
+    - 検索対象文字列
+- `mode`
+  - `Tag`: `text` を改行と「,」で分解し、個別に置換する
+  - `Advanced`: `text` をまとめて置換する
+- `regex_and_output`
+    - 検索文字列と出力文字列の一覧
+    - 下記のフォーマットで記入する
+    - 出力文字列に何も記載されてない時はマッチした部分を削除する
+    - 個数に上限は無い
+
+```
+検索文字 1
+--
+出力文字列 1
+--
+検索文字 2
+--
+出力文字列 2
+```
+
+#### Output
+
+- `text`
+    - 置換処理をしたテキスト
+
+</details>
+
+
 
 ### D2 Prompt SR
 
@@ -362,6 +410,10 @@ custom_nodes フォルダで `git clone` する
 ```
 
 ## :blossom: Changelog
+
+**2024.10.24**
+
+- D2 Regex Replace を追加
 
 **2024.10.19**
 

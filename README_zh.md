@@ -100,6 +100,53 @@
   因為不匹配時會變成 `-1`，所以使用匹配所有字符串的正則表達式 `.+` 作為默認輸出的替代。
 </details>
 
+
+
+### D2 Regex Replace
+
+  <img src="./img/regex_replace.png">
+
+- 替換輸入文字
+- 可以指定多個條件
+
+<details class="d2-details">
+  <summary><strong>詳細</strong></summary>
+
+- 支持使用正則表達式進行替換
+- 支持重複使用正則表達式匹配字串（使用 \1、\2 等）
+- 可以按「標籤單位」或「整體」處理目標字串
+
+#### 輸入
+
+- `text`
+    - 搜尋目標字串
+- `mode`
+  - `Tag`: 將 `text` 按換行和逗號分解，然後單獨替換
+  - `Advanced`: 整體替換 `text`
+- `regex_and_output`
+    - 搜尋模式和輸出字串的列表
+    - 按以下格式輸入
+    - 當輸出字串為空時，將刪除匹配部分
+    - 模式數量沒有上限
+```
+搜尋模式 1
+--
+輸出字串 1
+--
+搜尋模式 2
+--
+輸出字串 2
+```
+
+#### 輸出
+
+- `text`
+    - 替換處理後的文字
+
+</details>
+
+
+
 ### D2 Prompt SR
 
   <img src="./img/prompt_sr.png">
@@ -363,6 +410,10 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 ## :blossom: 更新日誌
 
+**2024.10.24**
+
+- 新增 D2 Regex Replace
+  
 **2024.10.19**
 - 新增 D2 Queue Button
 
