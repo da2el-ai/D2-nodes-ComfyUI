@@ -256,6 +256,12 @@ Output string 2
 <details class="d2-details">
   <summary><strong>Details</strong></summary>
 
+#### Input
+
+  - `image_path`
+    - Used for connection with D2 Folder Image Queue
+    - Loads the file when an image path is input
+
   #### Output
   
   - `IMAGE / MASK`
@@ -269,6 +275,48 @@ Output string 2
 
 </details>
 
+
+
+
+### D2 Folder Image Queue
+
+<img src="./img/folder_image_queue.png">
+
+- Outputs paths of images in a folder
+- Click the `Queue (x - y) images` button to execute queues for the number of images. Don't use the standard Queue button
+- Very convenient as humans don't need to count the number of images
+
+<details class="d2-details">
+  <summary><strong>Details</strong></summary>
+
+<img src="./workflow/folder_image_queue_20241025.png">
+
+- This workflow performs img2img using the same prompt for all images in the folder
+- A more detailed workflow is introduced in the Sample Workflow chapter
+
+#### Input
+
+- `folder`
+  - Image folder
+- `extension`
+  - Specify filename filter
+  - `*.*`: All images
+  - `*.png`: PNG format only
+- `start_at`
+  - Image number to start processing from
+- `batch_count`
+  - How many queues to register per image
+- `Queue (x - y) images`
+  - Button to start generation
+  - x: Number of images
+  - y: `start_at`
+
+#### Output
+
+- `image_path`
+  - Full path of the image
+
+</details>
 
 
 
@@ -386,6 +434,10 @@ Output string 2
 ## :card_index_dividers: Sample Workflow
 You can recreate the workflow by dropping the image into ComfyUI.
 
+**Process all images in folder**
+Extracts prompts from images, replaces quality tags, applies ControlNet AnyTest, and upscales.
+<a href="./workflow/folder_image_queue_adv_20241025.png"><img src="./workflow/folder_image_queue_adv_20241025.png"></a>
+
 **SDXL XY Plot**
 
 <a href="./workflow/XYPlot_SDXL_20241002.png"><img src="./workflow/XYPlot_SDXL_20241002.png"></a>
@@ -415,7 +467,9 @@ In the custom_nodes folder, `git clone`
 **2024.10.24**
 
 - Added D2 Regex Replace
+- Added D2 Folder Image Queue
 - D2 Load Image: Added image path input
+- D2 KSampler(Advanced): Added Positive / Negative Conditioning to Input
 
 **2024.10.19**
 - Added D2 Queue Button

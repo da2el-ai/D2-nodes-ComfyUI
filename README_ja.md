@@ -216,6 +216,8 @@
 
 </details>
 
+
+
 ### D2 KSampler / D2 KSampler(Advanced)
 
 <img src="./img/ksampler.png">
@@ -241,6 +243,8 @@
 
 </details>
 
+
+
 ### D2 Load Image
 
 <img src="./img/load_image.png">
@@ -251,6 +255,12 @@
 
 <details class="d2-details">
   <summary><strong>詳細</strong></summary>
+
+#### Input
+
+- `image_path`
+  - D2 Folder Image Queue との接続に使用する
+  - 画像のパスを入力するとファイルを読み込む
 
 #### Output
 
@@ -264,6 +274,49 @@
 ※ワークフローの構成によってはプロンプトを取得できない場合もあります。例えば「KSampler」という文字が含まれたノード（例：Tiled KSampler）が無いと取得できません。
 
 </details>
+
+
+### D2 Folder Image Queue
+
+<img src="./img/folder_image_queue.png">
+
+- フォルダ内の画像のパスを出力する
+- `Queue (x - y) images` ボタンをクリックすると画像枚数分のキューを実行する。標準の Queue ボタンは使わない
+- 人間が画像枚数を数える必要がないのでとても楽ちん
+
+<details class="d2-details">
+  <summary><strong>詳細</strong></summary>
+
+<img src="./workflow/folder_image_queue_20241025.png">
+
+- このワークフローはフォルダ内の画像を同じプロンプトを使って img2img を実行している
+- Sample Workflow の章でより詳細なワークフローを紹介している
+
+#### Input
+
+- `folder`
+  - 画像フォルダ
+- `extension`
+  - ファイル名のフィルタを指定
+  - `*.*`: 全ての画像
+  - `*.png`: PNG形式のみ対象
+- `start_at`
+  - 処理を開始する画像番号
+- `batch_count`
+  - 1枚の画像に対して何回のキューを登録するか
+- `Queue (x - y) images`
+  - 生成を開始するボタン
+  - x: 画像枚数
+  - y: `start_at`
+
+#### Output
+
+- `image_path`
+  - 画像のフルパス
+
+</details>
+
+
 
 ### D2 Size Slector
 
@@ -382,6 +435,10 @@
 
 画像を ComfyUI にドロップするとワークフローを再現できます。
 
+**フォルダ内の画像を全て処理**
+画像からプロンプトを抜き出し、クオリティタグを置換し、ControlNet AnyTest を適用し、アップスケールしている。
+<a href="./workflow/folder_image_queue_adv_20241025.png"><img src="./workflow/folder_image_queue_adv_20241025.png"></a>
+
 **SDXL の XY Plot**
 
 <a href="./workflow/XYPlot_SDXL_20241002.png"><img src="./workflow/XYPlot_SDXL_20241002.png"></a>
@@ -394,6 +451,9 @@
 
 **Refiner で Checkpoint を途中で切り替える**
 <a href="./workflow/Refiner_20241002.png"><img src="./workflow/Refiner_20241002.png"></a>
+
+
+
 
 ## :computer: Installation Options
 
@@ -413,8 +473,10 @@ custom_nodes フォルダで `git clone` する
 
 **2024.10.24**
 
-- D2 Regex Replace を追加
+- D2 Regex Replace を新規追加
+- D2 Folder Image Queue を新規追加
 - D2 Load Image: 画像パスの入力を追加
+- D2 KSampler(Advanced): Input に Positive / Negative Conditioning を追加
 
 **2024.10.19**
 

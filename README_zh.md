@@ -255,6 +255,11 @@
 <details class="d2-details">
   <summary><strong>詳細信息</strong></summary>
 
+  #### Input
+  - `image_path`
+    - 用於與 D2 Folder Image Queue 連接
+    - 輸入圖片路徑時讀取文件
+
   #### Output
   
   - `IMAGE / MASK`
@@ -268,6 +273,48 @@
 
 </details>
 
+
+
+
+### D2 Folder Image Queue
+
+<img src="./img/folder_image_queue.png">
+
+- 輸出文件夾中圖片的路徑
+- 點擊 `Queue (x - y) images` 按鈕可執行對應圖片數量的佇列。請勿使用標準的 Queue 按鈕
+- 非常方便，因為使用者不需要手動計算圖片數量
+
+<details class="d2-details">
+  <summary><strong>詳細</strong></summary>
+
+<img src="./workflow/folder_image_queue_20241025.png">
+
+- 此工作流程使用相同的提示詞對文件夾中的所有圖片執行 img2img
+- 在 Sample Workflow 章節中介紹了更詳細的工作流程
+
+#### 輸入
+
+- `folder`
+  - 圖片文件夾
+- `extension`
+  - 指定文件名過濾器
+  - `*.*`: 所有圖片
+  - `*.png`: 僅 PNG 格式
+- `start_at`
+  - 開始處理的圖片編號
+- `batch_count`
+  - 每張圖片註冊多少個佇列
+- `Queue (x - y) images`
+  - 開始生成的按鈕
+  - x: 圖片數量
+  - y: `start_at`
+
+#### 輸出
+
+- `image_path`
+  - 圖片的完整路徑
+
+</details>
 
 
 
@@ -384,6 +431,10 @@
 ## :card_index_dividers: 示例工作流程
 將圖像拖放到 ComfyUI 中可以重現工作流程。
 
+**處理文件夾中的所有圖片**
+從圖片中提取提示詞，替換品質標籤，應用 ControlNet AnyTest，並進行放大。
+<a href="./workflow/folder_image_queue_adv_20241025.png"><img src="./workflow/folder_image_queue_adv_20241025.png"></a>
+
 **SDXL 的 XY Plot**
 
 <a href="./workflow/XYPlot_SDXL_20241002.png"><img src="./workflow/XYPlot_SDXL_20241002.png"></a>
@@ -413,9 +464,12 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 **2024.10.24**
 
 - 新增 D2 Regex Replace
-- D2 Load Image: 增加圖片路徑輸入
+- 新增 D2 Folder Image Queue
+- D2 Load Image: 添加圖片路徑輸入
+- D2 KSampler(Advanced): 在輸入中添加 Positive / Negative Conditioning
   
 **2024.10.19**
+
 - 新增 D2 Queue Button
 
 **2024.10.18**
