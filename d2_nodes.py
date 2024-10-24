@@ -171,13 +171,20 @@ class D2_KSampler:
 
 
     def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
-            preview_method, positive, negative, prompt=None, extra_pnginfo=None, my_unique_id=None,
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, prompt=None, extra_pnginfo=None, my_unique_id=None,
             add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular"):
 
         util.set_preview_method(preview_method)
 
-        (positive_encoded,) = CLIPTextEncode().encode(clip, positive)
-        (negative_encoded,) = CLIPTextEncode().encode(clip, negative)
+        if positive_cond != None:
+            positive_encoded = positive_cond
+        else:
+            (positive_encoded,) = CLIPTextEncode().encode(clip, positive)
+        
+        if negative_cond != None:
+            negative_encoded = negative_cond
+        else:
+            (negative_encoded,) = CLIPTextEncode().encode(clip, negative)
 
         disable_noise = add_noise == "disable"
         force_full_denoise = return_with_leftover_noise != "enable"
@@ -227,6 +234,10 @@ class D2_KSamplerAdvanced(D2_KSampler):
                 "positive": ("STRING", {"default": "","multiline": True}),
                 "negative": ("STRING", {"default": "", "multiline": True}),
             },
+            "optional": {
+                "positive_cond": ("CONDITIONING",),
+                "negative_cond": ("CONDITIONING",),
+            },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
@@ -238,10 +249,10 @@ class D2_KSamplerAdvanced(D2_KSampler):
 
     def run(self, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 
             start_at_step, end_at_step, return_with_leftover_noise,
-            preview_method, positive, negative, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
 
         return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
-            preview_method, positive, negative, prompt, extra_pnginfo, my_unique_id,
+            preview_method, positive, negative, positive_cond, negative_cond, prompt, extra_pnginfo, my_unique_id,
             add_noise, start_at_step, end_at_step, return_with_leftover_noise, sampler_type="advanced")
 
 
