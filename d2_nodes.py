@@ -39,6 +39,7 @@ class D2_LoadImage(LoadImage):
                 "image": (sorted(files), {"image_upload": True})
             },
             "optional": {
+                "image_path": ("STRING", {"forceInput": True}),
                 "editor": ("D2MASKEDITOR", {})
             }
         }
@@ -48,7 +49,11 @@ class D2_LoadImage(LoadImage):
     FUNCTION = "load_image"
     CATEGORY = "D2"
 
-    def load_image(self, image):
+    def load_image(self, image, image_path=None):
+
+        if image_path != None:
+            image = image_path
+            
         # オリジナルのLoadImage処理
         output_images, output_masks = super().load_image(image)
 

@@ -414,6 +414,7 @@ custom_nodes フォルダで `git clone` する
 **2024.10.24**
 
 - D2 Regex Replace を追加
+- D2 Load Image: 画像パスの入力を追加
 
 **2024.10.19**
 

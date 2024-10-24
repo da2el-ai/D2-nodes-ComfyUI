@@ -415,6 +415,7 @@ In the custom_nodes folder, `git clone`
 **2024.10.24**
 
 - Added D2 Regex Replace
+- D2 Load Image: Added image path input
 
 **2024.10.19**
 - Added D2 Queue Button

@@ -413,6 +413,7 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 **2024.10.24**
 
 - 新增 D2 Regex Replace
+- D2 Load Image: 增加圖片路徑輸入
   
 **2024.10.19**
 - 新增 D2 Queue Button
