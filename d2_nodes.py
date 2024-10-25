@@ -674,25 +674,21 @@ class D2_ImageResize:
             },
         }
 
-    RETURN_TYPES = ("IMAGE", "LIST", "LIST", "FLOAT",)
-    RETURN_NAMES = ("image", "width_list", "height_list", "rescale_factor",)
+    RETURN_TYPES = ("IMAGE", "INT", "INT", "FLOAT",)
+    RETURN_NAMES = ("image", "width", "height", "rescale_factor",)
     FUNCTION = "run"
     CATEGORY = "D2"
 
     def run(self, image, mode="rescale", supersample='true', resampling="lanczos", rescale_factor=2, resize_width=1024, resize_height=1024, round_method="Floor"):
         scaled_images = []
-        width_list = []
-        height_list = []
 
         for img in image:
             resized_image, new_width, new_height = self.apply_resize_image(util.tensor2pil(img), mode, supersample, rescale_factor, resize_width, resize_height, resampling, round_method)
             scaled_images.append(util.pil2tensor(resized_image))
-            width_list.append(new_width)
-            height_list.append(new_height)
 
         scaled_images = torch.cat(scaled_images, dim=0)
 
-        return (scaled_images, width_list, height_list, rescale_factor, )
+        return (scaled_images, new_width, new_height, rescale_factor, )
 
 
     def apply_resize_image(self, image: Image.Image, mode='scale', supersample='true', factor: int = 2, width: int = 1024, height: int = 1024, resample='bicubic', round_method="Floor"):
