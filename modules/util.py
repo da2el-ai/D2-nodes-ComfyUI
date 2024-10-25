@@ -1,6 +1,10 @@
 import os
 import yaml
+import math
 import shutil
+from PIL import Image
+import numpy as np
+import torch
 import latent_preview
 from pathlib import Path
 
@@ -50,3 +54,43 @@ def set_preview_method(method):
     else:
         args.preview_method = latent_preview.LatentPreviewMethod.NoPreviews
 
+"""
+任意の単位で四捨五入(round) or 切り捨て(floor) or 切り上げ(ceil)
+"""
+def number_adjust(number, method='floor', target_num=8):
+    valid_methods = ['round', 'ceil', 'floor']
+    method = method.lower()
+
+    if method not in valid_methods:
+        raise ValueError(f"Invalid method: {method}. Must be one of {valid_methods}")
+
+    if method == 'round':
+        return round(number / target_num) * target_num
+    elif method == 'ceil':
+        return math.ceil(number / target_num) * target_num
+    else:
+        return math.floor(number / target_num) * target_num
+
+"""
+幅と高さをリサイズ
+"""
+def resize_calc(width, height, rescale_factor=2, method='floor'):
+    width = int(width*rescale_factor)
+    height = int(height*rescale_factor)
+
+    width = number_adjust(width, method, 8)
+    height = number_adjust(height, method, 8)
+    return width, height
+
+
+"""
+Tensor to PIL
+"""
+def tensor2pil(image):
+    return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
+
+"""
+PIL to Tensor
+"""
+def pil2tensor(image):
+    return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)

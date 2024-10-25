@@ -6,8 +6,7 @@
 
 **シンプルなワークフローを作りたい方に向いています。**
 
-過去に制作した下記のカスタムノードをまとめ、D2 KSampler などを追加しています。  
-**ノード名が衝突してしまうので下記のカスタムノードをインストール済みでしたら削除してください。**
+**過去に制作した下記のカスタムノードをインストール済みの方は削除してください。**
 
 - [ComfyUI-d2-size-selector](https://github.com/da2el-ai/ComfyUI-d2-size-selector)
 - [ComfyUI-d2-steps](https://github.com/da2el-ai/ComfyUI-d2-steps)
@@ -317,6 +316,22 @@
 </details>
 
 
+### D2 Image Resize
+
+<img src="./img/image_resize.png">
+
+- 画像の単純なリサイズ
+- 小数点３位まで指定可能
+- 四捨五入、切り捨て、切り上げが選択できる
+
+
+### D2 Resize Calculator
+
+<img src="./img/resize_calc.png">
+
+- 計算した数値は必ず8の倍数になる
+- 四捨五入、切り捨て、切り上げが選択できる
+
 
 ### D2 Size Slector
 
@@ -470,6 +485,11 @@ custom_nodes フォルダで `git clone` する
 ```
 
 ## :blossom: Changelog
+
+**2024.10.26**
+
+- D2 Image Resize を新規追加
+- D2 Resize Calculator を新規追加
 
 **2024.10.24**
 

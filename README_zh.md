@@ -9,8 +9,7 @@
 
 **適合想要創建簡單工作流程的用戶。**
 
-我們整合了之前創建的以下自定義節點，並添加了諸如 D2 KSampler 等節點。  
-**如果您已經安裝了以下自定義節點，請刪除它們，因為節點名稱會發生衝突。**
+**如果您之前已經安裝了以下自訂節點，請務必將其解除安裝。**
 
 - [ComfyUI-d2-size-selector](https://github.com/da2el-ai/ComfyUI-d2-size-selector)
 - [ComfyUI-d2-steps](https://github.com/da2el-ai/ComfyUI-d2-steps)
@@ -318,6 +317,23 @@
 
 
 
+### D2 Image Resize
+
+<img src="./img/image_resize.png">
+
+- 簡單的圖像縮放
+- 可指定至小數點後三位
+- 可選擇四捨五入、無條件捨去或無條件進位
+
+
+### D2 Resize Calculator
+
+<img src="./img/resize_calc.png">
+
+- 計算出的數值必定為8的倍數
+- 可選擇四捨五入、無條件捨去或無條件進位
+
+
 ### D2 Size Selector
 
 <img src="./img/sizeselector_2.png">
@@ -460,6 +476,11 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 ```
 
 ## :blossom: 更新日誌
+
+**2024.10.26**
+
+- 新增 D2 Image Resize
+- 新增 D2 Resize Calculator
 
 **2024.10.24**
 

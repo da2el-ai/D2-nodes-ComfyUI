@@ -618,6 +618,112 @@ class D2_MultiOutput:
         return (output_list,)
 
 
+"""
+
+D2 Rescale Calculator
+サイズのリスケール計算機
+
+"""
+class D2_ResizeCalculator:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
+                "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
+                "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
+                "round_method": (["Floor", "Round", "Ceil"],),
+            },
+        }
+
+    RETURN_TYPES = ("INT", "INT", "FLOAT",)
+    RETURN_NAMES = ("width", "height", "rescale_factor",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, width, height, rescale_factor, round_method):
+
+        width, height = util.resize_calc(width, height, rescale_factor, round_method)
+
+        return(width, height, rescale_factor,)
+
+
+"""
+
+D2 Image Resize
+画像リサイズ
+WAS_Node_Suite の関数を流用
+https://github.com/WASasquatch/was-node-suite-comfyui
+
+"""
+class D2_ImageResize:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+                "mode": (["rescale", "resize"],),
+                "supersample": (["true", "false"],),
+                "resampling": (["lanczos", "nearest", "bilinear", "bicubic"],),
+                "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
+                "resize_width": ("INT", {"default": 1024, "min": 1, "max": 48000, "step": 1}),
+                "resize_height": ("INT", {"default": 1536, "min": 1, "max": 48000, "step": 1}),
+                "round_method": (["Floor", "Round", "Ceil"],),
+            },
+        }
+
+    RETURN_TYPES = ("IMAGE", "LIST", "LIST", "FLOAT",)
+    RETURN_NAMES = ("image", "width_list", "height_list", "rescale_factor",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, image, mode="rescale", supersample='true', resampling="lanczos", rescale_factor=2, resize_width=1024, resize_height=1024, round_method="Floor"):
+        scaled_images = []
+        width_list = []
+        height_list = []
+
+        for img in image:
+            resized_image, new_width, new_height = self.apply_resize_image(util.tensor2pil(img), mode, supersample, rescale_factor, resize_width, resize_height, resampling, round_method)
+            scaled_images.append(util.pil2tensor(resized_image))
+            width_list.append(new_width)
+            height_list.append(new_height)
+
+        scaled_images = torch.cat(scaled_images, dim=0)
+
+        return (scaled_images, width_list, height_list, rescale_factor, )
+
+
+    def apply_resize_image(self, image: Image.Image, mode='scale', supersample='true', factor: int = 2, width: int = 1024, height: int = 1024, resample='bicubic', round_method="Floor"):
+
+        current_width, current_height = image.size
+
+        if mode == 'rescale':
+            new_width = util.number_adjust(current_width * factor, round_method, 8)
+            new_height = util.number_adjust(current_height * factor, round_method, 8)
+        else:
+            new_width = util.number_adjust(width, round_method, 8)
+            new_height = util.number_adjust(height, round_method, 8)
+
+        # Define a dictionary of resampling filters
+        resample_filters = {
+            'nearest': 0,
+            'bilinear': 2,
+            'bicubic': 3,
+            'lanczos': 1
+        }
+
+        # Apply supersample
+        if supersample == 'true':
+            image = image.resize((new_width * 8, new_height * 8), resample=Image.Resampling(resample_filters[resample]))
+
+        # Resize the image using the given resampling filter
+        resized_image = image.resize((new_width, new_height), resample=Image.Resampling(resample_filters[resample]))
+
+        return resized_image, new_width, new_height
+
+
 
 """
 
@@ -645,9 +751,9 @@ class D2_SizeSelector:
                 "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
                 "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
                 "swap_dimensions": (["Off", "On"],),
-                "upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.001}),
-                "prescale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.001}),
-                "round_method": (["Floor", "Round"],),
+                "upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
+                "prescale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
+                "round_method": (["Floor", "Round", "Ceil"],),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 64})
             },
             "optional": {
@@ -663,7 +769,6 @@ class D2_SizeSelector:
 
     def run(self, preset, width, height, swap_dimensions, upscale_factor, prescale_factor, round_method, batch_size, images=None):
 
-
         if(images != None):
             width = images.shape[2]
             height = images.shape[1]
@@ -675,22 +780,11 @@ class D2_SizeSelector:
         if swap_dimensions == "On":
             width, height = height, width
 
-        width = int(width*prescale_factor)
-        height = int(height*prescale_factor)
-
-        width = D2_SizeSelector.adjust_to_8(width, round_method)
-        height = D2_SizeSelector.adjust_to_8(height, round_method)
+        width, height = util.resize_calc(width, height, prescale_factor, round_method)
 
         latent = torch.zeros([batch_size, 4, height // 8, width // 8])
 
         return(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent}, )
-
-    @staticmethod
-    def adjust_to_8(number, method='Floor'):
-        if method == 'Round':
-            return round(number / 8) * 8
-        else:
-            return (number // 8) * 8
 
 
 """
@@ -797,6 +891,8 @@ NODE_CLASS_MAPPINGS = {
     "D2 Regex Replace": D2_RegexReplace,
     "D2 Prompt SR": D2_PromptSR,
     "D2 Multi Output": D2_MultiOutput,
+    "D2 Resize Calculator": D2_ResizeCalculator,
+    "D2 Image Resize": D2_ImageResize,
     "D2 Size Slector": D2_SizeSelector,
     "D2 Refiner Steps": D2_RefinerSteps,
     "D2 Refiner Steps A1111": D2_RefinerStepsA1111,

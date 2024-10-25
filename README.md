@@ -8,8 +8,7 @@
 
 **It's suitable for those who want to create simple workflows.**
 
-I have consolidated the following custom nodes that I previously created, and added nodes such as D2 KSampler.  
-**If you have already installed the following custom nodes, please delete them as the node names will conflict.**
+**Please uninstall any of the following custom nodes if you have previously installed them.**
 
 - [ComfyUI-d2-size-selector](https://github.com/da2el-ai/ComfyUI-d2-size-selector)
 - [ComfyUI-d2-steps](https://github.com/da2el-ai/ComfyUI-d2-steps)
@@ -319,6 +318,22 @@ Output string 2
 </details>
 
 
+### D2 Image Resize
+
+<img src="./img/image_resize.png">
+
+- Simple image resizing
+- Can specify up to 3 decimal places
+- Can select rounding, floor, or ceiling methods
+
+
+### D2 Resize Calculator
+
+<img src="./img/resize_calc.png">
+
+- Calculated values are always multiples of 8
+- Can select rounding, floor, or ceiling methods
+
 
 ### D2 Size Selector
 
@@ -463,6 +478,11 @@ In the custom_nodes folder, `git clone`
 ```
 
 ## :blossom: Changelog
+
+**2024.10.26**
+
+- Added new D2 Image Resize
+- Added new D2 Resize Calculator
 
 **2024.10.24**
 
