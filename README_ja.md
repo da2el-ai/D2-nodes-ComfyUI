@@ -316,6 +316,14 @@
 </details>
 
 
+### D2 EmptyImage Alpha
+
+<img src="./img/empty_image_alpha.png">
+
+- EmptyImage にαチャンネル（透明度）を追加
+
+
+
 ### D2 Image Resize
 
 <img src="./img/image_resize.png">
@@ -488,6 +496,7 @@ custom_nodes フォルダで `git clone` する
 
 **2024.10.26**
 
+- D2 EmptyImage Alpha を新規追加
 - D2 Image Resize を新規追加
 - D2 Resize Calculator を新規追加
 

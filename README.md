@@ -318,6 +318,12 @@ Output string 2
 </details>
 
 
+### D2 EmptyImage Alpha
+
+<img src="./img/empty_image_alpha.png">
+
+- Added alpha channel (transparency) to EmptyImage
+
 ### D2 Image Resize
 
 <img src="./img/image_resize.png">
@@ -481,6 +487,7 @@ In the custom_nodes folder, `git clone`
 
 **2024.10.26**
 
+- Added new D2 EmptyImage Alpha
 - Added new D2 Image Resize
 - Added new D2 Resize Calculator
 

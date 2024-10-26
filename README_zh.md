@@ -316,6 +316,12 @@
 </details>
 
 
+### D2 EmptyImage Alpha
+
+<img src="./img/empty_image_alpha.png">
+
+- 在 EmptyImage 中添加α通道（透明度）
+
 
 ### D2 Image Resize
 
@@ -479,6 +485,7 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 **2024.10.26**
 
+- 新增 D2 EmptyImage Alpha
 - 新增 D2 Image Resize
 - 新增 D2 Resize Calculator
 

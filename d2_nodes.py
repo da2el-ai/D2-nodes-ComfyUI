@@ -23,6 +23,7 @@ from .modules import pnginfo_util
 
 
 MAX_SEED = 2**32 - 1  # 4,294,967,295
+MAX_RESOLUTION = 16384
 
 
 """
@@ -651,6 +652,42 @@ class D2_ResizeCalculator:
 
 """
 
+D2 EmptyImage Alpha
+αチャンネル（透明度）付き画像作成
+
+"""
+class D2_EmptyImageAlpha:
+    def __init__(self, device="cpu"):
+        self.device = device
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": { 
+                "width": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 1}),
+                "height": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 1}),
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
+                "color": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFF, "step": 1, "display": "color"}),
+                "alpha": ("FLOAT", {"default": 1.0, "min": 0, "max": 1.0, "step": 0.001, "display": "alpha"}),
+            }
+        }
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, width, height, batch_size=1, color=0, alpha=1.0):
+        r = torch.full([batch_size, height, width, 1], ((color >> 16) & 0xFF) / 0xFF)
+        g = torch.full([batch_size, height, width, 1], ((color >> 8) & 0xFF) / 0xFF)
+        b = torch.full([batch_size, height, width, 1], ((color) & 0xFF) / 0xFF)
+        # アルファチャンネル追加
+        a = torch.full([batch_size, height, width, 1], alpha)
+        # RGBAを結合
+        return (torch.cat((r, g, b, a), dim=-1), )
+
+
+
+"""
+
 D2 Image Resize
 画像リサイズ
 WAS_Node_Suite の関数を流用
@@ -888,6 +925,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Prompt SR": D2_PromptSR,
     "D2 Multi Output": D2_MultiOutput,
     "D2 Resize Calculator": D2_ResizeCalculator,
+    "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
     "D2 Image Resize": D2_ImageResize,
     "D2 Size Slector": D2_SizeSelector,
     "D2 Refiner Steps": D2_RefinerSteps,
