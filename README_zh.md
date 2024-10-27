@@ -103,7 +103,7 @@
 
 ### D2 Regex Replace
 
-  <img src="./img/regex_replace.png">
+  <img src="./img/regex_replace_2.png">
 
 - 替換輸入文字
 - 可以指定多個條件
@@ -140,7 +140,33 @@
 #### 輸出
 
 - `text`
-    - 替換處理後的文字
+    - 經過替換處理的文字
+
+#### Sample
+
+移除Pony系列品質標籤的範例。
+
+Mode: `Tag`
+
+Input text
+```
+score_9, score_8_up, (score_7_up, score_6_up:0.8) , rating_explicit, source_anime, BREAK
+1girl, swimsuit
+```
+Regex Replace
+```
+.*(score_|rating_|source_).*
+--
+--
+BREAK
+--
+
+```
+
+Output text
+```
+1girl, swimsuit
+```
 
 </details>
 

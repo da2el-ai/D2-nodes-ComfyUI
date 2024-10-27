@@ -103,7 +103,7 @@
 
 ### D2 Regex Replace
 
-  <img src="./img/regex_replace.png">
+  <img src="./img/regex_replace_2.png">
 
 - Replace input text
 - Multiple conditions can be specified
@@ -142,6 +142,33 @@ Output string 2
 
 - `text`
     - Text after replacement processing
+
+#### Sample
+
+Sample for removing Pony series quality tags.
+
+
+Mode: `Tag`
+
+Input text
+```
+score_9, score_8_up, (score_7_up, score_6_up:0.8) , rating_explicit, source_anime, BREAK
+1girl, swimsuit
+```
+Regex Replace
+```
+.*(score_|rating_|source_).*
+--
+--
+BREAK
+--
+
+```
+
+Output text
+```
+1girl, swimsuit
+```
 
 </details>
 
