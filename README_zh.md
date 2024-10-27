@@ -509,6 +509,10 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 ## :blossom: 更新日誌
 
+**2024.10.28**
+
+- D2 Folder Image Queue: 修復生成圖片數量不一致的錯誤
+
 **2024.10.26**
 
 - 新增 D2 EmptyImage Alpha

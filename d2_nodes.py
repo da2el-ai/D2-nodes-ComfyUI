@@ -101,20 +101,22 @@ class D2_FolderImageQueue:
     ######
     def run(self, folder = "", extension="*.*", start_at=0, batch_count=1):
         files = D2_FolderImageQueue.get_files(folder, extension)
-        image_path = files[start_at]
+        image_path = files[start_at - 1]
 
         return {
-            "result": (image_path,)
+            "result": (image_path,),
+            "ui": {"message":(image_path, start_at,)}
         }
 
     @classmethod
     def get_files(cls, folder, extension):
         search_pattern = os.path.join(folder, extension)
         file_list = glob.glob(search_pattern)
-        
-        # 絶対パスに変換
+        # ソートして絶対パスに変換
+        file_list = sorted(file_list, key=lambda x: os.path.basename(x))
         file_list = [os.path.abspath(file) for file in file_list]
         return file_list
+
 
 """
 対象画像枚数を取得

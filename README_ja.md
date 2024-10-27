@@ -520,6 +520,10 @@ custom_nodes フォルダで `git clone` する
 
 ## :blossom: Changelog
 
+**2024.10.28**
+
+- D2 Folder Image Queue: 画像生成枚数が同じにならない不具合を修正
+
 **2024.10.26**
 
 - D2 EmptyImage Alpha を新規追加

@@ -68,7 +68,7 @@ class FolderImageQueue {
     for (let i = startAt; i < imageCount; i++) {
       app.queuePrompt(0, this.batchCountWidget.value);
       this.countUpStartAt();
-      await this.sleep(100);
+      await this.sleep(200);
     }
   }
 
@@ -122,6 +122,17 @@ app.registerExtension({
     if (nodeData.name !== "D2 Folder Image Queue") return;
 
     const folderImageQueue = new FolderImageQueue();
+
+    /**
+     * ノード実行時
+     */
+    const onExecuted = nodeType.prototype.onExecuted;
+    nodeType.prototype.onExecuted = function (message) {
+      onExecuted?.apply(this, arguments);
+      // populate.call(this, message.text);
+      // console.log("onExecuted");
+      // console.log(message);
+    };
 
     /**
      * ノード作成された

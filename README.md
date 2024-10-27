@@ -512,6 +512,10 @@ In the custom_nodes folder, `git clone`
 
 ## :blossom: Changelog
 
+**2024.10.28**
+
+- D2 Folder Image Queue: Fixed a bug where the number of generated images was not consistent
+
 **2024.10.26**
 
 - Added new D2 EmptyImage Alpha
