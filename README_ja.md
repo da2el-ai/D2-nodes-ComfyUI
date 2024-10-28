@@ -480,6 +480,21 @@ Output text
 
 - steps を確認するためのノード
 
+
+
+### Prompt convert dialog
+
+<img src="./img/prompt_convert_dialog.png">
+
+- NovelAI と StableDiffusion の weight を相互変換するダイアログ
+- `Prompt convert` ボタンから開く
+- 初期状態では非表示になっている
+- `settings > D2 > Show prompt convert button` を有効にすると表示する
+
+
+
+
+
 ## :card_index_dividers: Sample Workflow
 
 画像を ComfyUI にドロップするとワークフローを再現できます。
@@ -522,6 +537,7 @@ custom_nodes フォルダで `git clone` する
 
 **2024.10.28**
 
+- Prompt convert: NovelAI と StableDiffusion のプロンプトを相互変換するダイアログを追加
 - D2 Folder Image Queue: 画像生成枚数が同じにならない不具合を修正
 
 **2024.10.26**

@@ -1,0 +1,25 @@
+.d2-prompt-convert {
+  z-index: 1000;
+  width: 1000px;
+  max-width: 100%;
+}
+
+.d2-prompt-convert__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .3rem 1rem;
+}
+
+/* .d2-prompt-convert__button-container {
+  gap: 0.25rem;
+} */
+
+.d2-prompt-convert__prompt-area{
+  height: 15rem;
+}
+
+
+.d2-prompt-convert__close-btn{
+  grid-column: span 2;
+  margin-top: 1rem;
+}

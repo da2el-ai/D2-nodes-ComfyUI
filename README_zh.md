@@ -476,6 +476,18 @@ Output text
 ### D2 Refiner Steps Tester
   - 用於確認步數的節點
 
+
+### Prompt convert dialog
+
+<img src="./img/prompt_convert_dialog.png">
+
+- 提供 NovelAI 和 StableDiffusion 權重（weight）互相轉換的對話框
+- 從 `Prompt convert` 按鈕開啟
+- 預設為隱藏狀態
+- 啟用 `settings > D2 > Show prompt convert button` 後即可顯示
+
+
+
 ## :card_index_dividers: 示例工作流程
 將圖像拖放到 ComfyUI 中可以重現工作流程。
 
@@ -511,6 +523,7 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 **2024.10.28**
 
+- Prompt convert: 新增 NovelAI 和 StableDiffusion 提示詞（prompt）互相轉換的對話框
 - D2 Folder Image Queue: 修復生成圖片數量不一致的錯誤
 
 **2024.10.26**

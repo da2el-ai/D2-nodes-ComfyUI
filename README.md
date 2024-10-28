@@ -479,6 +479,19 @@ Output text
 ### D2 Refiner Steps Tester
   - A node for checking steps
 
+
+### Prompt convert dialog
+
+<img src="./img/prompt_convert_dialog.png">
+
+- Dialog for converting weights between NovelAI and StableDiffusion formats
+- Open from the `Prompt convert` button
+- Hidden by default
+- Enable `settings > D2 > Show prompt convert button` to display
+
+
+
+
 ## :card_index_dividers: Sample Workflow
 You can recreate the workflow by dropping the image into ComfyUI.
 
@@ -514,6 +527,7 @@ In the custom_nodes folder, `git clone`
 
 **2024.10.28**
 
+- Prompt convert: Added a dialog for converting prompts between NovelAI and StableDiffusion formats
 - D2 Folder Image Queue: Fixed a bug where the number of generated images was not consistent
 
 **2024.10.26**

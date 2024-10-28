@@ -19,7 +19,6 @@ class D2_FloatContainer {
 
         // 初期位置
         const pos = this._getPosition(default_left, default_top);
-        console.log("constructor", pos);
         this.container.style.left = pos[0] + "px";
         this.container.style.top = pos[1] + "px";
 
@@ -94,7 +93,6 @@ class D2_FloatContainer {
     _getPosition(default_left, default_top) {
         const cookieName = `${this.cookieNameBase}_pos`;
         const cookieValue = getCookie(cookieName);
-        console.log("_getPosition", cookieName, cookieValue);
         return cookieValue !== undefined ? cookieValue : [default_left, default_top];
     }
 
