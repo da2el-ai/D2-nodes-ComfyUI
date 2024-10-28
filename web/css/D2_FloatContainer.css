@@ -1,0 +1,12 @@
+.d2-float-container {
+  position: fixed;
+  z-index: 1000;
+}
+
+.d2-float-container__content {
+  padding: 0.25rem;
+}
+
+.d2-float-container__button-container {
+  gap: 0.25rem;
+}
