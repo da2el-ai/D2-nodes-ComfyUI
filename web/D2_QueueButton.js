@@ -12,7 +12,7 @@ class D2_QueueButton {
 
   constructor() {
     // フロートコンテナ
-    this.floatContainer = new D2_FloatContainer(50, 50);
+    this.floatContainer = new D2_FloatContainer('D2_QueueButton', 50, 50);
     
     this._createButtons();
 

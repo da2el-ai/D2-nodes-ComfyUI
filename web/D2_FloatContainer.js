@@ -2,19 +2,24 @@
  * ボタンを並べた小さいフロートウィンドウのクラス
  */
 
+import { setCookie, getCookie, loadCssFile } from "./utils.js";
+
+
 class D2_FloatContainer {
     static CSS_FILEPATH = "./extensions/D2-nodes-ComfyUI/css/D2_FloatContainer.css";
-    static COOKIE_NAME = "D2_FloatContainer_Pos";
 
     container = undefined;
     buttonContainer = undefined;
+    cookieNameBase = "";
 
-    constructor(default_left = 50, default_top = 50) {
-        D2_FloatContainer._loadStyles();
+    constructor(cookieNameBase, default_left = 50, default_top = 50) {
+        this.cookieNameBase = cookieNameBase;
+        loadCssFile(D2_FloatContainer.CSS_FILEPATH);
         this._createContainer();
 
         // 初期位置
-        const pos = D2_FloatContainer._getPosition(default_left, default_top);
+        const pos = this._getPosition(default_left, default_top);
+        console.log("constructor", pos);
         this.container.style.left = pos[0] + "px";
         this.container.style.top = pos[1] + "px";
 
@@ -75,45 +80,22 @@ class D2_FloatContainer {
     }
 
     /**
-     * CSSを動的に読み込む
-     */
-    static _loadStyles() {
-        const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href = D2_FloatContainer.CSS_FILEPATH;
-        document.head.appendChild(link);
-    }
-
-    /**
      * 座標をcookieに記録
      */
-    static _savePosition(x, y) {
-        const jsonString = JSON.stringify([x, y]);
-        const encodedJsonString = encodeURIComponent(jsonString);
-
-        const farFuture = new Date();
-        farFuture.setFullYear(farFuture.getFullYear() + 100);
-
-        document.cookie = `${
-            D2_FloatContainer.COOKIE_NAME
-        }=${encodedJsonString}; expires=${farFuture.toUTCString()}; path=/`;
+    _savePosition(x, y) {
+        const cookieName = `${this.cookieNameBase}_pos`;
+        const cookieValue = [x, y];
+        setCookie(cookieName, cookieValue);
     }
 
     /**
      * 座標をcookieから取得
      */
-    static _getPosition(default_left, default_top) {
-        const cookies = document.cookie.split(";");
-        for (let cookie of cookies) {
-            cookie = cookie.trim();
-            if (cookie.startsWith(D2_FloatContainer.COOKIE_NAME + "=")) {
-                const encodedJsonString = cookie.substring(D2_FloatContainer.COOKIE_NAME.length + 1);
-                const jsonString = decodeURIComponent(encodedJsonString);
-                return JSON.parse(jsonString);
-            }
-        }
-        // Cookieが見つからない場合
-        return [default_left, default_top];
+    _getPosition(default_left, default_top) {
+        const cookieName = `${this.cookieNameBase}_pos`;
+        const cookieValue = getCookie(cookieName);
+        console.log("_getPosition", cookieName, cookieValue);
+        return cookieValue !== undefined ? cookieValue : [default_left, default_top];
     }
 
     /**
@@ -145,7 +127,7 @@ class D2_FloatContainer {
             container.style.left = `${x}px`;
             container.style.top = `${y}px`;
 
-            D2_FloatContainer._savePosition(x, y);
+            this._savePosition(x, y);
         });
 
         // マウスアップイベントリスナー
