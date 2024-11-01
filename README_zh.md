@@ -521,6 +521,10 @@ ComfyUI Manager → Custom Node Manager → 搜索 `D2 Nodes` 並安裝
 
 ## :blossom: 更新日誌
 
+**2024.11.02**
+
+- D2 Regex Switcher: 新增輸入文字確認文字區域的顯示/隱藏切換功能
+
 **2024.10.28**
 
 - Prompt convert: 新增 NovelAI 和 StableDiffusion 提示詞（prompt）互相轉換的對話框

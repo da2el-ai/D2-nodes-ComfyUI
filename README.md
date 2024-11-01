@@ -525,6 +525,10 @@ In the custom_nodes folder, `git clone`
 
 ## :blossom: Changelog
 
+**2024.11.02**
+
+- D2 Regex Switcher: Added toggle visibility for input text confirmation textarea
+
 **2024.10.28**
 
 - Prompt convert: Added a dialog for converting prompts between NovelAI and StableDiffusion formats

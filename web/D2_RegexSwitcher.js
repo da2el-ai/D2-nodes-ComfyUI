@@ -6,33 +6,40 @@ app.registerExtension({
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "D2 Regex Switcher") return;
 
-        // 以下、カスタムノード処理
-        function populate(text) {
-            // 確認用ウィジェットがすでにあれば削除、なければ作る
-            // すでに表示しているものがあれば削除
-            if (this.widgets) {
-                let index = this.widgets.findIndex((widget) => widget.name === "text_check");
-
-                if (index >= 0) {
-                    const widget = this.widgets[index];
-                    this.widgets.splice(index, 1);
-                    widget?.onRemove();
-                }
-
-                const newWidget = ComfyWidgets["STRING"](
-                    this,
-                    "text_check",
-                    ["STRING", { multiline: true }],
-                    app
-                ).widget;
-                newWidget.inputEl.readOnly = true;
-                newWidget.inputEl.style.opacity = 0.6;
-
-                // 文字列はなぜか配列で送られてくるので結合
-                const showText = text.join("");
-                newWidget.value = showText;
+        const checkTextVisible = (isShow, widget) => {
+            if (isShow === "True") {
+                widget.type = "customtext";
+            } else {
+                widget.type = "converted-widget";
             }
-        }
+        };
+
+        /**
+         * ノード作成された
+         * ウィジェット登録と初期設定
+         */
+        const origOnNodeCreated = nodeType.prototype.onNodeCreated;
+        nodeType.prototype.onNodeCreated = function () {
+            const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+
+            // 入力文字確認を読み込み専用にする
+            const checkTextWidget = this.widgets?.find((w) => w.name === "text_check");
+            checkTextWidget.inputEl.readOnly = true;
+            checkTextWidget.inputEl.style.opacity = 0.5;
+
+            // 入力確認の表示・非表示切り替え
+            const showTextWidget = this.widgets?.find((w) => w.name === "show_text");
+            showTextWidget.callback = (isShow) => {
+                checkTextVisible(isShow, checkTextWidget)
+            };
+            
+            // 前回の状態を引き継ぎ
+            setTimeout(()=>{
+                checkTextVisible(showTextWidget.value, checkTextWidget)
+            },200);
+
+            return r;
+        };
 
         /**
          * ノード実行時
@@ -40,7 +47,8 @@ app.registerExtension({
         const onExecuted = nodeType.prototype.onExecuted;
         nodeType.prototype.onExecuted = function (message) {
             onExecuted?.apply(this, arguments);
-            populate.call(this, message.text);
+            const checkTextWidget = this.widgets?.find((w) => w.name === "text_check");
+            checkTextWidget.value = message.text[0];
         };
     },
 });

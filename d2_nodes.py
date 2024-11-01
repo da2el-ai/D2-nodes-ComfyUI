@@ -316,6 +316,9 @@ class D2_RegexSwitcher:
                 ),
                 "pre_delim": (["Comma", "Line break", "None"],),
                 "suf_delim": (["Comma", "Line break", "None"],),
+                "show_text": (["False", "True"],),
+                # 入力確認用
+                "text_check": ("STRING", {"multiline": True},),
             },
             "optional": {
                 # 先頭に結合するテキスト
@@ -336,7 +339,7 @@ class D2_RegexSwitcher:
         "None": "",
     }
 
-    def run(self, text, regex_and_output, pre_delim, suf_delim, prefix="", suffix=""):
+    def run(self, text, regex_and_output, pre_delim, suf_delim, show_text="True", prefix="", suffix="", text_check=""):
         """
         正規表現に基づいてテキストをマッチングし、結果を結合して返す関数。
 
@@ -365,7 +368,7 @@ class D2_RegexSwitcher:
         combined_text = "".join(parts)
 
         return {
-            "ui": {"text": text}, 
+            "ui": {"text": (text,)}, 
             "result": (combined_text, prefix, suffix, match_index)
         }
 

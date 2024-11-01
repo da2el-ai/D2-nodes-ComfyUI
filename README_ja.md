@@ -535,6 +535,10 @@ custom_nodes フォルダで `git clone` する
 
 ## :blossom: Changelog
 
+**2024.11.02**
+
+- D2 Regex Switcher: 入力テキストの確認用テキストエリアの表示・非表示切り替えを追加
+
 **2024.10.28**
 
 - Prompt convert: NovelAI と StableDiffusion のプロンプトを相互変換するダイアログを追加
