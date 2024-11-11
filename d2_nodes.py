@@ -296,6 +296,38 @@ class D2_CheckpointLoader:
 
 """
 
+D2_CheckpointList
+Checkpointのフルパスを取得できる Checkpoint List
+
+"""
+class D2_CheckpointList:
+    @classmethod
+    def INPUT_TYPES(cls):
+        ckpt_input = ["None"] +folder_paths.get_filename_list("checkpoints")
+        inputs = {
+            "required": {
+                "ckpt_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
+            }
+        }
+
+        for i in range(1, 50):
+            inputs["required"][f"ckpt_name_{i}"] = (ckpt_input,)
+
+        return inputs
+
+    RETURN_TYPES = ("LIST","STRING",)
+    RETURN_NAMES = ("list","list_str")
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+    def run(self, ckpt_count, **kwargs):
+        ckpt_list = [kwargs.get(f"ckpt_name_{i}") for i in range(1, ckpt_count + 1)]
+        ckpt_list_str = ",".join(ckpt_list)
+        return (ckpt_list, ckpt_list_str,)
+
+
+"""
+
 D2 RegexSwitcher
 正規表現で検索して文字列を結合・出力するノード
 
@@ -927,8 +959,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Checkpoint Loader": D2_CheckpointLoader,
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Regex Replace": D2_RegexReplace,
-    "D2 Prompt SR": D2_PromptSR,
-    "D2 Multi Output": D2_MultiOutput,
     "D2 Resize Calculator": D2_ResizeCalculator,
     "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
     "D2 Image Resize": D2_ImageResize,
@@ -936,6 +966,9 @@ NODE_CLASS_MAPPINGS = {
     "D2 Refiner Steps": D2_RefinerSteps,
     "D2 Refiner Steps A1111": D2_RefinerStepsA1111,
     "D2 Refiner Steps Tester": D2_RefinerStepsTester,
+    "D2 Checkpoint List": D2_CheckpointList,
+    "D2 Prompt SR": D2_PromptSR,
+    "D2 Multi Output": D2_MultiOutput,
 }
 
 
