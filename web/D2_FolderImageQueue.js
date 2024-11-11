@@ -1,4 +1,5 @@
 import { app } from "/scripts/app.js";
+import { findWidgetByName, findWidgetByType } from "./utils.js";
 
 const BUTTON_NAME = "Queue 0 images";
 const API_BASE_URL = "/D2/folder-image-queue/";
@@ -142,11 +143,11 @@ app.registerExtension({
     nodeType.prototype.onNodeCreated = function () {
       const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
-      const folderWidget = this.widgets?.find((w) => w.name === "folder");
-      const extensionWidget = this.widgets?.find((w) => w.name === "extension");
-      const startAtWidget = this.widgets?.find((w) => w.name === "start_at");
-      const batchCountWidget = this.widgets?.find((w) => w.name === "batch_count");
-      const queueButton = this.widgets?.find((w) => w.type === "button");
+      const folderWidget = findWidgetByName(this, "folder");
+      const extensionWidget = findWidgetByName(this, "extension");
+      const startAtWidget = findWidgetByName(this, "start_at");
+      const batchCountWidget = findWidgetByName(this, "batch_count");
+      const queueButton = findWidgetByType(this, "button");
       folderImageQueue.initWidget(this.id, folderWidget, extensionWidget, startAtWidget, batchCountWidget, queueButton);
       return r;
     };

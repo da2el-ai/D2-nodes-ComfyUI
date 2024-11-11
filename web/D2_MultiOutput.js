@@ -1,6 +1,7 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 import { ComfyWidgets } from "/scripts/widgets.js";
+import { findWidgetByName } from "./utils.js";
 
 const BUTTON_NAME = "Add Random";
 const MAX_SEED = 2 ** 32 - 1; // 4,294,967,295
@@ -31,9 +32,9 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
-            d2mo.btnWidget = this.widgets?.find((w) => w.name === BUTTON_NAME);
-            d2mo.typeWidget = this.widgets?.find((w) => w.name === "type");
-            d2mo.inputWidget = this.widgets?.find((w) => w.name === "parameter");
+            d2mo.btnWidget = findWidgetByName(this, BUTTON_NAME);
+            d2mo.typeWidget = findWidgetByName(this, "type");
+            d2mo.inputWidget = findWidgetByName(this, "parameter");
 
             // seed生成ボタンの表示切り替え
             if (d2mo.typeWidget !== undefined) {
