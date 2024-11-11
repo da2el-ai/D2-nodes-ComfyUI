@@ -322,7 +322,7 @@ class D2_CheckpointList:
 
     def run(self, ckpt_count, **kwargs):
         ckpt_list = [kwargs.get(f"ckpt_name_{i}") for i in range(1, ckpt_count + 1)]
-        ckpt_list_str = ",".join(ckpt_list)
+        ckpt_list_str = "\n".join(ckpt_list)
         return (ckpt_list, ckpt_list_str,)
 
 
