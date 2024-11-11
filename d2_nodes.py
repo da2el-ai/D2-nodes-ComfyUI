@@ -587,7 +587,7 @@ class D2_PromptSR:
     RETURN_TYPES = ("LIST",)
     RETURN_NAMES = ("LIST",)
     FUNCTION = "replace_text"
-    CATEGORY = "D2"
+    CATEGORY = "D2/XY Plot"
 
     def replace_text(self, prompt, search_txt, replace):
         # 置換文字列を改行で分割
@@ -632,7 +632,7 @@ class D2_MultiOutput:
     RETURN_TYPES = ("LIST",)
     RETURN_NAMES = ("LIST",)
     FUNCTION = "output_list"
-    CATEGORY = "D2"
+    CATEGORY = "D2/XY Plot"
 
     ######
     # def output_list(self, type, parameter, seed):
