@@ -46,18 +46,19 @@ class D2_XYPlot:
                 "y_title": ("STRING", {"default": ""}),
                 "y_list": ("STRING", {"multiline": True},),
                 "auto_queue": ("BOOLEAN", {"default": True},),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "index": ("INT", {"min":0, "default": 0}),
+                # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                # "index": ("INT", {"min":0, "default": 0}),
+                "index": ("D2_XYPLOT_INDEX", {})
             },
         }
     
-    RETURN_TYPES = (AnyType("*"), AnyType("*"), "DICT", "DICT", "BOOLEAN",)
-    RETURN_NAMES = ("X", "Y", "x_annotation", "y_annotation", "trigger",)
+    RETURN_TYPES = (AnyType("*"), AnyType("*"), "DICT", "DICT", "BOOLEAN","INT",)
+    RETURN_NAMES = ("X", "Y", "x_annotation", "y_annotation", "trigger","index",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
 
-    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, seed, index=0):
+    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, index=0):
         # 入力文字列を改行で分割
         x_array = self.change_type(x_type, x_list.strip().split('\n'))
         y_array = self.change_type(y_type, y_list.strip().split('\n'))
@@ -83,7 +84,7 @@ class D2_XYPlot:
         y_annotation = {"title":y_title, "values":y_array},
 
         return {
-            "result": (x_value, y_value, x_annotation, y_annotation, trigger,),
+            "result": (x_value, y_value, x_annotation, y_annotation, trigger,index,),
             "ui": {
                 "auto_queue": (auto_queue,),
                 "x_array": (x_array,),

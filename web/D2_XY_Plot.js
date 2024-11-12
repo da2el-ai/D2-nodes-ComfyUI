@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { sleep, findWidgetOrInputsByName, findWidgetByName, findWidgetByType } from "./utils.js";
+import { sleep, findWidgetByName, getReadOnlyWidgetBase } from "./utils.js";
 
 app.registerExtension({
   name: "Comfy.D2.D2_XY_Plot",
@@ -36,6 +36,23 @@ app.registerExtension({
       }
     };
 
+  },
+
+  getCustomWidgets(app) {
+    return {
+      D2_XYPLOT_INDEX(node, inputName, inputData, app) {
+        const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_INDEX", inputName, 0);
+
+        widget.draw = function(ctx, node, width, y) {
+            const text = `Index: ${this.value}`;
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "12px Arial";
+            ctx.fillText(text, 20, y + 20);
+        };
+        node.addCustomWidget(widget);
+        return widget;
+      },
+    };
   },
 
 });

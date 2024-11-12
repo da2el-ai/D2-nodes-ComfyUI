@@ -66,7 +66,6 @@ app.registerExtension({
         return {
             D2RESET(node, inputName, inputData, app) {
                 const widget = node.addWidget("button", BUTTON_NAME, 0, () => {
-                    console.log("click reset");
                     const seed = Math.floor(Math.random() * MAX_SEED);
                     d2mo.inputWidget.value += d2mo.inputWidget.value.length >= 1 ? "\n" : "";
                     d2mo.inputWidget.value += seed;

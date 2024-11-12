@@ -1,8 +1,7 @@
-
 /**
  * 指定ミリ秒待機
  */
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * ウィジェットを名前から探す
@@ -21,7 +20,6 @@ const findWidgetOrInputsByName = (node, name) => {
     return node.inputs ? node.inputs.find((w) => w.name === name) : null;
 };
 
-
 /**
  * ウィジェットをタイプから探す
  */
@@ -31,8 +29,8 @@ const findWidgetByType = (node, type) => {
 
 /**
  * クッキーに保存
- * @param {string} cookieName 
- * @param {any} obj 
+ * @param {string} cookieName
+ * @param {any} obj
  */
 const setCookie = (cookieName, obj) => {
     const jsonString = JSON.stringify(obj);
@@ -40,11 +38,11 @@ const setCookie = (cookieName, obj) => {
     const farFuture = new Date();
     farFuture.setFullYear(farFuture.getFullYear() + 100);
     document.cookie = `${cookieName}=${encodedJsonString}; expires=${farFuture.toUTCString()}; path=/`;
-}
+};
 
 /**
  * クッキーから取得
- * @param {string} cookieName 
+ * @param {string} cookieName
  * @returns any
  */
 const getCookie = (cookieName) => {
@@ -59,7 +57,7 @@ const getCookie = (cookieName) => {
         }
     }
     return undefined;
-}
+};
 
 /**
  * CSSを動的に読み込む
@@ -69,7 +67,7 @@ const loadCssFile = (filePath) => {
     link.rel = "stylesheet";
     link.href = filePath;
     document.head.appendChild(link);
-}
+};
 
 /**
  * widget inputs に存在するか
@@ -99,7 +97,7 @@ function toggleWidget(node, widget, show = false, suffix = "") {
     widget.computeSize = show ? origProps[widget.name].origComputeSize : () => [0, -4];
 
     // Recursively handle linked widgets if they exist
-    widget.linkedWidgets?.forEach(w => toggleWidget(node, w, ":" + widget.name, show));
+    widget.linkedWidgets?.forEach((w) => toggleWidget(node, w, ":" + widget.name, show));
 
     // Calculate the new height for the node based on its computeSize method
     const newHeight = node.computeSize()[1];
@@ -112,9 +110,8 @@ function toggleWidget(node, widget, show = false, suffix = "") {
 function handleWidgetsVisibility(node, countValue, targets) {
     // 全てのウィジェットについて処理
     for (let i = 1; i <= 50; i++) {
-
         // 同じ番号が付いた関連ウィジェットを対象にする
-        targets.forEach(target => {
+        targets.forEach((target) => {
             const widget = findWidgetByName(node, `${target}_${i}`);
 
             if (i <= countValue) {
@@ -126,5 +123,55 @@ function handleWidgetsVisibility(node, countValue, targets) {
     }
 }
 
+/**
+ * 表示線用ウィジェットのベース
+ */
+function getReadOnlyWidgetBase(node, type, inputName, value) {
+    return {
+        type: type,
+        name: inputName,
+        value: value,
+        size: [100, 30],
 
-export { sleep, findWidgetByName, findWidgetOrInputsByName, findWidgetByType, setCookie, getCookie, loadCssFile, handleWidgetsVisibility }
+        // 描画処理
+        draw(ctx, node, width, y) {
+            // 背景描画
+            ctx.fillStyle = "#2a2a2a";
+            ctx.fillRect(0, y, width, this.size[1]);
+
+            // データ表示
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "12px Arial";
+            // ctx.fillText(JSON.stringify(text), 10, y + 20);
+            ctx.fillText("sample", 20, y + 20);
+        },
+
+        // サイズ計算
+        computeSize(width) {
+            return [Math.min(width, this.size[0]), this.size[1]];
+        },
+
+        // データのシリアライズ
+        async serializeValue(nodeId, widgetIndex) {
+            return this.value;
+        },
+
+        // データ更新メソッド
+        setValue(value) {
+            this.value = value;
+            node.setDirtyCanvas(true); // 再描画をトリガー
+        },
+    };
+}
+
+export {
+    sleep,
+    findWidgetByName,
+    findWidgetOrInputsByName,
+    findWidgetByType,
+    setCookie,
+    getCookie,
+    loadCssFile,
+    handleWidgetsVisibility,
+    getReadOnlyWidgetBase,
+};
