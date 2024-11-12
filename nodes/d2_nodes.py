@@ -87,10 +87,10 @@ class D2_FolderImageQueue:
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
                 "start_at": ("INT", {"default": 0}),
-                "batch_count": ("INT", {"default": 1}),
+                "auto_queue": ("BOOLEAN", {"default": True},),
             },
             "optional": {
-                "exec_queue": ("D2_FOLDER_IMAGE_QUEUE", {})
+                "image_count": ("D2_FOLDER_IMAGE_COUNT", {})
             },
         }
 

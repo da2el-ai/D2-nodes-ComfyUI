@@ -1,17 +1,16 @@
 import { app } from "/scripts/app.js";
-import { findWidgetByName, findWidgetByType } from "./utils.js";
+import { $el } from "../../../scripts/ui.js";  
+import { findWidgetByName, findWidgetByType, sleep } from "./utils.js";
 
-const BUTTON_NAME = "Queue 0 images";
 const API_BASE_URL = "/D2/folder-image-queue/";
 
 class FolderImageQueue {
   folderWidget;
   extensionWidget;
   startAtWidget;
-  batchCountWidget;
-  queueButton;
+  imageCountWidget;
+  autoQueueWidget;
   imageCount = 0;
-  startAt = 0;
   id = 0;
 
   /**
@@ -31,14 +30,6 @@ class FolderImageQueue {
   }
 
   /**
-   * 開始番号を取得
-   */
-  getStartAt() {
-    this.startAt = parseInt(this.startAtWidget.value);
-    return this.startAt;
-  }
-
-  /**
    * 開始番号を更新
    */
   countUpStartAt() {
@@ -49,27 +40,26 @@ class FolderImageQueue {
   /**
    * ボタンテキストを書き換え
    */
-  refreshButtonText() {
-    this.queueButton.name = `Queue (${this.imageCount} - ${this.startAt}) images`;
+  refreshImageCount() {
+    this.imageCountWidget.setValue(this.imageCount);
   }
 
-  // 待機用の関数
-  sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
   /**
-   * キューを実行
+   * キューが実行された
    */
-  async execQueue() {
-    // 枚数を取得してボタンを書き換えた後にキューを実行
-    const imageCount = await this.getImageCount();
-    const startAt = this.startAt;
-    const queueCount = imageCount - startAt;
-    this.refreshButtonText();
+  async onExecuted(imageCount, startAt) {
+    // まだ残りがあるならキューを入れる
+    if(startAt + 1 < imageCount && imageCount >= 2){
+      this.startAtWidget.value = startAt + 1;
 
-    for (let i = startAt; i < imageCount; i++) {
-      app.queuePrompt(0, this.batchCountWidget.value);
-      this.countUpStartAt();
-      await this.sleep(200);
+      if(this.autoQueueWidget.value){
+        await sleep(200);
+        app.queuePrompt(0, 1);
+      }
+    }
+    // 最後までいった
+    else if(startAt + 1 >= imageCount){
+      this.startAtWidget.value = 0;
     }
   }
 
@@ -77,47 +67,42 @@ class FolderImageQueue {
    * 入力フィールドのイベント設定
    * パス、拡張子が入力されたら枚数を取得する
    */
-  initWidget(id, folderWidget, extensionWidget, startAtWidget, batchCountWidget, queueButton) {
+  // initWidget(id, folderWidget, extensionWidget, startAtWidget, batchCountWidget, queueButton) {
+  initWidget(id, folderWidget, extensionWidget, startAtWidget, imageCountWidget, autoQueueWidget) {
     this.id = id;
     this.folderWidget = folderWidget;
     this.extensionWidget = extensionWidget;
     this.startAtWidget = startAtWidget;
-    this.batchCountWidget = batchCountWidget;
-    this.queueButton = queueButton;
+    // this.queueButton = queueButton;
+    this.imageCountWidget = imageCountWidget;
+    this.autoQueueWidget = autoQueueWidget;
 
     // イベント登録
     folderWidget.callback = async () => {
       await this.getImageCount();
-      this.refreshButtonText();
+      this.refreshImageCount();
     };
     extensionWidget.callback = async () => {
       await this.getImageCount();
-      this.refreshButtonText();
-    };
-    startAtWidget.callback = () => {
-      startAtWidget.value = startAtWidget.value % this.imageCount;
-      this.getStartAt();
-      this.refreshButtonText();
-    };
-    queueButton.callback = () => {
-      this.execQueue();
+      this.refreshImageCount();
     };
 
     // 初期表示変更
     setTimeout(async () => {
       await this.getImageCount();
-      this.getStartAt();
-      this.refreshButtonText();
+      this.refreshImageCount();
     }, 100);
   }
 }
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
 
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 app.registerExtension({
   name: "Comfy.D2.D2_FolderImageQueue",
+
 
   async beforeRegisterNodeDef(nodeType, nodeData, app) {
     if (nodeData.name !== "D2 Folder Image Queue") return;
@@ -128,11 +113,12 @@ app.registerExtension({
      * ノード実行時
      */
     const onExecuted = nodeType.prototype.onExecuted;
-    nodeType.prototype.onExecuted = function (message) {
+    nodeType.prototype.onExecuted = async function (message) {
       onExecuted?.apply(this, arguments);
-      // populate.call(this, message.text);
-      // console.log("onExecuted");
-      // console.log(message);
+
+      const imageCount = message["image_count"][0];
+      const startAt = message["start_at"][0];
+      folderImageQueue.onExecuted(imageCount, startAt);
     };
 
     /**
@@ -146,21 +132,58 @@ app.registerExtension({
       const folderWidget = findWidgetByName(this, "folder");
       const extensionWidget = findWidgetByName(this, "extension");
       const startAtWidget = findWidgetByName(this, "start_at");
-      const batchCountWidget = findWidgetByName(this, "batch_count");
-      const queueButton = findWidgetByType(this, "button");
-      folderImageQueue.initWidget(this.id, folderWidget, extensionWidget, startAtWidget, batchCountWidget, queueButton);
+      const imageCountWidget = findWidgetByName(this, "image_count");
+      const autoQueueWidget = findWidgetByName(this, "auto_queue");
+      folderImageQueue.initWidget(this.id, folderWidget, extensionWidget, startAtWidget, imageCountWidget, autoQueueWidget);
+
       return r;
     };
   },
 
   /**
-   * D2_FOLDER_IMAGE_QUEUE ボタンを作成
+   * D2_FOLDER_IMAGE_COUNT 画像枚数を表示
    */
   getCustomWidgets(app) {
     return {
-      D2_FOLDER_IMAGE_QUEUE(node, inputName, inputData, app) {
-        const widget = node.addWidget("button", BUTTON_NAME, 0, () => {});
-        return widget;
+      D2_FOLDER_IMAGE_COUNT(node, inputName, inputData, app) {
+        const widget = {
+          type: "D2_FOLDER_IMAGE_COUNT",
+          name: inputName,
+          value: 0,
+          size: [100, 30],
+
+          // 描画処理
+          draw(ctx, node, width, y) {
+            // 背景描画
+            // ctx.fillStyle = "#2a2a2a";
+            // ctx.fillRect(0, y, width, this.size[1]);
+            
+            // データ表示
+            const text = `Image count: ${this.value}`;
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "12px Arial";
+            // ctx.fillText(JSON.stringify(text), 10, y + 20);
+            ctx.fillText(text, 20, y + 20);
+          },
+        
+          // サイズ計算
+          computeSize(width) {
+              return [Math.min(width, this.size[0]), this.size[1]];
+          },
+          
+          // データのシリアライズ
+          async serializeValue(nodeId, widgetIndex) {
+              return this.value;
+          },
+          
+          // データ更新メソッド
+          setValue(value) {
+              this.value = value;
+              node.setDirtyCanvas(true); // 再描画をトリガー
+          }
+        }
+        node.addCustomWidget(widget);
+        // return widget;
       },
     };
   },
