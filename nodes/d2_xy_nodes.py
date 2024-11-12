@@ -127,7 +127,7 @@ class D2_XYGridImage:
                 "trigger": ("BOOLEAN", {"forceInput": True, "default": False},),
                 "font_size": ("INT", {"default": 12},),
                 "grid_gap": ("INT", {"default": 0},),
-                "swap_dimensions": ("BOOLEAN", {"forceInput": True, "default": False},),
+                "swap_dimensions": ("BOOLEAN", {"default": False},),
             },
         }
     
