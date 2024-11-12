@@ -914,6 +914,31 @@ class D2_RefinerStepsTester:
         return {"ui": {"text": text}, "result": (text,)}
 
 
+"""
+
+D2 List To String
+
+"""
+class D2_ListToString:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "LIST": ("LIST",),
+                "separator": (util.SEPARATOR,),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("STRING",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, LIST, separator):
+        output = util.list_to_text(LIST, separator)
+        return {
+            "result": (output,),
+        }
 
 
 NODE_CLASS_MAPPINGS = {
@@ -933,6 +958,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Refiner Steps Tester": D2_RefinerStepsTester,
     "D2 Prompt SR": D2_PromptSR,
     "D2 Multi Output": D2_MultiOutput,
+    "D2 List To String": D2_ListToString,
 }
 
 

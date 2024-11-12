@@ -219,7 +219,6 @@ class D2_XYCheckpointList:
         ckpt_input = ["None"] +folder_paths.get_filename_list("checkpoints")
         inputs = {
             "required": {
-                "separator": (util.SEPARATOR,), 
                 "ckpt_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
             }
         }
@@ -229,13 +228,13 @@ class D2_XYCheckpointList:
         return inputs
 
     RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("STRING", "LIST")
+    RETURN_NAMES = ("x / y_list", "LIST")
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, separator, ckpt_count, **kwargs):
+    def run(self, ckpt_count, **kwargs):
         ckpt_list = [kwargs.get(f"ckpt_name_{i}") for i in range(1, ckpt_count + 1)]
-        ckpt_list_str = util.list_to_text(ckpt_list, separator)
+        ckpt_list_str = util.list_to_text(ckpt_list, util.LINE_BREAK)
         return (ckpt_list_str, ckpt_list,)
 
 
@@ -250,7 +249,6 @@ class D2_XYLoraList:
         lora_input = ["None"] +folder_paths.get_filename_list("loras")
         inputs = {
             "required": {
-                "separator": (util.SEPARATOR,), 
                 "lora_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
             }
         }
@@ -260,13 +258,13 @@ class D2_XYLoraList:
         return inputs
 
     RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("STRING", "LIST")
+    RETURN_NAMES = ("x / y_list", "LIST")
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, separator, lora_count, **kwargs):
+    def run(self, lora_count, **kwargs):
         lora_list = [kwargs.get(f"lora_name_{i}") for i in range(1, lora_count + 1)]
-        lora_list_str = util.list_to_text(lora_list, separator)
+        lora_list_str = util.list_to_text(lora_list, util.LINE_BREAK)
         return (lora_list_str, lora_list,)
 
 
@@ -303,26 +301,25 @@ class D2_XYPromptSR:
 
 """
 
-D2 XY List To String
+D2 XY List To XYPlot
 
 """
-class D2_XYListToString:
+class D2_XYListToPlot:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
                 "LIST": ("LIST",),
-                "separator": (util.SEPARATOR,), 
             }
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING")
+    RETURN_NAMES = ("x / y_list",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, LIST, separator):
-        output = util.list_to_text(LIST, separator)
+    def run(self, LIST):
+        output = util.list_to_text(LIST, util.LINE_BREAK)
         return {
             "result": (output,),
         }
@@ -342,19 +339,18 @@ class D2_XYFolderImages:
             "required":{
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
-                "separator": (util.SEPARATOR,), 
             },
         }
 
     RETURN_TYPES = ("STRING", "LIST",)
-    RETURN_NAMES = ("STRING", "LIST",)
+    RETURN_NAMES = ("x / y_list", "LIST",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
     ######
-    def run(self, folder, extension, separator):
+    def run(self, folder, extension):
         files = util.get_files(folder, extension)
-        output = util.list_to_text(files, separator)
+        output = util.list_to_text(files, util.LINE_BREAK)
         return {
             "result": (output, files,),
         }
@@ -367,7 +363,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Checkpoint List": D2_XYCheckpointList,
     "D2 XY Lora List": D2_XYLoraList,
     "D2 XY Prompt SR": D2_XYPromptSR,
-    "D2 XY List To String": D2_XYListToString,
+    "D2 XY List To Plot": D2_XYListToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
 }
 

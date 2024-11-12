@@ -13,7 +13,8 @@ from comfy.cli_args import args
 
 
 MAX_RESOLUTION = 16384
-SEPARATOR = ["Line break", ",", ";"]
+LINE_BREAK = "Line break"
+SEPARATOR = [LINE_BREAK, ",", ";"]
 
 """
 入出力をANYにするもの
