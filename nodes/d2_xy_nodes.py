@@ -236,7 +236,7 @@ class D2_XYCheckpointList:
     def run(self, separator, ckpt_count, **kwargs):
         ckpt_list = [kwargs.get(f"ckpt_name_{i}") for i in range(1, ckpt_count + 1)]
         ckpt_list_str = util.list_to_text(ckpt_list, separator)
-        return (ckpt_list, ckpt_list_str,)
+        return (ckpt_list_str, ckpt_list, )
 
 
 """
@@ -267,7 +267,7 @@ class D2_XYLoraList:
     def run(self, separator, lora_count, **kwargs):
         lora_list = [kwargs.get(f"lora_name_{i}") for i in range(1, lora_count + 1)]
         lora_list_str = util.list_to_text(lora_list, separator)
-        return (lora_list, lora_list_str,)
+        return (lora_list_str, lora_list,)
 
 
 """
