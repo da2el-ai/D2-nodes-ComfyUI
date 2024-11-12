@@ -8,22 +8,24 @@ import re
 import random
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
+import math
+from aiohttp import web
 
 import folder_paths
 import comfy.sd
 import node_helpers
 import comfy.samplers
-from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage
+from comfy_execution.graph_utils import GraphBuilder
+from comfy_execution.graph import ExecutionBlocker
+from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage
 from server import PromptServer
-from aiohttp import web
+from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
 from .modules import util
 from .modules import checkpoint_util
 from .modules import pnginfo_util
 
 
-MAX_SEED = 2**32 - 1  # 4,294,967,295
-MAX_RESOLUTION = 16384
 
 
 """
@@ -296,38 +298,6 @@ class D2_CheckpointLoader:
 
 """
 
-D2_CheckpointList
-Checkpointのフルパスを取得できる Checkpoint List
-
-"""
-class D2_CheckpointList:
-    @classmethod
-    def INPUT_TYPES(cls):
-        ckpt_input = ["None"] +folder_paths.get_filename_list("checkpoints")
-        inputs = {
-            "required": {
-                "ckpt_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
-            }
-        }
-
-        for i in range(1, 50):
-            inputs["required"][f"ckpt_name_{i}"] = (ckpt_input,)
-
-        return inputs
-
-    RETURN_TYPES = ("LIST","STRING",)
-    RETURN_NAMES = ("list","list_str")
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    def run(self, ckpt_count, **kwargs):
-        ckpt_list = [kwargs.get(f"ckpt_name_{i}") for i in range(1, ckpt_count + 1)]
-        ckpt_list_str = "\n".join(ckpt_list)
-        return (ckpt_list, ckpt_list_str,)
-
-
-"""
-
 D2 RegexSwitcher
 正規表現で検索して文字列を結合・出力するノード
 
@@ -587,7 +557,7 @@ class D2_PromptSR:
     RETURN_TYPES = ("LIST",)
     RETURN_NAMES = ("LIST",)
     FUNCTION = "replace_text"
-    CATEGORY = "D2/XY Plot"
+    CATEGORY = "D2"
 
     def replace_text(self, prompt, search_txt, replace):
         # 置換文字列を改行で分割
@@ -602,6 +572,8 @@ class D2_PromptSR:
             output_list.append(new_prompt)
 
         return (output_list,)
+
+
 
 
 
@@ -632,7 +604,7 @@ class D2_MultiOutput:
     RETURN_TYPES = ("LIST",)
     RETURN_NAMES = ("LIST",)
     FUNCTION = "output_list"
-    CATEGORY = "D2/XY Plot"
+    CATEGORY = "D2"
 
     ######
     # def output_list(self, type, parameter, seed):
@@ -701,8 +673,8 @@ class D2_EmptyImageAlpha:
     def INPUT_TYPES(cls):
         return {
             "required": { 
-                "width": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 1}),
-                "height": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 1}),
+                "width": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
+                "height": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
                 "color": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFF, "step": 1, "display": "color"}),
                 "alpha": ("FLOAT", {"default": 1.0, "min": 0, "max": 1.0, "step": 0.001, "display": "alpha"}),
@@ -966,7 +938,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Refiner Steps": D2_RefinerSteps,
     "D2 Refiner Steps A1111": D2_RefinerStepsA1111,
     "D2 Refiner Steps Tester": D2_RefinerStepsTester,
-    "D2 Checkpoint List": D2_CheckpointList,
     "D2 Prompt SR": D2_PromptSR,
     "D2 Multi Output": D2_MultiOutput,
 }

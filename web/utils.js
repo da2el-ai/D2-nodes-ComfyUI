@@ -1,10 +1,26 @@
 
 /**
+ * 指定ミリ秒待機
+ */
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
  * ウィジェットを名前から探す
  */
 const findWidgetByName = (node, name) => {
     return node.widgets ? node.widgets.find((w) => w.name === name) : null;
 };
+
+/**
+ * ウィジェットを名前から探す
+ * "converted-widget" なら inputs から探す
+ */
+const findWidgetOrInputsByName = (node, name) => {
+    const widget = findWidgetByName(node, name);
+    if (widget.type !== "converted-widget") return widget;
+    return node.inputs ? node.inputs.find((w) => w.name === name) : null;
+};
+
 
 /**
  * ウィジェットをタイプから探す
@@ -111,4 +127,4 @@ function handleWidgetsVisibility(node, countValue, targets) {
 }
 
 
-export { findWidgetByName, findWidgetByType, setCookie, getCookie, loadCssFile, handleWidgetsVisibility }
+export { sleep, findWidgetByName, findWidgetOrInputsByName, findWidgetByType, setCookie, getCookie, loadCssFile, handleWidgetsVisibility }

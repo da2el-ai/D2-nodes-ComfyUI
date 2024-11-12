@@ -11,6 +11,17 @@ from pathlib import Path
 from comfy.cli_args import args
 
 
+MAX_RESOLUTION = 16384
+
+
+"""
+入出力をANYにするもの
+"""
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+
+
 """
 設定ファイルを読み込む
 ファイルがなければ見本を複製する
@@ -28,7 +39,7 @@ def load_config(config_path:str, sample_path:str):
 ルートディレクトリ取得
 """
 def get_root_path():
-    return Path(__file__).resolve().parents[1]
+    return Path(__file__).resolve().parents[2]
 
 
 
