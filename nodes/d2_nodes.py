@@ -123,7 +123,8 @@ async def route_d2_folder_image_get_image_count(request):
     try:
         folder = request.query.get('folder')
         extension = request.query.get('extension')
-        files = D2_FolderImageQueue.get_files(folder, extension)
+        files = util.get_files(folder, extension)
+
         image_count = len(files)
     except:
         image_count = 0
