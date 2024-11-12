@@ -66,7 +66,6 @@ class D2_XYPlot:
         x_len = len(x_array)
         y_len = len(y_array)
         total = x_len * y_len
-        print("//////////// - ", index, " / ", total)
 
         # 採用する値
         x_value = x_array[index % x_len]
@@ -82,10 +81,6 @@ class D2_XYPlot:
         # プロット図に表示する値
         x_annotation = {"title":x_title, "values":x_array},
         y_annotation = {"title":y_title, "values":y_array},
-
-        print(x_value)
-        print(y_value)
-        print(trigger)
 
         return {
             "result": (x_value, y_value, x_annotation, y_annotation, trigger,),
@@ -216,7 +211,6 @@ class D2_XYGridImage:
 """
 
 D2 XY Checkpoint List
-Checkpointのフルパスを取得できる Checkpoint List
 
 """
 class D2_XYCheckpointList:
@@ -225,24 +219,55 @@ class D2_XYCheckpointList:
         ckpt_input = ["None"] +folder_paths.get_filename_list("checkpoints")
         inputs = {
             "required": {
+                "separator": (util.SEPARATOR,), 
                 "ckpt_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
             }
         }
-
         for i in range(1, 50):
             inputs["required"][f"ckpt_name_{i}"] = (ckpt_input,)
 
         return inputs
 
-    RETURN_TYPES = ("LIST","STRING",)
-    RETURN_NAMES = ("list","list_str")
+    RETURN_TYPES = ("STRING", "LIST")
+    RETURN_NAMES = ("STRING", "LIST")
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, ckpt_count, **kwargs):
+    def run(self, separator, ckpt_count, **kwargs):
         ckpt_list = [kwargs.get(f"ckpt_name_{i}") for i in range(1, ckpt_count + 1)]
-        ckpt_list_str = "\n".join(ckpt_list)
+        ckpt_list_str = util.list_to_text(ckpt_list, separator)
         return (ckpt_list, ckpt_list_str,)
+
+
+"""
+
+D2 XY Lora List
+
+"""
+class D2_XYLoraList:
+    @classmethod
+    def INPUT_TYPES(cls):
+        lora_input = ["None"] +folder_paths.get_filename_list("loras")
+        inputs = {
+            "required": {
+                "separator": (util.SEPARATOR,), 
+                "lora_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
+            }
+        }
+        for i in range(1, 50):
+            inputs["required"][f"lora_name_{i}"] = (lora_input,)
+
+        return inputs
+
+    RETURN_TYPES = ("STRING", "LIST")
+    RETURN_NAMES = ("STRING", "LIST")
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+    def run(self, separator, lora_count, **kwargs):
+        lora_list = [kwargs.get(f"lora_name_{i}") for i in range(1, lora_count + 1)]
+        lora_list_str = util.list_to_text(lora_list, separator)
+        return (lora_list, lora_list_str,)
 
 
 """
@@ -287,7 +312,7 @@ class D2_XYListToString:
         return {
             "required": {
                 "LIST": ("LIST",),
-                "separator": (["Line break", ",", ";"],), 
+                "separator": (util.SEPARATOR,), 
             }
         }
 
@@ -297,11 +322,42 @@ class D2_XYListToString:
     CATEGORY = "D2/XY Plot"
 
     def run(self, LIST, separator):
-        separator = "\n" if separator == "Line break" else separator
-        output = separator.join(LIST)
-        return (output,)
+        output = util.list_to_text(LIST, separator)
+        return {
+            "result": (output,),
+        }
 
 
+
+"""
+
+D2 XY Folder Images
+フォルダ内画像を渡す
+
+"""
+class D2_XYFolderImages:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required":{
+                "folder": ("STRING", {"default": ""}),
+                "extension": ("STRING", {"default": "*.*"}),
+                "separator": (util.SEPARATOR,), 
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "LIST",)
+    RETURN_NAMES = ("STRING", "LIST",)
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+    ######
+    def run(self, folder, extension, separator):
+        files = util.get_files(folder, extension)
+        output = util.list_to_text(files, separator)
+        return {
+            "result": (output, files,),
+        }
 
 
 
@@ -309,8 +365,10 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Plot": D2_XYPlot,
     "D2 XY Grid Image": D2_XYGridImage,
     "D2 XY Checkpoint List": D2_XYCheckpointList,
+    "D2 XY Lora List": D2_XYLoraList,
     "D2 XY Prompt SR": D2_XYPromptSR,
     "D2 XY List To String": D2_XYListToString,
+    "D2 XY Folder Images": D2_XYFolderImages,
 }
 
 

@@ -1,6 +1,7 @@
 import os
 import yaml
 import math
+import glob
 import shutil
 from PIL import Image
 import numpy as np
@@ -12,7 +13,7 @@ from comfy.cli_args import args
 
 
 MAX_RESOLUTION = 16384
-
+SEPARATOR = ["Line break", ",", ";"]
 
 """
 入出力をANYにするもの
@@ -20,6 +21,13 @@ MAX_RESOLUTION = 16384
 class AnyType(str):
     def __ne__(self, __value: object) -> bool:
         return False
+
+"""
+リストを文字結合する
+"""
+def list_to_text(list, separator):
+    separator = "\n" if separator == "Line break" else separator
+    return separator.join(list)
 
 
 """
@@ -50,6 +58,16 @@ def get_config_path(filename):
     config_path = get_root_path() / 'config'
     return config_path / filename
 
+"""
+ファイルリスト取得
+"""
+def get_files(folder, extension):
+    search_pattern = os.path.join(folder, extension)
+    file_list = glob.glob(search_pattern)
+    # ソートして絶対パスに変換
+    file_list = sorted(file_list, key=lambda x: os.path.basename(x))
+    file_list = [os.path.abspath(file) for file in file_list]
+    return file_list
 
 
 """

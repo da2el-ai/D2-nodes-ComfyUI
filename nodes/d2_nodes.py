@@ -1,7 +1,6 @@
 import torch
 import math
 import os
-import glob
 import json
 import hashlib
 import re
@@ -101,23 +100,17 @@ class D2_FolderImageQueue:
     CATEGORY = "D2"
 
     ######
-    def run(self, folder = "", extension="*.*", start_at=0, batch_count=1):
-        files = D2_FolderImageQueue.get_files(folder, extension)
+    def run(self, folder = "", extension="*.*", start_at=0, auto_queue=True, image_count=""):
+        files = util.get_files(folder, extension)
         image_path = files[start_at - 1]
 
         return {
             "result": (image_path,),
-            "ui": {"message":(image_path, start_at,)}
+            "ui": {
+                "image_count": (len(files),),
+                "start_at": (start_at,),
+            }
         }
-
-    @classmethod
-    def get_files(cls, folder, extension):
-        search_pattern = os.path.join(folder, extension)
-        file_list = glob.glob(search_pattern)
-        # ソートして絶対パスに変換
-        file_list = sorted(file_list, key=lambda x: os.path.basename(x))
-        file_list = [os.path.abspath(file) for file in file_list]
-        return file_list
 
 
 """

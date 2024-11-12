@@ -3,16 +3,16 @@ import { findWidgetByName, handleWidgetsVisibility } from "./utils.js";
 
 
 app.registerExtension({
-  name: "Comfy.D2.D2_XYCheckpointList",
+  name: "Comfy.D2.D2_XYLoraList",
 
   nodeCreated(node) {
-    if (node.constructor.title == "D2 XY Checkpoint List"){
+    if (node.constructor.title == "D2 XY Lora List"){
       if (node.widgets){
-        const countWidget = findWidgetByName(node, "ckpt_count");
+        const countWidget = findWidgetByName(node, "lora_count");
         let widgetValue = countWidget.value;
-        handleWidgetsVisibility(node, widgetValue, ["ckpt_name"])
+        handleWidgetsVisibility(node, widgetValue, ["lora_name"])
 
-        // ckpt_count.value の再定義
+        // lora_count.value の再定義
         Object.defineProperty(countWidget, 'value', {
           get() {
             return widgetValue;
@@ -20,7 +20,7 @@ app.registerExtension({
           set(newVal) {
             if (newVal !== widgetValue) {
               widgetValue = newVal;
-              handleWidgetsVisibility(node, newVal, ["ckpt_name"])
+              handleWidgetsVisibility(node, newVal, ["lora_name"])
             }
           }
         });
