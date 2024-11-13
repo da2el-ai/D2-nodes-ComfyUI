@@ -46,10 +46,13 @@ class D2_XYPlot:
                 "y_title": ("STRING", {"default": ""}),
                 "y_list": ("STRING", {"multiline": True},),
                 "auto_queue": ("BOOLEAN", {"default": True},),
-                # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                # "index": ("INT", {"min":0, "default": 0}),
-                "index": ("D2_XYPLOT_INDEX", {})
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
+            "optional": {
+                "reset": ("D2_XYPLOT_RESET", {"default":""}),
+                "index": ("D2_XYPLOT_INDEX", {}),
+            }
+
         }
     
     RETURN_TYPES = (AnyType("*"), AnyType("*"), "DICT", "DICT", "BOOLEAN","INT",)
@@ -58,7 +61,7 @@ class D2_XYPlot:
     CATEGORY = "D2/XY Plot"
 
 
-    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, index=0):
+    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, seed, reset="", index=0):
         # 入力文字列を改行で分割
         x_array = self.change_type(x_type, x_list.strip().split('\n'))
         y_array = self.change_type(y_type, y_list.strip().split('\n'))

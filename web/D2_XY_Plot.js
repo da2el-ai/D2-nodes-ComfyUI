@@ -23,7 +23,7 @@ app.registerExtension({
 
       // まだ残りがあるならキューを入れる
       if(index + 1 < total && total >= 2){
-        indexWidget.value = index + 1;
+        indexWidget.setValue(index + 1);
 
         if(autoQueue){
           await sleep(200);
@@ -32,7 +32,7 @@ app.registerExtension({
       }
       // 最後までいった
       else if(index + 1 >= total){
-        indexWidget.value = 0;
+        indexWidget.setValue(0);
       }
     };
 
@@ -40,14 +40,22 @@ app.registerExtension({
 
   getCustomWidgets(app) {
     return {
+      D2_XYPLOT_RESET(node, inputName, inputData, app) {
+        const widget = node.addWidget("button", "Reset index", "", () => {
+          const indexWidget = findWidgetByName(node, "index");
+          indexWidget.setValue(0);
+        });
+        node.addCustomWidget(widget);
+        return widget;
+      },
       D2_XYPLOT_INDEX(node, inputName, inputData, app) {
         const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_INDEX", inputName, 0);
 
         widget.draw = function(ctx, node, width, y) {
-            const text = `Index: ${this.value}`;
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "12px Arial";
-            ctx.fillText(text, 20, y + 20);
+          const text = `Index: ${this.value}`;
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "12px Arial";
+          ctx.fillText(text, 20, y + 20);
         };
         node.addCustomWidget(widget);
         return widget;
