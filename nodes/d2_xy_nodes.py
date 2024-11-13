@@ -126,9 +126,10 @@ class D2_XYGridImage:
                 "x_annotation": ("DICT", {"default": annotation}),
                 "y_annotation": ("DICT", {"default": annotation}),
                 "trigger": ("BOOLEAN", {"forceInput": True, "default": False},),
-                "font_size": ("INT", {"default": 12},),
+                "font_size": ("INT", {"default": 24},),
                 "grid_gap": ("INT", {"default": 0},),
                 "swap_dimensions": ("BOOLEAN", {"default": False},),
+                "grid_only": ("BOOLEAN", {"default": True},),
             },
         }
     
@@ -140,7 +141,7 @@ class D2_XYGridImage:
     image_batch = torch.Tensor()
     finished = True
 
-    def run(self, images, x_annotation, y_annotation, trigger, font_size, grid_gap, swap_dimensions):
+    def run(self, images, x_annotation, y_annotation, trigger, font_size, grid_gap, swap_dimensions, grid_only):
         if swap_dimensions:
             x_temp = x_annotation[0]
             y_temp = y_annotation[0]
@@ -191,11 +192,14 @@ class D2_XYGridImage:
                 "result": (images_grid_node.out(0),),
                 "expand": graph.finalize()
             }
-        
-        return {
-            # "result": (ExecutionBlocker(None),),
-            "result": (images,),
-        }
+        elif grid_only:
+            return {
+                "result": (ExecutionBlocker(None),),
+            }
+        else:
+            return {
+                "result": (images,),
+            }
 
     @classmethod
     def create_grid_text(cls, annotation, separator=";"):
