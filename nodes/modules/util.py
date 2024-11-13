@@ -16,6 +16,13 @@ MAX_RESOLUTION = 16384
 LINE_BREAK = "Line break"
 SEPARATOR = [LINE_BREAK, ",", ";"]
 
+RESAMPLE_FILTERS = {
+    'nearest': 0,
+    'bilinear': 2,
+    'bicubic': 3,
+    'lanczos': 1
+}
+
 """
 入出力をANYにするもの
 """
@@ -124,3 +131,18 @@ PIL to Tensor
 """
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
+
+"""
+サイズプリセットの配列を取得
+"""
+def get_size_preset():
+    # 設定を読む
+    config_path = get_config_path("sizeselector_config.yaml")
+    config_sample_path = get_config_path("sizeselector_config.sample.yaml")
+    config_value = load_config(config_path, config_sample_path)
+
+    size_dict = config_value["size_dict"]
+    size_list = ["custom"]
+    size_list.extend(size_dict.keys())
+
+    return size_list, size_dict

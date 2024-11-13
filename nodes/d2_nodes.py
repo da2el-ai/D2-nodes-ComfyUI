@@ -622,35 +622,6 @@ class D2_MultiOutput:
         return (output_list,)
 
 
-"""
-
-D2 Rescale Calculator
-サイズのリスケール計算機
-
-"""
-class D2_ResizeCalculator:
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
-                "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
-                "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
-                "round_method": (["Floor", "Round", "Ceil"],),
-            },
-        }
-
-    RETURN_TYPES = ("INT", "INT", "FLOAT",)
-    RETURN_NAMES = ("width", "height", "rescale_factor",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, width, height, rescale_factor, round_method):
-
-        width, height = util.resize_calc(width, height, rescale_factor, round_method)
-
-        return(width, height, rescale_factor,)
 
 
 """
@@ -688,6 +659,35 @@ class D2_EmptyImageAlpha:
         return (torch.cat((r, g, b, a), dim=-1), )
 
 
+"""
+
+D2 Rescale Calculator
+サイズのリスケール計算機
+
+"""
+class D2_ResizeCalculator:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
+                "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
+                "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
+                "round_method": (["Floor", "Round", "Ceil"],{"default":"Round"}),
+            },
+        }
+
+    RETURN_TYPES = ("INT", "INT", "FLOAT",)
+    RETURN_NAMES = ("width", "height", "rescale_factor",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, width, height, rescale_factor, round_method):
+
+        width, height = util.resize_calc(width, height, rescale_factor, round_method)
+
+        return(width, height, rescale_factor,)
 
 """
 
@@ -701,16 +701,20 @@ class D2_ImageResize:
 
     @classmethod
     def INPUT_TYPES(cls):
+        cls.size_list, cls.size_dict = util.get_size_preset()
+
         return {
             "required": {
                 "image": ("IMAGE",),
                 "mode": (["rescale", "resize"],),
-                "supersample": (["true", "false"],),
-                "resampling": (["lanczos", "nearest", "bilinear", "bicubic"],),
                 "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
+                "preset": (cls.size_list,),
                 "resize_width": ("INT", {"default": 1024, "min": 1, "max": 48000, "step": 1}),
                 "resize_height": ("INT", {"default": 1536, "min": 1, "max": 48000, "step": 1}),
-                "round_method": (["Floor", "Round", "Ceil"],),
+                "swap_dimensions": ("BOOLEAN", {"default":False}),
+                "round_method": (["Floor", "Round", "Ceil"],{"default":"Round"}),
+                "supersample": ("BOOLEAN", {"default":True}),
+                "resampling": (["lanczos", "nearest", "bilinear", "bicubic"],),
             },
         }
 
@@ -719,46 +723,69 @@ class D2_ImageResize:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, image, mode="rescale", supersample='true', resampling="lanczos", rescale_factor=2, resize_width=1024, resize_height=1024, round_method="Floor"):
+    def run(self, image, mode="rescale", rescale_factor=2, preset="custom", resize_width=1024, resize_height=1024, swap_dimensions=False, round_method="Floor", supersample='true', resampling="lanczos"):
         scaled_images = []
 
         for img in image:
-            resized_image, new_width, new_height = self.apply_resize_image(util.tensor2pil(img), mode, supersample, rescale_factor, resize_width, resize_height, resampling, round_method)
+            resized_image, new_width, new_height = self.__class__.apply_resize_image(util.tensor2pil(img), mode, rescale_factor, resize_width, resize_height, swap_dimensions, round_method, supersample, resampling, preset)
             scaled_images.append(util.pil2tensor(resized_image))
 
         scaled_images = torch.cat(scaled_images, dim=0)
 
         return (scaled_images, new_width, new_height, rescale_factor, )
 
+    @classmethod
+    def apply_resize_image(cls, image: Image.Image, mode="rescale", rescale_factor=2, resize_width=1024, resize_height=1024, swap_dimensions=False, round_method="Floor", supersample='true', resampling="lanczos", preset="custom"):
 
-    def apply_resize_image(self, image: Image.Image, mode='scale', supersample='true', factor: int = 2, width: int = 1024, height: int = 1024, resample='bicubic', round_method="Floor"):
-
-        current_width, current_height = image.size
-
-        if mode == 'rescale':
-            new_width = util.number_adjust(current_width * factor, round_method, 8)
-            new_height = util.number_adjust(current_height * factor, round_method, 8)
-        else:
-            new_width = util.number_adjust(width, round_method, 8)
-            new_height = util.number_adjust(height, round_method, 8)
-
-        # Define a dictionary of resampling filters
-        resample_filters = {
-            'nearest': 0,
-            'bilinear': 2,
-            'bicubic': 3,
-            'lanczos': 1
-        }
+        org_width, org_height = image.size
+        new_width, new_height = cls.get_new_size(mode, rescale_factor, resize_width, resize_height, swap_dimensions, round_method, org_width, org_height, preset)
 
         # Apply supersample
-        if supersample == 'true':
-            image = image.resize((new_width * 8, new_height * 8), resample=Image.Resampling(resample_filters[resample]))
+        if supersample:
+            image = image.resize((new_width * 8, new_height * 8), resample=Image.Resampling(util.RESAMPLE_FILTERS[resampling]))
 
         # Resize the image using the given resampling filter
-        resized_image = image.resize((new_width, new_height), resample=Image.Resampling(resample_filters[resample]))
+        resized_image = image.resize((new_width, new_height), resample=Image.Resampling(util.RESAMPLE_FILTERS[resampling]))
 
         return resized_image, new_width, new_height
 
+    """
+    サイズ計算
+    mode: resize か rescale か
+    rescale_factor: 倍率指定
+    resize_width / resize_height: 数値指定
+    swap_dimensions: サイズの縦横を入れ替えるか
+    round_method: Floor / Round/ Ceil
+    org_width: rescale で使う変更前のサイズ（主に画像から取得）
+    preset: サイズプリセット
+    """
+    @classmethod
+    def get_new_size(cls, mode="rescale", rescale_factor=2, resize_width=1024, resize_height=1024, swap_dimensions=False, round_method="Floor", org_width=0, org_height=0, preset="custom"):
+        if(mode == "resize"):
+            """
+            数値指定モード
+            """
+            if(preset != "custom"):
+                new_width = cls.size_dict.get(preset).get("width", resize_width)
+                new_height = cls.size_dict.get(preset).get("height", resize_height)
+            else:
+                new_width = resize_width
+                new_height = resize_height
+            
+            # 端数を入力される可能性があるので四捨五入
+            new_width, new_height = util.resize_calc(new_width, new_height, 1, round_method)
+
+        else:
+            """
+            倍率指定モード
+            """
+            new_width, new_height = util.resize_calc(org_width, org_height, rescale_factor, round_method)
+
+        # 縦横入れ替え
+        if swap_dimensions:
+            new_width, new_height = new_height, new_width
+
+        return new_width, new_height
 
 
 """
@@ -773,23 +800,24 @@ class D2_SizeSelector:
     @classmethod
     def INPUT_TYPES(cls):
         # 設定を読む
-        config_path = util.get_config_path("sizeselector_config.yaml")
-        config_sample_path = util.get_config_path("sizeselector_config.sample.yaml")
-        config_value = util.load_config(config_path, config_sample_path)
+        cls.size_list, cls.size_dict = util.get_size_preset()
+        # config_path = util.get_config_path("sizeselector_config.yaml")
+        # config_sample_path = util.get_config_path("sizeselector_config.sample.yaml")
+        # config_value = util.load_config(config_path, config_sample_path)
 
-        cls.size_dict = config_value["size_dict"]
-        cls.size_list = ["custom"]
-        cls.size_list.extend(cls.size_dict.keys())
+        # cls.size_dict = config_value["size_dict"]
+        # cls.size_list = ["custom"]
+        # cls.size_list.extend(cls.size_dict.keys())
 
         return {
             "required": {
                 "preset": (cls.size_list,),
                 "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
                 "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
-                "swap_dimensions": (["Off", "On"],),
+                "swap_dimensions": ("BOOLEAN", {"default":False}),
                 "upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
                 "prescale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
-                "round_method": (["Floor", "Round", "Ceil"],),
+                "round_method": (["Floor", "Round", "Ceil"],{"default":"Round"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 64})
             },
             "optional": {
