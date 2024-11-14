@@ -16,7 +16,7 @@ import node_helpers
 import comfy.samplers
 from comfy_execution.graph_utils import GraphBuilder
 from comfy_execution.graph import ExecutionBlocker
-from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage
+from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced
 from server import PromptServer
 from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
@@ -25,6 +25,19 @@ from .modules import checkpoint_util
 from .modules import pnginfo_util
 
 
+
+
+"""
+Controlnet object wrapper
+"""
+class D2_Cnet:
+    def __init__(self, controlnet_name, image, strength, start_percent, end_percent):
+        self.controlnet_path = folder_paths.get_full_path_or_raise("controlnet", controlnet_name)
+        self.controlnet = comfy.controlnet.load_controlnet(self.controlnet_path)
+        self.image = image
+        self.strength = strength
+        self.start_percent = start_percent
+        self.end_percent = end_percent
 
 
 """
@@ -159,6 +172,9 @@ class D2_KSampler:
                 "positive": ("STRING", {"default": "","multiline": True}),
                 "negative": ("STRING", {"default": "", "multiline": True}),
             },
+            "optional": {
+                "cnet_stack": ("D2_CNET_STACK",),
+            },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
@@ -170,11 +186,12 @@ class D2_KSampler:
 
 
     def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, prompt=None, extra_pnginfo=None, my_unique_id=None,
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, prompt=None, extra_pnginfo=None, my_unique_id=None,
             add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular"):
 
         util.set_preview_method(preview_method)
 
+        # コンディショニングが入力されていたらそちらを優先する
         if positive_cond != None:
             positive_encoded = positive_cond
         else:
@@ -184,6 +201,16 @@ class D2_KSampler:
             negative_encoded = negative_cond
         else:
             (negative_encoded,) = CLIPTextEncode().encode(clip, negative)
+
+        # control net
+        if isinstance(cnet_stack, list):
+            for d2_cnet in cnet_stack:
+                controlnet_conditioning = ControlNetApplyAdvanced().apply_controlnet(
+                    positive_encoded, negative_encoded, 
+                    d2_cnet.controlnet, d2_cnet.image, d2_cnet.strength,
+                    d2_cnet.start_percent, d2_cnet.end_percent
+                )
+                positive_encoded, negative_encoded = controlnet_conditioning[0], controlnet_conditioning[1]
 
         disable_noise = add_noise == "disable"
         force_full_denoise = return_with_leftover_noise != "enable"
@@ -236,6 +263,7 @@ class D2_KSamplerAdvanced(D2_KSampler):
             "optional": {
                 "positive_cond": ("CONDITIONING",),
                 "negative_cond": ("CONDITIONING",),
+                "cnet_stack": ("D2_CNET_STACK",),
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
@@ -248,10 +276,10 @@ class D2_KSamplerAdvanced(D2_KSampler):
 
     def run(self, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 
             start_at_step, end_at_step, return_with_leftover_noise,
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
 
         return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
-            preview_method, positive, negative, positive_cond, negative_cond, prompt, extra_pnginfo, my_unique_id,
+            preview_method, positive, negative, positive_cond, negative_cond, cnet_stack, prompt, extra_pnginfo, my_unique_id,
             add_noise, start_at_step, end_at_step, return_with_leftover_noise, sampler_type="advanced")
 
 
@@ -288,6 +316,45 @@ class D2_CheckpointLoader:
         ckpt_name = os.path.basename(ckpt_name)
         return out[:3] + (ckpt_name, hash, ckpt_path)
 
+
+"""
+
+D2 Controlnet Loader
+D2 Ksampler専用のcontrolnetローダー
+
+"""
+class D2_ControlnetLoader:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": { 
+                "controlnet_name": (folder_paths.get_filename_list("controlnet"),),
+                "image": ("IMAGE",),
+                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.001}),
+                "start_percent": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.001}),
+                "end_percent": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.001})
+            },
+            "optional": {
+                "cnet_stack": ("D2_CNET_STACK",),
+            },
+        }
+
+    RETURN_TYPES = ("D2_CNET_STACK",)
+    RETURN_NAMES = ("cnet_stack",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, controlnet_name, image, strength, start_percent, end_percent, cnet_stack=None ):
+        d2_cnet = D2_Cnet(
+            controlnet_name, image, strength, start_percent, end_percent
+        )
+
+        if isinstance(cnet_stack, list):
+            cnet_stack.append(d2_cnet)
+        else:
+            cnet_stack = [d2_cnet]
+        
+        return (cnet_stack,)
 
 
 """
@@ -976,6 +1043,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 KSampler": D2_KSampler,
     "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
+    "D2 Controlnet Loader": D2_ControlnetLoader,
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Regex Replace": D2_RegexReplace,
     "D2 Resize Calculator": D2_ResizeCalculator,
