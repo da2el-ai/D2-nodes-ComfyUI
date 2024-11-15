@@ -207,7 +207,7 @@ class D2_XYGridImage:
     @classmethod
     def create_grid_text(cls, annotation, separator=";"):
         def format_annotation(title, value):
-            return value if title == "" else f"{title}:{value}"
+            return value if title == "" else f"{title}:{str(value)}"
 
         return separator.join([
             format_annotation(annotation['title'], value)
