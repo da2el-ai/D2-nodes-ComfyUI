@@ -908,7 +908,7 @@ class D2_SizeSelector:
             width = self.__class__.size_dict.get(preset).get("width", width)
             height = self.__class__.size_dict.get(preset).get("height", height)
 
-        if swap_dimensions == "On":
+        if swap_dimensions:
             width, height = height, width
 
         width, height = util.resize_calc(width, height, prescale_factor, round_method)
