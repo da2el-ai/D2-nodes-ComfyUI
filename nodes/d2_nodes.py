@@ -867,97 +867,6 @@ class D2_SizeSelector:
         return(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent}, )
 
 
-"""
-
-D2_RefinerSteps
-Refinerの切り替えステップをステップ数で指定する
-
-"""
-class D2_RefinerSteps:
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "steps": ("INT", {"default": 25, "min":0}),
-                "start": ("INT", {"default": 0, "min":0}),
-                "end": ("INT", {"default": 5, "min":0}),
-            }
-        }
-    RETURN_TYPES = ("INT", "INT", "INT", "INT",)
-    RETURN_NAMES = ("steps", "start", "end", "refiner_start",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, steps, start, end):
-        refiner_start = end + 1
-        return(steps, start, end, refiner_start,)
-
-
-
-"""
-
-D2 Refiner Steps A1111
-Refinerの切り替えステップを％で指定する
-
-"""
-class D2_RefinerStepsA1111:
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "steps": ("INT", {"default": 25}),
-                "denoise": ("FLOAT", {"default": 1, "min":0, "max":1, "step":0.01}),
-                "switch_at": ("FLOAT", {"default": 0.2, "min":0, "max":1, "step":0.01}),
-            }
-        }
-    RETURN_TYPES = ("INT", "INT", "INT", "INT",)
-    RETURN_NAMES = ("steps", "start", "end", "refiner_start",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, steps, denoise, switch_at):
-        real_steps = math.floor(steps / denoise)
-        start = real_steps - steps
-        end = math.floor((real_steps - start) * switch_at) + start
-        refiner_start = end + 1
-
-        return(real_steps, start, end, refiner_start,)
-
-
-
-
-"""
-
-D2 Refiner Steps Tester
-Refiner Steps の計算結果を確認するノード
-
-"""
-class D2_RefinerStepsTester:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "steps": ("INT", {"forceInput":True}),
-            },
-            "optional": {
-                "start": ("INT", {"forceInput":True}),
-                "end": ("INT", {"forceInput":True}),
-                "refiner_start": ("INT", {"forceInput":True}),
-            }
-        }
-
-    # INPUT_IS_LIST = True
-    RETURN_TYPES = ()
-    OUTPUT_NODE = True
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, steps=0, start=0, end=0, refiner_start=0):
-        text = f"stesps: {steps}\nstart: {start}\nend: {end}\nrefiner_start: {refiner_start}"
-        return {"ui": {"text": text}, "result": (text,)}
-
 
 """
 
@@ -999,9 +908,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
     "D2 Image Resize": D2_ImageResize,
     "D2 Size Slector": D2_SizeSelector,
-    "D2 Refiner Steps": D2_RefinerSteps,
-    "D2 Refiner Steps A1111": D2_RefinerStepsA1111,
-    "D2 Refiner Steps Tester": D2_RefinerStepsTester,
     "D2 Multi Output": D2_MultiOutput,
     "D2 List To String": D2_ListToString,
 }
