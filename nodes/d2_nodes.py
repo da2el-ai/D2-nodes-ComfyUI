@@ -1002,7 +1002,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Refiner Steps": D2_RefinerSteps,
     "D2 Refiner Steps A1111": D2_RefinerStepsA1111,
     "D2 Refiner Steps Tester": D2_RefinerStepsTester,
-    "D2 Prompt SR": D2_PromptSR,
     "D2 Multi Output": D2_MultiOutput,
     "D2 List To String": D2_ListToString,
 }

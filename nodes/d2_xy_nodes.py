@@ -319,6 +319,51 @@ class D2_XYPromptSR:
         return (output_xy, output_list,)
 
 
+"""
+
+D2 XY Seed
+SEEDのリストを出力するノード
+
+"""
+class D2_XYSeed:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                # プロンプト
+                "seeds": (
+                    "STRING",{"multiline": True},
+                ),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "LIST",)
+    RETURN_NAMES = ("x / y_list", "LIST",)
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+    ######
+    def run(self, seeds):
+
+        # 入力文字列を改行で分割
+        seed_list = seeds.strip().split('\n')
+        print(seed_list)
+
+        # 出力リスト
+        output_list = []
+
+        # 入力が -1 ならランダム数値を生成
+        for seed_str in seed_list:
+            if seed_str == "-1":
+                output_list.append(util.create_seed())
+            else:
+                output_list.append(int(seed_str))
+
+        output_xy = "\n".join(str(x) for x in output_list)
+
+        return (output_xy, output_list,)
+
 
 """
 
@@ -378,6 +423,9 @@ class D2_XYFolderImages:
 
 
 
+
+
+
 NODE_CLASS_MAPPINGS = {
     "D2 XY Plot": D2_XYPlot,
     "D2 XY Grid Image": D2_XYGridImage,
@@ -386,6 +434,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Prompt SR": D2_XYPromptSR,
     "D2 XY List To Plot": D2_XYListToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
+    "D2 XY Seed": D2_XYSeed,
 }
 
 

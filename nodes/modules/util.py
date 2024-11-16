@@ -3,6 +3,7 @@ import yaml
 import math
 import glob
 import shutil
+import random
 from PIL import Image
 import numpy as np
 import torch
@@ -13,6 +14,7 @@ from comfy.cli_args import args
 
 
 MAX_RESOLUTION = 16384
+MAX_SEED = 0xffffffffffffffff
 LINE_BREAK = "Line break"
 SEPARATOR = [LINE_BREAK, ",", ";"]
 
@@ -22,6 +24,13 @@ RESAMPLE_FILTERS = {
     'bicubic': 3,
     'lanczos': 1
 }
+
+"""
+seed値を作る
+"""
+def create_seed():
+    return random.randrange(MAX_SEED)
+
 
 """
 入出力をANYにするもの
