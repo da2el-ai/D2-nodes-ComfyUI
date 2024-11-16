@@ -332,9 +332,8 @@ class D2_XYSeed:
         return {
             "required": {
                 # プロンプト
-                "seeds": (
-                    "STRING",{"multiline": True},
-                ),
+                "seeds": ("STRING",{"multiline": True},),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
         }
 
@@ -344,7 +343,7 @@ class D2_XYSeed:
     CATEGORY = "D2/XY Plot"
 
     ######
-    def run(self, seeds):
+    def run(self, seeds, seed):
 
         # 入力文字列を改行で分割
         seed_list = seeds.strip().split('\n')
