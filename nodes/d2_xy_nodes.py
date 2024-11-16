@@ -288,23 +288,36 @@ class D2_XYPromptSR:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                # 置換文字列
-                "replace": ("STRING", {"forceInput":True}),
-                # 検索ワード
-                "search": ("STRING", {"default":""}),
                 # プロンプト
                 "prompt": ("STRING", {"multiline":True, "default":""},),
+                # 検索ワード
+                "search": ("STRING", {"default":""}),
+                # 置換文字列
+                "replace": ("STRING", {"multiline":True, "default":""}),
             },
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
+    RETURN_TYPES = ("STRING", "LIST")
+    RETURN_NAMES = ("x / y_list", "LIST")
     FUNCTION = "replace_text"
     CATEGORY = "D2/XY Plot"
 
-    def replace_text(self, replace, search, prompt):
-        new_prompt = prompt.replace(search, replace)
-        return (new_prompt,)
+    def replace_text(self, prompt, search, replace):
+        # 置換文字列を改行で分割
+        replace_items = replace.strip().split('\n')
+
+        # 出力リスト
+        output_list = [prompt]
+
+        # 文字列を検索して置換
+        for item in replace_items:
+            new_prompt = prompt.replace(search, item)
+            output_list.append(new_prompt)
+
+        output_xy = "\n".join(output_list)
+
+        return (output_xy, output_list,)
+
 
 
 """
