@@ -347,7 +347,6 @@ class D2_XYSeed:
 
         # 入力文字列を改行で分割
         seed_list = seeds.strip().split('\n')
-        print(seed_list)
 
         # 出力リスト
         output_list = []
