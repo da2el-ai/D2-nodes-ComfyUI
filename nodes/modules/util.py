@@ -102,9 +102,10 @@ def set_preview_method(method):
 
 """
 任意の単位で四捨五入(round) or 切り捨て(floor) or 切り上げ(ceil)
+それ以外は数値そのまま返す
 """
 def number_adjust(number, method='floor', target_num=8):
-    valid_methods = ['round', 'ceil', 'floor']
+    valid_methods = ['round', 'ceil', 'floor', 'none']
     method = method.lower()
 
     if method not in valid_methods:
@@ -114,8 +115,10 @@ def number_adjust(number, method='floor', target_num=8):
         return round(number / target_num) * target_num
     elif method == 'ceil':
         return math.ceil(number / target_num) * target_num
-    else:
+    elif method == 'ceil':
         return math.floor(number / target_num) * target_num
+    else:
+        return number
 
 """
 幅と高さをリサイズ

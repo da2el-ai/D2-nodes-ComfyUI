@@ -690,7 +690,7 @@ class D2_ResizeCalculator:
                 "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
                 "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
                 "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
-                "round_method": (["Floor", "Round", "Ceil"],{"default":"Round"}),
+                "round_method": (["Floor", "Round", "Ceil", "None"],{"default":"Round"}),
             },
         }
 
@@ -728,7 +728,7 @@ class D2_ImageResize:
                 "resize_width": ("INT", {"default": 1024, "min": 1, "max": 48000, "step": 1}),
                 "resize_height": ("INT", {"default": 1536, "min": 1, "max": 48000, "step": 1}),
                 "swap_dimensions": ("BOOLEAN", {"default":False}),
-                "round_method": (["Floor", "Round", "Ceil"],{"default":"Round"}),
+                "round_method": (["Floor", "Round", "Ceil", "None"],{"default":"Round"}),
                 "supersample": ("BOOLEAN", {"default":True}),
                 "resampling": (["lanczos", "nearest", "bilinear", "bicubic"],),
             },
@@ -833,7 +833,7 @@ class D2_SizeSelector:
                 "swap_dimensions": ("BOOLEAN", {"default":False}),
                 "upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
                 "prescale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
-                "round_method": (["Floor", "Round", "Ceil"],{"default":"Round"}),
+                "round_method": (["Floor", "Round", "Ceil", "None"],{"default":"Round"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 64})
             },
             "optional": {
@@ -866,6 +866,46 @@ class D2_SizeSelector:
 
         return(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent}, )
 
+
+
+
+"""
+
+D2 Get Image Size
+画像サイズ表示
+
+"""
+class D2_GetImageSize:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+
+        return {
+            "required": {
+                "images": ("IMAGE",),
+            },
+            "optional": {
+                "display": ("STRING", {"multiline":True, "default":""},),
+            }
+        }
+
+    RETURN_TYPES = ("INT", "INT",)
+    RETURN_NAMES = ("width", "height",)
+    OUTPUT_NODE = True
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, images, display):
+        width = images.shape[2]
+        height = images.shape[1]
+
+        return {
+            "result": (width, height, ),
+            "ui": {
+                "width": (width,), 
+                "height": (height,),
+            },
+        }
 
 
 """
@@ -907,6 +947,8 @@ NODE_CLASS_MAPPINGS = {
     "D2 Resize Calculator": D2_ResizeCalculator,
     "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
     "D2 Image Resize": D2_ImageResize,
+    "D2 Get Image Size": D2_GetImageSize,
+    "D2 Size Slector": D2_SizeSelector,
     "D2 Size Slector": D2_SizeSelector,
     "D2 Multi Output": D2_MultiOutput,
     "D2 List To String": D2_ListToString,
