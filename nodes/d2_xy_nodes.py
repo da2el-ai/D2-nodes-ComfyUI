@@ -168,29 +168,27 @@ class D2_XYGridImage:
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    image_batch = torch.Tensor()
+    image_batch = None
     finished = True
 
     def run(self, images, x_annotation, y_annotation, trigger, font_size, grid_gap, swap_dimensions, grid_only):
+
         if swap_dimensions:
-            x_temp = x_annotation[0]
-            y_temp = y_annotation[0]
-            x_annotation = y_temp
-            y_annotation = x_temp
-        else:
-            x_annotation = x_annotation[0]
-            y_annotation = y_annotation[0]
+            x_annotation, y_annotation = y_annotation, x_annotation
 
         if self.finished:
             self.finished = False
-            self.image_batch = torch.Tensor()
+            self.image_batch = None
 
-        self.image_batch = torch.cat((self.image_batch, images))
-
-        # 期待される総画像数を計算
-        expected_count = len(x_annotation['values']) * len(y_annotation['values'])
+        if self.image_batch is None:
+            self.image_batch = images
+        else:
+            self.image_batch = torch.cat((self.image_batch, images), dim=0)
 
         if trigger:
+            # 期待される総画像数を計算
+            expected_count = len(x_annotation['values']) * len(y_annotation['values'])
+
             # 画像数チェック
             if self.image_batch.shape[0] != expected_count:
                 print(f"Warning: Expected {expected_count} images, but got {self.image_batch.shape[0]}")
@@ -215,8 +213,7 @@ class D2_XYGridImage:
                 gap=grid_gap)
 
             self.finished = True
-            # メモリ解放
-            self.image_batch = torch.Tensor()
+            self.image_batch = None
 
             return {
                 "result": (images_grid_node.out(0),),
@@ -242,6 +239,43 @@ class D2_XYGridImage:
         ])
 
 
+"""
+
+D2 XY Image Stack
+
+"""
+class D2_XYImageStack:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+            }
+        }
+
+    
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("images",)
+    FUNCTION = "stack_image"
+    CATEGORY = "D2/XY Plot"
+
+    def stack_image(self, image_count, **kwargs):
+
+        image_list = []
+        
+        for i in range(1, image_count + 1):
+            image = kwargs.get(f"image_{i}")
+            if image is not None:
+                image_list.append(image)
+
+        if len(image_list) > 0:
+            image_batch = torch.cat(image_list, dim=0)
+
+            return (image_batch,)
+
+        return (None,)
+
 
 """
 
@@ -254,7 +288,7 @@ class D2_XYCheckpointList:
         ckpt_input = ["None"] +folder_paths.get_filename_list("checkpoints")
         inputs = {
             "required": {
-                "ckpt_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
+                "ckpt_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
             }
         }
         for i in range(1, 50):
@@ -284,7 +318,7 @@ class D2_XYLoraList:
         lora_input = ["None"] +folder_paths.get_filename_list("loras")
         inputs = {
             "required": {
-                "lora_count": ("INT", {"default": 3, "min": 0, "max": 50, "step": 1}),
+                "lora_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
             }
         }
         for i in range(1, 50):
@@ -450,12 +484,12 @@ class D2_XYFolderImages:
 
 
 
-
 NODE_CLASS_MAPPINGS = {
     "D2 XY Plot": D2_XYPlot,
     "D2 XY Grid Image": D2_XYGridImage,
     "D2 XY Checkpoint List": D2_XYCheckpointList,
     "D2 XY Lora List": D2_XYLoraList,
+    "D2 XY Image Stack": D2_XYImageStack,
     "D2 XY Prompt SR": D2_XYPromptSR,
     "D2 XY List To Plot": D2_XYListToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,

@@ -11,6 +11,13 @@ const findWidgetByName = (node, name) => {
 };
 
 /**
+ * 入力を名前から探す
+ */
+const findInputByName = (node, name) => {
+    return node.inputs ? node.inputs.find((w) => w.name === name) : null;
+};
+
+/**
  * ウィジェットを名前から探す
  * "converted-widget" なら inputs から探す
  */
@@ -123,6 +130,33 @@ function handleWidgetsVisibility(node, countValue, targets) {
     }
 }
 
+
+/**
+ * 番号付き入力の追加・削除
+ */
+function handleInputsVisibility(node, countValue, targets, type) {
+    // 全ての入力について処理
+    for (let i = 1; i <= 10; i++) {
+        // 同じ番号が付いた関連入力を対象にする
+        targets.forEach((target) => {
+            const name = `${target}_${i}`;
+            const input = findInputByName(node, name);
+
+            if(input){
+                if (i > countValue) {
+                    node.removeInput(i);
+                    node.inputs.length = node.inputs.length -1;
+                }
+            }else{
+                if (i <= countValue) {
+                    node.addInput(name, type);
+                }
+            }
+        });
+    }
+}
+
+
 /**
  * 表示線用ウィジェットのベース
  */
@@ -169,9 +203,11 @@ export {
     findWidgetByName,
     findWidgetOrInputsByName,
     findWidgetByType,
+    findInputByName,
     setCookie,
     getCookie,
     loadCssFile,
     handleWidgetsVisibility,
+    handleInputsVisibility,
     getReadOnlyWidgetBase,
 };
