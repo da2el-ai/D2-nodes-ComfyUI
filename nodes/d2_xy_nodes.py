@@ -27,6 +27,53 @@ from .modules import pnginfo_util
 
 
 
+"""
+
+D2 XY Annotation
+
+"""
+class D2_XYAnnotation:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "type": (["STRING","INT","FLOAT",],),
+                "title": ("STRING", {"default": ""}),
+                "list": ("STRING", {"multiline": True},),
+            },
+        }
+    
+    RETURN_TYPES = ("DICT",)
+    RETURN_NAMES = ("x / y_annotation",)
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+    def run(self, type, title, list):
+        annotation = self.__class__.get_annotation(type, title, list)
+        return (annotation,)
+
+    @classmethod
+    def get_annotation(cls, type, title, list) -> dict:
+        array = cls.change_type(type, list.strip().split('\n'))
+        annotation = {"title":title, "values":array}
+        return annotation
+
+    @classmethod
+    def change_type(cls, type, values):
+        outputs = []
+
+        # 文字列を検索して置換
+        for val in values:
+            if type == "INT":
+                outputs.append(int(val))
+            elif type == "FLOAT":
+                outputs.append(float(val))
+            else:
+                outputs.append(val)
+
+        return outputs
+
 
 """
 
@@ -62,9 +109,11 @@ class D2_XYPlot:
 
 
     def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, seed, reset="", index=0):
-        # 入力文字列を改行で分割
-        x_array = self.change_type(x_type, x_list.strip().split('\n'))
-        y_array = self.change_type(y_type, y_list.strip().split('\n'))
+        x_annotation = D2_XYAnnotation.get_annotation(x_type, x_title, x_list)
+        y_annotation = D2_XYAnnotation.get_annotation(y_type, y_title, y_list)
+
+        x_array = x_annotation["values"]
+        y_array = y_annotation["values"]
 
         # 要素の数
         x_len = len(x_array)
@@ -75,16 +124,8 @@ class D2_XYPlot:
         x_value = x_array[index % x_len]
         y_value = y_array[math.floor(index / x_len)]
 
-        # プロット図に表示する値
-        x_annotation = [x_title] + x_array
-        y_annotation = [y_title] + y_array
-
         # 全部完了したか
         trigger = index + 1 >= total
-
-        # プロット図に表示する値
-        x_annotation = {"title":x_title, "values":x_array},
-        y_annotation = {"title":y_title, "values":y_array},
 
         return {
             "result": (x_value, y_value, x_annotation, y_annotation, trigger,index,),
@@ -97,20 +138,6 @@ class D2_XYPlot:
             }
         }
 
-    @classmethod
-    def change_type(cls, type, values):
-        outputs = []
-
-        # 文字列を検索して置換
-        for val in values:
-            if type == "INT":
-                outputs.append(int(val))
-            elif type == "FLOAT":
-                outputs.append(float(val))
-            else:
-                outputs.append(val)
-
-        return outputs
 
 """
 
@@ -433,6 +460,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY List To Plot": D2_XYListToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
     "D2 XY Seed": D2_XYSeed,
+    "D2 XY Annotation": D2_XYAnnotation,
 }
 
 
