@@ -94,8 +94,8 @@ class D2_XYPlot:
 
 
     def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, seed, reset="", index=0):
-        x_annotation = D2_XYAnnotation.get_annotation(x_type, x_title, x_list)
-        y_annotation = D2_XYAnnotation.get_annotation(y_type, y_title, y_list)
+        x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
+        y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
 
         x_array = x_annotation.values
         y_array = y_annotation.values
