@@ -136,7 +136,7 @@ function handleWidgetsVisibility(node, countValue, targets) {
  */
 function handleInputsVisibility(node, countValue, targets, type) {
     // 全ての入力について処理
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 50; i++) {
         // 同じ番号が付いた関連入力を対象にする
         targets.forEach((target) => {
             const name = `${target}_${i}`;
