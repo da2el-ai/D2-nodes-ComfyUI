@@ -3,13 +3,10 @@ import { findWidgetByName, handleInputsVisibility } from "./utils.js";
 
 
 app.registerExtension({
-  name: "Comfy.D2.D2_XYImageStack",
+  name: "Comfy.D2.D2_ImageStack",
 
   nodeCreated(node) {
-    if (node.constructor.title == "D2 XY Image Stack"){
-      console.log("D2 XY Image Stack");
-      console.log(node);
-
+    if (node.constructor.title == "D2 Image Stack"){
       if (node.widgets){
         const countWidget = findWidgetByName(node, "image_count");
         let widgetValue = countWidget.value;
