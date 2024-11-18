@@ -97,9 +97,9 @@ class D2_XYPlot:
         x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
         y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
 
-        x_array = x_annotation.values
-        y_array = y_annotation.values
 
+        x_array = self.__class__.change_type(x_type, x_annotation.values)
+        y_array = self.__class__.change_type(y_type, y_annotation.values)
         # 要素の数
         x_len = len(x_array)
         y_len = len(y_array)
@@ -122,6 +122,15 @@ class D2_XYPlot:
                 "total": (total,),
             }
         }
+
+    @classmethod
+    def change_type(cls, type:str, values:list) -> list:
+        if type == "INT":
+            return [int(val) for val in values]
+        elif type == "FLOAT":
+            return [float(val) for val in values]
+        return values
+
 
 
 """
