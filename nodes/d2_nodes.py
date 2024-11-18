@@ -9,6 +9,7 @@ from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 import math
 from aiohttp import web
+from torchvision import transforms
 
 import folder_paths
 import comfy.sd
@@ -23,6 +24,7 @@ from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 from .modules import util
 from .modules import checkpoint_util
 from .modules import pnginfo_util
+from .modules import grid_image_util
 
 
 
@@ -85,6 +87,78 @@ class D2_LoadImage(LoadImage):
         return (output_images, output_masks, width, height, prompt["positive"], prompt["negative"])
 
 
+"""
+
+D2 Load Folder Images
+フォルダ内画像読み込んで渡す
+
+"""
+class D2_LoadFolderImages():
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required":{
+                "folder": ("STRING", {"default": ""}),
+                "extension": ("STRING", {"default": "*.*"}),
+            },
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("images",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    ######
+    def run(self, folder = "", extension="*.*"):
+        files = util.get_files(folder, extension)
+        load_image = LoadImage()
+        image_list = []
+
+        for img_path in files:
+            # オリジナルのLoadImage処理
+            output_images, output_masks = load_image.load_image(img_path)
+            image_list.append(output_images)
+
+        image_batch = torch.cat(image_list, dim=0)
+        return (image_batch,)
+
+
+"""
+
+D2 Image Stack
+
+"""
+class D2_ImageStack:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+            }
+        }
+
+    
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("images",)
+    FUNCTION = "stack_image"
+    CATEGORY = "D2"
+
+    def stack_image(self, image_count, **kwargs):
+
+        image_list = []
+        
+        for i in range(1, image_count + 1):
+            image = kwargs.get(f"image_{i}")
+            if image is not None:
+                image_list.append(image)
+
+        if len(image_list) > 0:
+            image_batch = torch.cat(image_list, dim=0)
+
+            return (image_batch,)
+
+        return (None,)
 
 """
 
@@ -124,6 +198,9 @@ class D2_FolderImageQueue:
                 "start_at": (start_at,),
             }
         }
+
+
+
 
 
 """
@@ -910,6 +987,93 @@ class D2_GetImageSize:
 
 """
 
+D2 Grid Image
+
+"""
+class D2_GridImage:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE",),
+                "max_columns": ("INT", {"default": 3},),
+                "grid_gap": ("INT", {"default": 0},),
+                "swap_dimensions": ("BOOLEAN", {"default": False},),
+                "trigger": ("BOOLEAN", {"default": True},),
+            },
+        }
+    
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("images",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    image_batch = None
+    finished = True
+
+    def run(self, images, max_columns, grid_gap, swap_dimensions, trigger):
+        # 完了・開始前だったら初期化する
+        if self.finished:
+            self.finished = False
+            self.image_batch = None
+
+        # 画像をスタックしていく
+        if self.image_batch is None:
+            self.image_batch = images
+        else:
+            self.image_batch = torch.cat((self.image_batch, images), dim=0)
+
+        # 最後の画像まで送られたらグリッド画像生成して完了状態にする
+        # 未完了なら今回送られてきた画像を送るか、または処理を止める
+        if trigger:
+            grid_image = self.__class__.create_grid_image(
+                max_columns = max_columns,
+                image_batch = self.image_batch, 
+                grid_gap = grid_gap, 
+                swap_dimensions = swap_dimensions
+            )
+            grid_image = util.pil2tensor(grid_image)
+            self.finished = True
+            self.image_batch = None
+
+            return {
+                "result": (grid_image,),
+            }
+        else:
+            return {
+                "result": (ExecutionBlocker(None),),
+            }
+
+    """
+    グリッド画像作成
+    """
+    @classmethod
+    def create_grid_image(cls, image_batch, max_columns, grid_gap, swap_dimensions) -> Image.Image:
+        # テンソルからPIL Imageへの変換
+        # チャンネルの位置を修正（permute使用）
+        image_batch = image_batch.permute(0, 3, 1, 2)
+        to_pil = transforms.ToPILImage()
+        images = [to_pil(img) for img in image_batch]
+
+        if swap_dimensions:
+            grid_data = grid_image_util.create_grid_by_rows(
+                images = images,
+                gap = grid_gap,
+                max_rows = max_columns,
+            )
+        else:
+            grid_data = grid_image_util.create_grid_by_columns(
+                images = images,
+                gap = grid_gap,
+                max_columns = max_columns,
+            )
+
+        return grid_data.image
+
+
+"""
+
 D2 List To String
 
 """
@@ -951,6 +1115,9 @@ NODE_CLASS_MAPPINGS = {
     "D2 Size Slector": D2_SizeSelector,
     "D2 Size Slector": D2_SizeSelector,
     "D2 Multi Output": D2_MultiOutput,
+    "D2 Grid Image": D2_GridImage,
+    "D2 Image Stack": D2_ImageStack,
+    "D2 Load Folder Images": D2_LoadFolderImages,
     "D2 List To String": D2_ListToString,
 }
 
