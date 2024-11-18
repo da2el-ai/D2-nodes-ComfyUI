@@ -173,7 +173,7 @@ class D2_FolderImageQueue:
             "required":{
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
-                "start_at": ("INT", {"default": 0}),
+                "start_at": ("INT", {"default": 1}),
                 "auto_queue": ("BOOLEAN", {"default": True},),
             },
             "optional": {
@@ -187,7 +187,7 @@ class D2_FolderImageQueue:
     CATEGORY = "D2"
 
     ######
-    def run(self, folder = "", extension="*.*", start_at=0, auto_queue=True, image_count=""):
+    def run(self, folder = "", extension="*.*", start_at=1, auto_queue=True, image_count=""):
         files = util.get_files(folder, extension)
         image_path = files[start_at - 1]
 

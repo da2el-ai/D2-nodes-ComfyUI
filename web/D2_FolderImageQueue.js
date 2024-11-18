@@ -49,7 +49,7 @@ class FolderImageQueue {
      */
     async onExecuted(imageCount, startAt) {
         // まだ残りがあるならキューを入れる
-        if (startAt + 1 < imageCount && imageCount >= 2) {
+        if (startAt + 1 <= imageCount && imageCount >= 2) {
             this.startAtWidget.value = startAt + 1;
 
             if (this.autoQueueWidget.value) {
@@ -59,7 +59,7 @@ class FolderImageQueue {
         }
         // 最後までいった
         else if (startAt + 1 >= imageCount) {
-            this.startAtWidget.value = 0;
+            this.startAtWidget.value = 1;
         }
     }
 
