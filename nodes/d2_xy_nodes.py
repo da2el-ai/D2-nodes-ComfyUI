@@ -1,15 +1,11 @@
 import torch
 import math
-import os
-import glob
-import json
-import hashlib
-import re
-import random
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 import math
 from aiohttp import web
+from dataclasses import dataclass
+from torchvision import transforms
 
 import folder_paths
 import comfy.sd
@@ -22,10 +18,13 @@ from server import PromptServer
 
 from .modules import util
 from .modules.util import AnyType
-from .modules import checkpoint_util
-from .modules import pnginfo_util
+from .modules import grid_image_util
 
 
+@dataclass
+class D2_TAnnotation:
+    title: str
+    values: list
 
 """
 
@@ -38,41 +37,27 @@ class D2_XYAnnotation:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "type": (["STRING","INT","FLOAT",],),
+                # "type": (["STRING","INT","FLOAT",],),
                 "title": ("STRING", {"default": ""}),
                 "list": ("STRING", {"multiline": True},),
             },
         }
     
-    RETURN_TYPES = ("DICT",)
+    RETURN_TYPES = ("D2_TAnnotation",)
     RETURN_NAMES = ("x / y_annotation",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, type, title, list):
-        annotation = self.__class__.get_annotation(type, title, list)
+    def run(self, title, list):
+        annotation = self.__class__.get_annotation(title, list)
         return (annotation,)
 
     @classmethod
-    def get_annotation(cls, type, title, list) -> dict:
-        array = cls.change_type(type, list.strip().split('\n'))
-        annotation = {"title":title, "values":array}
+    def get_annotation(cls, title, list) -> D2_TAnnotation:
+        array = list.strip().split('\n')
+        annotation = D2_TAnnotation(title = title, values = array)
         return annotation
 
-    @classmethod
-    def change_type(cls, type, values):
-        outputs = []
-
-        # 文字列を検索して置換
-        for val in values:
-            if type == "INT":
-                outputs.append(int(val))
-            elif type == "FLOAT":
-                outputs.append(float(val))
-            else:
-                outputs.append(val)
-
-        return outputs
 
 
 """
@@ -102,7 +87,7 @@ class D2_XYPlot:
 
         }
     
-    RETURN_TYPES = (AnyType("*"), AnyType("*"), "DICT", "DICT", "BOOLEAN","INT",)
+    RETURN_TYPES = (AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "BOOLEAN","INT",)
     RETURN_NAMES = ("X", "Y", "x_annotation", "y_annotation", "trigger","index",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
@@ -112,8 +97,8 @@ class D2_XYPlot:
         x_annotation = D2_XYAnnotation.get_annotation(x_type, x_title, x_list)
         y_annotation = D2_XYAnnotation.get_annotation(y_type, y_title, y_list)
 
-        x_array = x_annotation["values"]
-        y_array = y_annotation["values"]
+        x_array = x_annotation.values
+        y_array = y_annotation.values
 
         # 要素の数
         x_len = len(x_array)
@@ -148,13 +133,11 @@ class D2_XYGridImage:
 
     @classmethod
     def INPUT_TYPES(cls):
-        annotation = {"title":"", "values":[]}
-
         return {
             "required": {
                 "images": ("IMAGE",),
-                "x_annotation": ("DICT", {"default": annotation}),
-                "y_annotation": ("DICT", {"default": annotation}),
+                "x_annotation": ("D2_TAnnotation", {}),
+                "y_annotation": ("D2_TAnnotation", {}),
                 "trigger": ("BOOLEAN", {"forceInput": True, "default": False},),
                 "font_size": ("INT", {"default": 24},),
                 "grid_gap": ("INT", {"default": 0},),
@@ -171,53 +154,35 @@ class D2_XYGridImage:
     image_batch = None
     finished = True
 
-    def run(self, images, x_annotation, y_annotation, trigger, font_size, grid_gap, swap_dimensions, grid_only):
-
-        if swap_dimensions:
-            x_annotation, y_annotation = y_annotation, x_annotation
-
+    def run(self, images, x_annotation:D2_TAnnotation, y_annotation:D2_TAnnotation, trigger, font_size, grid_gap, swap_dimensions, grid_only):
+        # 完了・開始前だったら初期化する
         if self.finished:
             self.finished = False
             self.image_batch = None
 
+        # 画像をスタックしていく
         if self.image_batch is None:
             self.image_batch = images
         else:
             self.image_batch = torch.cat((self.image_batch, images), dim=0)
 
+        # 最後の画像まで送られたらグリッド画像生成して完了状態にする
+        # 未完了なら今回送られてきた画像を送るか、または処理を止める
         if trigger:
-            # 期待される総画像数を計算
-            expected_count = len(x_annotation['values']) * len(y_annotation['values'])
-
-            # 画像数チェック
-            if self.image_batch.shape[0] != expected_count:
-                print(f"Warning: Expected {expected_count} images, but got {self.image_batch.shape[0]}")
-                
-            # 見出しテキスト
-            column_texts = self.create_grid_text(x_annotation)
-            row_texts = self.create_grid_text(y_annotation)
-
-            # images-grid-comfy-plugin を使用
-            graph = GraphBuilder()
-            grid_annotation_node = graph.node(
-                "GridAnnotation", row_texts=row_texts, column_texts=column_texts, font_size=font_size)
-
-            grid_node_name = "ImagesGridByColumns" if swap_dimensions else "ImagesGridByRows"
-
-            images_grid_node = graph.node(
-                grid_node_name, 
-                images=self.image_batch, 
-                annotation=grid_annotation_node.out(0), 
-                max_columns=len(x_annotation["values"]), 
-                max_rows=len(y_annotation["values"]), 
-                gap=grid_gap)
-
+            grid_image = self.__class__.create_grid_image(
+                image_batch = self.image_batch, 
+                x_annotation = x_annotation, 
+                y_annotation = y_annotation, 
+                font_size = font_size, 
+                grid_gap = grid_gap, 
+                swap_dimensions = swap_dimensions
+            )
+            grid_image = util.pil2tensor(grid_image)
             self.finished = True
             self.image_batch = None
 
             return {
-                "result": (images_grid_node.out(0),),
-                "expand": graph.finalize()
+                "result": (grid_image,),
             }
         elif grid_only:
             return {
@@ -228,53 +193,67 @@ class D2_XYGridImage:
                 "result": (images,),
             }
 
+    """
+    グリッド画像作成
+    """
     @classmethod
-    def create_grid_text(cls, annotation, separator=";"):
-        def format_annotation(title, value):
-            return value if title == "" else f"{title}:{str(value)}"
+    def create_grid_image(cls, image_batch, x_annotation:D2_TAnnotation, y_annotation:D2_TAnnotation, font_size, grid_gap, swap_dimensions) -> Image.Image:
+        x_len = len(x_annotation.values)
+        y_len = len(y_annotation.values)
 
-        return separator.join([
-            format_annotation(annotation['title'], value)
-            for value in annotation['values']
-        ])
+        # 見出しテキストのアイテム数から総画像数を計算
+        expected_count = x_len * y_len
 
+        # 画像数チェック
+        if image_batch.shape[0] != expected_count:
+            print(f"Warning: Expected {expected_count} images, but got {image_batch.shape[0]}")
 
-"""
+        # 縦横入れ替え
+        if swap_dimensions:
+            x_annotation, y_annotation = y_annotation, x_annotation
+            x_len, y_len = y_len, x_len
 
-D2 XY Image Stack
+        # 見出しテキスト
+        column_texts = cls.create_grid_text(x_annotation)
+        row_texts = cls.create_grid_text(y_annotation)
 
-"""
-class D2_XYImageStack:
+        # テンソルからPIL Imageへの変換
+        # チャンネルの位置を修正（permute使用）
+        image_batch = image_batch.permute(0, 3, 1, 2)
+        to_pil = transforms.ToPILImage()
+        images = [to_pil(img) for img in image_batch]
 
+        if swap_dimensions:
+            grid_image = grid_image_util.create_grid_with_annotation_by_rows(
+                images = images,
+                gap = grid_gap,
+                max_rows = len(row_texts),
+                column_texts = column_texts,
+                row_texts = row_texts,
+                font_size = font_size
+            )
+        else:
+            grid_image = grid_image_util.create_grid_with_annotation_by_columns(
+                images = images,
+                gap = grid_gap,
+                max_columns = len(column_texts),
+                column_texts = column_texts,
+                row_texts = row_texts,
+                font_size = font_size
+            )
+
+        return grid_image
+
+    """
+    アノテーション作成
+    """
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
+    def create_grid_text(cls, annotation:D2_TAnnotation):
+        if len(annotation.title) > 0:
+            return [f"{annotation.title}: {value}" for value in annotation.values]
+        else:
+            return annotation.values
 
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
-    FUNCTION = "stack_image"
-    CATEGORY = "D2/XY Plot"
-
-    def stack_image(self, image_count, **kwargs):
-
-        image_list = []
-        
-        for i in range(1, image_count + 1):
-            image = kwargs.get(f"image_{i}")
-            if image is not None:
-                image_list.append(image)
-
-        if len(image_list) > 0:
-            image_batch = torch.cat(image_list, dim=0)
-
-            return (image_batch,)
-
-        return (None,)
 
 
 """
@@ -378,6 +357,38 @@ class D2_XYPromptSR:
         output_xy = "\n".join(output_list)
 
         return (output_xy, output_list,)
+
+
+
+"""
+
+D2 XYPromptSR2
+D2 XY Plot 用に作った文字列置換
+
+"""
+class D2_XYPromptSR2:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                # 検索ワード
+                "search": ("STRING", {}),
+                # プロンプト
+                "prompt": ("STRING", {"multiline":True}),
+                # 置換文字列
+                "x_y": ("STRING", {"forceInput":True},),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("STRING",)
+    FUNCTION = "replace_text"
+    CATEGORY = "D2/XY Plot"
+
+    def replace_text(self, prompt, search, x_y):
+        new_prompt = prompt.replace(search, x_y)
+        return (new_prompt,)
 
 
 """
@@ -489,8 +500,8 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Grid Image": D2_XYGridImage,
     "D2 XY Checkpoint List": D2_XYCheckpointList,
     "D2 XY Lora List": D2_XYLoraList,
-    "D2 XY Image Stack": D2_XYImageStack,
     "D2 XY Prompt SR": D2_XYPromptSR,
+    "D2 XY Prompt SR2": D2_XYPromptSR2,
     "D2 XY List To Plot": D2_XYListToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
     "D2 XY Seed": D2_XYSeed,
