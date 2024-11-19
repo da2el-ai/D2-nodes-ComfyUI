@@ -1,13 +1,12 @@
 <img src="../img/title.jpg" style="max-width:100%">
 
 
-<div style="text-align:center; margin-block:2rem;">
-<a href="../en/index.md">English</a> | <a href="../ja/index.md">日本語</a> | <a href="../zh/index.md">繁体中文</a>
-</div>
 
-<div style="margin-block:2rem;">
-<a href="index.md">Top</a> | <a href="node.md">Node</a> | <a href="workflow.md">Workflow</a>
-</div>
+<a href="../en/index.md">English</a> | <a href="../ja/index.md">日本語</a> | <a href="../zh/index.md">繁体中文</a>
+
+- <a href="index.md">Top</a>
+- <a href="node.md">Node</a>
+- <a href="workflow.md">Workflow</a>
 
 
 

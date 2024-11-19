@@ -3,9 +3,10 @@
 </h1>
 
 
-<div style="text-align:center; margin-block:2rem;">
+
 <a href="docs/en/index.md">English</a> | <a href="docs/ja/index.md">日本語</a> | <a href="docs/zh/index.md">繁体中文</a>
-</div>
+
+
 
 <strong>D2 Nodes ComfyUI</strong> is a collection of custom nodes created with the themes of "slightly convenient," "simple," and "maintaining versatility."
 Features:
