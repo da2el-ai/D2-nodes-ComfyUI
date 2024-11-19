@@ -25,7 +25,7 @@ Drop images into ComfyUI to recreate workflows.
 <a href="../../workflow/folder_image_queue_upscale_20241119.png"><img src="../../workflow/folder_image_queue_upscale_20241119.png"></a>
 
 - Retrieves all images from folder and extracts prompts
-- Gets Controlnet anyTest
+- Use Controlnet anyTest
 - Upscales by 1.5x
 
 ## :card_index_dividers: XY Plot: Prompt S/R

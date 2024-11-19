@@ -29,7 +29,7 @@ Workflow
 <a href="../../workflow/folder_image_queue_upscale_20241119.png"><img src="../../workflow/folder_image_queue_upscale_20241119.png"></a>
 
 - フォルダー内画像を全て取得し、プロンプトを取得
-- Controlnet anyTestを取得
+- Controlnet anyTestを使用
 - 1.5倍にアップスケールしている
 
 

@@ -25,7 +25,7 @@
 <a href="../../workflow/folder_image_queue_upscale_20241119.png"><img src="../../workflow/folder_image_queue_upscale_20241119.png"></a>
 
 - 獲取資料夾內所有圖像並提取提示詞
-- 獲取 `Controlnet anyTest`
+- 使用 `Controlnet anyTest`
 - 放大至 1.5 倍
 
 ## :card_index_dividers: XY Plot: Prompt S/R
