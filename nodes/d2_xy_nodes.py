@@ -1,3 +1,4 @@
+from typing import Literal
 import torch
 import math
 from PIL import Image, ImageOps, ImageSequence, ImageFile
@@ -25,6 +26,10 @@ from .modules import grid_image_util
 class D2_TAnnotation:
     title: str
     values: list
+
+D2_TXyStatus = Literal["INIT", "FINISH", ""]
+
+
 
 """
 
@@ -87,8 +92,8 @@ class D2_XYPlot:
 
         }
     
-    RETURN_TYPES = (AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "BOOLEAN","INT",)
-    RETURN_NAMES = ("X", "Y", "x_annotation", "y_annotation", "trigger","index",)
+    RETURN_TYPES = (AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
+    RETURN_NAMES = ("X", "Y", "x_annotation", "y_annotation", "status","index",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
@@ -109,11 +114,17 @@ class D2_XYPlot:
         x_value = x_array[index % x_len]
         y_value = y_array[math.floor(index / x_len)]
 
-        # 全部完了したか
+        # D2 Grid Image に送るステータス
         trigger = index + 1 >= total
+        if index == 0:
+            status = "INIT"
+        elif index + 1 >= total:
+            status = "FINISH"
+        else:
+            status = ""
 
         return {
-            "result": (x_value, y_value, x_annotation, y_annotation, trigger,index,),
+            "result": (x_value, y_value, x_annotation, y_annotation, status,index,),
             "ui": {
                 "auto_queue": (auto_queue,),
                 "x_array": (x_array,),
@@ -147,7 +158,7 @@ class D2_XYGridImage:
                 "images": ("IMAGE",),
                 "x_annotation": ("D2_TAnnotation", {}),
                 "y_annotation": ("D2_TAnnotation", {}),
-                "trigger": ("BOOLEAN", {"forceInput": True, "default": False},),
+                "status": ("STRING", {"forceInput": True, "default": ""},),
                 "font_size": ("INT", {"default": 24},),
                 "grid_gap": ("INT", {"default": 0},),
                 "swap_dimensions": ("BOOLEAN", {"default": False},),
@@ -163,9 +174,9 @@ class D2_XYGridImage:
     image_batch = None
     finished = True
 
-    def run(self, images, x_annotation:D2_TAnnotation, y_annotation:D2_TAnnotation, trigger, font_size, grid_gap, swap_dimensions, grid_only):
-        # 完了・開始前だったら初期化する
-        if self.finished:
+    def run(self, images, x_annotation:D2_TAnnotation, y_annotation:D2_TAnnotation, status, font_size, grid_gap, swap_dimensions, grid_only):
+        # 最初の画像だったら初期化する
+        if status == "INIT":
             self.finished = False
             self.image_batch = None
 
@@ -177,7 +188,7 @@ class D2_XYGridImage:
 
         # 最後の画像まで送られたらグリッド画像生成して完了状態にする
         # 未完了なら今回送られてきた画像を送るか、または処理を止める
-        if trigger:
+        if status == "FINISH":
             grid_image = self.__class__.create_grid_image(
                 image_batch = self.image_batch, 
                 x_annotation = x_annotation, 
@@ -413,7 +424,7 @@ class D2_XYSeed:
         return {
             "required": {
                 # プロンプト
-                "seeds": ("STRING",{"multiline": True},),
+                "seeds": ("STRING",{"multiline": True, "default":"-1\n-1"},),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
         }
