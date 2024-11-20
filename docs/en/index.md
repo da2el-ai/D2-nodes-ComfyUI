@@ -124,7 +124,14 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
   - Dialog for converting weights between NovelAI and StableDiffusion
 
+
+
+
 ## :blossom: Changelog
+
+**2024.11.20**
+
+- `D2 Image Resize`: Added support for upscale models (like SwinIR_4x)
 
 **2024.11.18**
 
@@ -149,12 +156,16 @@ If you have installed any of the following custom nodes previously, please remov
 - Added new `D2 Image Resize`
 - Added new `D2 Resize Calculator`
 
+
+<details>
 <summary><strong>2024.10.24</strong></summary>
 
 - Added new `D2 Regex Replace`
 - Added new `D2 Folder Image Queue`
 - `D2 Load Image`: Added image path input
 - `D2 KSampler(Advanced)`: Added Positive / Negative Conditioning to Input
+</details>
+
 
 <details>
   <summary><strong>2024.10.19</strong></summary>

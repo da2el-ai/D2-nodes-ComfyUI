@@ -128,6 +128,10 @@
 
 ## :blossom: 更新日誌
 
+**2024.11.20**
+
+- `D2 Image Resize`: 追加放大模型支援（如 SwinIR_4x）
+
 **2024.11.18**
 
 - 一次添加了許多功能
@@ -151,12 +155,16 @@
 - 新增 `D2 Image Resize`
 - 新增 `D2 Resize Calculator`
 
+
+<details>
 <summary><strong>2024.10.24</strong></summary>
 
 - 新增 `D2 Regex Replace`
 - 新增 `D2 Folder Image Queue`
 - `D2 Load Image`: 新增圖像路徑輸入
 - `D2 KSampler(Advanced)`: Input 新增 Positive / Negative Conditioning
+</details>
+
 
 <details>
   <summary><strong>2024.10.19</strong></summary>

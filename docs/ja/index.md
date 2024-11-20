@@ -131,6 +131,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2024.11.20**
+
+- `D2 Image Resize`: アップスケールモデル（SwinIR_4xなど）を使えるようにした
+
 **2024.11.18**
 
 - 一気にたくさん追加しました
@@ -154,12 +158,16 @@ D2 Nodes ComfyUI
 - `D2 Image Resize` を新規追加
 - `D2 Resize Calculator` を新規追加
 
+<details>
 <summary><strong>2024.10.24</strong></summary>
 
 - `D2 Regex Replace` を新規追加
 - `D2 Folder Image Queue` を新規追加
 - `D2 Load Image`: 画像パスの入力を追加
 - `D2 KSampler(Advanced)`: Input に Positive / Negative Conditioning を追加
+
+</details>
+
 
 <details>
   <summary><strong>2024.10.19</strong></summary>
