@@ -44,18 +44,28 @@
 
 ### D2 Checkpoint Loader
 
-<img src="../img/checkpoint_loader.png">
+<img src="../img/checkpoint_loader_2.png">
 
-- Checkpoint Loader that outputs the full path of model files
+- A Checkpoint Loader that outputs the full path of model files
+- Can automatically apply v_prediction settings when the filename contains "vpred"
+
+#### Input
+
+- `ckpt_name`
+  - Checkpoint name
+- `auto_vpred`
+  - `true`: Automatically applies v_prediction settings if the filename contains "vpred"
+- `sampling` / `zsnr`
+  - Same settings as ModelSamplingDiscrete (details unknown)
+- `multiplier`
+  - Same settings as RescaleCFG (details unknown)
 
 #### Output
 
 - `model` / `clip` / `vae`
-    - Same as conventional CheckpointLoader
+    - Same as the conventional CheckpointLoader.
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
-    - Checkpoint name, hash, and full path
-
-Implementation mostly uses code from [mikey_nodes](https://github.com/bash-j/mikey_nodes).
+    - Checkpoint name, hash, and full path.
 
 ---
 

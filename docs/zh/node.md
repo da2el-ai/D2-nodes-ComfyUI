@@ -47,18 +47,28 @@
 
 ### D2 Checkpoint Loader
 
-<img src="../img/checkpoint_loader.png">
+<img src="../img/checkpoint_loader_2.png">
 
-- 輸出模型文件完整路徑的 Checkpoint Loader
+- 輸出模型檔案完整路徑的 Checkpoint Loader
+- 當檔案名稱包含「vpred」時，可以自動套用 v_prediction 設定
+
+#### Input
+
+- `ckpt_name`
+  - 檢查點名稱
+- `auto_vpred`
+  - `true`: 當檔案名稱包含「vpred」時，自動套用 v_prediction 設定
+- `sampling` / `zsnr`
+  - 與 ModelSamplingDiscrete 相同的設定（詳細不明）
+- `multiplier`
+  - 與 RescaleCFG 相同的設定（詳細不明）
 
 #### Output
 
 - `model` / `clip` / `vae`
-    - 與傳統 CheckpointLoader 相同
+    - 與一般的 CheckpointLoader 相同。
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
-    - Checkpoint 名稱、雜湊值、完整路徑
-
-實作大多使用了 [mikey_nodes](https://github.com/bash-j/mikey_nodes) 的程式碼。
+    - 檢查點名稱、雜湊值和完整路徑。
 
 ---
 

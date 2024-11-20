@@ -15,6 +15,8 @@ import folder_paths
 import comfy.sd
 import node_helpers
 import comfy.samplers
+from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
+
 from comfy_execution.graph_utils import GraphBuilder
 from comfy_execution.graph import ExecutionBlocker
 from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced
@@ -375,23 +377,56 @@ class D2_CheckpointLoader:
         return {
             "required": {
                 "ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),
+                "auto_vpred": ("BOOLEAN", {"default": True}),
+                "sampling": (["normal", "eps", "v_prediction", "lcm", "x0"],),
+                "zsnr": ("BOOLEAN", {"default": False}),
+                "multiplier": ("FLOAT", {"default": 0.6, "min": 0.0, "max": 1.0, "step": 0.01}),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID", "extra_pnginfo": "EXTRA_PNGINFO", "prompt": "PROMPT"}
             }
 
-    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ("model", "clip", "vae", "ckpt_name", "ckpt_hash", "ckpt_fullpath")
+    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING", "STRING", "STRING", "STRING",)
+    RETURN_NAMES = ("model", "clip", "vae", "ckpt_name", "ckpt_hash", "ckpt_fullpath", "sampling", )
     FUNCTION = "load_checkpoint"
 
     CATEGORY = "D2"
 
-    def load_checkpoint(self, ckpt_name, output_vae=True, output_clip=True, unique_id=None, extra_pnginfo=None, prompt=None):
+    def load_checkpoint(
+            self, 
+            ckpt_name, 
+            auto_vpred = True, 
+            sampling = "normal", 
+            zsnr = False, 
+            multiplier = 0.6, 
+            output_vae = True, 
+            output_clip = True, 
+            unique_id = None, 
+            extra_pnginfo = None, 
+            prompt = None
+        ):
         ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
         out = comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        model = out[0]
+        clip = out[1]
+        vae = out[2]
+
+        # vpred対応準備
+        model_sampling = ModelSamplingDiscrete()
+        rescale_cfg = RescaleCFG()
+
+        if auto_vpred and "vpred" in ckpt_name.lower():
+            sampling = "v_prediction"
+            model = model_sampling.patch(model, "v_prediction", zsnr)[0]
+            model = rescale_cfg.patch(model, multiplier)[0]
+
+        elif sampling != "normal":
+            model = model_sampling.patch(model, sampling, zsnr)[0]
+            model = rescale_cfg.patch(model, multiplier)[0]
+
         hash = checkpoint_util.get_file_hash(ckpt_path)
         ckpt_name = os.path.basename(ckpt_name)
-        return out[:3] + (ckpt_name, hash, ckpt_path)
+        return (model, clip, vae, ckpt_name, hash, ckpt_path, sampling,)
 
 
 """

@@ -50,9 +50,21 @@ Node
 
 ### D2 Checkpoint Loader
 
-<img src="../img/checkpoint_loader.png">
+<img src="../img/checkpoint_loader_2.png">
 
 - モデルファイルのフルパスを出力する Checkpoint Loader
+- ファイル名に「vpred」が入っていたら自動的に v_prediction 設定を適用することが可能
+
+#### Input
+
+- `ckpt_name`
+  - チェックポイント名
+- `auto_vpred`
+  - `true`: ファイル名に「vpred」が入っていたら自動的に v_prediction 設定を適用する
+- `sampling` / `zsnr`
+  - ModelSamplingDiscrete と同じ設定（詳しくは知りません）
+- `multiplier`
+  - RescaleCFG と同じ設定（詳しくは知りません）
 
 #### Output
 
@@ -60,8 +72,6 @@ Node
     - 従来の CheckpointLoader と同じ。
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - Checkpoint 名、ハッシュ、フルパス。
-
-実装はほとんど [mikey_nodes](https://github.com/bash-j/mikey_nodes) のコードを使わせていただきました。
 
 
 ---

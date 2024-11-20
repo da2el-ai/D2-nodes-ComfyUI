@@ -129,6 +129,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2024.11.21**
+
+- `D2 Checkpoint Loader`: Implemented configuration options for Vpred (v_prediction) parameter
+
 **2024.11.20**
 
 - `D2 Image Resize`: Added support for upscale models (like SwinIR_4x)

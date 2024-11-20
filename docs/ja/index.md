@@ -131,6 +131,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2024.11.21**
+
+- `D2 Checkpoint Loader`: Vpred（v_prediction）に関する設定を追加
+
 **2024.11.20**
 
 - `D2 Image Resize`: アップスケールモデル（SwinIR_4xなど）を使えるようにした

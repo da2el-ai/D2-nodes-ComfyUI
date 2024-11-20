@@ -128,6 +128,10 @@
 
 ## :blossom: 更新日誌
 
+**2024.11.21**
+
+- `D2 Checkpoint Loader`: 增加了 Vpred（v_prediction）參數的設定選項
+
 **2024.11.20**
 
 - `D2 Image Resize`: 追加放大模型支援（如 SwinIR_4x）
