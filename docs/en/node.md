@@ -289,7 +289,6 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 <img src="../img/resize_calc.png">
 </figure>
 
-- Calculated values are always multiples of 8
 - Can select rounding, floor, or ceiling
 
 ---

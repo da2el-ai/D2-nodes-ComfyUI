@@ -292,7 +292,6 @@
 <img src="../img/resize_calc.png">
 </figure>
 
-- 計算結果必定為8的倍數
 - 可選擇四捨五入、無條件捨去、無條件進位
 
 ---
@@ -513,12 +512,7 @@ Output text
   - `true`: 僅輸出網格圖像
   - `false`: 也輸出個別圖像
 
-#### Output
 
-- `X` / `Y`
-  - 從 `x_list` `y_list` 獲取的元素
-- `index`
-  - 當前處理次數
 
 ---
 

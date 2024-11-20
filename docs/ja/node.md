@@ -317,7 +317,6 @@ Node
 <img src="../img/resize_calc.png">
 </figure>
 
-- 計算した数値は必ず8の倍数になる
 - 四捨五入、切り捨て、切り上げが選択できる
 
 ---
@@ -553,12 +552,6 @@ Output text
   - `true`: グリッド画像のみ出力する
   - `false`: 個別画像も出力する
 
-#### Output
-
-- `X` / `Y`
-  - `x_list` `x_list` から取得した要素
-- `index`
-  - 現在の処理回数
 
 
 ---
