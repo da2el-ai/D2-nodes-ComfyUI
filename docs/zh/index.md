@@ -130,7 +130,9 @@
 
 **2024.11.21**
 
-- `D2 Checkpoint Loader`: 增加了 Vpred（v_prediction）參數的設定選項
+- `D2 Checkpoint Loader`: 新增 Vpred（v_prediction）相關設定
+- `D2 Image Resize`: 修改為可輸出 Latent
+
 
 **2024.11.20**
 

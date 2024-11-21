@@ -24,6 +24,14 @@ Workflow
 - Lora も Controlnet も使わないシンプルな txt2img。
 
 
+## :card_index_dividers: txt2img + Hires fix
+
+<a href="../../workflow/hiresfix_20241121.png"><img src="../../workflow/hiresfix_20241121.png"></a>
+
+- D2 KSampler を2個、間に D2 Image Resize を入れて SwinR_4x を使用した Hires fix。
+
+
+
 ## :card_index_dividers: フォルダー内画像を一括でアップスケール
 
 <a href="../../workflow/folder_image_queue_upscale_20241119.png"><img src="../../workflow/folder_image_queue_upscale_20241119.png"></a>

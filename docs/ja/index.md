@@ -134,6 +134,7 @@ D2 Nodes ComfyUI
 **2024.11.21**
 
 - `D2 Checkpoint Loader`: Vpred（v_prediction）に関する設定を追加
+- `D2 Image Resize`: Latentを出力できるように変更した
 
 **2024.11.20**
 

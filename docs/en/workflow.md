@@ -14,11 +14,20 @@
 
 Drop images into ComfyUI to recreate workflows.
 
+
 ## :card_index_dividers: Simple txt2img
 
 <a href="../../workflow/simple_t2i_20241119.png"><img src="../../workflow/simple_t2i_20241119.png"></a>
 
 - Simple txt2img without Lora or Controlnet.
+
+
+## :card_index_dividers: txt2img + Hires fix
+
+<a href="../../workflow/hiresfix_20241121.png"><img src="../../workflow/hiresfix_20241121.png"></a>
+
+- Hires fix using two D2 KSampler nodes with D2 Image Resize in between, utilizing SwinR_4x.
+
 
 ## :card_index_dividers: Batch Upscale Images in Folder
 

@@ -131,7 +131,8 @@ If you have installed any of the following custom nodes previously, please remov
 
 **2024.11.21**
 
-- `D2 Checkpoint Loader`: Implemented configuration options for Vpred (v_prediction) parameter
+- `D2 Checkpoint Loader`: Added settings for Vpred (v_prediction)
+- `D2 Image Resize`: Modified to enable Latent output
 
 **2024.11.20**
 

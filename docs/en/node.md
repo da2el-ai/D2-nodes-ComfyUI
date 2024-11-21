@@ -290,6 +290,8 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 - Simple image resizing
 - Precision up to 3 decimal places
 - Can select rounding, floor, or ceiling
+- Capable of upscaling using upscale models
+- Latent output is also possible (requires VAE)
 
 ---
 

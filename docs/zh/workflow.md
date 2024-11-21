@@ -20,6 +20,14 @@
 
 - 不使用 `Lora` 和 `Controlnet` 的簡單 txt2img。
 
+
+## :card_index_dividers: txt2img + Hires fix
+
+<a href="../../workflow/hiresfix_20241121.png"><img src="../../workflow/hiresfix_20241121.png"></a>
+
+- 使用兩個 D2 KSampler，中間加入使用 SwinR_4x 的 D2 Image Resize 來實現 Hires fix。
+
+
 ## :card_index_dividers: 批量放大資料夾內的圖像
 
 <a href="../../workflow/folder_image_queue_upscale_20241119.png"><img src="../../workflow/folder_image_queue_upscale_20241119.png"></a>
