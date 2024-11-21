@@ -63,11 +63,15 @@ class D2_ImageResize:
                 "round_method": (["Floor", "Round", "Ceil", "None"],{"default":"Round"}),
                 "upscale_model": (["None"] + folder_paths.get_filename_list("upscale_models"), ),
                 "resampling": (["lanczos", "nearest", "bilinear", "bicubic"],),
+                "use_tiled_vae": ("BOOLEAN", {"default":False}),
+            },
+            "optional": {
+                "vae": ("VAE",),
             },
         }
 
-    RETURN_TYPES = ("IMAGE", "INT", "INT", "FLOAT",)
-    RETURN_NAMES = ("image", "width", "height", "rescale_factor",)
+    RETURN_TYPES = ("IMAGE", "INT", "INT", "FLOAT", "LATENT")
+    RETURN_NAMES = ("image", "width", "height", "rescale_factor", "latent")
     FUNCTION = "run"
     CATEGORY = "D2"
 
@@ -82,7 +86,9 @@ class D2_ImageResize:
             swap_dimensions = False, 
             round_method:size_util.D2_TResizeMethod = "Floor", 
             upscale_model = 'None', 
-            resampling = "lanczos"
+            resampling = "lanczos",
+            use_tiled_vae = False,
+            vae = None,
         ):
 
         scaled_images = []
@@ -104,7 +110,16 @@ class D2_ImageResize:
 
         scaled_images = torch.cat(scaled_images, dim=0)
 
-        return (scaled_images, new_width, new_height, rescale_factor, )
+        latent = None
+
+        if(vae is not None):
+            if use_tiled_vae:
+                l = vae.encode_tiled(scaled_images[:,:,:,:3])
+            else:
+                l = vae.encode(scaled_images[:,:,:,:3])
+            latent = {"samples":l}
+
+        return (scaled_images, new_width, new_height, rescale_factor, latent,)
 
 
 """
