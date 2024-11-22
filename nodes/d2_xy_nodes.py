@@ -1,6 +1,7 @@
 from typing import Literal
 import torch
 import math
+import json
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 import math
@@ -338,6 +339,51 @@ class D2_XYLoraList:
 
 """
 
+D2 XY Model List
+
+"""
+class D2_XYModelList:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "model_type": (["checkpoints", "loras"],),
+                "get_list": ("D2_GET_MODEL_BTN", {}),
+                "list": ("STRING", {"multiline": True}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING", "LIST")
+    RETURN_NAMES = ("x / y_list", "LIST")
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+    def run(self, model_type, get_list, list):
+        list_list = list.split("\n")
+        return (list, list_list,)
+
+
+
+"""
+モデルファイル一覧を取得
+D2/model-list/get-list?type=****
+という形式でリクエストが届く
+"""
+@PromptServer.instance.routes.get("/D2/model-list/get-list")
+async def route_d2_model_list_get_list(request):
+    try:
+        type = request.query.get('type')
+        files = folder_paths.get_filename_list(type)
+    except:
+        files = []
+
+    # JSON応答を返す
+    json_data = json.dumps({"files":files})
+    return web.Response(text=json_data, content_type='application/json')
+
+
+"""
+
 D2 XYPromptSR
 D2 XY Plot 用に作った文字列置換
 
@@ -520,6 +566,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Grid Image": D2_XYGridImage,
     "D2 XY Checkpoint List": D2_XYCheckpointList,
     "D2 XY Lora List": D2_XYLoraList,
+    "D2 XY Model List": D2_XYModelList,
     "D2 XY Prompt SR": D2_XYPromptSR,
     "D2 XY Prompt SR2": D2_XYPromptSR2,
     "D2 XY List To Plot": D2_XYListToPlot,
