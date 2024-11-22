@@ -601,6 +601,21 @@ Output text
 
 ---
 
+
+### D2 XY Model List
+
+<figure>
+  <img src="../img/xy_model_list.png">
+</figure>
+
+- 將 Checkpoint / Lora 列表傳遞給 `D2 XY Plot` 的節點
+- 當想獲取大量模型列表，但在 `D2 Checkpoint List` 中逐個選擇很麻煩時使用
+- 點擊 `get_list` 獲取模型列表，然後編輯保留需要的項目即可
+
+
+---
+
+
 ### D2 XY Folder Images
 
 <figure>

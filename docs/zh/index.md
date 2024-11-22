@@ -103,6 +103,8 @@
   - 輸出 Checkpoint 列表
 - <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
   - 輸出 Lora 列表
+- <a href="node.md#D2-XY-Model-List">`D2 XY Model List`</a>
+  - 輸出 Checkpoint / Lora 列表
 - <a href="node.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
   - 輸出資料夾內文件列表
 - <a href="node.md#D2-XY-Annotation">`D2 XY Annotation`</a>
@@ -127,6 +129,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2024.11.23**
+
+- 新增 `D2 Model List`
 
 **2024.11.21**
 

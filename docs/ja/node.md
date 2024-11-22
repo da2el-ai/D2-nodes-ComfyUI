@@ -648,6 +648,20 @@ Output text
 ---
 
 
+### D2 XY Model List
+
+<figure>
+  <img src="../img/xy_model_list.png">
+</figure>
+
+- Checkpoint / Lora を `D2 XY Plot` に渡すノード
+- 大量のモデルリストを取得したいけど `D2 Checkpoint List` で1個ずつ選ぶのが面倒くさい、という時に遣う
+- `get_list` をクリックするとモデル一覧を取得するので、編集して必要なものだけ残して利用してください
+
+
+---
+
+
 ### D2 XY Folder Images
 
 <figure>

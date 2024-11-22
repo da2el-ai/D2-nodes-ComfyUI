@@ -104,6 +104,8 @@ D2 Nodes ComfyUI
   - Checkpoint のリストを出力する
 - <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
   - Lora のリストを出力する
+- <a href="node.md#D2-XY-Model-List">`D2 XY Model List`</a>
+  - Checkpoint / Lora のリストを出力する
 - <a href="node.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
   - フォルダ内ファイルのリストを出力する
 - <a href="node.md#D2-XY-Annotation">`D2 XY Annotation`</a>
@@ -130,6 +132,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2024.11.23**
+
+- `D2 Model List`: を新規追加
 
 **2024.11.21**
 

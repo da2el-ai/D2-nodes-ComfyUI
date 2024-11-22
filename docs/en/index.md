@@ -102,6 +102,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Outputs list of Checkpoints
 - <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
   - Outputs list of Loras
+- <a href="node.md#D2-XY-Model-List">`D2 XY Model List`</a>
+  - Outputs a list of Checkpoints / Loras
 - <a href="node.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
   - Outputs list of files in folder
 - <a href="node.md#D2-XY-Annotation">`D2 XY Annotation`</a>
@@ -128,6 +130,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2024.11.23**
+
+- Added new `D2 Model List`
 
 **2024.11.21**
 
