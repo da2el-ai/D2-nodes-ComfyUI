@@ -605,12 +605,22 @@ Output text
 ### D2 XY Model List
 
 <figure>
-  <img src="../img/xy_model_list.png">
+  <img src="../img/xy_model_list.png?2">
 </figure>
 
-- 將 Checkpoint / Lora 列表傳遞給 `D2 XY Plot` 的節點
-- 當想獲取大量模型列表，但在 `D2 Checkpoint List` 中逐個選擇很麻煩時使用
-- 點擊 `get_list` 獲取模型列表，然後編輯保留需要的項目即可
+- 將 Checkpoint/Lora 傳遞給 `D2 XY Plot` 的節點
+- 當你想獲取大量模型列表，但不想在 `D2 Checkpoint List` 中一個一個選擇時使用
+- 點擊 `get_list` 獲取模型列表，然後編輯保留需要的部分
+
+#### input
+- `model_type`
+  - 選擇 `checkpoints` 或 `loras`
+- `filter`
+  - 輸入過濾文字
+  - 支援正則表達式
+  - 當搜尋文字包含 `\` 時，需寫成 `\\`
+- `get_list`
+  - 獲取模型列表按鈕
 
 
 ---

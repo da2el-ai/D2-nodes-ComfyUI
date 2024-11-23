@@ -575,12 +575,23 @@ Output text
 ### D2 XY Model List
 
 <figure>
-  <img src="../img/xy_model_list.png">
+  <img src="../img/xy_model_list.png?2">
 </figure>
 
-- A node that passes Checkpoint / Lora lists to `D2 XY Plot`
-- Useful when you want to get a large list of models but find it tedious to select them one by one in `D2 Checkpoint List`
+- A node that passes Checkpoint/Lora to `D2 XY Plot`
+- Useful when you want to get a large list of models but don't want to select them one by one in `D2 Checkpoint List`
 - Click `get_list` to retrieve the model list, then edit it to keep only the ones you need
+
+#### input
+- `model_type`
+  - Select either `checkpoints` or `loras`
+- `filter`
+  - Enter text to filter
+  - Regular expressions are supported
+  - When including `\` in search text, write it as `\\`
+- `get_list`
+  - Button to retrieve model list
+
 
 ---
 

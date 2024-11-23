@@ -2,6 +2,7 @@ from typing import Literal
 import torch
 import math
 import json
+import re
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 import math
@@ -348,8 +349,9 @@ class D2_XYModelList:
         return {
             "required": {
                 "model_type": (["checkpoints", "loras"],),
+                "filter": ("STRING", {"default":""}),
                 "get_list": ("D2_GET_MODEL_BTN", {}),
-                "list": ("STRING", {"multiline": True}),
+                "model_list": ("STRING", {"multiline": True}),
             }
         }
 
@@ -358,27 +360,29 @@ class D2_XYModelList:
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, model_type, get_list, list):
-        list_list = list.split("\n")
-        return (list, list_list,)
+    def run(self, model_type, filter="", get_list="", model_list=""):
+        list_list = model_list.split("\n")
+        return (model_list, list_list,)
 
 
 
 """
 モデルファイル一覧を取得
-D2/model-list/get-list?type=****
+D2/model-list/get-list?type=****&filter=****
 という形式でリクエストが届く
 """
 @PromptServer.instance.routes.get("/D2/model-list/get-list")
 async def route_d2_model_list_get_list(request):
     try:
         type = request.query.get('type')
-        files = folder_paths.get_filename_list(type)
+        filter = request.query.get('filter')
+        model_list = folder_paths.get_filename_list(type)
+        filtered_list = [s for s in model_list if re.search(filter, s, re.IGNORECASE)]
     except:
-        files = []
+        filtered_list = []
 
     # JSON応答を返す
-    json_data = json.dumps({"files":files})
+    json_data = json.dumps({"files":filtered_list})
     return web.Response(text=json_data, content_type='application/json')
 
 

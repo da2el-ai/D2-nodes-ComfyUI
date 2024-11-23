@@ -9,9 +9,9 @@ app.registerExtension({
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "D2 XY Model List") return;
 
-        const getModelFiles = (type) => {
+        const getModelFiles = (type, filter) => {
             return new Promise(async (resolve) => {
-                const url = `/D2/model-list/get-list?type=${type}`;
+                const url = `/D2/model-list/get-list?type=${type}&filter=${filter}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 resolve(data.files);
@@ -28,11 +28,12 @@ app.registerExtension({
 
             const btn = findWidgetByName(this, "get_list");
             const typeWidget = findWidgetByName(this, "model_type");
-            const listWidget = findWidgetByName(this, "list");
+            const filterWidget = findWidgetByName(this, "filter");
+            const modelListWidget = findWidgetByName(this, "model_list");
 
             btn.callback = async () => {
-                const modelList = await getModelFiles(typeWidget.value);
-                listWidget.value = modelList.join("\n");
+                const modelList = await getModelFiles(typeWidget.value, filterWidget.value);
+                modelListWidget.value = modelList.join("\n");
             };
 
             return r;

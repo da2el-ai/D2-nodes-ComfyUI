@@ -651,12 +651,22 @@ Output text
 ### D2 XY Model List
 
 <figure>
-  <img src="../img/xy_model_list.png">
+  <img src="../img/xy_model_list.png?2">
 </figure>
 
 - Checkpoint / Lora を `D2 XY Plot` に渡すノード
 - 大量のモデルリストを取得したいけど `D2 Checkpoint List` で1個ずつ選ぶのが面倒くさい、という時に遣う
 - `get_list` をクリックするとモデル一覧を取得するので、編集して必要なものだけ残して利用してください
+
+#### input
+- `model_type`
+  - `checkpoints` または `lolas` を選択
+- `filter`
+  - 絞り込み文字列を入力
+  - 正規表現が利用可能
+  - 検索文字に `\` を含める時は `\\` と書く
+- `get_list`
+  - モデル一覧取得ボタン
 
 
 ---
