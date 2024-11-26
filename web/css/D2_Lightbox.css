@@ -1,0 +1,74 @@
+.d2-lightbox {
+    --d2-lightbox--list-height: 80px;
+    --d2-lightbox--list-padding: 10px;
+
+    z-index: 10000000;
+    position: fixed;
+    display: none;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.d2-lightbox__bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* .d2-lightbox__content {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr var(--d2-lightbox--list-height);
+    gap: 2rem;
+    overflow: hidden;
+} */
+
+.d2-lightbox__list {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: var(--d2-lightbox--list-padding);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap ;
+    gap: .5rem;
+    background-color: rgba(0, 0, 0, .5);
+}
+
+.d2-lightbox__list-image {
+    width: var(--d2-lightbox--list-height);
+    height: var(--d2-lightbox--list-height);
+    object-fit: contain;
+    opacity: 0.6;
+    border: solid 1px #fff;
+    transition: 0.3s;
+
+    &:hover,
+    &[data-active="true"] {
+        opacity: 1;
+    }
+}
+
+.d2-lightbox__gallery {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* padding: 100px; */
+    overflow: hidden;
+}
+
+.d2-lightbox__gallery-image{
+    position: absolute;
+    /* cursor: grab; */
+    /* width: 100%;
+    height: 100%;
+    object-fit: contain; */
+}

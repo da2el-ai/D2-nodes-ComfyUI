@@ -44,6 +44,39 @@ class D2_Cnet:
         self.end_percent = end_percent
 
 
+
+
+
+"""
+
+D2 Prewview Image
+画像クリックでポップアップする Preview Image
+
+"""
+class D2_PreviewImage(SaveImage):
+    def __init__(self):
+        self.output_dir = folder_paths.get_temp_directory()
+        self.type = "temp"
+        self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+        self.compress_level = 1
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {"images": ("IMAGE", ), },
+            "optional": {
+                "popup_image": ("D2_PREVIEW_IMAGE", {}, )
+            },
+            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
+        }
+
+    CATEGORY = "D2"
+
+    def save_images(self, images, popup_image="", filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
+        return super().save_images(images)
+
+
+
 """
 
 D2 Load Image
@@ -360,7 +393,6 @@ class D2_KSamplerAdvanced(D2_KSampler):
         return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
             preview_method, positive, negative, positive_cond, negative_cond, cnet_stack, prompt, extra_pnginfo, my_unique_id,
             add_noise, start_at_step, end_at_step, return_with_leftover_noise, sampler_type="advanced")
-
 
 
 
@@ -902,6 +934,7 @@ class D2_ListToString:
 
 
 NODE_CLASS_MAPPINGS = {
+    "D2 Preview Image": D2_PreviewImage,
     "D2 Load Image": D2_LoadImage,
     "D2 Folder Image Queue": D2_FolderImageQueue,
     "D2 KSampler": D2_KSampler,
