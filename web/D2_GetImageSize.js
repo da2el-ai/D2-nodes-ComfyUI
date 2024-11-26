@@ -24,8 +24,6 @@ app.registerExtension({
     nodeType.prototype.onExecuted = function (message) {
       onExecuted?.apply(this, arguments);
 
-      console.log("/////////////////", message);
-
       const w = message["width"][0];
       const h = message["height"][0];
 
