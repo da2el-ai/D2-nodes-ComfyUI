@@ -23,7 +23,6 @@ app.registerExtension({
       D2_PREVIEW_IMAGE(node, inputName, inputData, app) {
         const widget = node.addWidget("button", "Popup Image", "", () => {
           if(node.images.length >= 1){
-            console.log("D2_PREVIEW_IMAGE", node);
             node.lightBox.openLightbox(node.images, 0);
           }
         });

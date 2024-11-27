@@ -12,6 +12,8 @@ loadCssFile(CSS_FILEPATH);
 const _createLightboxBase = () => {
     const container = document.createElement('div');
     container.classList.add('d2-lightbox');
+    // フォーカス可能にする
+    container.setAttribute('tabindex', '-1');
     document.querySelector('body').appendChild(container);
 
     const bg = document.createElement('div');
@@ -55,8 +57,11 @@ class D2Lightbox{
         this.images = [];
         this.resizeTimer;
 
-
+        // 背景クリックで閉じる
         this.galleryContainer.addEventListener('click', ()=>{ this.closeLightbox(); });
+
+        // thisをバインドしてコールバック内でも正しくthisが参照できるようにする
+        this._onKeyDown = this._onKeyDown.bind(this);
     }
 
     openLightbox(imageObjects, imageIndex = 0){
@@ -65,10 +70,16 @@ class D2Lightbox{
         this._clickListImage(imageIndex);
         this.container.style.display = 'block';
 
+        // Lightboxを開いた時に自動でフォーカスを設定
+        this.container.focus();
+
         // リサイズイベントリスナーを追加
         // 既存のリサイズイベントリスナーを削除（重複防止）
-        window.removeEventListener('resize', this._handleResize, this);
-        window.addEventListener('resize', this._handleResize, this);
+        window.removeEventListener('resize', this._handleResize);
+        window.addEventListener('resize', this._handleResize);
+        // キーボードイベントリスナー
+        document.removeEventListener('keydown', this._onKeyDown);
+        document.addEventListener('keydown', this._onKeyDown);
     }
 
     closeLightbox(){
@@ -78,6 +89,7 @@ class D2Lightbox{
 
         // リサイズイベントリスナーを削除
         window.removeEventListener('resize', this._handleResize, this);
+        document.removeEventListener('keydown', this._onKeyDown);
     }
 
     /**
@@ -174,7 +186,13 @@ class D2Lightbox{
         this.resizeTimer = setTimeout(() => {
             this._resetGalleryPosition();
         }, 200); // 200ms後に実行
-    };    
+    };
+
+    _onKeyDown = (ev) => {
+        if(ev.key === 'Escape'){
+            this.closeLightbox();
+        }
+    }
 }
 
 export {D2Lightbox}

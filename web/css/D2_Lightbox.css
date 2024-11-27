@@ -11,6 +11,10 @@
     height: 100%;
 }
 
+.d2-lightbox:focus {
+    outline: none;
+}
+
 .d2-lightbox__bg {
     position: absolute;
     left: 0;
