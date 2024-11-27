@@ -131,6 +131,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2024.11.27**
+
+- Added new `D2 Preview Image`
+
 **2024.11.23**
 
 - Added new `D2 Model List`

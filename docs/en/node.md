@@ -91,6 +91,18 @@
 
 ## :tomato: Image Node
 
+
+### D2 Preview Image
+
+<figure>
+<img src="../img/preview_image_1.png">
+<img src="../img/preview_image_2.png">
+</figure>
+
+- Click the `Popup Image` button to display the full-screen gallery
+
+---
+
 ### D2 Load Image
 
 <figure>

@@ -94,6 +94,19 @@
 
 ## :tomato: Image Node
 
+
+### D2 預覽圖像
+
+<figure>
+<img src="../img/preview_image_1.png">
+<img src="../img/preview_image_2.png">
+</figure>
+
+- 點擊 `Popup Image` 按鈕可顯示全螢幕圖庫
+
+---
+
+
 ### D2 Load Image
 
 <figure>

@@ -100,6 +100,16 @@ Node
 
 ## :tomato: Image Node
 
+### D2 Preview Image
+
+<figure>
+<img src="../img/preview_image_1.png">
+<img src="../img/preview_image_2.png">
+</figure>
+
+- `Popup Image` ボタンをクリックすると全画面ギャラリーが表示される
+
+---
 
 ### D2 Load Image
 

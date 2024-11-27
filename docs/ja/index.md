@@ -133,9 +133,13 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2024.11.27**
+
+- `D2 Preview Image` を新規追加
+
 **2024.11.23**
 
-- `D2 Model List`: を新規追加
+- `D2 Model List` を新規追加
 
 **2024.11.21**
 
