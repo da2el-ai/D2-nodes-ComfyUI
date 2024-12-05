@@ -290,8 +290,8 @@ class D2_KSampler:
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative",)
+    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", )
     OUTPUT_NODE = True
     FUNCTION = "run"
     CATEGORY = "D2"
@@ -339,7 +339,7 @@ class D2_KSampler:
 
         return {
             "ui": {"images": results_images},
-            "result": (samp_images, latent, positive, negative,)
+            "result": (samp_images, latent, positive, negative, positive_encoded, negative_encoded,)
         }
 
 
@@ -380,8 +380,9 @@ class D2_KSamplerAdvanced(D2_KSampler):
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative",)
+    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", )
+
     OUTPUT_NODE = True
     FUNCTION = "run"
     CATEGORY = "D2"

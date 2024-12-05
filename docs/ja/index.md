@@ -133,6 +133,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2024.12.05**
+
+- `D2 KSampler` / `D2 KSampler` に Conditioning 出力を追加
+
 **2024.11.27**
 
 - `D2 Preview Image` を新規追加

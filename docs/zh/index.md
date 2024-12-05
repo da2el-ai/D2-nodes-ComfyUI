@@ -130,6 +130,10 @@
 
 ## :blossom: 更新日誌
 
+**2024.12.05**
+
+- 為 `D2 KSampler` / `D2 KSampler` 新增了 Conditioning 輸出
+  
 **2024.11.27**
 
 - 新增 `D2 Preview Image`
