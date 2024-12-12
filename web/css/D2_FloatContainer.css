@@ -1,6 +1,6 @@
 .d2-float-container {
   position: fixed;
-  z-index: 1000;
+  z-index: 2000;
 }
 
 .d2-float-container__content {
