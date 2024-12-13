@@ -1,3 +1,4 @@
+from typing import Optional
 import torch
 import math
 import os
@@ -24,6 +25,7 @@ from server import PromptServer
 from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
 from .modules import util
+from .modules.util import D2_TXYPipe
 from .modules import checkpoint_util
 from .modules import pnginfo_util
 from .modules import grid_image_util
@@ -286,6 +288,7 @@ class D2_KSampler:
             },
             "optional": {
                 "cnet_stack": ("D2_CNET_STACK",),
+                "xy_pipe": ("D2_TXYPipe",),
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
@@ -298,10 +301,22 @@ class D2_KSampler:
 
 
     def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, prompt=None, extra_pnginfo=None, my_unique_id=None,
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, 
+            xy_pipe:Optional[D2_TXYPipe]=None, prompt=None, extra_pnginfo=None, my_unique_id=None,
             add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular"):
 
         util.set_preview_method(preview_method)
+
+        # pipeがあったらそれを優先する
+        if xy_pipe != None:
+            positive = xy_pipe.positive if xy_pipe.positive else positive
+            negative = xy_pipe.negative if xy_pipe.negative else negative
+            seed = xy_pipe.seed if xy_pipe.seed else seed
+            steps = xy_pipe.steps if xy_pipe.steps else steps
+            cfg = xy_pipe.cfg if xy_pipe.cfg else cfg
+            sampler_name = xy_pipe.sampler_name if xy_pipe.sampler_name else sampler_name
+            scheduler = xy_pipe.scheduler if xy_pipe.scheduler else scheduler
+            denoise = xy_pipe.denoise if xy_pipe.denoise else denoise
 
         # コンディショニングが入力されていたらそちらを優先する
         if positive_cond != None:
@@ -376,6 +391,7 @@ class D2_KSamplerAdvanced(D2_KSampler):
                 "positive_cond": ("CONDITIONING",),
                 "negative_cond": ("CONDITIONING",),
                 "cnet_stack": ("D2_CNET_STACK",),
+                "xy_pipe": ("D2_TXYPipe",),
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
@@ -389,10 +405,10 @@ class D2_KSamplerAdvanced(D2_KSampler):
 
     def run(self, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 
             start_at_step, end_at_step, return_with_leftover_noise,
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, xy_pipe=None, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
 
         return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
-            preview_method, positive, negative, positive_cond, negative_cond, cnet_stack, prompt, extra_pnginfo, my_unique_id,
+            preview_method, positive, negative, positive_cond, negative_cond, cnet_stack, xy_pipe, prompt, extra_pnginfo, my_unique_id,
             add_noise, start_at_step, end_at_step, return_with_leftover_noise, sampler_type="advanced")
 
 

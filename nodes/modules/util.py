@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from typing import Literal
 import os
 import yaml
 import math
@@ -17,6 +19,31 @@ MAX_RESOLUTION = 16384
 MAX_SEED = 0xffffffffffffffff
 LINE_BREAK = "Line break"
 SEPARATOR = [LINE_BREAK, ",", ";"]
+
+@dataclass
+class D2_TAnnotation:
+    title: str
+    values: list
+
+D2_TXyStatus = Literal["INIT", "FINISH", ""]
+
+@dataclass
+class D2_TXYPipe:
+    positive: str
+    negative: str
+    seed: int
+    steps: int
+    cfg: float
+    sampler_name: str
+    scheduler: str
+    denoise: float
+
+@dataclass
+class D2_TGridPipe:
+    x_annotation: D2_TAnnotation
+    y_annotation: D2_TAnnotation
+    status: D2_TXyStatus
+
 
 
 """

@@ -1,4 +1,5 @@
-from typing import Literal
+from typing import Optional
+from dataclasses import dataclass
 import os
 import torch
 import math
@@ -9,7 +10,6 @@ from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 import math
 from aiohttp import web
-from dataclasses import dataclass
 from torchvision import transforms
 
 import folder_paths
@@ -22,16 +22,10 @@ from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, Save
 from server import PromptServer
 
 from .modules import util
-from .modules.util import AnyType
+from .modules.util import AnyType, D2_TXYPipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe
 from .modules import grid_image_util
 
 
-@dataclass
-class D2_TAnnotation:
-    title: str
-    values: list
-
-D2_TXyStatus = Literal["INIT", "FINISH", ""]
 
 
 
@@ -96,8 +90,8 @@ class D2_XYPlot:
 
         }
     
-    RETURN_TYPES = (AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
-    RETURN_NAMES = ("X", "Y", "x_annotation", "y_annotation", "status","index",)
+    RETURN_TYPES = ("D2_TGridPipe", AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
+    RETURN_NAMES = ("grid_pipe", "X", "Y", "x_annotation", "y_annotation", "status","index",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
@@ -127,8 +121,14 @@ class D2_XYPlot:
         else:
             status = ""
 
+        grid_pipe = D2_TGridPipe(
+            x_annotation = x_annotation,
+            y_annotation = y_annotation,
+            status = status
+        )
+
         return {
-            "result": (x_value, y_value, x_annotation, y_annotation, status,index,),
+            "result": (grid_pipe, x_value, y_value, x_annotation, y_annotation, status,index,),
             "ui": {
                 "auto_queue": (auto_queue,),
                 "x_array": (x_array,),
@@ -185,10 +185,10 @@ class D2_XYPlotEasy:
         }
    
     RETURN_TYPES = (
-        "STRING", "STRING", AnyType("*"), "INT", "INT", "FLOAT", AnyType("*"), AnyType("*"), "FLOAT", 
+        "D2_TXYPipe", "D2_TGridPipe", "STRING", "STRING", AnyType("*"), "INT", "INT", "FLOAT", AnyType("*"), AnyType("*"), "FLOAT", 
         AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
     RETURN_NAMES = (
-        "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", 
+        "xy_pipe", "grid_pipe", "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", 
         "x_other", "y_other", "x_annotation", "y_annotation", "status", "index",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
@@ -239,8 +239,28 @@ class D2_XYPlotEasy:
         org_values = self.__class__.apply_xy("x", x_annotation, x_value, org_values)
         org_values = self.__class__.apply_xy("y", y_annotation, y_value, org_values)
 
+        # KSamplerに渡すパイプ
+        xy_pipe = D2_TXYPipe(
+            positive = org_values["positive"],
+            negative = org_values["negative"],
+            seed = org_values["seed"],
+            steps = org_values["steps"],
+            cfg = org_values["cfg"],
+            sampler_name = org_values["sampler_name"],
+            scheduler = org_values["scheduler"],
+            denoise = org_values["denoise"],
+        )
+
+        grid_pipe = D2_TGridPipe(
+            x_annotation = x_annotation,
+            y_annotation = y_annotation,
+            status = status
+        )
+
         return {
             "result": (
+                xy_pipe,
+                grid_pipe,
                 org_values["positive"], org_values["negative"], org_values["ckpt_name"], 
                 org_values["seed"], org_values["steps"], org_values["cfg"], 
                 org_values["sampler_name"], org_values["scheduler"], org_values["denoise"], 
@@ -293,13 +313,16 @@ class D2_XYGridImage:
         return {
             "required": {
                 "images": ("IMAGE",),
-                "x_annotation": ("D2_TAnnotation", {}),
-                "y_annotation": ("D2_TAnnotation", {}),
-                "status": ("STRING", {"forceInput": True, "default": ""},),
                 "font_size": ("INT", {"default": 24},),
                 "grid_gap": ("INT", {"default": 0},),
                 "swap_dimensions": ("BOOLEAN", {"default": False},),
                 "grid_only": ("BOOLEAN", {"default": True},),
+            },
+            "optional": {
+                "x_annotation": ("D2_TAnnotation", {}),
+                "y_annotation": ("D2_TAnnotation", {}),
+                "status": ("STRING", {"forceInput": True, "default": ""},),
+                "grid_pipe": ("D2_TGridPipe", {"forceInput": True}),
             },
         }
     
@@ -311,7 +334,14 @@ class D2_XYGridImage:
     image_batch = None
     finished = True
 
-    def run(self, images, x_annotation:D2_TAnnotation, y_annotation:D2_TAnnotation, status, font_size, grid_gap, swap_dimensions, grid_only):
+    def run(self, images, font_size, grid_gap, swap_dimensions, grid_only, 
+            x_annotation:Optional[D2_TAnnotation]=None, y_annotation:Optional[D2_TAnnotation]=None, status=None, grid_pipe:Optional[D2_TGridPipe]=None):
+        
+        if grid_pipe != None:
+            x_annotation = grid_pipe.x_annotation if grid_pipe.x_annotation else x_annotation
+            y_annotation = grid_pipe.y_annotation if grid_pipe.y_annotation else y_annotation
+            status = grid_pipe.status if grid_pipe.status else status
+
         # 最初の画像だったら初期化する
         if status == "INIT":
             self.finished = False
