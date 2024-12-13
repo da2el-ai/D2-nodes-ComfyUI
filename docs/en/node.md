@@ -444,6 +444,55 @@ Output text
 
 ## :tomato: XY Plot Node
 
+
+### D2 XY Plot Easy
+
+<figure>
+<img src="../img/xyplot_easy.png">
+</figure>
+
+- A node that creates XY Plots with simplified workflow limited to KSampler parameters
+
+#### Input
+
+- `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+  - Settings to pass to KSampler
+- `ckpt_name`
+  - Setting to pass to D2 Checkpoint Loader
+- `x_type` / `y_type`
+  - Specify items to execute in XY Plot
+  - When `STRING`, `INT`, or `FLOAT` is specified, output will be from `x_other`, `y_other`
+- `x_list` / `y_list`
+  - XY Plot modification contents
+  - Since it's newline-separated text, input from other nodes is possible
+- `auto_queue`
+  - `true`: Automatically executes Queue the required number of times
+  - `false`: Manually execute Queue
+- `Reset index`
+  - Reset index with this button when stopped midway
+
+#### Output
+
+- `xy_pipe`
+  - Collectively outputs parameters used in D2 KSampler
+- `grid_pipe`
+  - Collectively outputs parameters `x_annotation` `y_annotation` `status` used in D2 Grid Image
+- `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+  - Parameters to pass to KSampler
+- `ckpt_name`
+  - Setting to pass to D2 Checkpoint Loader
+- `x_other` / `y_other`
+  - Outputs from here when `x_type` `y_type` is set to `STRING` `INT` `FLOAT`
+- `x_annotation` / `y_annotation`
+  - Header text to connect to `D2 XY Grid Image`
+- `status`
+  - Control signal to connect to `D2 XY Grid Image`
+- `index`
+  - Current processing count
+
+---
+
+
 ### D2 XY Plot
 
 <figure>

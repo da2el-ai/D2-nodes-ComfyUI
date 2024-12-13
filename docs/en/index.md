@@ -87,6 +87,8 @@ If you have installed any of the following custom nodes previously, please remov
 
 ### XY Plot
 
+- <a href="node.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
+  - A simplified XY Plot node limited to D2 KSampler parameters, designed for streamlined workflow
 - <a href="node.md#D2-XY-Plot">`D2 XY Plot`</a>
   - Versatile XY Plot node
   - Automatically executes required number of queues
@@ -130,6 +132,13 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2024.12.14**
+
+- `D2 KSampler`: Added `xy_pipe` for connection with `D2 XY Plot Easy`
+- `D2 Grid Image`: Added `grid_pipe` for connection with `D2 XY Plot` and `D2 XY Plot Easy`
+- `D2 XY Plot Easy`: Newly added
+- `D2 XY Model List`: Added filename and date sorting. Added support for retrieving Sampler and Scheduler lists
 
 **2024.12.05**
 

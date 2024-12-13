@@ -507,6 +507,55 @@ Output text
 ## :tomato: XY Plot Node
 
 
+### D2 XY Plot Easy
+
+<figure>
+<img src="../img/xyplot_easy.png">
+</figure>
+
+- KSampler の項目に限定したシンプルなワークフローの XY Plot が作れるノード
+
+#### Input
+
+- `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+  - KSampler に渡すための設定
+- `ckpt_name`
+  - D2 Checkpoint Loader に渡す設定
+- `x_type` / `y_type`
+  - XY Plot を実行する項目を指定
+  - `STRING`、`INT`、`FLOAT` を指定すると `x_other`、`y_other` から出力する
+- `x_list` / `y_list`
+  - XY Plot の変更内容
+  - 改行区切りテキストなので他のノードを使って入力することも可能
+- `auto_queue`
+  - `true`: 必要な回数の Queue を自動的に実行
+  - `false`: 手動で Queue を実行する
+- `Reset index`
+  - 途中で停止した時はこのボタンで index をリセットする
+
+#### Output
+
+- `xy_pipe`
+  - D2 KSampler で使用するパラメーターをまとめて出力
+- `grid_pipe`
+  - D2 Grid Image で使用するパラメーター `x_annotation` `y_annotation` `status` をまとめて出力
+- `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+  - KSampler に渡すパラメーター
+- `ckpt_name`
+  - D2 Checkpoint Loader に渡す設定
+- `x_other` / `y_other`
+  - `x_type` `x_type` を `STRING` `INT` `FLOAT` に指定するとここから出力する
+- `x_annotation` / `y_annotation`
+  - `D2 XY Grid Image` に接続する見出しテキスト
+- `status`
+  - `D2 XY Grid Image` に接続する制御信号
+- `index`
+  - 現在の処理回数
+
+
+---
+
+
 ### D2 XY Plot
 
 <figure>

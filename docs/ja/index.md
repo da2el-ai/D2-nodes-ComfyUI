@@ -89,6 +89,8 @@ D2 Nodes ComfyUI
 
 ### XY Plot
 
+- <a href="node.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
+  - D2 KSampler の項目に限定し、ワークフローをシンプルにした XY Plot ノード
 - <a href="node.md#D2-XY-Plot">`D2 XY Plot`</a>
   - 汎用的な XY Plot ノード
   - 必要な回数の Queue を自動的に実行する
@@ -132,6 +134,13 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2024.12.14**
+
+- `D2 KSampler`: `D2 XY Plot Easy` と接続するための `xy_pipe` を追加
+- `D2 Grid Image`: `D2 XY Plot`、`D2 XY Plot Easy` と接続するための `grid_pip` を追加
+- `D2 XY Plot Easy`: を新規追加
+- `D2 XY Model List`: ファイル名、日付ソートを追加。Sampler、Schedulerのリスト取得に対応。
 
 **2024.12.05**
 

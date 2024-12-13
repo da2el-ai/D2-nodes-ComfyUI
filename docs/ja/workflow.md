@@ -41,6 +41,14 @@ Workflow
 - 1.5倍にアップスケールしている
 
 
+## :card_index_dividers: XY Plot: Checkpoint & Prompt S/R
+
+<a href="../../workflow/xy_easy_20241214.png"><img src="../../workflow/xy_easy_20241214.png"></a>
+
+- D2 XY Plot Easy を使ったシンプルな XY Plot
+
+
+
 ## :card_index_dividers: XY Plot: Prompt S/R
 
 <a href="../../workflow/xy_prompt_sr_20241119.png"><img src="../../workflow/xy_prompt_sr_20241119.png"></a>

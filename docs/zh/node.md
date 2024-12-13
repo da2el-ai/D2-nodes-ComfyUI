@@ -472,6 +472,55 @@ Output text
 
 ## :tomato: XY Plot Node
 
+
+### D2 XY Plot Easy
+
+<figure>
+<img src="../img/xyplot_easy.png">
+</figure>
+
+- 一個可建立限定於 KSampler 項目的簡化工作流程 XY Plot 的節點
+
+#### 輸入
+
+- `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+  - 傳遞給 KSampler 的設定
+- `ckpt_name`
+  - 傳遞給 D2 Checkpoint Loader 的設定
+- `x_type` / `y_type`
+  - 指定要在 XY Plot 中執行的項目
+  - 當指定為 `STRING`、`INT`、`FLOAT` 時，將從 `x_other`、`y_other` 輸出
+- `x_list` / `y_list`
+  - XY Plot 的變更內容
+  - 因為是換行分隔的文字，所以也可以使用其他節點輸入
+- `auto_queue`
+  - `true`：自動執行所需次數的 Queue
+  - `false`：手動執行 Queue
+- `Reset index`
+  - 中途停止時使用此按鈕重置索引
+
+#### 輸出
+
+- `xy_pipe`
+  - 統一輸出用於 D2 KSampler 的參數
+- `grid_pipe`
+  - 統一輸出用於 D2 Grid Image 的參數 `x_annotation` `y_annotation` `status`
+- `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+  - 傳遞給 KSampler 的參數
+- `ckpt_name`
+  - 傳遞給 D2 Checkpoint Loader 的設定
+- `x_other` / `y_other`
+  - 當 `x_type` `y_type` 設定為 `STRING` `INT` `FLOAT` 時從此處輸出
+- `x_annotation` / `y_annotation`
+  - 連接至 `D2 XY Grid Image` 的標題文字
+- `status`
+  - 連接至 `D2 XY Grid Image` 的控制信號
+- `index`
+  - 目前的處理次數
+
+---
+
+
 ### D2 XY Plot
 
 <figure>

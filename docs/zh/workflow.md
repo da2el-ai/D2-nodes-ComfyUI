@@ -36,6 +36,14 @@
 - 使用 `Controlnet anyTest`
 - 放大至 1.5 倍
 
+
+## :card_index_dividers: XY Plot: Checkpoint & Prompt S/R
+
+<a href="../../workflow/xy_easy_20241214.png"><img src="../../workflow/xy_easy_20241214.png"></a>
+
+- 使用 D2 XY Plot Easy 的簡單 XY Plot
+
+
 ## :card_index_dividers: XY Plot: Prompt S/R
 
 <a href="../../workflow/xy_prompt_sr_20241119.png"><img src="../../workflow/xy_prompt_sr_20241119.png"></a>

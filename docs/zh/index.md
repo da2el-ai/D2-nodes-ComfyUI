@@ -88,6 +88,8 @@
 
 ### XY Plot
 
+- <a href="node.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
+  - 限定於 D2 KSampler 項目的簡化版 XY Plot 節點，提供更簡潔的工作流程
 - <a href="node.md#D2-XY-Plot">`D2 XY Plot`</a>
   - 通用的 XY Plot 節點
   - 自動執行所需次數的佇列
@@ -129,6 +131,13 @@
 
 
 ## :blossom: 更新日誌
+
+**2024.12.14**
+
+- `D2 KSampler`：新增 `xy_pipe` 以連接 `D2 XY Plot Easy`
+- `D2 Grid Image`：新增 `grid_pipe` 以連接 `D2 XY Plot` 和 `D2 XY Plot Easy`
+- `D2 XY Plot Easy`：新增功能
+- `D2 XY Model List`：新增檔案名稱和日期排序功能。新增支援 Sampler 和 Scheduler 列表獲取
 
 **2024.12.05**
 
