@@ -350,7 +350,7 @@ class D2_XYModelList:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model_type": (["checkpoints", "loras"],),
+                "model_type": (["checkpoints", "loras", "samplers", "schedulers"],),
                 "filter": ("STRING", {"default":""}),
                 "sort_by": (["Name", "Date"], {"default":"Name"}),
                 "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
@@ -383,28 +383,37 @@ async def route_d2_model_list_get_list(request):
         sort_by = request.query.get('sort_by')
         order_by = request.query.get('order_by')
 
-        file_list = folder_paths.get_filename_list(type)
+        if type == "samplers":
+            file_list = comfy.samplers.KSampler.SAMPLERS
+        elif type == "schedulers":
+            file_list = comfy.samplers.KSampler.SCHEDULERS
+        else:
+            file_list = folder_paths.get_filename_list(type)
+
         filtered_list = [s for s in file_list if re.search(filter, s, re.IGNORECASE)]
 
-        model_list = []
-        for file in filtered_list:
-            full_path = folder_paths.get_full_path(type, file)
-            # timestamp にファイルの日付を入れる
-            timestamp = datetime.fromtimestamp(os.path.getmtime(full_path))
-            model_list.append({
-                'file': file,
-                'timestamp': timestamp.isoformat(),
-            })
-
-        # sort_by、order_by を使ってソートする
-        reverse = order_by.lower() == 'z-a'
-        sort_key = 'timestamp' if sort_by.lower() == 'date' else 'file'
-        
-        # fileの場合は大文字小文字を区別しないソート
-        if sort_key == 'file':
-            sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key].lower(), reverse=reverse)]
+        if type in ["samplers", "schedulers"]:
+            sorted_list = filtered_list
         else:
-            sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key], reverse=reverse)]
+            model_list = []
+            for file in filtered_list:
+                full_path = folder_paths.get_full_path(type, file)
+                # timestamp にファイルの日付を入れる
+                timestamp = datetime.fromtimestamp(os.path.getmtime(full_path))
+                model_list.append({
+                    'file': file,
+                    'timestamp': timestamp.isoformat(),
+                })
+
+            # sort_by、order_by を使ってソートする
+            reverse = order_by.lower() == 'z-a'
+            sort_key = 'timestamp' if sort_by.lower() == 'date' else 'file'
+            
+            # fileの場合は大文字小文字を区別しないソート
+            if sort_key == 'file':
+                sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key].lower(), reverse=reverse)]
+            else:
+                sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key], reverse=reverse)]
 
 
     except:
