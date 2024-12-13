@@ -5,7 +5,7 @@ app.registerExtension({
   name: "Comfy.D2.D2_XY_Plot",
 
   async beforeRegisterNodeDef(nodeType, nodeData, app) {
-    if (nodeData.name !== "D2 XY Plot") return;
+    if (nodeData.name !== "D2 XY Plot" && nodeData.name !== "D2 XY Plot Easy") return;
 
     /**
      * ノード実行時
@@ -20,6 +20,12 @@ app.registerExtension({
       const index = message["index"][0]; // 0スタート
       const total = message["total"][0];
       const indexWidget = findWidgetByName(this, "index");
+      
+      // seed更新
+      const seedWidget = findWidgetByName(this, "xy_seed");
+      if(seedWidget){
+        seedWidget.setValue(Math.floor(Math.random()*100000));
+      }
 
       // まだ残りがあるならキューを入れる
       if(index + 1 < total && total >= 2){
@@ -53,6 +59,18 @@ app.registerExtension({
 
         widget.draw = function(ctx, node, width, y) {
           const text = `Index: ${this.value}`;
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "12px Arial";
+          ctx.fillText(text, 20, y + 20);
+        };
+        node.addCustomWidget(widget);
+        return widget;
+      },
+      D2_XYPLOT_SEED(node, inputName, inputData, app) {
+        const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_SEED", inputName, 0);
+
+        widget.draw = function(ctx, node, width, y) {
+          const text = `Seed: ${this.value}`;
           ctx.fillStyle = "#ffffff";
           ctx.font = "12px Arial";
           ctx.fillText(text, 20, y + 20);

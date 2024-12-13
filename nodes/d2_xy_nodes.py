@@ -140,12 +140,145 @@ class D2_XYPlot:
 
     @classmethod
     def change_type(cls, type:str, values:list) -> list:
-        if type == "INT":
+        if type in ["INT", "seed", "steps"]:
             return [int(val) for val in values]
-        elif type == "FLOAT":
+        elif type in ["FLOAT", "cfg", "denoise"]:
             return [float(val) for val in values]
         return values
 
+
+
+"""
+
+D2 XY Plot Easy
+
+"""
+class D2_XYPlotEasy:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        intput_types = ["none", "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name",
+                        "scheduler", "denoise", "STRING", "INT", "FLOAT",]
+
+        return {
+            "required": {
+                "positive": ("STRING", {"multiline": True},),
+                "negative": ("STRING", {"multiline": True},),
+                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
+                "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0}),
+                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, ),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, ),
+                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "x_type": (intput_types,),
+                "x_list": ("STRING", {"multiline": True},),
+                "y_type": (intput_types,),
+                "y_list": ("STRING", {"multiline": True},),
+                "auto_queue": ("BOOLEAN", {"default": True},),
+            },
+            "optional": {
+                "reset": ("D2_XYPLOT_RESET", {"default":""}),
+                "index": ("D2_XYPLOT_INDEX", {}),
+                "xy_seed": ("D2_XYPLOT_SEED", {}),
+            }
+        }
+   
+    RETURN_TYPES = (
+        "STRING", "STRING", AnyType("*"), "INT", "INT", "FLOAT", AnyType("*"), AnyType("*"), "FLOAT", 
+        AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
+    RETURN_NAMES = (
+        "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", 
+        "x_other", "y_other", "x_annotation", "y_annotation", "status", "index",)
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+
+    def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, xy_seed, reset="", index=0):
+        
+        org_values = {
+            "positive": positive,
+             "negative": negative,
+             "ckpt_name": ckpt_name,
+             "seed": seed,
+             "steps": steps,
+             "cfg": cfg,
+             "sampler_name": sampler_name,
+             "scheduler": scheduler,
+             "denoise": denoise,
+             "x_other": "",
+             "y_other": "",
+        }
+
+        x_annotation = D2_XYAnnotation.get_annotation(x_type, x_list)
+        y_annotation = D2_XYAnnotation.get_annotation(y_type, y_list)
+
+        x_array = D2_XYPlot.change_type(x_type, x_annotation.values)
+        y_array = D2_XYPlot.change_type(y_type, y_annotation.values)
+
+        # 要素の数
+        x_len = len(x_array)
+        y_len = len(y_array)
+        total = x_len * y_len
+
+        # 採用する値
+        x_value = x_array[index % x_len]
+        y_value = y_array[math.floor(index / x_len)]
+
+        # D2 Grid Image に送るステータス
+        trigger = index + 1 >= total
+        if index == 0:
+            status = "INIT"
+        elif index + 1 >= total:
+            status = "FINISH"
+        else:
+            status = ""
+
+        # 出力値をtypeによって変える
+        org_values = self.__class__.apply_xy("x", x_annotation, x_value, org_values)
+        org_values = self.__class__.apply_xy("y", y_annotation, y_value, org_values)
+
+        return {
+            "result": (
+                org_values["positive"], org_values["negative"], org_values["ckpt_name"], 
+                org_values["seed"], org_values["steps"], org_values["cfg"], 
+                org_values["sampler_name"], org_values["scheduler"], org_values["denoise"], 
+                org_values["x_other"], org_values["y_other"], 
+                x_annotation, y_annotation, status,index,
+            ),
+            "ui": {
+                "auto_queue": (auto_queue,),
+                "x_array": (x_array,),
+                "y_array": (y_array,),
+                "index": (index,),
+                "total": (total,),
+            }
+        }
+    
+    @classmethod
+    def apply_xy(cls, xy, annotation:D2_TAnnotation, val, org_values ):
+        type = annotation.title
+
+        if type in ["ckpt_name", "steps", "cfg", "sampler_name", "scheduler", "denoise"]:
+            org_values[type] = val
+        elif type in ["STRING", "INT", "FLOAT"]:
+            key = "x_other" if xy == "x" else "y_other"
+            org_values[key] = val
+        elif type == "seed":
+            org_values["seed"] = util.create_seed() if val == -1 else val
+        elif type == "positive" or type == "negative":
+            search = annotation.values[0]
+            if type == "positive":
+                org_values["positive"] = cls.apply_promptsr(org_values["positive"], search, val)
+            else:
+                org_values["negative"] = cls.apply_promptsr(org_values["negative"], search, val)
+
+        return org_values
+
+    @classmethod
+    def apply_promptsr(cls, prompt, search, replace):
+        return prompt.replace(search, replace)
 
 
 """
@@ -338,6 +471,9 @@ class D2_XYLoraList:
         lora_list = [kwargs.get(f"lora_name_{i}") for i in range(1, lora_count + 1)]
         lora_list_str = util.list_to_text(lora_list, util.LINE_BREAK)
         return (lora_list_str, lora_list,)
+
+
+
 
 
 """
@@ -605,6 +741,7 @@ class D2_XYFolderImages:
 
 NODE_CLASS_MAPPINGS = {
     "D2 XY Plot": D2_XYPlot,
+    "D2 XY Plot Easy": D2_XYPlotEasy,
     "D2 XY Grid Image": D2_XYGridImage,
     "D2 XY Checkpoint List": D2_XYCheckpointList,
     "D2 XY Lora List": D2_XYLoraList,
