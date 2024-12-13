@@ -1,8 +1,10 @@
 from typing import Literal
+import os
 import torch
 import math
 import json
 import re
+from datetime import datetime
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 import math
@@ -350,6 +352,8 @@ class D2_XYModelList:
             "required": {
                 "model_type": (["checkpoints", "loras"],),
                 "filter": ("STRING", {"default":""}),
+                "sort_by": (["Name", "Date"], {"default":"Name"}),
+                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
                 "get_list": ("D2_GET_MODEL_BTN", {}),
                 "model_list": ("STRING", {"multiline": True}),
             }
@@ -360,7 +364,7 @@ class D2_XYModelList:
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, model_type, filter="", get_list="", model_list=""):
+    def run(self, model_type, filter="", sort_by="Name", order_by="A-Z", get_list="", model_list=""):
         list_list = model_list.split("\n")
         return (model_list, list_list,)
 
@@ -376,13 +380,38 @@ async def route_d2_model_list_get_list(request):
     try:
         type = request.query.get('type')
         filter = request.query.get('filter')
-        model_list = folder_paths.get_filename_list(type)
-        filtered_list = [s for s in model_list if re.search(filter, s, re.IGNORECASE)]
+        sort_by = request.query.get('sort_by')
+        order_by = request.query.get('order_by')
+
+        file_list = folder_paths.get_filename_list(type)
+        filtered_list = [s for s in file_list if re.search(filter, s, re.IGNORECASE)]
+
+        model_list = []
+        for file in filtered_list:
+            full_path = folder_paths.get_full_path(type, file)
+            # timestamp にファイルの日付を入れる
+            timestamp = datetime.fromtimestamp(os.path.getmtime(full_path))
+            model_list.append({
+                'file': file,
+                'timestamp': timestamp.isoformat(),
+            })
+
+        # sort_by、order_by を使ってソートする
+        reverse = order_by.lower() == 'z-a'
+        sort_key = 'timestamp' if sort_by.lower() == 'date' else 'file'
+        
+        # fileの場合は大文字小文字を区別しないソート
+        if sort_key == 'file':
+            sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key].lower(), reverse=reverse)]
+        else:
+            sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key], reverse=reverse)]
+
+
     except:
-        filtered_list = []
+        sorted_list = []
 
     # JSON応答を返す
-    json_data = json.dumps({"files":filtered_list})
+    json_data = json.dumps({"files":sorted_list})
     return web.Response(text=json_data, content_type='application/json')
 
 
