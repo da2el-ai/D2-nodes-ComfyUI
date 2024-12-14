@@ -19,6 +19,7 @@ app.registerExtension({
       const yArray = message["y_array"][0];
       const index = message["index"][0]; // 0スタート
       const total = message["total"][0];
+      this.total = total;
       const indexWidget = findWidgetByName(this, "index");
       
       // seed更新
@@ -56,9 +57,10 @@ app.registerExtension({
       },
       D2_XYPLOT_INDEX(node, inputName, inputData, app) {
         const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_INDEX", inputName, 0);
+        node.total = 0;
 
         widget.draw = function(ctx, node, width, y) {
-          const text = `Index: ${this.value}`;
+          const text = `Index: ${this.value} / ${node.total}`;
           ctx.fillStyle = "#ffffff";
           ctx.font = "12px Arial";
           ctx.fillText(text, 20, y + 20);
