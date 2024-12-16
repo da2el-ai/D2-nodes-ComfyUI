@@ -49,8 +49,8 @@ class D2_TGridPipe:
 """
 seed値を作る
 """
-def create_seed():
-    return random.randrange(MAX_SEED)
+def create_seed(num = 0):
+    return random.randrange(MAX_SEED) if num == -1 else num
 
 
 """
