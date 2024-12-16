@@ -56,7 +56,7 @@ class D2_XYAnnotation:
         return (annotation,)
 
     @classmethod
-    def get_annotation(cls, title, list) -> D2_TAnnotation:
+    def get_annotation(cls, title:str, list:str) -> D2_TAnnotation:
         array = list.strip().split('\n')
         annotation = D2_TAnnotation(title = title, values = array)
         return annotation
@@ -100,7 +100,6 @@ class D2_XYPlot:
         x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
         y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
 
-
         x_array = self.__class__.change_type(x_type, x_annotation.values)
         y_array = self.__class__.change_type(y_type, y_annotation.values)
         # 要素の数
@@ -113,7 +112,6 @@ class D2_XYPlot:
         y_value = y_array[math.floor(index / x_len)]
 
         # D2 Grid Image に送るステータス
-        trigger = index + 1 >= total
         if index == 0:
             status = "INIT"
         elif index + 1 >= total:
@@ -140,12 +138,14 @@ class D2_XYPlot:
 
     @classmethod
     def change_type(cls, type:str, values:list) -> list:
-        if type in ["INT", "seed", "steps"]:
+        if type in ["INT", "steps"]:
             return [int(val) for val in values]
         elif type in ["FLOAT", "cfg", "denoise"]:
             return [float(val) for val in values]
+        elif type == "seed":
+            # seed値を作る
+            return [util.create_seed(int(val)) for val in values]
         return values
-
 
 
 """
@@ -211,23 +211,23 @@ class D2_XYPlotEasy:
              "y_other": "",
         }
 
-        x_annotation = D2_XYAnnotation.get_annotation(x_type, x_list)
-        y_annotation = D2_XYAnnotation.get_annotation(y_type, y_list)
-
-        x_array = D2_XYPlot.change_type(x_type, x_annotation.values)
-        y_array = D2_XYPlot.change_type(y_type, y_annotation.values)
+        # index = 0 の時に値を変換する
+        if index == 0:
+            x_array = D2_XYPlot.change_type(x_type, x_list.strip().split('\n'))
+            y_array = D2_XYPlot.change_type(y_type, y_list.strip().split('\n'))
+            self.x_annotation = D2_TAnnotation(x_type, x_array)
+            self.y_annotation = D2_TAnnotation(y_type, y_array)
 
         # 要素の数
-        x_len = len(x_array)
-        y_len = len(y_array)
+        x_len = len(self.x_annotation.values)
+        y_len = len(self.y_annotation.values)
         total = x_len * y_len
 
         # 採用する値
-        x_value = x_array[index % x_len]
-        y_value = y_array[math.floor(index / x_len)]
+        x_value = self.x_annotation.values[index % x_len]
+        y_value = self.y_annotation.values[math.floor(index / x_len)]
 
         # D2 Grid Image に送るステータス
-        trigger = index + 1 >= total
         if index == 0:
             status = "INIT"
         elif index + 1 >= total:
@@ -236,8 +236,8 @@ class D2_XYPlotEasy:
             status = ""
 
         # 出力値をtypeによって変える
-        org_values = self.__class__.apply_xy("x", x_annotation, x_value, org_values)
-        org_values = self.__class__.apply_xy("y", y_annotation, y_value, org_values)
+        org_values = self.__class__.apply_xy("x", self.x_annotation, x_value, org_values)
+        org_values = self.__class__.apply_xy("y", self.y_annotation, y_value, org_values)
 
         # KSamplerに渡すパイプ
         xy_pipe = D2_TXYPipe(
@@ -251,9 +251,10 @@ class D2_XYPlotEasy:
             denoise = org_values["denoise"],
         )
 
+        # Grid Image に渡すパイプ
         grid_pipe = D2_TGridPipe(
-            x_annotation = x_annotation,
-            y_annotation = y_annotation,
+            x_annotation = self.x_annotation,
+            y_annotation = self.y_annotation,
             status = status
         )
 
@@ -265,12 +266,12 @@ class D2_XYPlotEasy:
                 org_values["seed"], org_values["steps"], org_values["cfg"], 
                 org_values["sampler_name"], org_values["scheduler"], org_values["denoise"], 
                 org_values["x_other"], org_values["y_other"], 
-                x_annotation, y_annotation, status,index,
+                self.x_annotation, self.y_annotation, status,index,
             ),
             "ui": {
                 "auto_queue": (auto_queue,),
-                "x_array": (x_array,),
-                "y_array": (y_array,),
+                "x_array": (self.x_annotation.values,),
+                "y_array": (self.y_annotation.values,),
                 "index": (index,),
                 "total": (total,),
             }
@@ -280,13 +281,11 @@ class D2_XYPlotEasy:
     def apply_xy(cls, xy, annotation:D2_TAnnotation, val, org_values ):
         type = annotation.title
 
-        if type in ["ckpt_name", "steps", "cfg", "sampler_name", "scheduler", "denoise"]:
+        if type in ["ckpt_name", "steps", "cfg", "sampler_name", "scheduler", "denoise", "seed"]:
             org_values[type] = val
         elif type in ["STRING", "INT", "FLOAT"]:
             key = "x_other" if xy == "x" else "y_other"
             org_values[key] = val
-        elif type == "seed":
-            org_values["seed"] = util.create_seed() if val == -1 else val
         elif type == "positive" or type == "negative":
             search = annotation.values[0]
             if type == "positive":
