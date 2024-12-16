@@ -428,7 +428,7 @@ class D2_XYGridImage:
             grid_image = grid_image_util.create_grid_with_annotation_by_rows(
                 images = images,
                 gap = grid_gap,
-                max_rows = len(x_annotation.values),
+                max_rows = len(y_annotation.values),
                 column_texts = column_texts,
                 row_texts = row_texts,
                 font_size = font_size
@@ -437,7 +437,7 @@ class D2_XYGridImage:
             grid_image = grid_image_util.create_grid_with_annotation_by_columns(
                 images = images,
                 gap = grid_gap,
-                max_columns = len(y_annotation.values),
+                max_columns = len(x_annotation.values),
                 column_texts = column_texts,
                 row_texts = row_texts,
                 font_size = font_size
