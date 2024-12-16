@@ -3,11 +3,14 @@ import math
 import os
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
+import textwrap
 # from .util import pil2tensor, tensor2pil
 
 
 FONT_PATH = str(Path(__file__).parent.parent.parent / "static" / "Roboto-Regular.ttf")
 PADDING = 16
+LINE_SPACING_PAR = 0.2 # ラベルの行間
+LINE_MAX_WIDTH_PAR = 1.5 # テキストボックスの最大幅
 
 @dataclass
 class GridData:
@@ -35,31 +38,105 @@ class AnnotationData:
 
 """
 
-文字画像を作成
+折り返しなしの文字画像を作成
 
 """
-def _get_text_image(
+def _get_text_image_1line(
     annotation_data: AnnotationData,
-    text: str
+    text: str,
 ) -> Image.Image:
-    
-    # 仮のImageを作成してテキストサイズを計算
+
+    # 仮のImageを作成
     temp_draw = ImageDraw.Draw(Image.new('RGB', (1, 1)))
-    text_width = temp_draw.textlength(text, font=annotation_data.font)
-    text_height = annotation_data.font.size
-    
+
+    # テキスト全体のバウンディングボックスを取得
+    # right - left、bottom - topでサイズを計算している
+    bbox = temp_draw.textbbox((0, 0), text, font=annotation_data.font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+
     # 画像を作成
     text_image = Image.new('RGB', (int(text_width), text_height), color=0xffffff)
     draw = ImageDraw.Draw(text_image)
     
     # テキストを描画（左揃え）
-    draw.text(
-        (0, 0),
-        text,
-        font=annotation_data.font,
-        fill=(0, 0, 0)  # 黒色
-    )
+    draw.text((-bbox[0], -bbox[1]), text, font=annotation_data.font, fill=(0, 0, 0))
+
     return text_image
+
+"""
+
+複数行の文字画像を作成
+
+"""
+def _get_text_image_multiline(
+    annotation_data: AnnotationData,
+    text: str,
+    max_width: int = 0
+) -> Image.Image:
+    
+    # 仮のImageを作成
+    temp_draw = ImageDraw.Draw(Image.new('RGB', (1, 1)))
+
+    # テキストを折り返す文字数を計算
+    avg_char_width = temp_draw.textlength('A', font=annotation_data.font)  # 平均文字幅を計算
+    chars_per_line = int(max_width / avg_char_width)  # １行あたりの文字数
+    
+    # テキストを折り返す
+    wrapped_text = textwrap.fill(text, width=chars_per_line)
+    lines = wrapped_text.split('\n')  # テキストを配列に分解
+    
+    # 全体のバウンディングボックスを計算
+    line_params = []
+    max_line_width = 0
+    total_height = 0
+    
+    for line in lines:
+        bbox = temp_draw.textbbox((0, 0), line, font=annotation_data.font)
+        line_width = bbox[2] - bbox[0]
+        line_height = bbox[3] - bbox[1]
+        max_line_width = max(max_line_width, line_width) # テキスト画像の最大幅
+        line_params.append((line, bbox, line_height)) # テキスト、テキスト画像のバウンディングボックス、テキスト画像の高さ
+        total_height += line_height
+    
+    # 行間を追加（フォントサイズの20%）
+    line_spacing = int(annotation_data.font.size * LINE_SPACING_PAR)
+    total_height += line_spacing * (len(lines) - 1)
+    
+    # 最終的な画像を作成
+    text_image = Image.new('RGB', (int(max_line_width), int(total_height)), color=0xffffff)
+    draw = ImageDraw.Draw(text_image)
+    
+    # 各行を描画
+    y_offset = 0
+    for line, bbox, line_height in line_params:
+        draw.text(
+            (-bbox[0], -bbox[1] + y_offset),
+            line,
+            font=annotation_data.font,
+            fill=(0, 0, 0)
+        )
+        y_offset += line_height + line_spacing
+
+    return text_image
+
+
+"""
+
+文字画像を作成
+
+"""
+def _get_text_image(
+    annotation_data: AnnotationData,
+    text: str,
+    max_width: int = 0
+) -> Image.Image:
+    
+    if max_width <= 0:
+        return _get_text_image_1line(annotation_data, text)
+    else:
+        return _get_text_image_multiline(annotation_data, text, max_width)
+
 
 """
 
@@ -74,7 +151,7 @@ def _create_column_image(
     column_height = 0
 
     for text in annotation_data.column_texts:
-        img = _get_text_image(annotation_data, text)
+        img = _get_text_image(annotation_data, text, int(grid_data.size[0] * LINE_MAX_WIDTH_PAR))
         column_height = max(column_height, img.size[1])
         column_images.append(img)
 
@@ -116,7 +193,7 @@ def _create_row_image(
     row_width = 0
 
     for text in annotation_data.row_texts:
-        img = _get_text_image(annotation_data, text)
+        img = _get_text_image(annotation_data, text, int(grid_data.size[0] * LINE_MAX_WIDTH_PAR))
         row_width = max(row_width, img.size[0])
         row_images.append(img)
 
