@@ -756,7 +756,6 @@ Output text
 
 ---
 
-
 ### D2 XY List To Plot
 
 <figure>
@@ -765,8 +764,24 @@ Output text
 
 - リストを出力するノードから `D2 XY Plot` に使えるように変換する
 - 内部的には `"\n".join(list)` をしているだけなので、リストの内容に改行が含まれていると意図しない動作になります
+- 改行を含むテキストを使う時は `D2 XY String To Plot` を使う
+
 
 ---
+
+### D2 XY String To Plot
+
+<figure>
+  <img src="../img/xy_string_to_plot.png">
+</figure>
+
+- 複数行のテキストを `D2 XY Plot` / `D2 XY Plot Easy` に使えるように変換する
+- プロンプト全体を比較する XY Plot を実行したい時に使う
+- `D2 XY Plot Easy` でプロンプト比較に使う時は `x/y_type` を `STRING` にし、`x/y_other` を `D2 KSampler` の `positive` に繋げる
+
+---
+
+
 
 
 ## :tomato: Refiner Node

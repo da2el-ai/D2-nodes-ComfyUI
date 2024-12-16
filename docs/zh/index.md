@@ -113,6 +113,9 @@
   - 創建在 `D2 Grid Image` 顯示的標題文字
 - <a href="node.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
   - 將陣列轉換為 `D2 XY Plot` 用列表
+- <a href="node.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
+  - 將包含換行符的文本轉換為 `D2 XY Plot` 可用的列表格式
+
 
 ### Refiner
 - <a href="node.md#D2-Refiner-Steps">`D2 Refiner Steps`</a>
@@ -131,6 +134,14 @@
 
 
 ## :blossom: 更新日誌
+
+**2024.12.16**
+
+- `D2 XY String To Plot`: 新增節點
+- `D2 Grid Image`: 支援標籤中的換行符
+- `D2 Grid Image`: 新增標籤輸出開關選項
+- `D2 XY Prompt SR`: 支援包含換行符的文本
+- `D2 XY Plot Easy`: 修改為在指定 seed 為 `-1` 時，在 `x/y_annotation` 中記錄隨機值
 
 **2024.12.14**
 

@@ -711,11 +711,24 @@ Output text
 ### D2 XY List To Plot
 
 <figure>
-<img src="../img/xy_list_to_plot.png?2">
+  <img src="../img/xy_list_to_plot.png?2">
 </figure>
 
-- 將列表輸出節點的輸出轉換為可用於 `D2 XY Plot` 的格式
-- 內部僅執行 `"\n".join(list)`，所以如果列表內容包含換行會產生非預期的行為
+- 將列表輸出節點的內容轉換為可用於 `D2 XY Plot` 的格式
+- 內部僅執行 `"\n".join(list)`，因此如果列表內容包含換行符，可能無法按預期工作
+- 處理包含換行符的文本時，請使用 `D2 XY String To Plot`
+
+---
+
+### D2 XY String To Plot
+
+<figure>
+  <img src="../img/xy_string_to_plot.png">
+</figure>
+
+- 將多行文本轉換為可用於 `D2 XY Plot` / `D2 XY Plot Easy` 的格式
+- 當需要比較整個提示詞時使用
+- 在 `D2 XY Plot Easy` 中進行提示詞比較時，將 `x/y_type` 設置為 `STRING`，並將 `x/y_other` 連接到 `D2 KSampler` 的 `positive` 輸入
 
 ---
 

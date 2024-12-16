@@ -114,6 +114,8 @@ D2 Nodes ComfyUI
   - D2 Grid Image で表示する見出しテキストを作成
 - <a href="node.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
   - 配列を D2 XY Plot 用リストに変換する
+- <a href="node.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
+  - 改行を含むテキストを `D2 XY Plot` 用リストに変換する
 
 ### Refiner
 - <a href="node.md#D2-Refiner-Steps">`D2 Refiner Steps`</a>
@@ -134,6 +136,14 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2024.12.16**
+
+- `D2 XY String To Plot`: 新規追加
+- `D2 Grid Image`: ラベルの改行に対応
+- `D2 Grid Image`: ラベル出力の ON/OFF を選択可能にした
+- `D2 XY Prompt SR`: 改行を含むテキストに対応
+- `D2 XY Plot Easy`: seed で `-1` を指定した時に `x/y_annotation` にランダム値を登録するように変更
 
 **2024.12.14**
 

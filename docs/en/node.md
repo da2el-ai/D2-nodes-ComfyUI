@@ -680,13 +680,27 @@ Output text
 ### D2 XY List To Plot
 
 <figure>
-<img src="../img/xy_list_to_plot.png?2">
+  <img src="../img/xy_list_to_plot.png?2">
 </figure>
 
-- Converts output from list-outputting nodes for use with `D2 XY Plot`
-- Internally just does `"\n".join(list)`, so will behave unexpectedly if list contents contain newlines
+- Converts output from list nodes to be compatible with `D2 XY Plot`
+- Internally, it simply performs `"\n".join(list)`, so if the list contents include line breaks, it may not work as intended
+- Use `D2 XY String To Plot` when working with text that contains line breaks
 
 ---
+
+### D2 XY String To Plot
+
+<figure>
+  <img src="../img/xy_string_to_plot.png">
+</figure>
+
+- Converts multiline text to be compatible with `D2 XY Plot` / `D2 XY Plot Easy`
+- Used when you want to perform XY Plot comparisons of entire prompts
+- When using with `D2 XY Plot Easy` for prompt comparison, set `x/y_type` to `STRING` and connect `x/y_other` to the `positive` input of `D2 KSampler`
+
+---
+
 
 ## :tomato: Refiner Node
 

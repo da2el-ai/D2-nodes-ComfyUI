@@ -112,6 +112,9 @@ If you have installed any of the following custom nodes previously, please remov
   - Creates header text for display in D2 Grid Image
 - <a href="node.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
   - Converts arrays to D2 XY Plot lists
+- <a href="node.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
+  - Converts text containing line breaks into a list format for `D2 XY Plot`
+
 
 ### Refiner
 - <a href="node.md#D2-Refiner-Steps">`D2 Refiner Steps`</a>
@@ -132,6 +135,14 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2024.12.16**
+
+- `D2 XY String To Plot`: Added new node
+- `D2 Grid Image`: Added support for line breaks in labels
+- `D2 Grid Image`: Added option to toggle label output
+- `D2 XY Prompt SR`: Added support for text containing line breaks
+- `D2 XY Plot Easy`: Modified to record random values in `x/y_annotation` when `-1` is specified for seed
 
 **2024.12.14**
 
