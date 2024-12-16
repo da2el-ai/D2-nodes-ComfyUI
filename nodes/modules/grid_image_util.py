@@ -32,8 +32,8 @@ class AnnotationData:
     font: ImageFont.FreeTypeFont
 
     def __init__(self, column_texts, row_texts, font_size):
-        self.column_texts = column_texts
-        self.row_texts = row_texts
+        self.column_texts = column_texts if column_texts else []
+        self.row_texts = row_texts if row_texts else []
         self.font = ImageFont.truetype(FONT_PATH, size = font_size)
 
 """
@@ -150,12 +150,17 @@ def _create_column_image(
     column_images = []
     column_height = 0
 
+    # テキストがなければ 0x0 の画像を返す
+    if len(annotation_data.column_texts) <= 0:
+        return Image.new('RGB', (0, 0), color=0xffffff)
+
     for text in annotation_data.column_texts:
         img = _get_text_image(annotation_data, text, int(grid_data.size[0] * LINE_MAX_WIDTH_PAR))
         column_height = max(column_height, img.size[1])
         column_images.append(img)
 
     padding_height = column_height + (PADDING * 2)
+
     column_image = Image.new('RGB', (grid_data.image.size[0], padding_height), color=0xffffff)
 
     for i, img in enumerate(column_images):
@@ -191,6 +196,10 @@ def _create_row_image(
 ) -> Image.Image:
     row_images = []
     row_width = 0
+
+    # テキストがなければ 0x0 の画像を返す
+    if len(annotation_data.row_texts) <= 0:
+        return Image.new('RGB', (0, 0), color=0xffffff)
 
     for text in annotation_data.row_texts:
         img = _get_text_image(annotation_data, text, int(grid_data.size[0] * LINE_MAX_WIDTH_PAR))
@@ -232,9 +241,6 @@ def _create_annotation_image(
     annotation_data: AnnotationData
 ) -> tuple[Image.Image, int, int]:
     
-    if not annotation_data.column_texts and not annotation_data.row_texts:
-        raise ValueError("Column text and row text is empty")
-
     column_image = _create_column_image(grid_data, annotation_data)
     row_image = _create_row_image(grid_data, annotation_data)
     label_width = row_image.size[0]

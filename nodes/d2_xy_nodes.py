@@ -317,6 +317,8 @@ class D2_XYGridImage:
                 "grid_gap": ("INT", {"default": 0},),
                 "swap_dimensions": ("BOOLEAN", {"default": False},),
                 "grid_only": ("BOOLEAN", {"default": True},),
+                "draw_x_label": ("BOOLEAN", {"default": True},),
+                "draw_y_label": ("BOOLEAN", {"default": True},),
             },
             "optional": {
                 "x_annotation": ("D2_TAnnotation", {}),
@@ -334,7 +336,7 @@ class D2_XYGridImage:
     image_batch = None
     finished = True
 
-    def run(self, images, font_size, grid_gap, swap_dimensions, grid_only, 
+    def run(self, images, font_size, grid_gap, swap_dimensions, grid_only, draw_x_label, draw_y_label,
             x_annotation:Optional[D2_TAnnotation]=None, y_annotation:Optional[D2_TAnnotation]=None, status=None, grid_pipe:Optional[D2_TGridPipe]=None):
         
         if grid_pipe != None:
@@ -360,6 +362,8 @@ class D2_XYGridImage:
                 image_batch = self.image_batch, 
                 x_annotation = x_annotation, 
                 y_annotation = y_annotation, 
+                draw_x_label = draw_x_label,
+                draw_y_label = draw_y_label,
                 font_size = font_size, 
                 grid_gap = grid_gap, 
                 swap_dimensions = swap_dimensions
@@ -384,7 +388,13 @@ class D2_XYGridImage:
     グリッド画像作成
     """
     @classmethod
-    def create_grid_image(cls, image_batch, x_annotation:D2_TAnnotation, y_annotation:D2_TAnnotation, font_size, grid_gap, swap_dimensions) -> Image.Image:
+    def create_grid_image(
+        cls, image_batch, 
+        x_annotation:D2_TAnnotation, y_annotation:D2_TAnnotation, 
+        draw_x_label:bool, draw_y_label:bool,
+        font_size, grid_gap, swap_dimensions
+    ) -> Image.Image:
+        
         x_len = len(x_annotation.values)
         y_len = len(y_annotation.values)
 
@@ -399,10 +409,14 @@ class D2_XYGridImage:
         if swap_dimensions:
             x_annotation, y_annotation = y_annotation, x_annotation
             x_len, y_len = y_len, x_len
+            draw_x_label, draw_y_label = draw_y_label, draw_x_label
 
         # 見出しテキスト
-        column_texts = cls.create_grid_text(x_annotation)
-        row_texts = cls.create_grid_text(y_annotation)
+        column_texts, row_texts = None, None
+        if draw_x_label:
+            column_texts = cls.create_grid_text(x_annotation)
+        if draw_y_label:
+            row_texts = cls.create_grid_text(y_annotation)
 
         # テンソルからPIL Imageへの変換
         # チャンネルの位置を修正（permute使用）
@@ -414,7 +428,7 @@ class D2_XYGridImage:
             grid_image = grid_image_util.create_grid_with_annotation_by_rows(
                 images = images,
                 gap = grid_gap,
-                max_rows = len(row_texts),
+                max_rows = len(x_annotation.values),
                 column_texts = column_texts,
                 row_texts = row_texts,
                 font_size = font_size
@@ -423,7 +437,7 @@ class D2_XYGridImage:
             grid_image = grid_image_util.create_grid_with_annotation_by_columns(
                 images = images,
                 gap = grid_gap,
-                max_columns = len(column_texts),
+                max_columns = len(y_annotation.values),
                 column_texts = column_texts,
                 row_texts = row_texts,
                 font_size = font_size
@@ -629,7 +643,7 @@ class D2_XYPromptSR:
             output_list.append(new_prompt)
 
         output_xy = "\n".join([prompt.replace('\n','') for prompt in output_list])
-        
+
         return (output_xy, output_list,)
 
 
