@@ -628,8 +628,8 @@ class D2_XYPromptSR:
             new_prompt = prompt.replace(search, item)
             output_list.append(new_prompt)
 
-        output_xy = "\n".join(output_list)
-
+        output_xy = "\n".join([prompt.replace('\n','') for prompt in output_list])
+        
         return (output_xy, output_list,)
 
 
