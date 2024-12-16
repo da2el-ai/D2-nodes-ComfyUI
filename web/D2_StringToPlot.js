@@ -20,7 +20,7 @@ app.registerExtension({
           set(newVal) {
             if (newVal !== widgetValue) {
               widgetValue = newVal;
-              handleInputsVisibility(node, newVal, ["string"], "IMAGE")
+              handleInputsVisibility(node, newVal, ["string"], "STRING")
             }
           }
         });
