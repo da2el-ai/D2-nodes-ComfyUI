@@ -735,6 +735,44 @@ class D2_XYListToPlot:
         }
 
 
+"""
+
+D2 XY String To XYPlot
+
+"""
+class D2_XYStringToPlot:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "string_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("x / y_list",)
+    FUNCTION = "string_to_plot"
+    CATEGORY = "D2/XY Plot"
+
+    def string_to_plot(self, string_count, **kwargs):
+
+        string_list = []
+        
+        for i in range(1, string_count + 1):
+            string = kwargs.get(f"string_{i}")
+            if string is not None:
+                string_list.append(string)
+
+        if len(string_list) > 0:
+            # xy_plot は改行でアイテムを区切っているので、各アイテムの改行を消す
+            cleaned = [s.replace('\n', '') for s in string_list]
+            result = '\n'.join(cleaned)
+
+            return (result,)
+
+        return (None,)
+
 
 """
 
@@ -779,6 +817,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Prompt SR": D2_XYPromptSR,
     "D2 XY Prompt SR2": D2_XYPromptSR2,
     "D2 XY List To Plot": D2_XYListToPlot,
+    "D2 XY String To Plot": D2_XYStringToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
     "D2 XY Seed": D2_XYSeed,
     "D2 XY Annotation": D2_XYAnnotation,
