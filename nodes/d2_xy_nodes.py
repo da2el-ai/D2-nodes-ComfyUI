@@ -692,7 +692,7 @@ class D2_XYSeed:
             "required": {
                 # プロンプト
                 "seeds": ("STRING",{"multiline": True, "default":"-1\n-1"},),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
         }
 
@@ -702,7 +702,7 @@ class D2_XYSeed:
     CATEGORY = "D2/XY Plot"
 
     ######
-    def run(self, seeds, seed):
+    def run(self, seeds):
 
         # 入力文字列を改行で分割
         seed_list = seeds.strip().split('\n')
@@ -710,13 +710,8 @@ class D2_XYSeed:
         # 出力リスト
         output_list = []
 
-        # 入力が -1 ならランダム数値を生成
-        for seed_str in seed_list:
-            if seed_str == "-1":
-                output_list.append(util.create_seed())
-            else:
-                output_list.append(int(seed_str))
-
+        # seed値を生成
+        output_list = [util.create_seed(seed) for seed in seed_list]
         output_xy = "\n".join(str(x) for x in output_list)
 
         return (output_xy, output_list,)

@@ -15,6 +15,7 @@ from pathlib import Path
 from comfy.cli_args import args
 
 
+
 MAX_RESOLUTION = 16384
 MAX_SEED = 0xffffffffffffffff
 LINE_BREAK = "Line break"
@@ -50,7 +51,8 @@ class D2_TGridPipe:
 seed値を作る
 """
 def create_seed(num = 0):
-    return random.randrange(MAX_SEED) if num == -1 else num
+    int_num = int(num)
+    return random.randrange(MAX_SEED) if int_num == -1 else int_num
 
 
 """
