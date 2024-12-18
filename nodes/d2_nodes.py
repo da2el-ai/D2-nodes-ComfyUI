@@ -851,7 +851,14 @@ class D2_GridImage:
                 "max_columns": ("INT", {"default": 3},),
                 "grid_gap": ("INT", {"default": 0},),
                 "swap_dimensions": ("BOOLEAN", {"default": False},),
-                "trigger": ("BOOLEAN", {"default": True},),
+                "trigger_count": ("INT", {"default": 1, "min": 1, "step": 1}),
+            },
+            "optional": {
+                "count": ("D2_GRID_COUNT", {}),
+                "reset": ("D2_GRID_RESET", {}),
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID",
             },
         }
     
@@ -860,40 +867,30 @@ class D2_GridImage:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    image_batch = None
-    finished = True
+    def run(self, images, max_columns, grid_gap, swap_dimensions, trigger_count, count=0, reset=None, unique_id=0):
+        # 画像をスタックして個数を取得
+        image_count = D2_GridImage_ImageStocker.add_image(unique_id, images)
 
-    def run(self, images, max_columns, grid_gap, swap_dimensions, trigger):
-        # 完了・開始前だったら初期化する
-        if self.finished:
-            self.finished = False
-            self.image_batch = None
-
-        # 画像をスタックしていく
-        if self.image_batch is None:
-            self.image_batch = images
-        else:
-            self.image_batch = torch.cat((self.image_batch, images), dim=0)
-
-        # 最後の画像まで送られたらグリッド画像生成して完了状態にする
-        # 未完了なら今回送られてきた画像を送るか、または処理を止める
-        if trigger:
+        if image_count >= trigger_count:
             grid_image = self.__class__.create_grid_image(
                 max_columns = max_columns,
-                image_batch = self.image_batch, 
+                image_batch = D2_GridImage_ImageStocker.get_images(unique_id), 
                 grid_gap = grid_gap, 
                 swap_dimensions = swap_dimensions
             )
             grid_image = util.pil2tensor(grid_image)
-            self.finished = True
-            self.image_batch = None
+            D2_GridImage_ImageStocker.reset_images(unique_id)
 
             return {
                 "result": (grid_image,),
+                "ui": {"image_count": (image_count,),}
             }
         else:
             return {
                 "result": (ExecutionBlocker(None),),
+                "ui": {
+                    "image_count": (image_count,),
+                }
             }
 
     """
@@ -921,6 +918,52 @@ class D2_GridImage:
             )
 
         return grid_data.image
+
+"""
+D2 GridImage で使う、画像格納クラス
+"""
+class D2_GridImage_ImageStocker:
+    images = {}
+
+    @classmethod
+    def get_count(cls, id:int) -> int:
+        if id not in cls.images or cls.images[id] is None:
+            return 0
+        return cls.images[id].size(0)
+    
+    @classmethod
+    def get_images(cls, id:int) -> Optional[torch.Tensor]:
+        return cls.images[id]
+
+    @classmethod
+    def add_image(cls, id:int, image:torch.Tensor) -> int:
+        if id in cls.images and cls.images[id] != None:
+            cls.images[id] = torch.cat((cls.images[id], image), dim=0)
+        else:
+            cls.images[id] = image
+        
+        return cls.get_count(id)
+
+    @classmethod
+    def reset_images(cls, id:int) -> None:
+        if id in cls.images:
+            del cls.images[id]
+
+
+"""
+D2_GrodImage のストック画像をリセットする
+D2/grid_image/reset_image_count?id=***
+"""
+@PromptServer.instance.routes.get("/D2/grid_image/reset_image_count")
+async def route_d2_grid_image_reset_image_count(request):
+    id = request.query.get('id')
+    D2_GridImage_ImageStocker.reset_images(id)
+    count = D2_GridImage_ImageStocker.get_count(id)
+
+    # JSON応答を返す
+    json_data = json.dumps({"image_count":count})
+    return web.Response(text=json_data, content_type='application/json')
+
 
 
 """
