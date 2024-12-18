@@ -471,6 +471,47 @@ Output text
     - 在輸入欄位添加隨機數
     - 僅在 `type` 為 `SEED` 時顯示
 
+
+---
+
+### D2 Filename Template
+
+<figure>
+  <img src="../img/filename_template.png">
+</figure>
+
+- 用於創建文件名的節點
+- 可以引入外部元素
+
+#### Input
+
+- `arg_1` `arg_2` `arg_3`
+  - 從其他節點導入值
+- `format`
+    - `%date:{yyyy/MM/dd/hh/mm/ss}%`
+      - `yyyy`: 年
+      - `MM`: 月
+      - `dd`: 日
+      - `hh`: 時
+      - `mm`: 分
+      - `ss`: 秒
+    - `%node:{id}.{key}%`
+      - 通過指定節點ID和項目名稱來獲取值
+      - 示例：`%node:8.width%`: 從ID為8的節點獲取width值
+    - `%arg_1%`（2和3相同）
+      - 嵌入輸入的值
+    - `%arg_1:ckpt_name%`（2和3相同）
+      - 嵌入移除 `.safetensors` 後的檢查點名稱
+
+#### Example
+
+```
+%date:yyyyMMdd-hhmmss%_%arg_1:ckpt_name%
+👇
+20241219-021926_obsessionIllustrious_v31
+```
+
+
 ---
 
 ## :tomato: XY Plot Node

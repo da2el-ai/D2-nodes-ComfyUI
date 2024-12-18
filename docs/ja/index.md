@@ -45,6 +45,8 @@ D2 Nodes ComfyUI
   - SEED / STRING / INT / FLOAT をリスト出力する
 - <a href="node.md#D2-List-To-String">`D2 List To String`</a>
   - 配列を文字列に変換する
+- <a href="node.md#D2-Filename-Template">`D2 Filename Template`</a>
+  - ファイルネームを作る
 
 ### Loader
 
@@ -139,6 +141,7 @@ D2 Nodes ComfyUI
 
 **2024.12.18**
 
+- `D2 Filename Template`: 新規追加
 - `D2 Grid Image`: グリッド画像出力のトリガーを画像枚数で指定できるようにした
 
 **2024.12.16**

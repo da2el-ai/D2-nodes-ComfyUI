@@ -44,6 +44,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Outputs SEED / STRING / INT / FLOAT as lists
 - <a href="node.md#D2-List-To-String">`D2 List To String`</a>
   - Converts arrays to strings
+- <a href="node.md#D2-Filename-Template">`D2 Filename Template`</a>
+  - Creates filenames
 
 ### Loader
 
@@ -138,6 +140,7 @@ If you have installed any of the following custom nodes previously, please remov
 
 **2024.12.18**
 
+- `D2 Filename Template`: Added new node
 - `D2 Grid Image`: Added the ability to specify the grid image output trigger by the number of images
 
 **2024.12.16**

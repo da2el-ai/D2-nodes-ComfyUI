@@ -445,6 +445,45 @@ Output text
 
 ---
 
+### D2 Filename Template
+
+<figure>
+  <img src="../img/filename_template.png">
+</figure>
+
+- A node for creating filenames
+- Can incorporate external elements
+
+#### Input
+
+- `arg_1` `arg_2` `arg_3`
+  - Import values from other nodes
+- `format`
+    - `%date:{yyyy/MM/dd/hh/mm/ss}%`
+      - `yyyy`: Year
+      - `MM`: Month
+      - `dd`: Day
+      - `hh`: Hour
+      - `mm`: Minute
+      - `ss`: Second
+    - `%node:{id}.{key}%`
+      - Retrieves values by specifying node ID and item name
+      - Example: `%node:8.width%`: Get width from node ID 8
+    - `%arg_1%` (same for 2 and 3)
+      - Embed input values
+    - `%arg_1:ckpt_name%` (same for 2 and 3)
+      - Embed checkpoint name with `.safetensors` removed
+
+#### Example
+```
+%date:yyyyMMdd-hhmmss%_%arg_1:ckpt_name%
+👇
+20241219-021926_obsessionIllustrious_v31
+```
+
+---
+
+
 ## :tomato: XY Plot Node
 
 

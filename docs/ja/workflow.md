@@ -19,14 +19,14 @@ Workflow
 
 ## :card_index_dividers: シンプルな txt2img
 
-<a href="../../workflow/simple_t2i_20241119.png"><img src="../../workflow/simple_t2i_20241119.png"></a>
+<a href="../../workflow/simple_t2i_20241218.png"><img src="../../workflow/simple_t2i_20241218.png"></a>
 
 - Lora も Controlnet も使わないシンプルな txt2img。
 
 
 ## :card_index_dividers: txt2img + Hires fix
 
-<a href="../../workflow/hiresfix_20241121.png"><img src="../../workflow/hiresfix_20241121.png"></a>
+<a href="../../workflow/hiresfix_20241218.png"><img src="../../workflow/hiresfix_20241218.png"></a>
 
 - D2 KSampler を2個、間に D2 Image Resize を入れて SwinR_4x を使用した Hires fix。
 
@@ -34,7 +34,7 @@ Workflow
 
 ## :card_index_dividers: フォルダー内画像を一括でアップスケール
 
-<a href="../../workflow/folder_image_queue_upscale_20241119.png"><img src="../../workflow/folder_image_queue_upscale_20241119.png"></a>
+<a href="../../workflow/folder_image_queue_upscale_20241218.png"><img src="../../workflow/folder_image_queue_upscale_20241218.png"></a>
 
 - フォルダー内画像を全て取得し、プロンプトを取得
 - Controlnet anyTestを使用
@@ -48,10 +48,19 @@ Workflow
 - D2 XY Plot Easy を使ったシンプルな XY Plot
 
 
+## :card_index_dividers: Checkpoint Test 
+
+<a href="../../workflow/checkpoint_test_20241218.png"><img src="../../workflow/checkpoint_test_20241218.png"></a>
+
+- チェックポイントテスト用の画像を一括で生成
+- 4種類のプロンプトを生成して1枚の画像に結合する
+- XY Plot と違い、チェックポイントごとに別の画像を保存する
+
+
 
 ## :card_index_dividers: XY Plot: Prompt S/R
 
-<a href="../../workflow/xy_prompt_sr_20241119.png"><img src="../../workflow/xy_prompt_sr_20241119.png"></a>
+<a href="../../workflow/xy_prompt_sr_20241218.png"><img src="../../workflow/xy_prompt_sr_20241218.png"></a>
 
 - 基本的な Prompt S/R
 
@@ -66,6 +75,6 @@ Workflow
 
 ## :card_index_dividers: Refiner: Checkpoint を途中で切り替え Hires.fix
 
-<a href="../../workflow/Refiner_20241119.png"><img src="../../workflow/Refiner_20241119.png"></a>
+<a href="../../workflow/Refiner_20241218.png"><img src="../../workflow/Refiner_20241218.png"></a>
 
 

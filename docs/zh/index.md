@@ -45,6 +45,8 @@
   - 以列表形式輸出 SEED / STRING / INT / FLOAT
 - <a href="node.md#D2-List-To-String">`D2 List To String`</a>
   - 將陣列轉換為字串
+- <a href="node.md#D2-Filename-Template">`D2 Filename Template`</a>
+  - 生成文件名稱
 
 ### 載入器
 
@@ -137,6 +139,7 @@
 
 **2024.12.18**
 
+- `D2 Filename Template`: 新增節點
 - `D2 Grid Image`: 新增了可以通過圖片數量來指定網格圖像輸出觸發的功能
 
 **2024.12.16**
