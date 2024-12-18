@@ -185,25 +185,28 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 ### D2 Grid Image
 
 <figure>
-<img src="../img/load_folder_images.png">
+<img src="../img/grid_image.png">
 </figure>
 
 - Outputs grid images
-- Supports both horizontal and vertical layouts
+- Supports both horizontal and vertical alignment
 
 #### Input
 
 - `max_columns`
   - Number of images to align horizontally
-  - Number of images vertically when `swap_dimensions` is `true`
+  - When `swap_dimensions` is `true`, this becomes the number of vertical images
 - `grid_gap`
-  - Gap between images
+  - Spacing between images
 - `swap_dimensions`
-  - `true`: Vertical direction
-  - `false`: Horizontal direction
-- `trigger`
-  - `true`: Output grid image
-  - `false`: Only retain images without outputting grid image
+  - `true`: Vertical alignment
+  - `false`: Horizontal alignment
+- `trigger_count`
+  - Outputs grid image when the number of input images reaches this specified value
+- `Image count`
+  - Number of input images
+- `Reset Images`
+  - Discards all input images
 
 ---
 

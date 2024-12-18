@@ -137,18 +137,22 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2024.12.18**
+
+- `D2 Grid Image`: グリッド画像出力のトリガーを画像枚数で指定できるようにした
+
 **2024.12.16**
 
 - `D2 XY String To Plot`: 新規追加
-- `D2 Grid Image`: ラベルの改行に対応
-- `D2 Grid Image`: ラベル出力の ON/OFF を選択可能にした
+- `D2 XY Grid Image`: ラベルの改行に対応
+- `D2 XY Grid Image`: ラベル出力の ON/OFF を選択可能にした
 - `D2 XY Prompt SR`: 改行を含むテキストに対応
 - `D2 XY Plot Easy`: seed で `-1` を指定した時に `x/y_annotation` にランダム値を登録するように変更
 
 **2024.12.14**
 
 - `D2 KSampler`: `D2 XY Plot Easy` と接続するための `xy_pipe` を追加
-- `D2 Grid Image`: `D2 XY Plot`、`D2 XY Plot Easy` と接続するための `grid_pip` を追加
+- `D2 XY Grid Image`: `D2 XY Plot`、`D2 XY Plot Easy` と接続するための `grid_pip` を追加
 - `D2 XY Plot Easy`: を新規追加
 - `D2 XY Model List`: ファイル名、日付ソートを追加。Sampler、Schedulerのリスト取得に対応。
 

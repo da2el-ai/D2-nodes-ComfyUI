@@ -189,25 +189,28 @@
 ### D2 Grid Image
 
 <figure>
-<img src="../img/load_folder_images.png">
+<img src="../img/grid_image.png">
 </figure>
 
 - 輸出網格圖像
-- 可選擇水平或垂直方向
+- 支持水平和垂直排列
 
 #### Input
 
 - `max_columns`
-  - 水平排列的圖像數量
-  - `swap_dimensions` 為 `true` 時為垂直方向的數量
+  - 水平排列的圖片數量
+  - 當 `swap_dimensions` 為 `true` 時，則為垂直排列的數量
 - `grid_gap`
-  - 圖像間距
+  - 圖片之間的間距
 - `swap_dimensions`
-  - `true`: 垂直方向
-  - `false`: 水平方向
-- `trigger`
-  - `true`: 輸出網格圖像
-  - `false`: 僅保持圖像而不輸出網格圖像
+  - `true`: 垂直排列
+  - `false`: 水平排列
+- `trigger_count`
+  - 當輸入圖片達到指定數量時輸出網格圖像
+- `Image count`
+  - 輸入圖片的數量
+- `Reset Images`
+  - 清除所有輸入的圖片
 
 ---
 

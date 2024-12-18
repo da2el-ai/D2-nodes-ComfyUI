@@ -135,11 +135,15 @@
 
 ## :blossom: 更新日誌
 
+**2024.12.18**
+
+- `D2 Grid Image`: 新增了可以通過圖片數量來指定網格圖像輸出觸發的功能
+
 **2024.12.16**
 
 - `D2 XY String To Plot`: 新增節點
-- `D2 Grid Image`: 支援標籤中的換行符
-- `D2 Grid Image`: 新增標籤輸出開關選項
+- `D2 XY Grid Image`: 支援標籤中的換行符
+- `D2 XY Grid Image`: 新增標籤輸出開關選項
 - `D2 XY Prompt SR`: 支援包含換行符的文本
 - `D2 XY Plot Easy`: 修改為在指定 seed 為 `-1` 時，在 `x/y_annotation` 中記錄隨機值
 

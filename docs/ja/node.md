@@ -200,7 +200,7 @@ Node
 ### D2 Grid Image
 
 <figure>
-<img src="../img/load_folder_images.png">
+<img src="../img/grid_image.png">
 </figure>
 
 - グリッド画像を出力する
@@ -216,9 +216,12 @@ Node
 - `swap_dimensions`
   - `true`: 縦方向
   - `false`: 横方向
-- `trigger`
-  - `true`: グリッド画像を出力する
-  - `false`: 画像を保持するだけでグリッド画像は出力しない
+- `trigger_count`
+  - 入力画像がここで指定した枚数になったらグリッド画像を出力する
+- `Image count`
+  - 入力した画像の枚数
+- `Reset Images`
+  - 入力した画像を破棄する
 
 
 
