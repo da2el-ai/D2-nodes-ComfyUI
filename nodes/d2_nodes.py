@@ -855,6 +855,8 @@ class D2_GridImage:
                 "trigger_count": ("INT", {"default": 1, "min": 1, "step": 1}),
             },
             "optional": {
+                "title_text": ("STRING", {},),
+                "font_size": ("INT", {"default":24},),
                 "count": ("D2_GRID_COUNT", {}),
                 "reset": ("D2_GRID_RESET", {}),
             },
@@ -868,22 +870,28 @@ class D2_GridImage:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, images, max_columns, grid_gap, swap_dimensions, trigger_count, count=0, reset=None, unique_id=0):
+    TITLE_HEIGHT = 64
+
+    def run(self, images, max_columns, grid_gap, swap_dimensions, trigger_count, title_text="", font_size=24, count=0, reset=None, unique_id=0):
         # 画像をスタックして個数を取得
         image_count = D2_GridImage_ImageStocker.add_image(unique_id, images)
 
         if image_count >= trigger_count:
+            # グリッド画像作成
             grid_image = self.__class__.create_grid_image(
                 max_columns = max_columns,
                 image_batch = D2_GridImage_ImageStocker.get_images(unique_id), 
                 grid_gap = grid_gap, 
                 swap_dimensions = swap_dimensions
             )
-            grid_image = util.pil2tensor(grid_image)
+
+            # タイトル結合
+            finish_image = self.__class__.create_grid_title_image(grid_image, title_text, font_size)
+            finish_image = util.pil2tensor(finish_image)
             D2_GridImage_ImageStocker.reset_images(unique_id)
 
             return {
-                "result": (grid_image,),
+                "result": (finish_image,),
                 "ui": {"image_count": (image_count,),}
             }
         else:
@@ -893,6 +901,33 @@ class D2_GridImage:
                     "image_count": (image_count,),
                 }
             }
+
+    """
+    グリッド＋タイトル画像作成
+    """
+    @classmethod
+    def create_grid_title_image(cls, grid_image, title_text, font_size) -> Image.Image:
+        # タイトル画像
+        if len(title_text) >= 1:
+            annotation_data = grid_image_util.AnnotationData(
+                column_texts = [""],
+                row_texts = [title_text],
+                font_size = font_size
+            )
+            title_max_width = grid_image.size[0] - (grid_image_util.PADDING * 2)
+            title_img = grid_image_util._get_text_image(annotation_data, title_text, title_max_width)
+            title_height = grid_image_util.PADDING * 2 + title_img.size[1]
+        else:
+            title_img = Image.new('RGB', (0, 0), color=0xffffff)
+            title_height = 0
+
+        finish_height = title_height + grid_image.size[1]
+        finish_img = Image.new('RGB', (grid_image.size[0], finish_height), color=0xffffff)
+        finish_img.paste(title_img, (grid_image_util.PADDING, grid_image_util.PADDING))
+        finish_img.paste(grid_image, (0, title_height))
+        
+        return finish_img
+
 
     """
     グリッド画像作成
