@@ -7,6 +7,18 @@ app.registerExtension({
   async beforeRegisterNodeDef(nodeType, nodeData, app) {
     if (nodeData.name !== "D2 XY Plot" && nodeData.name !== "D2 XY Plot Easy") return;
 
+    const origOnNodeCreated = nodeType.prototype.onNodeCreated;
+    nodeType.prototype.onNodeCreated = function () {
+        const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+
+        // なぜか auto_queue ウィジェットのラベルが書き換えられてしまうので戻す
+        const autoQueueWidget = findWidgetByName(this, "auto_queue");
+        autoQueueWidget.label = "auto_queue";
+
+        return r;
+    };
+
+
     /**
      * ノード実行時
      */
@@ -52,8 +64,8 @@ app.registerExtension({
           const indexWidget = findWidgetByName(node, "index");
           indexWidget.setValue(0);
         });
-        node.addCustomWidget(widget);
-        return widget;
+        // node.addCustomWidget(widget);
+        // return widget;
       },
       D2_XYPLOT_INDEX(node, inputName, inputData, app) {
         const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_INDEX", inputName, 0);
