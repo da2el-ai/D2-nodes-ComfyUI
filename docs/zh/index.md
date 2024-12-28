@@ -33,6 +33,8 @@
 
 - <a href="node.md#d2-ksampler--d2-ksampleradvanced">`D2 KSampler / D2 KSampler(Advanced)`</a>
   - 可以用 STRING 格式輸入輸出提示詞的 KSampler
+- <a href="node.md#d2-pipe">`D2 Pipe`</a>
+  - 用於修改和獲取 D2 XYPlot Easy、D2 KSampler 和 D2 Send Eagle 所使用的 d2_pipe 的節點
 
 ### 文字
 
@@ -136,6 +138,11 @@
 
 
 ## :blossom: 更新日誌
+
+**2024.12.28**
+
+- `D2 Pipe`: 新增節點
+- `D2_KSampler / D2_XYPlotEasy`：將 xy_pipe 名稱更改為 d2_pipe
 
 **2024.12.18**
 

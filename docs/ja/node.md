@@ -45,6 +45,19 @@ Node
 
 ---
 
+### D2 Pipe
+
+<figure>
+<img src="../img/pipe.png">
+</figure>
+
+- `d2_pipe` の内容を変更・取り出すためのノード
+- `d2_pipe` は D2 XY Plot Easy、D2 KSampler、D2 Send Eagle などでパラメーターをまとめて渡すためのもの
+
+
+---
+
+
 ## :tomato: Loader Node
 
 

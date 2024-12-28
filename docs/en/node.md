@@ -38,6 +38,19 @@
 - `positive` / `negative`
     - Input passthrough
 
+
+---
+
+### D2 Pipe
+
+<figure>
+<img src="../img/pipe.png">
+</figure>
+
+- A node for modifying and extracting the contents of `d2_pipe`
+- `d2_pipe` is used to pass parameters collectively in nodes such as D2 XY Plot Easy, D2 KSampler, and D2 Send Eagle
+
+
 ---
 
 ## :tomato: Loader Node

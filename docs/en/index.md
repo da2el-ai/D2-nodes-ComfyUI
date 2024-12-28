@@ -32,6 +32,8 @@ If you have installed any of the following custom nodes previously, please remov
 
 - <a href="node.md#d2-ksampler--d2-ksampleradvanced">`D2 KSampler / D2 KSampler(Advanced)`</a>
   - KSampler that inputs and outputs prompts as STRING
+- <a href="node.md#d2-pipe">`D2 Pipe`</a>
+  - A node for modifying and retrieving the d2_pipe used in D2 XYPlot Easy, D2 KSampler, and D2 Send Eagle
 
 ### Text
 
@@ -137,6 +139,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2024.12.28**
+
+- `D2 Pipe`: Added new node
+- `D2_KSampler / D2_XYPlotEasy`: Changed xy_pipe name to d2_pipe
 
 **2024.12.18**
 

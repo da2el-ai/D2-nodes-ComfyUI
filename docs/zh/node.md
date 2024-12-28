@@ -41,6 +41,19 @@
 - `positive` / `negative`
     - Input 的直通
 
+
+---
+
+### D2 Pipe
+
+<figure>
+<img src="../img/pipe.png">
+</figure>
+
+- 用於修改和提取 `d2_pipe` 內容的節點
+- `d2_pipe` 用於在 D2 XY Plot Easy、D2 KSampler、D2 Send Eagle 等節點中批量傳遞參數
+
+
 ---
 
 ## :tomato: Loader Node

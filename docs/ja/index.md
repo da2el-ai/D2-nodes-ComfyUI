@@ -34,6 +34,10 @@ D2 Nodes ComfyUI
 - <a href="node.md#d2-ksampler--d2-ksampleradvanced">`D2 KSampler / D2 KSampler(Advanced)`</a>
   - プロンプトを STRING で入力・出力する KSampler
 
+- <a href="node.md#d2-pipe">`D2 Pipe`</a>
+  - D2 XYPlot Easy、D2 KSampler、D2 Send Eagle で使う d2_pipe の変更、取得をするノード
+
+
 ### Text
 
 - <a href="node.md#D2-Regex-Replace">`D2 Regex Replace`</a>
@@ -138,6 +142,11 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2024.12.28**
+
+- `D2 Pipe`: 新規追加
+- `D2_KSampler / D2_XYPlotEasy`: xy_pipe の名前を d2_pipe に変更
 
 **2024.12.18**
 
