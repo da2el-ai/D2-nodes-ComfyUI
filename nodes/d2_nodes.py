@@ -1061,6 +1061,85 @@ class D2_FilenameTemplate:
         }
 
 
+"""
+
+D2 D2 Pipe
+
+"""
+class D2_Pipe:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "optional": {
+                "d2_pipe": ("D2_TD2Pipe",),
+                "ckpt_name": ("STRING", {"forceInput":True},),
+                "positive": ("STRING", {"forceInput":True},),
+                "negative": ("STRING", {"forceInput":True},),
+                "seed": ("INT", {"forceInput":True},),
+                "steps": ("INT", {"forceInput":True},),
+                "cfg": ("FLOAT", {"forceInput":True},),
+                "sampler_name": ("STRING", {"forceInput":True},),
+                "scheduler": ("STRING", {"forceInput":True},),
+                "denoise": ("FLOAT", {"forceInput":True},),
+                "width": ("INT", {"forceInput":True},),
+                "height": ("INT", {"forceInput":True},),
+            },
+        }
+
+    RETURN_TYPES = ("D2_TD2Pipe", "STRING", "STRING", "STRING", "INT", "INT", "FLOAT", "STRING", "STRING", "FLOAT", "INT", "INT", )
+    RETURN_NAMES = ("d2_pipe", "ckpt_name", "positive", "negative", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", "width", "height", )
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, d2_pipe:Optional[D2_TD2Pipe]=None, ckpt_name = None, positive = None, negative = None, seed = None, steps = None, cfg = None, sampler_name = None, scheduler = None, denoise = None, width = None, height = None):
+    
+        # d2_pipeがNoneの場合、デフォルト値で新しいインスタンスを作成
+        if d2_pipe is None:
+            d2_pipe = D2_TD2Pipe()
+        else:
+            # d2_pipeのコピーを作成して元のインスタンスを変更しないようにする
+            d2_pipe = D2_TD2Pipe(
+                ckpt_name = d2_pipe.ckpt_name,
+                positive = d2_pipe.positive,
+                negative = d2_pipe.negative,
+                seed = d2_pipe.seed,
+                steps = d2_pipe.steps,
+                cfg = d2_pipe.cfg,
+                sampler_name = d2_pipe.sampler_name,
+                scheduler = d2_pipe.scheduler,
+                denoise = d2_pipe.denoise,
+                width = d2_pipe.width,
+                height = d2_pipe.height
+            )
+
+        # 個別のパラメータがNoneでない場合、d2_pipeの値を上書き
+        if ckpt_name != None:
+            d2_pipe.ckpt_name = ckpt_name
+        if positive != None:
+            d2_pipe.positive = positive
+        if negative != None:
+            d2_pipe.negative = negative
+        if seed != None:
+            d2_pipe.seed = seed
+        if steps != None:
+            d2_pipe.steps = steps
+        if cfg != None:
+            d2_pipe.cfg = cfg
+        if sampler_name != None:
+            d2_pipe.sampler_name = sampler_name
+        if scheduler != None:
+            d2_pipe.scheduler = scheduler
+        if denoise != None:
+            d2_pipe.denoise = denoise
+        if width != None:
+            d2_pipe.width = width
+        if height != None:
+            d2_pipe.height = height
+
+        return {
+            "result": (d2_pipe, d2_pipe.ckpt_name, d2_pipe.positive, d2_pipe.negative, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, d2_pipe.denoise, d2_pipe.width, d2_pipe.height,),
+        }
+
 
 
 NODE_CLASS_MAPPINGS = {
@@ -1080,6 +1159,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Load Folder Images": D2_LoadFolderImages,
     "D2 List To String": D2_ListToString,
     "D2 Filename Template": D2_FilenameTemplate,
+    "D2 Pipe": D2_Pipe,
 }
 
 
