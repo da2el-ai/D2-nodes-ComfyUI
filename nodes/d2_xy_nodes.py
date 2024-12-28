@@ -22,7 +22,7 @@ from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, Save
 from server import PromptServer
 
 from .modules import util
-from .modules.util import AnyType, D2_TXYPipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe
+from .modules.util import AnyType, D2_TD2Pipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe
 from .modules import grid_image_util
 
 
@@ -185,10 +185,10 @@ class D2_XYPlotEasy:
         }
    
     RETURN_TYPES = (
-        "D2_TXYPipe", "D2_TGridPipe", "STRING", "STRING", AnyType("*"), "INT", "INT", "FLOAT", AnyType("*"), AnyType("*"), "FLOAT", 
+        "D2_TD2Pipe", "D2_TGridPipe", "STRING", "STRING", AnyType("*"), "INT", "INT", "FLOAT", AnyType("*"), AnyType("*"), "FLOAT", 
         AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
     RETURN_NAMES = (
-        "xy_pipe", "grid_pipe", "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", 
+        "d2_pipe", "grid_pipe", "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", 
         "x_other", "y_other", "x_annotation", "y_annotation", "status", "index",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
@@ -240,7 +240,7 @@ class D2_XYPlotEasy:
         org_values = self.__class__.apply_xy("y", self.y_annotation, y_value, org_values)
 
         # KSamplerに渡すパイプ
-        xy_pipe = D2_TXYPipe(
+        d2_pipe = D2_TD2Pipe(
             positive = org_values["positive"],
             negative = org_values["negative"],
             seed = org_values["seed"],
@@ -260,7 +260,7 @@ class D2_XYPlotEasy:
 
         return {
             "result": (
-                xy_pipe,
+                d2_pipe,
                 grid_pipe,
                 org_values["positive"], org_values["negative"], org_values["ckpt_name"], 
                 org_values["seed"], org_values["steps"], org_values["cfg"], 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Optional
 import os
 import yaml
 import math
@@ -29,15 +29,18 @@ class D2_TAnnotation:
 D2_TXyStatus = Literal["INIT", "FINISH", ""]
 
 @dataclass
-class D2_TXYPipe:
-    positive: str
-    negative: str
-    seed: int
-    steps: int
-    cfg: float
-    sampler_name: str
-    scheduler: str
-    denoise: float
+class D2_TD2Pipe:
+    ckpt_name: Optional[str] = None
+    positive: Optional[str] = None
+    negative: Optional[str] = None
+    seed: Optional[int] = None
+    steps: Optional[int] = None
+    cfg: Optional[float] = None
+    sampler_name: Optional[str] = None
+    scheduler: Optional[str] = None
+    denoise: Optional[float] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
 
 @dataclass
 class D2_TGridPipe:
