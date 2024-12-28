@@ -30,14 +30,14 @@ D2_TXyStatus = Literal["INIT", "FINISH", ""]
 
 @dataclass
 class D2_TD2Pipe:
-    ckpt_name: Optional[str] = None
-    positive: Optional[str] = None
-    negative: Optional[str] = None
+    ckpt_name: str = ""
+    positive: str = ""
+    negative: str = ""
     seed: Optional[int] = None
     steps: Optional[int] = None
     cfg: Optional[float] = None
-    sampler_name: Optional[str] = None
-    scheduler: Optional[str] = None
+    sampler_name: str  = ""
+    scheduler: str  = ""
     denoise: Optional[float] = None
     width: Optional[int] = None
     height: Optional[int] = None

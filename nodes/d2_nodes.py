@@ -294,8 +294,8 @@ class D2_KSampler:
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", )
+    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
     OUTPUT_NODE = True
     FUNCTION = "run"
     CATEGORY = "D2"
@@ -308,27 +308,34 @@ class D2_KSampler:
 
         util.set_preview_method(preview_method)
 
-        # pipeがあったらそれを優先する
-        if d2_pipe != None:
-            positive = d2_pipe.positive if d2_pipe.positive else positive
-            negative = d2_pipe.negative if d2_pipe.negative else negative
-            seed = d2_pipe.seed if d2_pipe.seed else seed
-            steps = d2_pipe.steps if d2_pipe.steps else steps
-            cfg = d2_pipe.cfg if d2_pipe.cfg else cfg
-            sampler_name = d2_pipe.sampler_name if d2_pipe.sampler_name else sampler_name
-            scheduler = d2_pipe.scheduler if d2_pipe.scheduler else scheduler
-            denoise = d2_pipe.denoise if d2_pipe.denoise else denoise
+        # positive / negative 以外は pipe を優先する
+        if d2_pipe == None:
+            d2_pipe = D2_TD2Pipe(
+                positive = positive,
+                negative = negative,
+                seed = seed,
+                steps = steps,
+                cfg = cfg,
+                sampler_name = sampler_name,
+                scheduler = scheduler,
+                denoise = denoise,
+            )
+        else:
+            if not d2_pipe.positive:
+                d2_pipe.positive = positive
+            if not d2_pipe.negative:
+                d2_pipe.negative = negative
 
         # コンディショニングが入力されていたらそちらを優先する
         if positive_cond != None:
             positive_encoded = positive_cond
         else:
-            (positive_encoded,) = CLIPTextEncode().encode(clip, positive)
+            (positive_encoded,) = CLIPTextEncode().encode(clip, d2_pipe.positive)
         
         if negative_cond != None:
             negative_encoded = negative_cond
         else:
-            (negative_encoded,) = CLIPTextEncode().encode(clip, negative)
+            (negative_encoded,) = CLIPTextEncode().encode(clip, d2_pipe.negative)
 
         # control net
         if isinstance(cnet_stack, list):
@@ -345,8 +352,10 @@ class D2_KSampler:
 
         # KSampler実行
         latent = common_ksampler(
-            model, seed, steps, cfg, sampler_name, scheduler, positive_encoded, negative_encoded, latent_image, denoise=denoise, 
-            disable_noise=disable_noise, start_step=start_at_step, last_step=end_at_step, force_full_denoise=force_full_denoise
+            model, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, 
+            positive_encoded, negative_encoded, latent_image, 
+            denoise=d2_pipe.denoise, disable_noise=disable_noise, 
+            start_step=start_at_step, last_step=end_at_step, force_full_denoise=force_full_denoise
         )[0]
 
         latent_samples = latent['samples']
@@ -355,7 +364,7 @@ class D2_KSampler:
 
         return {
             "ui": {"images": results_images},
-            "result": (samp_images, latent, positive, negative, positive_encoded, negative_encoded,)
+            "result": (samp_images, latent, d2_pipe.positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
         }
 
 
@@ -1092,7 +1101,7 @@ class D2_Pipe:
     CATEGORY = "D2"
 
     def run(self, d2_pipe:Optional[D2_TD2Pipe]=None, ckpt_name = None, positive = None, negative = None, seed = None, steps = None, cfg = None, sampler_name = None, scheduler = None, denoise = None, width = None, height = None):
-    
+
         # d2_pipeがNoneの場合、デフォルト値で新しいインスタンスを作成
         if d2_pipe is None:
             d2_pipe = D2_TD2Pipe()
@@ -1113,11 +1122,11 @@ class D2_Pipe:
             )
 
         # 個別のパラメータがNoneでない場合、d2_pipeの値を上書き
-        if ckpt_name != None:
+        if ckpt_name:
             d2_pipe.ckpt_name = ckpt_name
-        if positive != None:
+        if positive:
             d2_pipe.positive = positive
-        if negative != None:
+        if negative:
             d2_pipe.negative = negative
         if seed != None:
             d2_pipe.seed = seed
@@ -1125,9 +1134,9 @@ class D2_Pipe:
             d2_pipe.steps = steps
         if cfg != None:
             d2_pipe.cfg = cfg
-        if sampler_name != None:
+        if sampler_name:
             d2_pipe.sampler_name = sampler_name
-        if scheduler != None:
+        if scheduler:
             d2_pipe.scheduler = scheduler
         if denoise != None:
             d2_pipe.denoise = denoise
@@ -1136,9 +1145,7 @@ class D2_Pipe:
         if height != None:
             d2_pipe.height = height
 
-        return {
-            "result": (d2_pipe, d2_pipe.ckpt_name, d2_pipe.positive, d2_pipe.negative, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, d2_pipe.denoise, d2_pipe.width, d2_pipe.height,),
-        }
+        return (d2_pipe, d2_pipe.ckpt_name, d2_pipe.positive, d2_pipe.negative, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, d2_pipe.denoise, d2_pipe.width, d2_pipe.height,)
 
 
 

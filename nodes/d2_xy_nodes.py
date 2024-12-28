@@ -243,6 +243,7 @@ class D2_XYPlotEasy:
         d2_pipe = D2_TD2Pipe(
             positive = org_values["positive"],
             negative = org_values["negative"],
+            ckpt_name = org_values["ckpt_name"],
             seed = org_values["seed"],
             steps = org_values["steps"],
             cfg = org_values["cfg"],
