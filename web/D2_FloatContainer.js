@@ -6,7 +6,7 @@ import { setCookie, getCookie, loadCssFile } from "./utils.js";
 
 
 class D2_FloatContainer {
-    static CSS_FILEPATH = "./extensions/D2-nodes-ComfyUI/css/D2_FloatContainer.css";
+    static CSS_FILEPATH = "/D2/assets/css/D2_FloatContainer.css";
 
     container = undefined;
     buttonContainer = undefined;

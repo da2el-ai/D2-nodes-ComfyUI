@@ -1,7 +1,7 @@
 
 import { loadCssFile } from "./utils.js";
 
-const CSS_FILEPATH = "./extensions/D2-nodes-ComfyUI/css/D2_Lightbox.css";
+const CSS_FILEPATH = "/D2/assets/css/D2_Lightbox.css";
 const IMAGE_URL = '/api/view?filename={filename}&subfolder=&type=temp&rand={random}';
 
 loadCssFile(CSS_FILEPATH);

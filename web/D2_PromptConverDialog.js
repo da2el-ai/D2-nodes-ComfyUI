@@ -83,7 +83,7 @@ class D2_PromptConvert {
  * プロンプト変換ダイアログ
  */
 class D2_PromptConvertDialog {
-    static CSS_FILEPATH = "./extensions/D2-nodes-ComfyUI/css/D2_PromptConvertDialog.css";
+    static CSS_FILEPATH = "/D2/assets/css/D2_PromptConvertDialog.css";
 
     container = undefined;
 
