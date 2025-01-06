@@ -59,7 +59,7 @@ class D2_QueueButton {
    */
   static _getCounts(string) {
     const setting = app.ui.settings.getSettingValue("D2.QueueButton.BatchCount", D2_QUEUE_DEFAULT_COUNT);
-    if (setting.trim() === "") return [];
+    if (!setting || setting.trim() === "") return [];
 
     return setting
       .split(",")
