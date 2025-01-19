@@ -745,13 +745,13 @@ class D2_RegexReplace:
         if not regex_replace.strip():
             return []
         
-        parts = [p.strip() for p in regex_replace.split('--')]
+        parts = [p.strip("\n\t") for p in regex_replace.split('--')]
         pairs = []
 
         for i in range(0, len(parts), 2):
-            search = parts[i].strip()
+            search = parts[i]
             if search:  # 検索文字があれば
-                replace = parts[i + 1].strip() if i + 1 < len(parts) else ""
+                replace = parts[i + 1] if i + 1 < len(parts) else ""
                 pairs.append((search, replace))
         
         return pairs
