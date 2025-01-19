@@ -81,11 +81,11 @@ class D2_XYPlot:
                 "y_title": ("STRING", {"default": ""}),
                 "y_list": ("STRING", {"multiline": True},),
                 "auto_queue": ("BOOLEAN", {"default": True},),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
             "optional": {
                 "reset": ("D2_XYPLOT_RESET", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
+                "xy_seed": ("D2_XYPLOT_SEED", {}),
             }
 
         }
@@ -96,7 +96,7 @@ class D2_XYPlot:
     CATEGORY = "D2/XY Plot"
 
 
-    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, seed, reset="", index=0):
+    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, xy_seed, reset="", index=0):
         x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
         y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
 
