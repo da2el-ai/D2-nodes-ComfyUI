@@ -11,9 +11,12 @@ app.registerExtension({
     nodeType.prototype.onNodeCreated = function () {
         const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
-        // なぜか auto_queue ウィジェットのラベルが書き換えられてしまうので戻す
+        // なぜかラベルが書き換えられてしまうので戻す
         const autoQueueWidget = findWidgetByName(this, "auto_queue");
         autoQueueWidget.label = "auto_queue";
+
+        const startIndexWidget = findWidgetByName(this, "start_index");
+        startIndexWidget.label = "start_index";
 
         return r;
     };
@@ -60,13 +63,15 @@ app.registerExtension({
   getCustomWidgets(app) {
     return {
       D2_XYPLOT_RESET(node, inputName, inputData, app) {
-        const widget = node.addWidget("button", "Reset index", "", () => {
+        const widget = node.addWidget("button", "Set start index", "", () => {
+          const startIndexWidget = findWidgetByName(node, "start_index");
           const indexWidget = findWidgetByName(node, "index");
-          indexWidget.setValue(0);
+          indexWidget.setValue(startIndexWidget.value);
         });
         // node.addCustomWidget(widget);
         // return widget;
       },
+
       D2_XYPLOT_INDEX(node, inputName, inputData, app) {
         const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_INDEX", inputName, 0);
         node.total = 0;
@@ -78,8 +83,9 @@ app.registerExtension({
           ctx.fillText(text, 20, y + 20);
         };
         node.addCustomWidget(widget);
-        return widget;
+        // return widget;
       },
+
       D2_XYPLOT_SEED(node, inputName, inputData, app) {
         const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_SEED", inputName, 0);
 
@@ -90,7 +96,7 @@ app.registerExtension({
           ctx.fillText(text, 20, y + 20);
         };
         node.addCustomWidget(widget);
-        return widget;
+        // return widget;
       },
     };
   },
