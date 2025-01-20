@@ -86,6 +86,7 @@ class D2_XYPlot:
             "optional": {
                 "reset": ("D2_XYPLOT_RESET", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
+                "remaining_time": ("D2_XYPLOT_REMAINING_TIME", {}),
                 "xy_seed": ("D2_XYPLOT_SEED", {}),
             }
 
@@ -97,7 +98,7 @@ class D2_XYPlot:
     CATEGORY = "D2/XY Plot"
 
 
-    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, start_index, reset="", index=0, xy_seed=0):
+    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, start_index, reset="", index=0, remaining_time=0, xy_seed=0):
         x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
         y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
 
@@ -182,6 +183,7 @@ class D2_XYPlotEasy:
             "optional": {
                 "reset": ("D2_XYPLOT_RESET", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
+                "remaining_time": ("D2_XYPLOT_REMAINING_TIME", {}),
                 "xy_seed": ("D2_XYPLOT_SEED", {}),
             }
         }
@@ -197,7 +199,7 @@ class D2_XYPlotEasy:
 
 
     def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, xy_seed=0):
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0):
         
         org_values = {
             "positive": positive,
