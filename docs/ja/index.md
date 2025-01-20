@@ -143,6 +143,12 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.01.20**
+
+- `D2_XYPlot / D2_XYPlotEasy`: XYプロットの開始位置を指定可能にした
+- `D2_XYPlot / D2_XYPlotEasy`: XYプロットの予想残り時間の表示を追加
+- `D2 Regex Replace`: 置換文字列に空白を指定可能にした
+
 **2024.12.28**
 
 - `D2 Pipe`: 新規追加

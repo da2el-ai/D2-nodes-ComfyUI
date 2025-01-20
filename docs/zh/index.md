@@ -139,6 +139,12 @@
 
 ## :blossom: 更新日誌
 
+**2025.01.20**
+
+- `D2_XYPlot / D2_XYPlotEasy`: 新增可指定XY繪圖起始位置的功能
+- `D2_XYPlot / D2_XYPlotEasy`: 新增XY繪圖預估剩餘時間顯示
+- `D2 Regex Replace`: 新增可在替換字串中使用空白的功能
+
 **2024.12.28**
 
 - `D2 Pipe`: 新增節點

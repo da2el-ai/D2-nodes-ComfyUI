@@ -140,6 +140,12 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.01.20**
+
+- `D2_XYPlot / D2_XYPlotEasy`: Added ability to specify XY plot starting position
+- `D2_XYPlot / D2_XYPlotEasy`: Added estimated time remaining display for XY plots
+- `D2 Regex Replace`: Added support for using whitespace in replacement strings
+
 **2024.12.28**
 
 - `D2 Pipe`: Added new node
