@@ -31,12 +31,12 @@ Drop images into ComfyUI to recreate workflows.
 
 ## :card_index_dividers: Batch Upscale Images in Folder
 
-<a href="../../workflow/folder_image_queue_upscale_20241218.png"><img src="../../workflow/folder_image_queue_upscale_20241218.png"></a>
+<a href="../../workflow/folder_image_queue_upscale_20250120.png"><img src="../../workflow/folder_image_queue_upscale_20250120.png"></a>
 
 - Retrieves all images and prompts from folder
 - Uses Controlnet anyTest
 - Upscales by 1.5x
-
+- Specify the number of outputs using D2 XY Seed2
 
 ## :card_index_dividers: XY Plot: Checkpoint & Prompt S/R
 

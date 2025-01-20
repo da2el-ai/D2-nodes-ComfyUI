@@ -720,6 +720,29 @@ Output text
 
 ---
 
+### D2 XY Seed2
+
+<figure>
+  <img src="../img/xy_seed2.png?2">
+</figure>
+
+- 輸出指定數量種子值的節點
+
+#### input
+- `initial_number`
+  - 當`mode`設為`increment`、`decrement`或`fixed`時，以此值為基準
+- `count`
+  - 要生成的種子值數量
+- `mode`
+  - `fixed`: 僅輸出`initial_number`
+  - `increment`: 以`initial_number`為基礎，每次加1
+  - `decrement`: 以`initial_number`為基礎，每次減1
+  - `randomize`: 不考慮`initial_number`，輸出隨機數
+
+
+---
+
+
 
 ### D2 XY Model List
 

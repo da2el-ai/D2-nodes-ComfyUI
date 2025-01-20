@@ -30,11 +30,12 @@
 
 ## :card_index_dividers: 批量放大資料夾內的圖像
 
-<a href="../../workflow/folder_image_queue_upscale_20241218.png"><img src="../../workflow/folder_image_queue_upscale_20241218.png"></a>
+<a href="../../workflow/folder_image_queue_upscale_20250120.png"><img src="../../workflow/folder_image_queue_upscale_20250120.png"></a>
 
 - 獲取資料夾內所有圖像和提示詞
 - 使用 Controlnet anyTest
 - 放大1.5倍
+- 使用D2 XY Seed2指定輸出數量
 
 
 ## :card_index_dividers: XY Plot: Checkpoint 和 Prompt S/R

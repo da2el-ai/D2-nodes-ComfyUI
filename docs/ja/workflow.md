@@ -34,11 +34,12 @@ Workflow
 
 ## :card_index_dividers: フォルダー内画像を一括でアップスケール
 
-<a href="../../workflow/folder_image_queue_upscale_20241218.png"><img src="../../workflow/folder_image_queue_upscale_20241218.png"></a>
+<a href="../../workflow/folder_image_queue_upscale_20250120.png"><img src="../../workflow/folder_image_queue_upscale_20250120.png"></a>
 
 - フォルダー内画像を全て取得し、プロンプトを取得
 - Controlnet anyTestを使用
 - 1.5倍にアップスケールしている
+- D2 XY Seed2 で出力枚数を指定
 
 
 ## :card_index_dividers: XY Plot: Checkpoint & Prompt S/R

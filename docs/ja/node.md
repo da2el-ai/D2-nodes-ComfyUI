@@ -750,6 +750,29 @@ Output text
 ---
 
 
+### D2 XY Seed2
+
+<figure>
+  <img src="../img/xy_seed2.png?2">
+</figure>
+
+- seed値を指定個数出力するノード
+
+#### input
+- `initial_number`
+  - `mode` が `increment`、`decrement`、`fixed` の時にこの値を基準にする
+- `count`
+  - 生成するseed値の個数
+- `mode`
+  - `fixed`: `initial_number` だけを出力する
+  - `increment`: `initial_number` に1ずつ加算する
+  - `decrement`: `initial_number` に1ずつ減算する
+  - `randomize`: `initial_number` に関係無く乱数を出力する
+
+
+---
+
+
 ### D2 XY Checkpoint List / D2 XY Lora List
 
 <figure>

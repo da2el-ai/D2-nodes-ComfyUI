@@ -108,6 +108,8 @@ D2 Nodes ComfyUI
   - テキストを検索・置換してリストで返す。D2 XY Plotの後に置くタイプ
 - <a href="node.md#D2-XY-Seed">`D2 XY Seed`</a>
   - SEED のリストを出力する
+- <a href="node.md#D2-XY-Seed2">`D2 XY Seed2`</a>
+  - 指定した個数の SEED のリストを出力する
 - <a href="node.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
   - Checkpoint のリストを出力する
 - <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
@@ -145,8 +147,9 @@ D2 Nodes ComfyUI
 
 **2025.01.20**
 
-- `D2_XYPlot / D2_XYPlotEasy`: XYプロットの開始位置を指定可能にした
-- `D2_XYPlot / D2_XYPlotEasy`: XYプロットの予想残り時間の表示を追加
+- `D2 XY Seed2`: 新規追加
+- `D2 XY Plot / D2 XY Plot Easy`: XYプロットの開始位置を指定可能にした
+- `D2 XY Plot / D2 XY Plot Easy`: XYプロットの予想残り時間の表示を追加
 - `D2 Regex Replace`: 置換文字列に空白を指定可能にした
 
 **2024.12.28**

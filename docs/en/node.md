@@ -675,6 +675,29 @@ Output text
 - Other numbers are output as-is
 - Must set `x/y_type` to `INT` on `D2 XY Plot` side
 
+
+---
+
+
+### D2 XY Seed2
+
+<figure>
+  <img src="../img/xy_seed2.png?2">
+</figure>
+
+- A node that outputs a specified number of seed values
+
+#### input
+- `initial_number`
+  - This value is used as a reference when `mode` is set to `increment`, `decrement`, or `fixed`
+- `count`
+  - Number of seed values to generate
+- `mode`
+  - `fixed`: Outputs only the `initial_number`
+  - `increment`: Adds 1 to `initial_number` for each value
+  - `decrement`: Subtracts 1 from `initial_number` for each value
+  - `randomize`: Outputs random numbers regardless of `initial_number`
+
 ---
 
 ### D2 XY Checkpoint List / D2 XY Lora List

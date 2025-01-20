@@ -105,6 +105,8 @@
   - 搜索替換文字並以列表返回，放在 `D2 XY Plot` 後的類型
 - <a href="node.md#D2-XY-Seed">`D2 XY Seed`</a>
   - 輸出 SEED 列表
+- <a href="node.md#D2-XY-Seed2">`D2 XY Seed2`</a>
+  - 輸出指定數量的SEED列表
 - <a href="node.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
   - 輸出 Checkpoint 列表
 - <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
@@ -141,8 +143,9 @@
 
 **2025.01.20**
 
-- `D2_XYPlot / D2_XYPlotEasy`: 新增可指定XY繪圖起始位置的功能
-- `D2_XYPlot / D2_XYPlotEasy`: 新增XY繪圖預估剩餘時間顯示
+- `D2 XY Seed2`: 新增節點
+- `D2 XY Plot / D2 XY Plot Easy`: 新增可指定XY繪圖起始位置的功能
+- `D2 XY Plot / D2 XY Plot Easy`: 新增XY繪圖預估剩餘時間顯示
 - `D2 Regex Replace`: 新增可在替換字串中使用空白的功能
 
 **2024.12.28**
