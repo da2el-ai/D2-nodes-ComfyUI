@@ -701,8 +701,9 @@ class D2_XYSeed:
             },
         }
 
-    RETURN_TYPES = ("STRING", "LIST",)
-    RETURN_NAMES = ("x / y_list", "LIST",)
+    RETURN_TYPES = ("STRING", "LIST", AnyType("*"))
+    RETURN_NAMES = ("x / y_list", "LIST", "BATCH")
+    OUTPUT_IS_LIST = (False, False, True)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
@@ -719,7 +720,61 @@ class D2_XYSeed:
         output_list = [util.create_seed(seed) for seed in seed_list]
         output_xy = "\n".join(str(x) for x in output_list)
 
-        return (output_xy, output_list,)
+        return (output_xy, output_list, output_list,)
+
+
+"""
+
+D2 XY Seed 2
+指定個数のSEEDのリストを出力するノード
+
+"""
+class D2_XYSeed2:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "initial_number": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
+                "count": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
+                "mode": (["fixed", "increment", "decrement", "randomize"], {"default": "randomize"}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "LIST", AnyType("*"))
+    RETURN_NAMES = ("x / y_list", "LIST", "BATCH")
+    OUTPUT_IS_LIST = (False, False, True)
+    FUNCTION = "run"
+    CATEGORY = "D2/XY Plot"
+
+    ######
+    """
+    seed値を生成する
+    initial_number: 元の数値
+    count: 生成個数
+    mode: モード（fixed / increment / decrement / randomize）
+    """
+    def run(self, initial_number, count, mode):
+        # 出力リスト
+        output_list = []
+        # 初期番号生成
+        initial_seed = util.create_seed(initial_number)
+
+        # count分生成して output_list に格納
+        for i in range(count):
+            if(mode == "fixed"):
+                output_list.append(initial_seed)
+            elif(mode == "increment"):
+                output_list.append(initial_seed + i)
+            elif(mode == "decrement"):
+                output_list.append(initial_seed - i)
+            elif(mode == "randomize"):
+                output_list.append(util.create_seed(-1))
+
+        output_xy = "\n".join(str(x) for x in output_list)
+
+        return (output_xy, output_list, output_list,)
+
 
 
 """
@@ -833,6 +888,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY String To Plot": D2_XYStringToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
     "D2 XY Seed": D2_XYSeed,
+    "D2 XY Seed2": D2_XYSeed2,
     "D2 XY Annotation": D2_XYAnnotation,
 }
 
