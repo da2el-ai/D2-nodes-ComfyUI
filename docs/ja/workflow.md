@@ -44,7 +44,7 @@ Workflow
 
 ## :card_index_dividers: XY Plot: Checkpoint & Prompt S/R
 
-<a href="../../workflow/xy_easy_20241214.png"><img src="../../workflow/xy_easy_20241214.png"></a>
+<a href="../../workflow/xy_easy_20250121.png"><img src="../../workflow/xy_easy_20250121.png"></a>
 
 - D2 XY Plot Easy を使ったシンプルな XY Plot
 
@@ -61,15 +61,9 @@ Workflow
 
 ## :card_index_dividers: XY Plot: Prompt S/R
 
-<a href="../../workflow/xy_prompt_sr_20241218.png"><img src="../../workflow/xy_prompt_sr_20241218.png"></a>
+<a href="../../workflow/xy_prompt_sr_20250121.png"><img src="../../workflow/xy_prompt_sr_20250121.png"></a>
 
-- 基本的な Prompt S/R
-
-
-## :card_index_dividers: XY Plot: Animagine、Pony、Illustrious の Chedckpoint 比較
-
-<a href="../../workflow/xy_checkpint_20241119.png"><img src="../../workflow/xy_checkpint_20241119.png"></a>
-
+- Checkpointの系統（SDXL / Pony / Illustrious）によってクオリティタグを切り替えるXYプロット
 - Animagine系、Pony系、Illustrious系はクオリティタグが異なるが、チェックポイントのパスを判断して自動的に切り替える
 - ファイル名に系統の名前が入っているとは限らないので、系統名のフォルダに分類しておく必要がある
 

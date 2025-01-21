@@ -40,7 +40,7 @@ Drop images into ComfyUI to recreate workflows.
 
 ## :card_index_dividers: XY Plot: Checkpoint & Prompt S/R
 
-<a href="../../workflow/xy_easy_20241214.png"><img src="../../workflow/xy_easy_20241214.png"></a>
+<a href="../../workflow/xy_easy_20250121.png"><img src="../../workflow/xy_easy_20250121.png"></a>
 
 - Simple XY Plot using D2 XY Plot Easy
 
@@ -56,17 +56,13 @@ Drop images into ComfyUI to recreate workflows.
 
 ## :card_index_dividers: XY Plot: Prompt S/R
 
-<a href="../../workflow/xy_prompt_sr_20241218.png"><img src="../../workflow/xy_prompt_sr_20241218.png"></a>
+<a href="../../workflow/xy_prompt_sr_20250121.png"><img src="../../workflow/xy_prompt_sr_20250121.png"></a>
 
-- Basic Prompt S/R
-
-
-## :card_index_dividers: XY Plot: Comparison of Animagine, Pony, and Illustrious Checkpoints
-
-<a href="../../workflow/xy_checkpint_20241119.png"><img src="../../workflow/xy_checkpint_20241119.png"></a>
-
+- XY plot that switches quality tags based on Checkpoint type (SDXL / Pony / Illustrious)
 - Animagine, Pony, and Illustrious series have different quality tags, but automatically switches based on checkpoint path
 - Files need to be organized in series-specific folders as filenames may not always contain series names
+
+
 
 
 ## :card_index_dividers: Refiner: Checkpoint switching Hires.fix

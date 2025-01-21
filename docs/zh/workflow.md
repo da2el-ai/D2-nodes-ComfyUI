@@ -40,7 +40,7 @@
 
 ## :card_index_dividers: XY Plot: Checkpoint 和 Prompt S/R
 
-<a href="../../workflow/xy_easy_20241214.png"><img src="../../workflow/xy_easy_20241214.png"></a>
+<a href="../../workflow/xy_easy_20250121.png"><img src="../../workflow/xy_easy_20250121.png"></a>
 
 - 使用 D2 XY Plot Easy 的簡單 XY Plot
 
@@ -56,17 +56,12 @@
 
 ## :card_index_dividers: XY Plot: Prompt S/R
 
-<a href="../../workflow/xy_prompt_sr_20241218.png"><img src="../../workflow/xy_prompt_sr_20241218.png"></a>
+<a href="../../workflow/xy_prompt_sr_20250121.png"><img src="../../workflow/xy_prompt_sr_20250121.png"></a>
 
-- 基本的 Prompt S/R
-
-
-## :card_index_dividers: XY Plot: Animagine、Pony 和 Illustrious 檢查點比較
-
-<a href="../../workflow/xy_checkpint_20241119.png"><img src="../../workflow/xy_checkpint_20241119.png"></a>
-
+- 根據Checkpoint類型（SDXL / Pony / Illustrious）切換品質標籤的XY繪圖
 - Animagine系列、Pony系列和Illustrious系列具有不同的質量標籤，但根據檢查點路徑自動切換
 - 由於文件名可能不包含系列名稱，需要將文件分類到相應系列的資料夾中
+
 
 
 ## :card_index_dividers: Refiner: 切換檢查點的 Hires.fix
