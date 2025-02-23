@@ -130,6 +130,11 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node.md#D2-Refiner-Steps-Tester">`D2 Refiner Steps Tester`</a>
   - Node for checking steps
 
+### Merge Node
+
+- <a href="node.md#D2-Model-and-CLIP-Merge-SDXL">`D2 Model and CLIP Merge SDXL`</a>
+  - A node that combines ModelMergeSDXL and CLIPMergeSimple
+
 ### Float Palet
 
 - <a href="node.md#D2-Queue-Button">`D2 Queue Button`</a>
@@ -141,6 +146,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.02.23**
+
+- `D2 Model and CLIP Merge SDXL`: Added checkpoint merge nodes
 
 **2025.01.20**
 

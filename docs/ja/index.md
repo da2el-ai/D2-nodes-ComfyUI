@@ -133,6 +133,12 @@ D2 Nodes ComfyUI
 - <a href="node.md#D2-Refiner-Steps-Tester">`D2 Refiner Steps Tester`</a>
   - steps を確認するためのノード
 
+### Merge Node
+
+- <a href="node.md#D2-Model-and-CLIP-Merge-SDXL">`D2 Model and CLIP Merge SDXL`</a>
+  - ModelMergeSDXL と CLIPMergeSimple を合体させたノード
+
+
 ### Float Palet
 
 - <a href="node.md#D2-Queue-Button">`D2 Queue Button`</a>
@@ -144,6 +150,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.02.23**
+
+- `D2 Model and CLIP Merge SDXL`: checkpointのマージノードを追加
 
 **2025.01.20**
 

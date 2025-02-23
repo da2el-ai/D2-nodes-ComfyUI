@@ -131,6 +131,13 @@
 - <a href="node.md#D2-Refiner-Steps-Tester">`D2 Refiner Steps Tester`</a>
   - 用於確認步數的節點
 
+### Merge Node
+
+- <a href="node.md#D2-Model-and-CLIP-Merge-SDXL">`D2 Model and CLIP Merge SDXL`</a>
+  - 將 ModelMergeSDXL 和 CLIPMergeSimple 結合的節點
+
+
+
 ### 浮動面板
 
 - <a href="node.md#D2-Queue-Button">`D2 Queue Button`</a>
@@ -140,6 +147,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.02.23**
+
+- `D2 Model and CLIP Merge SDXL`: 新增 checkpoint 合併節點
 
 **2025.01.20**
 

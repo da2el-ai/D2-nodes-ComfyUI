@@ -878,6 +878,24 @@ Output text
 
 ---
 
+## :tomato: Merge Node
+
+
+### D2 Model and CLIP Merge SDXL
+
+<figure>
+  <img src="../img/merge_sdxl.png">
+</figure>
+
+- 將 ModelMergeSDXL 和 CLIPMergeSimple 結合的節點
+- 為了便於在 XYPlot 中使用，可以用逗號分隔指定各個權重
+- 在此圖中指定了 `0.85,0.85,1,1,0.4,0.4,1,0.4,0.4,0.4,1,0.4,0.4,0.4,0,0.55,0.85,0.85,0.85,0.85,0.85,0.85,1,1,0.65`
+
+
+
+
+---
+
 ## :tomato: Float Palet
 
 ### D2 Queue Button

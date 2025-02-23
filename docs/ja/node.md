@@ -935,6 +935,23 @@ Output text
 ---
 
 
+## :tomato: Merge Node
+
+
+### D2 Model and CLIP Merge SDXL
+
+<figure>
+  <img src="../img/merge_sdxl.png">
+</figure>
+
+- ModelMergeSDXL と CLIPMergeSimple を合体させたノード
+- XYPlot で使いやすいように、各 weight をカンマ区切りで指定可能にした
+- この図では `0.85,0.85,1,1,0.4,0.4,1,0.4,0.4,0.4,1,0.4,0.4,0.4,0,0.55,0.85,0.85,0.85,0.85,0.85,0.85,1,1,0.65` を指定している
+
+
+---
+
+
 ## :tomato: Float Palet
 
 

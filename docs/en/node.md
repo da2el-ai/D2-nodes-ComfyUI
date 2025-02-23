@@ -842,6 +842,25 @@ Output text
 
 - Node for checking steps
 
+
+---
+
+
+## :tomato: Merge Node
+
+
+### D2 Model and CLIP Merge SDXL
+
+<figure>
+  <img src="../img/merge_sdxl.png">
+</figure>
+
+- A node that combines ModelMergeSDXL and CLIPMergeSimple
+- Allows comma-separated weight specifications for easier use with XYPlot
+- In this figure, `0.85,0.85,1,1,0.4,0.4,1,0.4,0.4,0.4,1,0.4,0.4,0.4,0,0.55,0.85,0.85,0.85,0.85,0.85,0.85,1,1,0.65` is specified
+
+
+
 ---
 
 ## :tomato: Float Palet
