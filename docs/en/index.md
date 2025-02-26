@@ -5,7 +5,7 @@
 <a href="../en/index.md">English</a> | <a href="../ja/index.md">日本語</a> | <a href="../zh/index.md">繁体中文</a>
 
 - <a href="index.md">Top</a>
-- <a href="node.md">Node</a>
+- <a href="node.md">Node</a> / <a href="node_image.md">Image Node</a> / <a href="node_text.md">Text Node</a> / <a href="node_xy.md">XYPlot Node</a> / <a href="node_float.md">Float Palet</a>
 - <a href="workflow.md">Workflow</a>
 
 
@@ -35,20 +35,6 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node.md#d2-pipe">`D2 Pipe`</a>
   - A node for modifying and retrieving the d2_pipe used in D2 XYPlot Easy, D2 KSampler, and D2 Send Eagle
 
-### Text
-
-- <a href="node.md#D2-Regex-Replace">`D2 Regex Replace`</a>
-  - Text replacement node with multiple condition support
-- <a href="node.md#D2-Regex-Switcher">`D2 Regex Switcher`</a>
-  - Node that switches output text based on input text
-  - Can also perform string concatenation
-- <a href="node.md#D2-Multi-Output">`D2 Multi Output`</a>
-  - Outputs SEED / STRING / INT / FLOAT as lists
-- <a href="node.md#D2-List-To-String">`D2 List To String`</a>
-  - Converts arrays to strings
-- <a href="node.md#D2-Filename-Template">`D2 Filename Template`</a>
-  - Creates filenames
-
 ### Loader
 
 - <a href="node.md#D2-Checkpoint-Loader">`D2 Checkpoint Loader`</a>
@@ -57,25 +43,6 @@ If you have installed any of the following custom nodes previously, please remov
   - Controlnet Loader that creates simple workflows when connected to D2 KSampler
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - Lora loader that can be specified with text
-
-### Image
-
-- <a href="node.md#D2-Load-Image">`D2 Load Image`</a>
-  - Load Image that can extract prompts from images
-  - Compatible with images created in StableDiffusion webui A1111 and NovelAI
-  - Includes a button to open mask editor
-- <a href="node.md#D2-Load-Folder-Images">`D2 Load Folder Images`</a>
-  - Loads all images from a folder
-- <a href="node.md#D2-Folder-Image-Queue">`D2 Folder Image Queue`</a>
-  - Sequentially outputs image paths from a folder
-  - Automatically executes queue for all images
-- <a href="node.md#D2-Grid-Image">`D2 Grid Image`</a>
-  - Generates grid images
-- <a href="node.md#D2-Image-Stack">`D2 Image Stack`</a>
-  - Node for stacking multiple images to pass to D2 Grid Image
-  - Outputs images directly
-- <a href="node.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
-  - Outputs EmptyImage with alpha channel (transparency)
 
 ### Size
 
@@ -91,38 +58,6 @@ If you have installed any of the following custom nodes previously, please remov
   - Image size calculator that ensures results are multiples of 8
   - Options for rounding, floor, or ceiling
 
-### XY Plot
-
-- <a href="node.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
-  - A simplified XY Plot node limited to D2 KSampler parameters, designed for streamlined workflow
-- <a href="node.md#D2-XY-Plot">`D2 XY Plot`</a>
-  - Versatile XY Plot node
-  - Automatically executes required number of queues
-- <a href="node.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
-  - Node for generating grid images
-- <a href="node.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
-  - Searches and replaces text, returns as list. Placed before D2 XY Plot
-- <a href="node.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
-  - Searches and replaces text, returns as list. Placed after D2 XY Plot
-- <a href="node.md#D2-XY-Seed">`D2 XY Seed`</a>
-  - Outputs list of SEEDs
-- <a href="node.md#D2-XY-Seed2">`D2 XY Seed2`</a>
-  - Outputs a list of SEEDs with specified count
-- <a href="node.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
-  - Outputs list of Checkpoints
-- <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
-  - Outputs list of Loras
-- <a href="node.md#D2-XY-Model-List">`D2 XY Model List`</a>
-  - Outputs a list of Checkpoints / Loras
-- <a href="node.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
-  - Outputs list of files in folder
-- <a href="node.md#D2-XY-Annotation">`D2 XY Annotation`</a>
-  - Creates header text for display in D2 Grid Image
-- <a href="node.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
-  - Converts arrays to D2 XY Plot lists
-- <a href="node.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
-  - Converts text containing line breaks into a list format for `D2 XY Plot`
-
 
 ### Refiner
 - <a href="node.md#D2-Refiner-Steps">`D2 Refiner Steps`</a>
@@ -137,11 +72,77 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node.md#D2-Model-and-CLIP-Merge-SDXL">`D2 Model and CLIP Merge SDXL`</a>
   - A node that combines ModelMergeSDXL and CLIPMergeSimple
 
+### Text
+
+- <a href="node_text.md#D2-Regex-Replace">`D2 Regex Replace`</a>
+  - Text replacement node with multiple condition support
+- <a href="node_text.md#D2-Regex-Switcher">`D2 Regex Switcher`</a>
+  - Node that switches output text based on input text
+  - Can also perform string concatenation
+- <a href="node_text.md#D2-Multi-Output">`D2 Multi Output`</a>
+  - Outputs SEED / STRING / INT / FLOAT as lists
+- <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
+  - Converts arrays to strings
+- <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
+  - Creates filenames
+
+### Image
+
+- <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
+  - Load Image that can extract prompts from images
+  - Compatible with images created in StableDiffusion webui A1111 and NovelAI
+  - Includes a button to open mask editor
+- <a href="node_image.md#D2-Load-Folder-Images">`D2 Load Folder Images`</a>
+  - Loads all images from a folder
+- <a href="node_image.md#D2-Folder-Image-Queue">`D2 Folder Image Queue`</a>
+  - Sequentially outputs image paths from a folder
+  - Automatically executes queue for all images
+- <a href="node_image.md#D2-Grid-Image">`D2 Grid Image`</a>
+  - Generates grid images
+- <a href="node_image.md#D2-Image-Stack">`D2 Image Stack`</a>
+  - Node for stacking multiple images to pass to D2 Grid Image
+  - Outputs images directly
+- <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
+  - Outputs EmptyImage with alpha channel (transparency)
+
+### XY Plot
+
+- <a href="node_xy.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
+  - A simplified XY Plot node limited to D2 KSampler parameters, designed for streamlined workflow
+- <a href="node_xy.md#D2-XY-Plot">`D2 XY Plot`</a>
+  - Versatile XY Plot node
+  - Automatically executes required number of queues
+- <a href="node_xy.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
+  - Node for generating grid images
+- <a href="node_xy.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
+  - Searches and replaces text, returns as list. Placed before D2 XY Plot
+- <a href="node_xy.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
+  - Searches and replaces text, returns as list. Placed after D2 XY Plot
+- <a href="node_xy.md#D2-XY-Seed">`D2 XY Seed`</a>
+  - Outputs list of SEEDs
+- <a href="node_xy.md#D2-XY-Seed2">`D2 XY Seed2`</a>
+  - Outputs a list of SEEDs with specified count
+- <a href="node_xy.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
+  - Outputs list of Checkpoints
+- <a href="node_xy.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
+  - Outputs list of Loras
+- <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
+  - Outputs a list of Checkpoints / Loras
+- <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
+  - Outputs list of files in folder
+- <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
+  - Creates header text for display in D2 Grid Image
+- <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
+  - Converts arrays to D2 XY Plot lists
+- <a href="node_xy.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
+  - Converts text containing line breaks into a list format for `D2 XY Plot`
+
+
 ### Float Palet
 
-- <a href="node.md#D2-Queue-Button">`D2 Queue Button`</a>
+- <a href="node_float.md#D2-Queue-Button">`D2 Queue Button`</a>
   - Button that generates specified number of images (Batch count)
-- <a href="node.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
+- <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
   - Dialog for converting weights between NovelAI and StableDiffusion
 
 

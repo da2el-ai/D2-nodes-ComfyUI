@@ -5,7 +5,7 @@
 <a href="../en/index.md">English</a> | <a href="../ja/index.md">日本語</a> | <a href="../zh/index.md">繁体中文</a>
 
 - <a href="index.md">Top</a>
-- <a href="node.md">Node</a>
+- <a href="node.md">Node</a> / <a href="node_image.md">Image Node</a> / <a href="node_text.md">Text Node</a> / <a href="node_xy.md">XYPlot Node</a> / <a href="node_float.md">Float Palet</a>
 - <a href="workflow.md">Workflow</a>
 
 
@@ -36,20 +36,6 @@
 - <a href="node.md#d2-pipe">`D2 Pipe`</a>
   - 用於修改和獲取 D2 XYPlot Easy、D2 KSampler 和 D2 Send Eagle 所使用的 d2_pipe 的節點
 
-### 文字
-
-- <a href="node.md#D2-Regex-Replace">`D2 Regex Replace`</a>
-  - 可設定多個條件的文字替換節點
-- <a href="node.md#D2-Regex-Switcher">`D2 Regex Switcher`</a>
-  - 根據輸入文字切換輸出文字的節點
-  - 可進行字串連接
-- <a href="node.md#D2-Multi-Output">`D2 Multi Output`</a>
-  - 以列表形式輸出 SEED / STRING / INT / FLOAT
-- <a href="node.md#D2-List-To-String">`D2 List To String`</a>
-  - 將陣列轉換為字串
-- <a href="node.md#D2-Filename-Template">`D2 Filename Template`</a>
-  - 生成文件名稱
-
 ### 載入器
 
 - <a href="node.md#D2-Checkpoint-Loader">`D2 Checkpoint Loader`</a>
@@ -59,25 +45,6 @@
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - 可通過文本指定的 Lora 加載器
 
-
-### 圖像
-
-- <a href="node.md#D2-Load-Image">`D2 Load Image`</a>
-  - 可從圖像獲取提示詞的 Load Image
-  - 支援 `StableDiffusion webui A1111`、`NovelAI` 創建的圖像
-  - 附帶打開遮罩編輯器按鈕
-- <a href="node.md#D2-Load-Folder-Images">`D2 Load Folder Images`</a>
-  - 載入資料夾內的所有圖像
-- <a href="node.md#D2-Folder-Image-Queue">`D2 Folder Image Queue`</a>
-  - 依序輸出資料夾內的圖像路徑
-  - 自動執行與圖像數量相應的佇列
-- <a href="node.md#D2-Grid-Image">`D2 Grid Image`</a>
-  - 生成網格圖像
-- <a href="node.md#D2-Image-Stack">`D2 Image Stack`</a>
-  - 用於堆疊多個圖像並傳遞給 `D2 Grid Image` 的節點
-  - 直接輸出圖像
-- <a href="node.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
-  - 輸出帶有 α 通道（透明度）的 EmptyImage
 
 ### 尺寸
 
@@ -93,39 +60,6 @@
   - 計算結果必定為 8 的倍數的圖像尺寸計算節點
   - 可選擇四捨五入、無條件捨去、無條件進位
 
-### XY Plot
-
-- <a href="node.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
-  - 限定於 D2 KSampler 項目的簡化版 XY Plot 節點，提供更簡潔的工作流程
-- <a href="node.md#D2-XY-Plot">`D2 XY Plot`</a>
-  - 通用的 XY Plot 節點
-  - 自動執行所需次數的佇列
-- <a href="node.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
-  - 生成網格圖像的節點
-- <a href="node.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
-  - 搜索替換文字並以列表返回，放在 `D2 XY Plot` 前的類型
-- <a href="node.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
-  - 搜索替換文字並以列表返回，放在 `D2 XY Plot` 後的類型
-- <a href="node.md#D2-XY-Seed">`D2 XY Seed`</a>
-  - 輸出 SEED 列表
-- <a href="node.md#D2-XY-Seed2">`D2 XY Seed2`</a>
-  - 輸出指定數量的SEED列表
-- <a href="node.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
-  - 輸出 Checkpoint 列表
-- <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
-  - 輸出 Lora 列表
-- <a href="node.md#D2-XY-Model-List">`D2 XY Model List`</a>
-  - 輸出 Checkpoint / Lora 列表
-- <a href="node.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
-  - 輸出資料夾內文件列表
-- <a href="node.md#D2-XY-Annotation">`D2 XY Annotation`</a>
-  - 創建在 `D2 Grid Image` 顯示的標題文字
-- <a href="node.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
-  - 將陣列轉換為 `D2 XY Plot` 用列表
-- <a href="node.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
-  - 將包含換行符的文本轉換為 `D2 XY Plot` 可用的列表格式
-
-
 ### Refiner
 - <a href="node.md#D2-Refiner-Steps">`D2 Refiner Steps`</a>
   - 輸出用於 Refiner 的步數
@@ -140,12 +74,80 @@
   - 將 ModelMergeSDXL 和 CLIPMergeSimple 結合的節點
 
 
+### 文字
+
+- <a href="node_text.md#D2-Regex-Replace">`D2 Regex Replace`</a>
+  - 可設定多個條件的文字替換節點
+- <a href="node_text.md#D2-Regex-Switcher">`D2 Regex Switcher`</a>
+  - 根據輸入文字切換輸出文字的節點
+  - 可進行字串連接
+- <a href="node_text.md#D2-Multi-Output">`D2 Multi Output`</a>
+  - 以列表形式輸出 SEED / STRING / INT / FLOAT
+- <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
+  - 將陣列轉換為字串
+- <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
+  - 生成文件名稱
+
+
+
+### 圖像
+
+- <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
+  - 可從圖像獲取提示詞的 Load Image
+  - 支援 `StableDiffusion webui A1111`、`NovelAI` 創建的圖像
+  - 附帶打開遮罩編輯器按鈕
+- <a href="node_image.md#D2-Load-Folder-Images">`D2 Load Folder Images`</a>
+  - 載入資料夾內的所有圖像
+- <a href="node_image.md#D2-Folder-Image-Queue">`D2 Folder Image Queue`</a>
+  - 依序輸出資料夾內的圖像路徑
+  - 自動執行與圖像數量相應的佇列
+- <a href="node_image.md#D2-Grid-Image">`D2 Grid Image`</a>
+  - 生成網格圖像
+- <a href="node_image.md#D2-Image-Stack">`D2 Image Stack`</a>
+  - 用於堆疊多個圖像並傳遞給 `D2 Grid Image` 的節點
+  - 直接輸出圖像
+- <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
+  - 輸出帶有 α 通道（透明度）的 EmptyImage
+
+
+### XY Plot
+
+- <a href="node_xy.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
+  - 限定於 D2 KSampler 項目的簡化版 XY Plot 節點，提供更簡潔的工作流程
+- <a href="node_xy.md#D2-XY-Plot">`D2 XY Plot`</a>
+  - 通用的 XY Plot 節點
+  - 自動執行所需次數的佇列
+- <a href="node_xy.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
+  - 生成網格圖像的節點
+- <a href="node_xy.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
+  - 搜索替換文字並以列表返回，放在 `D2 XY Plot` 前的類型
+- <a href="node_xy.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
+  - 搜索替換文字並以列表返回，放在 `D2 XY Plot` 後的類型
+- <a href="node_xy.md#D2-XY-Seed">`D2 XY Seed`</a>
+  - 輸出 SEED 列表
+- <a href="node_xy.md#D2-XY-Seed2">`D2 XY Seed2`</a>
+  - 輸出指定數量的SEED列表
+- <a href="node_xy.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
+  - 輸出 Checkpoint 列表
+- <a href="node_xy.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
+  - 輸出 Lora 列表
+- <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
+  - 輸出 Checkpoint / Lora 列表
+- <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
+  - 輸出資料夾內文件列表
+- <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
+  - 創建在 `D2 Grid Image` 顯示的標題文字
+- <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
+  - 將陣列轉換為 `D2 XY Plot` 用列表
+- <a href="node_xy.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
+  - 將包含換行符的文本轉換為 `D2 XY Plot` 可用的列表格式
+
 
 ### 浮動面板
 
-- <a href="node.md#D2-Queue-Button">`D2 Queue Button`</a>
+- <a href="node_float.md#D2-Queue-Button">`D2 Queue Button`</a>
   - 生成指定數量（Batch count）的按鈕
-- <a href="node.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
+- <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
   - `NovelAI` 和 `StableDiffusion` 權重互相轉換的對話框
 
 

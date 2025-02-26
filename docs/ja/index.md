@@ -4,7 +4,7 @@
 <a href="../en/index.md">English</a> | <a href="../ja/index.md">日本語</a> | <a href="../zh/index.md">繁体中文</a>
 
 - <a href="index.md">Top</a>
-- <a href="node.md">Node</a>
+- <a href="node.md">Node</a> / <a href="node_image.md">Image Node</a> / <a href="node_text.md">Text Node</a> / <a href="node_xy.md">XYPlot Node</a> / <a href="node_float.md">Float Palet</a>
 - <a href="workflow.md">Workflow</a>
 
 
@@ -37,21 +37,6 @@ D2 Nodes ComfyUI
 - <a href="node.md#d2-pipe">`D2 Pipe`</a>
   - D2 XYPlot Easy、D2 KSampler、D2 Send Eagle で使う d2_pipe の変更、取得をするノード
 
-
-### Text
-
-- <a href="node.md#D2-Regex-Replace">`D2 Regex Replace`</a>
-  - 複数条件の指定が可能なテキスト置換ノード
-- <a href="node.md#D2-Regex-Switcher">`D2 Regex Switcher`</a>
-  - 入力テキストによって出力テキストを切り替えるノード
-  - 文字列結合も行える
-- <a href="node.md#D2-Multi-Output">`D2 Multi Output`</a>
-  - SEED / STRING / INT / FLOAT をリスト出力する
-- <a href="node.md#D2-List-To-String">`D2 List To String`</a>
-  - 配列を文字列に変換する
-- <a href="node.md#D2-Filename-Template">`D2 Filename Template`</a>
-  - ファイルネームを作る
-
 ### Loader
 
 - <a href="node.md#D2-Checkpoint-Loader">`D2 Checkpoint Loader`</a>
@@ -60,25 +45,6 @@ D2 Nodes ComfyUI
   - D2 KSampler に接続してシンプルなワークフローが作れる Controlnet Loader
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - テキストで指定するLoraローダー
-
-### Image
-
-- <a href="node.md#D2-Load-Image">`D2 Load Image`</a>
-  - 画像からプロンプトを取得できる Load Image
-  - StableDiffusion webui A1111、NovelAI で作成した画像にも対応
-  - マスクエディターを開くボタンが付いてる
-- <a href="node.md#D2-Load-Folder-Images">`D2 Load Folder Images`</a>
-  - フォルダ内の画像を全て読み込む
-- <a href="node.md#D2-Folder-Image-Queue">`D2 Folder Image Queue`</a>
-  - フォルダ内の画像パスを順次出力する
-  - 自動で画像枚数分のキューを実行する
-- <a href="node.md#D2-Grid-Image">`D2 Grid Image`</a>
-  - グリッド画像を生成
-- <a href="node.md#D2-Image-Stack">`D2 Image Stack`</a>
-  - 複数の画像をスタックして D2 Grid Image に渡すためのノード
-  - 画像を直接出力する
-- <a href="node.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
-  - αチャンネル（透明度）付きの EmptyImage を出力
 
 ### Size
 
@@ -94,39 +60,6 @@ D2 Nodes ComfyUI
   - 計算した数値は必ず8の倍数になる画像サイズ計算ノード
   - 四捨五入、切り捨て、切り上げが選択できる
 
-
-### XY Plot
-
-- <a href="node.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
-  - D2 KSampler の項目に限定し、ワークフローをシンプルにした XY Plot ノード
-- <a href="node.md#D2-XY-Plot">`D2 XY Plot`</a>
-  - 汎用的な XY Plot ノード
-  - 必要な回数の Queue を自動的に実行する
-- <a href="node.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
-  - グリッド画像を生成するノード
-- <a href="node.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
-  - テキストを検索・置換してリストで返す。D2 XY Plotの前に置くタイプ
-- <a href="node.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
-  - テキストを検索・置換してリストで返す。D2 XY Plotの後に置くタイプ
-- <a href="node.md#D2-XY-Seed">`D2 XY Seed`</a>
-  - SEED のリストを出力する
-- <a href="node.md#D2-XY-Seed2">`D2 XY Seed2`</a>
-  - 指定した個数の SEED のリストを出力する
-- <a href="node.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
-  - Checkpoint のリストを出力する
-- <a href="node.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
-  - Lora のリストを出力する
-- <a href="node.md#D2-XY-Model-List">`D2 XY Model List`</a>
-  - Checkpoint / Lora のリストを出力する
-- <a href="node.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
-  - フォルダ内ファイルのリストを出力する
-- <a href="node.md#D2-XY-Annotation">`D2 XY Annotation`</a>
-  - D2 Grid Image で表示する見出しテキストを作成
-- <a href="node.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
-  - 配列を D2 XY Plot 用リストに変換する
-- <a href="node.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
-  - 改行を含むテキストを `D2 XY Plot` 用リストに変換する
-
 ### Refiner
 - <a href="node.md#D2-Refiner-Steps">`D2 Refiner Steps`</a>
   - Refiner 用の steps を出力する
@@ -141,11 +74,79 @@ D2 Nodes ComfyUI
   - ModelMergeSDXL と CLIPMergeSimple を合体させたノード
 
 
+### Text
+
+- <a href="node_text.md#D2-Regex-Replace">`D2 Regex Replace`</a>
+  - 複数条件の指定が可能なテキスト置換ノード
+- <a href="node_text.md#D2-Regex-Switcher">`D2 Regex Switcher`</a>
+  - 入力テキストによって出力テキストを切り替えるノード
+  - 文字列結合も行える
+- <a href="node_text.md#D2-Multi-Output">`D2 Multi Output`</a>
+  - SEED / STRING / INT / FLOAT をリスト出力する
+- <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
+  - 配列を文字列に変換する
+- <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
+  - ファイルネームを作る
+
+### Image
+
+- <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
+  - 画像からプロンプトを取得できる Load Image
+  - StableDiffusion webui A1111、NovelAI で作成した画像にも対応
+  - マスクエディターを開くボタンが付いてる
+- <a href="node_image.md#D2-Load-Folder-Images">`D2 Load Folder Images`</a>
+  - フォルダ内の画像を全て読み込む
+- <a href="node_image.md#D2-Folder-Image-Queue">`D2 Folder Image Queue`</a>
+  - フォルダ内の画像パスを順次出力する
+  - 自動で画像枚数分のキューを実行する
+- <a href="node_image.md#D2-Grid-Image">`D2 Grid Image`</a>
+  - グリッド画像を生成
+- <a href="node_image.md#D2-Image-Stack">`D2 Image Stack`</a>
+  - 複数の画像をスタックして D2 Grid Image に渡すためのノード
+  - 画像を直接出力する
+- <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
+  - αチャンネル（透明度）付きの EmptyImage を出力
+
+
+### XY Plot
+
+- <a href="node_xy.md#D2-XY-Plot-Easy">`D2 XY Plot Easy`</a>
+  - D2 KSampler の項目に限定し、ワークフローをシンプルにした XY Plot ノード
+- <a href="node_xy.md#D2-XY-Plot">`D2 XY Plot`</a>
+  - 汎用的な XY Plot ノード
+  - 必要な回数の Queue を自動的に実行する
+- <a href="node_xy.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
+  - グリッド画像を生成するノード
+- <a href="node_xy.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
+  - テキストを検索・置換してリストで返す。D2 XY Plotの前に置くタイプ
+- <a href="node_xy.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
+  - テキストを検索・置換してリストで返す。D2 XY Plotの後に置くタイプ
+- <a href="node_xy.md#D2-XY-Seed">`D2 XY Seed`</a>
+  - SEED のリストを出力する
+- <a href="node_xy.md#D2-XY-Seed2">`D2 XY Seed2`</a>
+  - 指定した個数の SEED のリストを出力する
+- <a href="node_xy.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
+  - Checkpoint のリストを出力する
+- <a href="node_xy.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
+  - Lora のリストを出力する
+- <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
+  - Checkpoint / Lora のリストを出力する
+- <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
+  - フォルダ内ファイルのリストを出力する
+- <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
+  - D2 Grid Image で表示する見出しテキストを作成
+- <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
+  - 配列を D2 XY Plot 用リストに変換する
+- <a href="node_xy.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
+  - 改行を含むテキストを `D2 XY Plot` 用リストに変換する
+
+
+
 ### Float Palet
 
-- <a href="node.md#D2-Queue-Button">`D2 Queue Button`</a>
+- <a href="node_float.md#D2-Queue-Button">`D2 Queue Button`</a>
   - 指定した枚数（Batch count）を生成するボタン
-- <a href="node.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
+- <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
   - NovelAI と StableDiffusion の weight を相互変換するダイアログ
 
 

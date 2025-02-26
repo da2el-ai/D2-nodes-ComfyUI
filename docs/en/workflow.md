@@ -5,7 +5,7 @@
 <a href="../en/index.md">English</a> | <a href="../ja/index.md">日本語</a> | <a href="../zh/index.md">繁体中文</a>
 
 - <a href="index.md">Top</a>
-- <a href="node.md">Node</a>
+- <a href="node.md">Node</a> / <a href="node_image.md">Image Node</a> / <a href="node_text.md">Text Node</a> / <a href="node_xy.md">XYPlot Node</a> / <a href="node_float.md">Float Palet</a>
 - <a href="workflow.md">Workflow</a>
 
 
