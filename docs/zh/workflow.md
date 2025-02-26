@@ -44,6 +44,11 @@
 
 - 使用 D2 XY Plot Easy 的簡單 XY Plot
 
+## :card_index_dividers: XY Plot: Lora
+
+<a href="../../workflow/xy_easy_lora_20250227.png"><img src="../../workflow/xy_easy_lora_20250227.png"></a>
+
+- Lora 的測試
 
 ## :card_index_dividers: Checkpoint Test
 

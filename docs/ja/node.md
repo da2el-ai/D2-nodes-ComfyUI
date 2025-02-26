@@ -109,6 +109,59 @@ Node
   - `D2 KSampler` または `D2 Controlnet Loader` 接続用
 
 
+
+---
+
+
+### D2 Load Lora
+
+<figure>
+<img src="../img/loadlora.png">
+</figure>
+
+- テキストでLoraを指定できるLoraローダー
+- model_weight / clip_weight も指定可能
+
+#### Format
+
+**例：lora:foo / model_weight:1 / clip_weight:1**
+model_weight が指定されていない場合は「1」が適用される
+```
+foo
+```
+**例：lora:foo / model_weight:0.5 / clip_weight:0.5**
+clip_weight が指定されていない場合は model_weight と同じ値が適用される
+```
+foo:1
+```
+**例：lora:foo / model_weight:2 / clip_weight:1**
+```
+foo:2:1
+```
+**例：2種類のLoraを使う(1)**
+改行で区切る
+```
+foo:0.5
+bar
+```
+**例：2種類のLoraを使う(2)**
+1行に2種類記述するときは「,」で区切る
+```
+foo:0.5,bar
+```
+
+(2)の記法は D2 XYPlot Easy などでLoraを検証したい時に役に立つ記法です。
+<a href="workflow.md">サンプルワークフロー</a>を参照してください。
+
+**例：コメントアウト**
+「//」または「#」で開始する行は無視されます。
+```
+//foo:0.5
+#bar
+```
+
+
+
 ---
 
 ## :tomato: Image Node

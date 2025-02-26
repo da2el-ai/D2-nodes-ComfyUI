@@ -103,6 +103,59 @@
 - `cnet_stack`
   - 用於連接 `D2 KSampler` 或 `D2 Controlnet Loader`
 
+
+
+
+---
+
+
+### D2 Load Lora
+
+<figure>
+<img src="../img/loadlora.png">
+</figure>
+
+- 可通過文本指定 Lora 的加載器
+- 也可指定 model_weight / clip_weight
+
+#### 格式
+
+**例：lora:foo / model_weight:1 / clip_weight:1**
+若未指定 model_weight，則應用「1」
+```
+foo
+```
+**例：lora:foo / model_weight:0.5 / clip_weight:0.5**
+若未指定 clip_weight，則應用與 model_weight 相同的值
+```
+foo:1
+```
+**例：lora:foo / model_weight:2 / clip_weight:1**
+```
+foo:2:1
+```
+**例：使用兩種 Lora (1)**
+以換行分隔
+```
+foo:0.5
+bar
+```
+**例：使用兩種 Lora (2)**
+在一行中寫入兩種類型時，以「,」分隔
+```
+foo:0.5,bar
+```
+
+格式 (2) 在您想要使用 D2 XYPlot Easy 等驗證 Lora 時很有用。
+請參考<a href="workflow.md">示例工作流程</a>。
+
+**例：註釋**
+以「//」或「#」開頭的行將被忽略。
+```
+//foo:0.5
+#bar
+```
+
 ---
 
 ## :tomato: Image Node

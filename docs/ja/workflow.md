@@ -48,6 +48,12 @@ Workflow
 
 - D2 XY Plot Easy を使ったシンプルな XY Plot
 
+## :card_index_dividers: XY Plot: Lora
+
+<a href="../../workflow/xy_easy_lora_20250227.png"><img src="../../workflow/xy_easy_lora_20250227.png"></a>
+
+- Lora のテスト
+
 
 ## :card_index_dividers: Checkpoint Test 
 

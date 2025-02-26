@@ -100,6 +100,57 @@
 - `cnet_stack`
   - For connecting to `D2 KSampler` or `D2 Controlnet Loader`
 
+
+---
+
+
+### D2 Load Lora
+
+<figure>
+<img src="../img/loadlora.png">
+</figure>
+
+- Lora loader that can specify Lora with text
+- model_weight / clip_weight can also be specified
+
+#### Format
+
+**Example: lora:foo / model_weight:1 / clip_weight:1**
+If model_weight is not specified, "1" is applied
+```
+foo
+```
+**Example: lora:foo / model_weight:0.5 / clip_weight:0.5**
+If clip_weight is not specified, the same value as model_weight is applied
+```
+foo:1
+```
+**Example: lora:foo / model_weight:2 / clip_weight:1**
+```
+foo:2:1
+```
+**Example: Using 2 types of Lora (1)**
+Separate with a line break
+```
+foo:0.5
+bar
+```
+**Example: Using 2 types of Lora (2)**
+When writing 2 types in one line, separate with ","
+```
+foo:0.5,bar
+```
+
+Notation (2) is useful when you want to verify Lora with D2 XYPlot Easy, etc.
+Please refer to the <a href="workflow.md">sample workflow</a>.
+
+**Example: Comment out**
+Lines starting with "//" or "#" will be ignored.
+```
+//foo:0.5
+#bar
+```
+
 ---
 
 ## :tomato: Image Node

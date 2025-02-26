@@ -58,6 +58,8 @@ D2 Nodes ComfyUI
   - モデルファイルのフルパスを出力する Checkpoint Loader
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - D2 KSampler に接続してシンプルなワークフローが作れる Controlnet Loader
+- <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
+  - テキストで指定するLoraローダー
 
 ### Image
 
@@ -150,6 +152,11 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.02.27**
+
+- `D2 Load Lora`: 新規追加
+- `D2 Multi Output`: x_list/ylist 出力を追加
 
 **2025.02.23**
 

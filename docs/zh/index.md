@@ -56,6 +56,9 @@
   - 輸出模型文件完整路徑的 Checkpoint Loader
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - 連接到 `D2 KSampler` 可建立簡單工作流程的 Controlnet Loader
+- <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
+  - 可通過文本指定的 Lora 加載器
+
 
 ### 圖像
 
@@ -147,6 +150,11 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.02.27**
+
+- `D2 Load Lora`: 新增
+- `D2 Multi Output`: 新增 x_list/ylist 輸出
 
 **2025.02.23**
 

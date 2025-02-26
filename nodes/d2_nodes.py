@@ -1,26 +1,22 @@
 from typing import Optional
 import torch
-import math
 import os
 import json
-import hashlib
 import re
 import random
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
-import math
 from aiohttp import web
 from torchvision import transforms
 
 import folder_paths
 import comfy.sd
-import node_helpers
 import comfy.samplers
 from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
 
 from comfy_execution.graph_utils import GraphBuilder
 from comfy_execution.graph import ExecutionBlocker
-from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced
+from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced, LoraLoader
 from server import PromptServer
 from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
@@ -488,6 +484,8 @@ class D2_CheckpointLoader:
         return (model, clip, vae, ckpt_name, hash, ckpt_path, sampling,)
 
 
+
+
 """
 
 D2 Controlnet Loader
@@ -526,6 +524,82 @@ class D2_ControlnetLoader:
             cnet_stack = [d2_cnet]
         
         return (cnet_stack,)
+
+
+
+"""
+
+D2 Load Lora
+Loraの指定をテキストで行うノード
+
+"""
+class D2_LoadLora:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "model": ("MODEL",),
+                "clip": ("CLIP",),
+                "lora_text": ("STRING", {"multiline": True}),
+            },
+        }
+
+    RETURN_TYPES = ("MODEL", "CLIP",)
+    FUNCTION = "apply_lora"
+    CATEGORY = "D2"
+
+    ######
+    def apply_lora(self, model, clip, lora_text):
+
+        # 入力文字列を改行で分割
+        params = lora_text.strip().split('\n')
+
+        # 処理対象のパラメータリスト
+        processed_params = []
+
+        # 文字列を検索して置換
+        for lora_param in params:
+            # lora_params は下記のフォーマットのテキスト
+            # {lora_name}:{strength_model}:{strength_clip},{lora_name}:{strength_model}:{strength_clip}
+            # strength_clip が存在しない場合は strength_model と同じ値が適用される
+            # strength_model が存在しない場合は strength_model / strength_clip 両方に「1」が適用される
+            # 先頭が「#」または「//」で始まるものはコメントとして無視する
+            
+            # コメント行をスキップ
+            if lora_param.startswith('#') or lora_param.startswith('//') or not lora_param.strip():
+                continue
+
+            # カンマで分割して処理対象リストに追加
+            sub_params = lora_param.split(',')
+            for sub_param in sub_params:
+                if sub_param.strip():  # 空でない場合のみ追加
+                    processed_params.append(sub_param.strip())
+
+        # 処理対象パラメータをそれぞれ適用
+        for lora_param in processed_params:
+
+            # パラメータを分割
+            parts = lora_param.split(':')
+            lora_name = parts[0].strip()
+            
+            # strength_model と strength_clip の設定
+            if len(parts) > 1:
+                strength_model = float(parts[1].strip())
+            else:
+                strength_model = 1.0
+                
+            if len(parts) > 2:
+                strength_clip = float(parts[2].strip())
+            else:
+                strength_clip = strength_model
+                
+            # LoraLoader を使用して lora を適用
+            lora_loader = LoraLoader()
+            model, clip = lora_loader.load_lora(model, clip, lora_name, strength_model, strength_clip)
+
+        return (model, clip,)
+
 
 
 """
@@ -1157,6 +1231,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
     "D2 Controlnet Loader": D2_ControlnetLoader,
+    "D2 Load Lora": D2_LoadLora,
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Regex Replace": D2_RegexReplace,
     "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
@@ -1168,5 +1243,3 @@ NODE_CLASS_MAPPINGS = {
     "D2 Filename Template": D2_FilenameTemplate,
     "D2 Pipe": D2_Pipe,
 }
-
-

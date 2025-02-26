@@ -44,6 +44,13 @@ Drop images into ComfyUI to recreate workflows.
 
 - Simple XY Plot using D2 XY Plot Easy
 
+## :card_index_dividers: XY Plot: Lora
+
+<a href="../../workflow/xy_easy_lora_20250227.png"><img src="../../workflow/xy_easy_lora_20250227.png"></a>
+
+- Lora test
+
+
 
 ## :card_index_dividers: Checkpoint Test
 

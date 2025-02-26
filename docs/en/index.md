@@ -55,6 +55,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Checkpoint Loader that outputs full model file paths
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - Controlnet Loader that creates simple workflows when connected to D2 KSampler
+- <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
+  - Lora loader that can be specified with text
 
 ### Image
 
@@ -146,6 +148,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.02.27**
+
+- `D2 Load Lora`: Newly added
+- `D2 Multi Output`: Added x_list/ylist output
 
 **2025.02.23**
 
