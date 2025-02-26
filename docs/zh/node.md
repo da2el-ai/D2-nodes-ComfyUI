@@ -113,10 +113,13 @@
 
 <figure>
 <img src="../img/loadlora.png">
+<img src="../img/loadlora_modellist.png">
 </figure>
 
 - 可通過文本指定 Lora 的加載器
 - 也可指定 model_weight / clip_weight
+- 沒有獲取Lora檔案名稱的功能，所以請使用`D2 XY Model List`來獲取並複製貼上
+
 
 #### 格式
 

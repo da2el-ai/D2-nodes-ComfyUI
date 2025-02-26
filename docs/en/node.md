@@ -108,10 +108,12 @@
 
 <figure>
 <img src="../img/loadlora.png">
+<img src="../img/loadlora_modellist.png">
 </figure>
 
 - Lora loader that can specify Lora with text
 - model_weight / clip_weight can also be specified
+- There is no function to retrieve Lora filenames, so please use `D2 XY Model List` to obtain them and copy & paste
 
 #### Format
 

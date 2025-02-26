@@ -117,10 +117,12 @@ Node
 
 <figure>
 <img src="../img/loadlora.png">
+<img src="../img/loadlora_modellist.png">
 </figure>
 
 - テキストでLoraを指定できるLoraローダー
 - model_weight / clip_weight も指定可能
+- Loraのファイル名を取得する機能は無いので、`D2 XY Model List` で取得してコピー＆ペーストをしてください
 
 #### Format
 
