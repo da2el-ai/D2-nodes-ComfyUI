@@ -782,8 +782,8 @@ class D2_MultiOutput:
             }
         }
 
-    RETURN_TYPES = ("LIST",)
-    RETURN_NAMES = ("LIST",)
+    RETURN_TYPES = ("LIST", "STRING",)
+    RETURN_NAMES = ("LIST", "x / y_list",)
     FUNCTION = "output_list"
     CATEGORY = "D2"
 
@@ -806,7 +806,7 @@ class D2_MultiOutput:
             else:
                 output_list.append(option)
 
-        return (output_list,)
+        return (output_list, parameter,)
 
 
 
