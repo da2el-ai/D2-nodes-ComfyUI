@@ -74,7 +74,7 @@ D2 Nodes ComfyUI
   - ModelMergeSDXL と CLIPMergeSimple を合体させたノード
 
 
-### Text
+### Textn
 
 - <a href="node_text.md#D2-Regex-Replace">`D2 Regex Replace`</a>
   - 複数条件の指定が可能なテキスト置換ノード
@@ -87,6 +87,8 @@ D2 Nodes ComfyUI
   - 配列を文字列に変換する
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - ファイルネームを作る
+- <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
+  - テキストのコメントを削除する
 
 ### Image
 
@@ -153,6 +155,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.03.23**
+
+- `D2 Delete Comment`: 新規追加
 
 **2025.02.27**
 

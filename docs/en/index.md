@@ -85,6 +85,10 @@ If you have installed any of the following custom nodes previously, please remov
   - Converts arrays to strings
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - Creates filenames
+- <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
+  - Delete comments from text
+
+
 
 ### Image
 
@@ -149,6 +153,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.03.23**
+
+- `D2 Delete Comment`: Newly added
 
 **2025.02.27**
 

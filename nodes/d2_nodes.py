@@ -1146,6 +1146,64 @@ class D2_FilenameTemplate:
 
 """
 
+D2 Delete Comment
+
+"""
+class D2_DeleteComment:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text": ("STRING", {"default": "","multiline": True}),
+                "type": (["# only","// only","/* */ only","# + // + /**/",],),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("STRING",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, text, type):
+        """
+        text のコメント行を消す
+        type: "# only" なら行頭が「#」の行を消す
+        type: "// only" なら行頭が「//」の行を消す
+        type: "/* */ only" なら「/* 〜 */」を消す。これは複数行にも対応する
+        type: "# + // + /**/" なら上記3つを全て実行する
+        """
+        
+        result_text = text
+        print("///// type", type)
+        
+        if type == "# only" or type == "# + // + /**/":
+            print("type #")
+            # 行頭が # のコメント行を削除（行頭の空白は考慮しない）
+            result_text = re.sub(r'^#.*$', '', result_text, flags=re.MULTILINE)
+        
+        if type == "// only" or type == "# + // + /**/":
+            print("type //")
+            # 行頭が // のコメント行を削除（行頭の空白は考慮しない）
+            result_text = re.sub(r'^//.*$', '', result_text, flags=re.MULTILINE)
+        
+        if type == "/* */ only" or type == "# + // + /**/":
+            print("type /**/")
+            # /* */ コメントを削除（複数行対応）
+            result_text = re.sub(r'/\*.*?\*/', '', result_text, flags=re.DOTALL)
+        
+        # # 空行が連続する場合、1つの空行にまとめる
+        # result_text = re.sub(r'\n\s*\n+', '\n\n', result_text)
+        
+        # # 先頭と末尾の余分な改行を削除
+        # result_text = result_text.strip()
+
+        return {
+            "result": (result_text,),
+        }
+
+
+"""
+
 D2 D2 Pipe
 
 """
@@ -1241,5 +1299,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Load Folder Images": D2_LoadFolderImages,
     "D2 List To String": D2_ListToString,
     "D2 Filename Template": D2_FilenameTemplate,
+    "D2 Delete Comment": D2_DeleteComment,
     "D2 Pipe": D2_Pipe,
 }

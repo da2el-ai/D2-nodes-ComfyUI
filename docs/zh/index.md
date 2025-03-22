@@ -87,6 +87,8 @@
   - 將陣列轉換為字串
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - 生成文件名稱
+- <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
+  - 刪除文本中的註釋
 
 
 
@@ -152,6 +154,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.03.23**
+
+- `D2 Delete Comment`: 新增功能
 
 **2025.02.27**
 

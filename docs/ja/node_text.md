@@ -210,3 +210,16 @@ Output text
 👇
 20241219-021926_obsessionIllustrious_v31
 ```
+
+---
+
+### D2 Delete Comment
+
+<figure>
+  <img src="../img/delete_comment.png">
+</figure>
+
+- テキスト内のコメントを削除する
+- 行頭「#」、行頭「//」、「/\*」〜「\*/」の間が対象
+
+

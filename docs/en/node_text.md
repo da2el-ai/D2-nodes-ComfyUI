@@ -173,3 +173,17 @@ Output text
 👇
 20241219-021926_obsessionIllustrious_v31
 ```
+
+
+
+---
+
+### D2 Delete Comment
+
+<figure>
+  <img src="../img/delete_comment.png">
+</figure>
+
+- Deletes comments from text
+- Targets line-beginning "#", line-beginning "//", and anything between "/\*" and "\*/"
+

@@ -201,3 +201,15 @@ Output text
 20241219-021926_obsessionIllustrious_v31
 ```
 
+
+---
+
+### D2 Delete Comment
+
+<figure>
+  <img src="../img/delete_comment.png">
+</figure>
+
+- 刪除文本中的註釋
+- 目標為行首「#」、行首「//」以及「/\*」到「\*/」之間的內容
+
