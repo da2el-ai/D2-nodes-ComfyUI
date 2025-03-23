@@ -542,41 +542,29 @@ class D2_LoadLora:
                 "model": ("MODEL",),
                 "clip": ("CLIP",),
                 "lora_text": ("STRING", {"multiline": True}),
+                "mode": (["a1111", "simple"],),
+                "insert_lora": (["CHOOSE"] + folder_paths.get_filename_list("loras"),)
             },
         }
 
-    RETURN_TYPES = ("MODEL", "CLIP",)
+    RETURN_TYPES = ("MODEL", "CLIP", "STRING",)
     FUNCTION = "apply_lora"
     CATEGORY = "D2"
 
     ######
-    def apply_lora(self, model, clip, lora_text):
-
-        # 入力文字列を改行で分割
-        params = lora_text.strip().split('\n')
+    def apply_lora(self, model, clip, lora_text, mode, insert_lora):
 
         # 処理対象のパラメータリスト
-        processed_params = []
-
-        # 文字列を検索して置換
-        for lora_param in params:
-            # lora_params は下記のフォーマットのテキスト
-            # {lora_name}:{strength_model}:{strength_clip},{lora_name}:{strength_model}:{strength_clip}
-            # strength_clip が存在しない場合は strength_model と同じ値が適用される
-            # strength_model が存在しない場合は strength_model / strength_clip 両方に「1」が適用される
-            # 先頭が「#」または「//」で始まるものはコメントとして無視する
-            
-            # コメント行をスキップ
-            if lora_param.startswith('#') or lora_param.startswith('//') or not lora_param.strip():
-                continue
-
-            # カンマで分割して処理対象リストに追加
-            sub_params = lora_param.split(',')
-            for sub_param in sub_params:
-                if sub_param.strip():  # 空でない場合のみ追加
-                    processed_params.append(sub_param.strip())
+        if mode == "simple":
+            processed_params = self.__class__.get_params_simple(lora_text)
+        else:
+            processed_params, lora_text = self.__class__.get_params_a1111(lora_text)
 
         # 処理対象パラメータをそれぞれ適用
+        """
+        strength_clip が存在しない場合は strength_model と同じ値が適用される
+        strength_model が存在しない場合は strength_model / strength_clip 両方に「1」が適用される
+        """
         for lora_param in processed_params:
 
             # パラメータを分割
@@ -598,7 +586,72 @@ class D2_LoadLora:
             lora_loader = LoraLoader()
             model, clip = lora_loader.load_lora(model, clip, lora_name, strength_model, strength_clip)
 
-        return (model, clip,)
+        return (model, clip, lora_text,)
+
+    # シンプルモード
+    """
+    LoRAパラメーターを返す
+    lora_text は下記のフォーマットのテキスト
+    -----------
+    {lora_name}:{strength_model}:{strength_clip}
+    {lora_name}:{strength_model}:{strength_clip},{lora_name}:{strength_model}:{strength_clip}
+    -----------
+    先頭が「#」または「//」で始まるものはコメントとして無視する
+    """
+    @classmethod
+    def get_params_simple(cls, lora_text):
+        processed_params = []
+
+        # 入力文字列を改行で分割
+        params = lora_text.strip().split('\n')
+
+        # 文字列を検索して置換
+        for lora_param in params:
+            
+            # コメント行をスキップ
+            if lora_param.startswith('#') or lora_param.startswith('//') or not lora_param.strip():
+                continue
+
+            # カンマで分割して処理対象リストに追加
+            sub_params = lora_param.split(',')
+            for sub_param in sub_params:
+                if sub_param.strip():  # 空でない場合のみ追加
+                    processed_params.append(sub_param.strip())
+
+        return processed_params
+
+    # A1111モード
+    """
+    LoRAパラメーターを返す
+    lora_text は下記のフォーマットのテキスト
+    A1111のようにプロンプトの中に <〜> でLoRAパラメータが記載されている
+    -----------
+    promptA, promptB, promptC,
+    <lora:{lora_name}>, promptX,
+    <lora:{lora_name}:{strength_model}>
+    <lora:{lora_name}:{strength_model}:{strength_clip}>
+    promptY,
+    -----------
+    """
+    @classmethod
+    def get_params_a1111(cls, lora_text):
+        processed_params = []
+
+        # <> で囲まれたLoRAパラメータを検索
+        pattern = r'<lora:([^>]+)>'
+        matches = re.findall(pattern, lora_text, re.IGNORECASE)
+        
+        # マッチした各パラメータを処理
+        for match in matches:
+            print(match)
+            # 空白を削除して processed_params に追加
+            processed_params.append(match.strip())
+        
+        # lora_text から <match> を削除
+        cleaned_text = re.sub(pattern, '', lora_text, flags=re.IGNORECASE)
+        print(cleaned_text)
+
+        return processed_params, cleaned_text
 
 
 
