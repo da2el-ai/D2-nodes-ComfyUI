@@ -107,51 +107,79 @@
 ### D2 Load Lora
 
 <figure>
-<img src="../img/loadlora.png">
-<img src="../img/loadlora_modellist.png">
+<img src="../img/loadlora.png?2">
 </figure>
 
-- Lora loader that can specify Lora with text
+- A Lora loader that allows specifying Lora through text
 - model_weight / clip_weight can also be specified
-- There is no function to retrieve Lora filenames, so please use `D2 XY Model List` to obtain them and copy & paste
 
-#### Format
+<figure>
+<img src="../img/loadlora_a1111.png">
+</figure>
 
-**Example: lora:foo / model_weight:1 / clip_weight:1**
-If model_weight is not specified, "1" is applied
+- There are two modes: one that uses the same format as StableDiffusion webui A1111 (a1111), and one that simply lists LoRA names (simple)
+- For specific usage, refer to the <a href="workflow.md">sample workflow</a>
+
+
+#### Input
+
+- `mode`
+  - `a1111`: Mode that allows using the same format as StableDiffusion webui A1111
+  - `simple`: Simple mode that just lists LoRA names. In this mode, the `STRING` output is not used
+
+
+#### Format differences based on mode
+
+**mode: a1111**
+Expressed as `<lora:~>`.
+
+```
+<lora:lora_name:1>
+```
+
+**mode: simple**
+No decorations needed before or after
+```
+lora_name:1
+```
+
+#### How to specify Weight
+Write in the format `{lora_name}:{model_weight}:{clip_weight}`.
+```
+foo:0.8:1
+```
+If clip_weight is not specified, the same value as model_weight is applied.
+The following have the same meaning.
+```
+foo:0.8
+foo:0.8:0.8
+```
+If weight is not specified, "1" is applied
+The following have the same meaning.
 ```
 foo
+foo:1:1
 ```
-**Example: lora:foo / model_weight:0.5 / clip_weight:0.5**
-If clip_weight is not specified, the same value as model_weight is applied
-```
-foo:1
-```
-**Example: lora:foo / model_weight:2 / clip_weight:1**
-```
-foo:2:1
-```
-**Example: Using 2 types of Lora (1)**
-Separate with a line break
+
+#### How to specify multiple LoRAs in simple mode
+
+Separate with line breaks
 ```
 foo:0.5
 bar
 ```
-**Example: Using 2 types of Lora (2)**
-When writing 2 types in one line, separate with ","
+When writing two types in one line, separate with ","
 ```
 foo:0.5,bar
 ```
 
-Notation (2) is useful when you want to verify Lora with D2 XYPlot Easy, etc.
-Please refer to the <a href="workflow.md">sample workflow</a>.
-
-**Example: Comment out**
-Lines starting with "//" or "#" will be ignored.
+#### Comments
+Lines that start with "//" or "#" are ignored.
 ```
 //foo:0.5
 #bar
 ```
+
 
 ---
 

@@ -104,62 +104,89 @@
   - 用於連接 `D2 KSampler` 或 `D2 Controlnet Loader`
 
 
-
-
 ---
 
 
 ### D2 Load Lora
 
 <figure>
-<img src="../img/loadlora.png">
-<img src="../img/loadlora_modellist.png">
+<img src="../img/loadlora.png?2">
 </figure>
 
-- 可通過文本指定 Lora 的加載器
-- 也可指定 model_weight / clip_weight
-- 沒有獲取Lora檔案名稱的功能，所以請使用`D2 XY Model List`來獲取並複製貼上
+- 可以通過文本指定Lora的Lora加載器
+- 也可以指定model_weight / clip_weight
+
+<figure>
+<img src="../img/loadlora_a1111.png">
+</figure>
+
+- 有兩種模式：使用與StableDiffusion webui A1111相同格式的模式（a1111）和僅列出LoRA名稱的模式（simple）
+- 具體使用方法請參考<a href="workflow.md">範例工作流程</a>
 
 
-#### 格式
+#### 輸入
 
-**例：lora:foo / model_weight:1 / clip_weight:1**
-若未指定 model_weight，則應用「1」
+- `mode`
+  - `a1111`: 可以使用與StableDiffusion webui A1111相同格式的模式
+  - `simple`: 僅列出LoRA名稱的簡單模式。在此模式下，不使用輸出中的`STRING`
+
+
+#### 不同模式下的格式差異
+
+**mode: a1111**
+表示為`<lora:~>`。
+
+```
+<lora:lora_name:1>
+```
+
+**mode: simple**
+前後不需要裝飾
+```
+lora_name:1
+```
+
+#### 如何指定Weight
+按照`{lora_name}:{model_weight}:{clip_weight}`的格式書寫。
+```
+foo:0.8:1
+```
+如果未指定clip_weight，則應用與model_weight相同的值。
+以下具有相同含義。
+```
+foo:0.8
+foo:0.8:0.8
+```
+如果未指定weight，則應用"1"
+以下具有相同含義。
 ```
 foo
+foo:1:1
 ```
-**例：lora:foo / model_weight:0.5 / clip_weight:0.5**
-若未指定 clip_weight，則應用與 model_weight 相同的值
-```
-foo:1
-```
-**例：lora:foo / model_weight:2 / clip_weight:1**
-```
-foo:2:1
-```
-**例：使用兩種 Lora (1)**
-以換行分隔
+
+#### 如何在simple模式下指定多個LoRA
+
+用換行分隔
 ```
 foo:0.5
 bar
 ```
-**例：使用兩種 Lora (2)**
-在一行中寫入兩種類型時，以「,」分隔
+當在一行中寫入兩種類型時，用","分隔
 ```
 foo:0.5,bar
 ```
 
-格式 (2) 在您想要使用 D2 XYPlot Easy 等驗證 Lora 時很有用。
-請參考<a href="workflow.md">示例工作流程</a>。
-
-**例：註釋**
-以「//」或「#」開頭的行將被忽略。
+#### 註釋
+以"//"或"#"開頭的行將被忽略。
 ```
 //foo:0.5
 #bar
 ```
 
+
 ---
+
+
 
 ## :tomato: Size Node
 

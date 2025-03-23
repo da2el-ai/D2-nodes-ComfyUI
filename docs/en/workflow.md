@@ -22,6 +22,13 @@ Drop images into ComfyUI to recreate workflows.
 - Simple txt2img without using Lora or Controlnet.
 
 
+## :card_index_dividers: txt2img with LoRA
+
+<a href="../../workflow/lora_t2i_20250323.png"><img src="../../workflow/lora_t2i_20250323.png"></a>
+
+- txt2img that uses Lora with the same format as StableDiffusion webui A1111.
+
+
 ## :card_index_dividers: txt2img + Hires fix
 
 <a href="../../workflow/hiresfix_20241218.png"><img src="../../workflow/hiresfix_20241218.png"></a>

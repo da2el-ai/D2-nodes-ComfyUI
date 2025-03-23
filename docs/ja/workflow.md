@@ -24,6 +24,14 @@ Workflow
 - Lora も Controlnet も使わないシンプルな txt2img。
 
 
+## :card_index_dividers: LoRA を使用した txt2img
+
+<a href="../../workflow/lora_t2i_20250323.png"><img src="../../workflow/lora_t2i_20250323.png"></a>
+
+- StableDiffusion webui A1111 と同じ書式で Lora を利用する txt2img。
+
+
+
 ## :card_index_dividers: txt2img + Hires fix
 
 <a href="../../workflow/hiresfix_20241218.png"><img src="../../workflow/hiresfix_20241218.png"></a>
@@ -50,7 +58,7 @@ Workflow
 
 ## :card_index_dividers: XY Plot: Lora
 
-<a href="../../workflow/xy_easy_lora_20250227.png"><img src="../../workflow/xy_easy_lora_20250227.png"></a>
+<a href="../../workflow/xy_easy_lora_20250323.png"><img src="../../workflow/xy_easy_lora_20250323.png"></a>
 
 - Lora のテスト
 

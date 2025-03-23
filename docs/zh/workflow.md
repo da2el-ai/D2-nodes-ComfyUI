@@ -20,6 +20,11 @@
 
 - 不使用 Lora 或 Controlnet 的簡單 txt2img。
 
+## :card_index_dividers: 使用LoRA的txt2img
+
+<a href="../../workflow/lora_t2i_20250323.png"><img src="../../workflow/lora_t2i_20250323.png"></a>
+
+- 使用與StableDiffusion webui A1111相同格式的Lora的txt2img。
 
 ## :card_index_dividers: txt2img + Hires fix
 

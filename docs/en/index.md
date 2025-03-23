@@ -157,6 +157,9 @@ If you have installed any of the following custom nodes previously, please remov
 **2025.03.23**
 
 - `D2 Delete Comment`: Newly added
+- `D2 Load Lora`: Added option to enable the use of A1111 format
+- `D2 Model List`: Added option to retrieve in A1111 format
+
 
 **2025.02.27**
 

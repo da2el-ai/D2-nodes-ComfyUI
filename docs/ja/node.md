@@ -116,46 +116,73 @@ Node
 ### D2 Load Lora
 
 <figure>
-<img src="../img/loadlora.png">
-<img src="../img/loadlora_modellist.png">
+<img src="../img/loadlora.png?2">
 </figure>
 
 - テキストでLoraを指定できるLoraローダー
 - model_weight / clip_weight も指定可能
-- Loraのファイル名を取得する機能は無いので、`D2 XY Model List` で取得してコピー＆ペーストをしてください
 
-#### Format
+<figure>
+<img src="../img/loadlora_a1111.png">
+</figure>
 
-**例：lora:foo / model_weight:1 / clip_weight:1**
-model_weight が指定されていない場合は「1」が適用される
+- StableDiffusion webui A1111 と同じ書式を使うモード（a1111）と、LoRA名を並べるだけのモード（simple）がある
+- 具体的な使い方は<a href="workflow.md">サンプルワークフロー</a>を参照
+
+
+#### Input
+
+- `mode`
+  - `a1111`: StableDiffusion webui A1111と同じ書式が使用可能なモード
+  - `simple`: LoRA名を並べるだけのシンプルなモード。このモードでは output の `STRING` は使わない
+
+
+#### モードによる書式の違い
+
+**mode: a1111**
+`<lora:〜>` と表記する。
+
+```
+<lora:lora_name:1>
+```
+
+**mode: simple**
+前後の装飾は不要
+```
+lora_name:1
+```
+
+#### Weight指定方法
+`{lora_name}:{model_weight}:{clip_weight}` という書式で記述する。
+```
+foo:0.8:1
+```
+clip_weight が指定されていない場合は model_weight と同じ値が適用される。
+下記は同じ意味になる。
+```
+foo:0.8
+foo:0.8:0.8
+```
+weight が指定されていない場合は「1」が適用される
+下記は同じ意味になる。
 ```
 foo
+foo:1:1
 ```
-**例：lora:foo / model_weight:0.5 / clip_weight:0.5**
-clip_weight が指定されていない場合は model_weight と同じ値が適用される
-```
-foo:1
-```
-**例：lora:foo / model_weight:2 / clip_weight:1**
-```
-foo:2:1
-```
-**例：2種類のLoraを使う(1)**
+
+#### simpleモードで複数のLoRAを指定する方法
+
 改行で区切る
 ```
 foo:0.5
 bar
 ```
-**例：2種類のLoraを使う(2)**
 1行に2種類記述するときは「,」で区切る
 ```
 foo:0.5,bar
 ```
 
-(2)の記法は D2 XYPlot Easy などでLoraを検証したい時に役に立つ記法です。
-<a href="workflow.md">サンプルワークフロー</a>を参照してください。
-
-**例：コメントアウト**
+#### コメントアウト
 「//」または「#」で開始する行は無視されます。
 ```
 //foo:0.5
