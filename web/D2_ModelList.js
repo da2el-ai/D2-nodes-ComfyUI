@@ -9,9 +9,9 @@ app.registerExtension({
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "D2 XY Model List") return;
 
-        const getModelFiles = (type, filter, sortBy, orderBy) => {
+        const getModelFiles = (type, filter, mode, sortBy, orderBy) => {
             return new Promise(async (resolve) => {
-                const url = `/D2/model-list/get-list?type=${type}&filter=${filter}&sort_by=${sortBy}&order_by=${orderBy}`;
+                const url = `/D2/model-list/get-list?type=${type}&filter=${filter}&mode=${mode}&sort_by=${sortBy}&order_by=${orderBy}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 resolve(data.files);
@@ -29,6 +29,7 @@ app.registerExtension({
             const btn = findWidgetByName(this, "get_list");
             const typeWidget = findWidgetByName(this, "model_type");
             const filterWidget = findWidgetByName(this, "filter");
+            const modeWidget = findWidgetByName(this, "mode");
             const sortByWidget = findWidgetByName(this, "sort_by");
             const orderByWidget = findWidgetByName(this, "order_by");
             const modelListWidget = findWidgetByName(this, "model_list");
@@ -37,6 +38,7 @@ app.registerExtension({
                 const modelList = await getModelFiles(
                     typeWidget.value, 
                     filterWidget.value,
+                    modeWidget.value,
                     sortByWidget.value,
                     orderByWidget.value
                 );

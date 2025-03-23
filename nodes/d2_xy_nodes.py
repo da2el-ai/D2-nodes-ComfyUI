@@ -536,6 +536,7 @@ class D2_XYModelList:
             "required": {
                 "model_type": (["checkpoints", "loras", "samplers", "schedulers"],),
                 "filter": ("STRING", {"default":""}),
+                "mode": (["simple", "a1111"],),
                 "sort_by": (["Name", "Date"], {"default":"Name"}),
                 "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
                 "get_list": ("D2_GET_MODEL_BTN", {}),
@@ -548,7 +549,7 @@ class D2_XYModelList:
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
-    def run(self, model_type, filter="", sort_by="Name", order_by="A-Z", get_list="", model_list=""):
+    def run(self, model_type, filter="", mode="simple", sort_by="Name", order_by="A-Z", get_list="", model_list=""):
         list_list = model_list.split("\n")
         return (model_list, list_list,)
 
@@ -564,6 +565,7 @@ async def route_d2_model_list_get_list(request):
     try:
         type = request.query.get('type')
         filter = request.query.get('filter')
+        mode = request.query.get('mode')
         sort_by = request.query.get('sort_by')
         order_by = request.query.get('order_by')
 
@@ -584,6 +586,11 @@ async def route_d2_model_list_get_list(request):
                 full_path = folder_paths.get_full_path(type, file)
                 # timestamp にファイルの日付を入れる
                 timestamp = datetime.fromtimestamp(os.path.getmtime(full_path))
+
+                # lora で mode:a1111 の時は <lora:〜:1> を前後に付ける
+                if type == "loras" and mode == "a1111":
+                    file = "<lora:" + file + ":1>"
+
                 model_list.append({
                     'file': file,
                     'timestamp': timestamp.isoformat(),
@@ -598,6 +605,7 @@ async def route_d2_model_list_get_list(request):
                 sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key].lower(), reverse=reverse)]
             else:
                 sorted_list = [item['file'] for item in sorted(model_list, key=lambda x: x[sort_key], reverse=reverse)]
+
 
 
     except:
