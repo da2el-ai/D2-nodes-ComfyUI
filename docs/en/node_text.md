@@ -187,3 +187,9 @@ Output text
 - Deletes comments from text
 - Targets line-beginning "#", line-beginning "//", and anything between "/\*" and "\*/"
 
+#### About the Comment Shortcut Key
+
+- Comment shortcut key (ctrl + /) is available in all text boxes
+- The shortcut key can be changed in `Settings > D2 > shortcutKey`
+- To disable it, delete the above content
+

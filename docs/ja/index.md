@@ -156,6 +156,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.03.25**
+
+- コメントアウトのショートカットキー（ctrl + /）を追加
+
 **2025.03.23**
 
 - `D2 Delete Comment`: 新規追加

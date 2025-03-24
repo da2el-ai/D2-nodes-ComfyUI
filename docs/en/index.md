@@ -154,6 +154,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.03.25**
+
+- Added comment shortcut key (ctrl + /)
+
 **2025.03.23**
 
 - `D2 Delete Comment`: Newly added
