@@ -157,6 +157,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2025.03.25**
 
 - Added comment shortcut key (ctrl + /)
+- `D2 XYPlot Easy Mini`: Added a version of `D2 XYPlot Easy` with limited output slots
 
 **2025.03.23**
 

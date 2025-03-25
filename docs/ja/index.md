@@ -159,6 +159,7 @@ D2 Nodes ComfyUI
 **2025.03.25**
 
 - コメントアウトのショートカットキー（ctrl + /）を追加
+- `D2 XYPlot Easy Mini`: `D2 XYPlot Easy` の出力スロット制限バージョンを追加
 
 **2025.03.23**
 
