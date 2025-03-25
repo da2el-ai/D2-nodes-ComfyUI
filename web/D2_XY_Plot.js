@@ -77,7 +77,7 @@ app.registerExtension({
   name: "Comfy.D2.D2_XY_Plot",
 
   async beforeRegisterNodeDef(nodeType, nodeData, app) {
-    if (nodeData.name !== "D2 XY Plot" && nodeData.name !== "D2 XY Plot Easy") return;
+    if (nodeData.name !== "D2 XY Plot" && nodeData.name !== "D2 XY Plot Easy" && nodeData.name !== "D2 XY Plot Easy Mini") return;
 
     const origOnNodeCreated = nodeType.prototype.onNodeCreated;
     nodeType.prototype.onNodeCreated = function () {

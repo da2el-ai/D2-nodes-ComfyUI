@@ -200,6 +200,12 @@ class D2_XYPlotEasy:
 
     def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0):
+        return self.run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, "full")
+
+
+    def run_xy(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, mode="full"):
         
         org_values = {
             "positive": positive,
@@ -263,8 +269,15 @@ class D2_XYPlotEasy:
             status = status
         )
 
-        return {
-            "result": (
+        if(mode == "mini"):
+            result = (
+                d2_pipe,
+                grid_pipe,
+                org_values["positive"], org_values["negative"], org_values["ckpt_name"], 
+                org_values["x_other"], org_values["y_other"], 
+            )
+        else:
+            result = (
                 d2_pipe,
                 grid_pipe,
                 org_values["positive"], org_values["negative"], org_values["ckpt_name"], 
@@ -272,7 +285,11 @@ class D2_XYPlotEasy:
                 org_values["sampler_name"], org_values["scheduler"], org_values["denoise"], 
                 org_values["x_other"], org_values["y_other"], 
                 self.x_annotation, self.y_annotation, status,index,
-            ),
+            )
+
+
+        return {
+            "result": result,
             "ui": {
                 "auto_queue": (auto_queue,),
                 "x_array": (self.x_annotation.values,),
@@ -303,6 +320,24 @@ class D2_XYPlotEasy:
     @classmethod
     def apply_promptsr(cls, prompt, search, replace):
         return prompt.replace(search, replace)
+
+
+
+"""
+
+D2 XY Plot Easy Mini
+
+"""
+class D2_XYPlotEasyMini(D2_XYPlotEasy):
+    RETURN_TYPES = (
+        "D2_TD2Pipe", "D2_TGridPipe", "STRING", "STRING", AnyType("*"), AnyType("*"), AnyType("*"),)
+    RETURN_NAMES = (
+        "d2_pipe", "grid_pipe", "positive", "negative", "ckpt_name", "x_other", "y_other",)
+
+    def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0):
+        return self.run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, "mini")
 
 
 """
@@ -886,6 +921,7 @@ class D2_XYFolderImages:
 NODE_CLASS_MAPPINGS = {
     "D2 XY Plot": D2_XYPlot,
     "D2 XY Plot Easy": D2_XYPlotEasy,
+    "D2 XY Plot Easy Mini": D2_XYPlotEasyMini,
     "D2 XY Grid Image": D2_XYGridImage,
     "D2 XY Checkpoint List": D2_XYCheckpointList,
     "D2 XY Lora List": D2_XYLoraList,
@@ -899,5 +935,3 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Seed2": D2_XYSeed2,
     "D2 XY Annotation": D2_XYAnnotation,
 }
-
-
