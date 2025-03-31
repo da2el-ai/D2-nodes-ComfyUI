@@ -8,6 +8,8 @@ from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 from aiohttp import web
 from torchvision import transforms
+import numpy as np
+from transformers import CLIPTokenizer
 
 import folder_paths
 import comfy.sd
@@ -940,6 +942,105 @@ class D2_MultiOutput:
 
 """
 
+D2 TokenCounter
+プロンプトのトークンを数える
+
+"""
+class D2_TokenCounter:
+    
+    def __init__(self):
+        self.tokenizer = None
+        self.loaded_tokenizer_name = None
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text": ("STRING", {"multiline": True}),
+                "clip_name": (["ViT-L/14", "ViT-B/32", "ViT-B/16"], {"default": "ViT-L/14"}),
+            }
+        }
+    
+    RETURN_TYPES = ("INT", "STRING")
+    RETURN_NAMES = ("token_count", "tokenized_result")
+    FUNCTION = "count_tokens"
+    CATEGORY = "conditioning"
+    
+    def load_tokenizer(self, clip_name):
+        """正しいCLIPトークナイザーを読み込む"""
+        if clip_name == "ViT-L/14":
+            tokenizer_name = "openai/clip-vit-large-patch14"
+        elif clip_name == "ViT-B/32":
+            tokenizer_name = "openai/clip-vit-base-patch32"
+        elif clip_name == "ViT-B/16":
+            tokenizer_name = "openai/clip-vit-base-patch16"
+        else:
+            raise ValueError(f"Unknown CLIP model: {clip_name}")
+        
+        # 新しいトークナイザーが必要な場合のみロードする
+        if self.tokenizer is None or self.loaded_tokenizer_name != tokenizer_name:
+            try:
+                self.tokenizer = CLIPTokenizer.from_pretrained(tokenizer_name)
+                self.loaded_tokenizer_name = tokenizer_name
+                print(f"Loaded CLIP tokenizer: {tokenizer_name}")
+            except Exception as e:
+                print(f"Error loading tokenizer {tokenizer_name}: {e}")
+                # フォールバックとしてデフォルトのCLIPトークナイザーを試す
+                self.tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
+                self.loaded_tokenizer_name = "openai/clip-vit-large-patch14"
+                print("Loaded fallback tokenizer: openai/clip-vit-large-patch14")
+    
+    def count_tokens(self, text, clip_name):
+        """
+        テキストをトークン化して、トークン数とトークン化された結果を返す
+        """
+        # トークナイザーをロード
+        self.load_tokenizer(clip_name)
+        
+        # テキストをトークン化
+        tokens = self.tokenizer.encode(text)
+        token_count = len(tokens)
+        
+        # トークン化の詳細結果を取得
+        tokenized_words = []
+        for word in text.split():
+            word_tokens = self.tokenizer.encode(" " + word if word != text.split()[0] else word)
+            # BPEトークナイザーの場合は先頭に特殊トークンが付くことがあるので除去
+            if len(word_tokens) > 0 and word_tokens[0] == self.tokenizer.bos_token_id:
+                word_tokens = word_tokens[1:]
+            
+            # トークンIDからテキスト表現に変換
+            token_texts = [self.tokenizer.decode([t]) for t in word_tokens]
+            
+            tokenized_words.append({
+                "word": word,
+                "token_count": len(word_tokens),
+                "tokens": token_texts
+            })
+        
+        # 人間が読みやすい形式でトークン化結果を整形
+        result_text = f"合計トークン数: {token_count}\n\n"
+        result_text += "トークン化された単語:\n"
+        for item in tokenized_words:
+            result_text += f"「{item['word']}」({item['token_count']}トークン): {', '.join(item['tokens'])}\n"
+        
+        # 特殊トークンとその意味について説明
+        result_text += "\n特殊トークン情報:\n"
+        special_tokens = {
+            self.tokenizer.bos_token: "文章の開始",
+            self.tokenizer.eos_token: "文章の終了",
+            self.tokenizer.pad_token: "パディング",
+            self.tokenizer.unk_token: "未知のトークン"
+        }
+        for token, description in special_tokens.items():
+            if token:  # Noneでないことを確認
+                result_text += f"{token}: {description}\n"
+        
+        return (token_count, result_text)
+
+
+"""
+
 D2 EmptyImage Alpha
 αチャンネル（透明度）付き画像作成
 
@@ -1345,6 +1446,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Load Lora": D2_LoadLora,
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Regex Replace": D2_RegexReplace,
+    "D2 Token Counter": D2_TokenCounter,
     "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
     "D2 Multi Output": D2_MultiOutput,
     "D2 Grid Image": D2_GridImage,
