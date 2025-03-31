@@ -74,7 +74,7 @@ D2 Nodes ComfyUI
   - ModelMergeSDXL と CLIPMergeSimple を合体させたノード
 
 
-### Textn
+### Text
 
 - <a href="node_text.md#D2-Regex-Replace">`D2 Regex Replace`</a>
   - 複数条件の指定が可能なテキスト置換ノード
@@ -89,6 +89,8 @@ D2 Nodes ComfyUI
   - ファイルネームを作る
 - <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
   - テキストのコメントを削除する
+- <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
+  - プロンプトのトークンを数える
 
 ### Image
 
@@ -155,6 +157,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.03.31**
+
+- `D2 Token Counter`: 新規追加
 
 **2025.03.25**
 

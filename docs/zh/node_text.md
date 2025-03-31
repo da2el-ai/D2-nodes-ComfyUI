@@ -218,3 +218,16 @@ Output text
 - 所有文字框都可使用註釋快捷鍵（ctrl + /）
 - 可在 `Settings > D2 > shortcutKey` 更改快捷鍵
 - 若要停用，請刪除上述內容
+
+
+
+---
+
+### D2 Token Counter
+
+<figure>
+  <img src="../img/token_counter.png">
+</figure>
+
+- 計算提示詞的標記數量
+

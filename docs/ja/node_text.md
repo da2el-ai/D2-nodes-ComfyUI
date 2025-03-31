@@ -229,3 +229,12 @@ Output text
 - 無効にしたい場合は上記の内容を削除する
 
 
+---
+
+### D2 Token Counter
+
+<figure>
+  <img src="../img/token_counter.png">
+</figure>
+
+- プロンプトのトークンを数える

@@ -89,6 +89,8 @@
   - 生成文件名稱
 - <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
   - 刪除文本中的註釋
+- <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
+  - 計算提示詞的標記數量
 
 
 
@@ -154,6 +156,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.03.31**
+
+- `D2 Token Counter`: 新增功能
 
 **2025.03.25**
 

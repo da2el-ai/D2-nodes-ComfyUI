@@ -193,3 +193,13 @@ Output text
 - The shortcut key can be changed in `Settings > D2 > shortcutKey`
 - To disable it, delete the above content
 
+
+---
+
+### D2 Token Counter
+
+<figure>
+  <img src="../img/token_counter.png">
+</figure>
+
+- Counts tokens in prompts

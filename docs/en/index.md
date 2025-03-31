@@ -87,6 +87,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Creates filenames
 - <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
   - Delete comments from text
+- <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
+  - Counts tokens in prompts
 
 
 
@@ -153,6 +155,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+
+**2025.03.31**
+
+- `D2 Token Counter`: Newly added
 
 **2025.03.25**
 
