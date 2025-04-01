@@ -213,14 +213,17 @@ Output text
 
 ---
 
-### D2 Delete Comment
+### D2 Prompt
 
 <figure>
-  <img src="../img/delete_comment.png">
+  <img src="../img/prompt.png">
 </figure>
 
 - テキスト内のコメントを削除する
 - 行頭「#」、行頭「//」、「/\*」〜「\*/」の間が対象
+- トークン数を下部に表示
+- トークン数の計測のCLIPは"ViT-L/14"を使用。他のCLIPを使いたい時は `D2 Token Counter` をご利用ください
+
 
 #### コメントアウトのショートカットキーについて
 

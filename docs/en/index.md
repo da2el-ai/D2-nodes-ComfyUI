@@ -85,10 +85,10 @@ If you have installed any of the following custom nodes previously, please remov
   - Converts arrays to strings
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - Creates filenames
-- <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
-  - Delete comments from text
 - <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
   - Counts tokens in prompts
+- <a href="node_text.md#D2-Prompt">`D2 Prompt`</a>
+  - Text node with comment deletion function and token count display
 
 
 
@@ -156,6 +156,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.02**
+
+- `D2 Prompt`: Newly added
+- `D2 Delete Comment`: Integrated into `D2 Prompt`
 
 **2025.03.31**
 

@@ -178,21 +178,24 @@ Output text
 
 ---
 
-### D2 Delete Comment
+
+### D2 Prompt
 
 <figure>
-  <img src="../img/delete_comment.png">
+  <img src="../img/prompt.png">
 </figure>
 
-- Deletes comments from text
-- Targets line-beginning "#", line-beginning "//", and anything between "/\*" and "\*/"
+- Delete comments in text
+- Targets lines starting with "#", lines starting with "//", and text between "/*" and "*/"
+- Displays token count at the bottom
+- Uses "ViT-L/14" CLIP for token count measurement. Please use `D2 Token Counter` if you want to use other CLIP models
 
-#### About the Comment Shortcut Key
+
+#### About Comment Shortcut Keys
 
 - Comment shortcut key (ctrl + /) is available in all text boxes
-- The shortcut key can be changed in `Settings > D2 > shortcutKey`
-- To disable it, delete the above content
-
+- Shortcut keys can be changed in `Settings > D2 > shortcutKey`
+- Delete the content above if you want to disable it
 
 ---
 

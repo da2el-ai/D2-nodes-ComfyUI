@@ -204,22 +204,24 @@ Output text
 
 ---
 
-### D2 Delete Comment
+
+### D2 Prompt
 
 <figure>
-  <img src="../img/delete_comment.png">
+  <img src="../img/prompt.png">
 </figure>
 
-- 刪除文本中的註釋
-- 目標為行首「#」、行首「//」以及「/\*」到「\*/」之間的內容
-
-#### 關於註釋快捷鍵
-
-- 所有文字框都可使用註釋快捷鍵（ctrl + /）
-- 可在 `Settings > D2 > shortcutKey` 更改快捷鍵
-- 若要停用，請刪除上述內容
+- 刪除文字中的註解
+- 包括行首「#」、行首「//」以及「/*」至「*/」之間的內容
+- 在底部顯示令牌數量
+- 令牌計數使用"ViT-L/14" CLIP。如果想使用其他CLIP模型，請使用`D2 Token Counter`
 
 
+#### 關於註解快捷鍵
+
+- 所有文字框都可使用註解快捷鍵（ctrl + /）
+- 快捷鍵可在`Settings > D2 > shortcutKey`中更改
+- 如需停用此功能，請刪除上述內容
 
 ---
 

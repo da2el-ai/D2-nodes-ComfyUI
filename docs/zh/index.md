@@ -87,10 +87,11 @@
   - 將陣列轉換為字串
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - 生成文件名稱
-- <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
-  - 刪除文本中的註釋
 - <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
   - 計算提示詞的標記數量
+- <a href="node_text.md#D2-Prompt">`D2 Prompt`</a>
+  - 具有刪除註解功能和顯示令牌數量的文字節點
+
 
 
 
@@ -156,6 +157,11 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.04.02**
+
+- `D2 Prompt`：新增功能
+- `D2 Delete Comment`：整合至`D2 Prompt`
 
 **2025.03.31**
 

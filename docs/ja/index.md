@@ -87,10 +87,10 @@ D2 Nodes ComfyUI
   - 配列を文字列に変換する
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - ファイルネームを作る
-- <a href="node_text.md#D2-Delete-Comment">`D2 Delete Comment`</a>
-  - テキストのコメントを削除する
 - <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
   - プロンプトのトークンを数える
+- <a href="node_text.md#D2-Prompt">`D2 Prompt`</a>
+  - テキストのコメントを削除やトークン数の表示があるテキストノード
 
 ### Image
 
@@ -157,6 +157,11 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.04.02**
+
+- `D2 Prompt`: 新規追加
+- `D2 Delete Comment`: `D2 Prompt`に統合
 
 **2025.03.31**
 
