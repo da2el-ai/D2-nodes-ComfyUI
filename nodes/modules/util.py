@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import Literal, Optional
 import os
 import yaml
-import math
+# import math
+import re
 import glob
 import shutil
 import random
@@ -139,3 +140,38 @@ PIL to Tensor
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
+"""
+コメントを削除
+"""
+def delete_comment(text, type):
+    """
+    text のコメント行を消す
+    type: "# only" なら行頭が「#」の行を消す
+    type: "// only" なら行頭が「//」の行を消す
+    type: "/* */ only" なら「/* 〜 */」を消す。これは複数行にも対応する
+    type: "# + // + /**/" なら上記3つを全て実行する
+    type: "None" ならなにもしない
+    """
+    result_text = text
+
+    if type == "None": return text
+
+    if type == "# only" or type == "# + // + /**/":
+        # 行頭が # のコメント行を削除（行頭の空白は考慮しない）
+        result_text = re.sub(r'^#.*$', '', result_text, flags=re.MULTILINE)
+    
+    if type == "// only" or type == "# + // + /**/":
+        # 行頭が // のコメント行を削除（行頭の空白は考慮しない）
+        result_text = re.sub(r'^//.*$', '', result_text, flags=re.MULTILINE)
+    
+    if type == "/* */ only" or type == "# + // + /**/":
+        # /* */ コメントを削除（複数行対応）
+        result_text = re.sub(r'/\*.*?\*/', '', result_text, flags=re.DOTALL)
+    
+    # # 空行が連続する場合、1つの空行にまとめる
+    # result_text = re.sub(r'\n\s*\n+', '\n\n', result_text)
+    
+    # # 先頭と末尾の余分な改行を削除
+    # result_text = result_text.strip()
+
+    return result_text

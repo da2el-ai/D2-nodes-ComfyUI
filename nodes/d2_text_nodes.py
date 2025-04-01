@@ -1,17 +1,18 @@
 # from typing import Optional
 # import torch
-# import os
-# import json
+import os
+import json
 import re
 # import random
 # from PIL import Image, ImageOps, ImageSequence, ImageFile
 # import numpy as np
-# from aiohttp import web
+from aiohttp import web
 # from torchvision import transforms
 # import numpy as np
 from transformers import CLIPTokenizer
+from datetime import datetime
 
-# import folder_paths
+import folder_paths
 # import comfy.sd
 # import comfy.samplers
 # from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
@@ -19,11 +20,11 @@ from transformers import CLIPTokenizer
 # from comfy_execution.graph_utils import GraphBuilder
 # from comfy_execution.graph import ExecutionBlocker
 # from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced, LoraLoader
-# from server import PromptServer
+from server import PromptServer
 # from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
 from .modules import util
-from .modules.util import D2_TD2Pipe, AnyType
+from .modules.util import D2_TD2Pipe, AnyType, delete_comment
 # from .modules import checkpoint_util
 # from .modules import pnginfo_util
 # from .modules import grid_image_util
@@ -316,29 +317,15 @@ class D2_MultiOutput:
 
 """
 
-D2 TokenCounter
-プロンプトのトークンを数える
+TokenCounter
+トークン化と計数を行うユーティリティクラス
 
 """
-class D2_TokenCounter:
-    
+class TokenCounter:
     def __init__(self):
+        # 明示的に初期化
         self.tokenizer = None
         self.loaded_tokenizer_name = None
-    
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "text": ("STRING", {"multiline": True}),
-                "clip_name": (["ViT-L/14", "ViT-B/32", "ViT-B/16"], {"default": "ViT-L/14"}),
-            }
-        }
-    
-    RETURN_TYPES = ("INT", "STRING")
-    RETURN_NAMES = ("token_count", "tokenized_result")
-    FUNCTION = "count_tokens"
-    CATEGORY = "D2"
     
     def load_tokenizer(self, clip_name):
         """正しいCLIPトークナイザーを読み込む"""
@@ -356,20 +343,28 @@ class D2_TokenCounter:
             try:
                 self.tokenizer = CLIPTokenizer.from_pretrained(tokenizer_name)
                 self.loaded_tokenizer_name = tokenizer_name
-                print(f"Loaded CLIP tokenizer: {tokenizer_name}")
+                # print(f"Loaded CLIP tokenizer: {tokenizer_name}")
             except Exception as e:
                 print(f"Error loading tokenizer {tokenizer_name}: {e}")
                 # フォールバックとしてデフォルトのCLIPトークナイザーを試す
                 self.tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
                 self.loaded_tokenizer_name = "openai/clip-vit-large-patch14"
                 print("Loaded fallback tokenizer: openai/clip-vit-large-patch14")
+        
+        # トークナイザーが正しくロードされたことを確認
+        if self.tokenizer is None:
+            raise ValueError("Failed to load tokenizer")
     
-    def count_tokens(self, text, clip_name):
+    def count_tokens(self, text, clip_name="ViT-L/14"):
         """
         テキストをトークン化して、トークン数とトークン化された結果を返す
         """
         # トークナイザーをロード
         self.load_tokenizer(clip_name)
+        
+        # トークナイザーが正しくロードされていることを確認
+        if self.tokenizer is None:
+            raise ValueError("Tokenizer is not loaded")
         
         # テキストをトークン化
         tokens = self.tokenizer.encode(text)
@@ -411,6 +406,95 @@ class D2_TokenCounter:
                 result_text += f"{token}: {description}\n"
         
         return (token_count, result_text)
+
+
+"""
+
+D2 TokenCounter
+プロンプトのトークンを数える
+
+"""
+class D2_TokenCounter:
+    
+    def __init__(self):
+        self.token_counter = TokenCounter()
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text": ("STRING", {"multiline": True}),
+                "clip_name": (["ViT-L/14", "ViT-B/32", "ViT-B/16"], {"default": "ViT-L/14"}),
+            }
+        }
+    
+    RETURN_TYPES = ("INT", "STRING")
+    RETURN_NAMES = ("token_count", "tokenized_result")
+    FUNCTION = "count_tokens"
+    CATEGORY = "D2"
+    
+    def count_tokens(self, text, clip_name):
+        """
+        テキストをトークン化して、トークン数とトークン化された結果を返す
+        """
+        return self.token_counter.count_tokens(text, clip_name)
+
+
+"""
+プロンプトのトークンカウンターをAPIで用意
+D2/token-counter/get-count
+という形式でリクエストが届く
+"""
+@PromptServer.instance.routes.post("/D2/token-counter/get-count")
+async def route_d2_token_counter_get_count(request):
+    count = 0
+    try:
+        data = await request.json()
+        prompt = data.get("prompt", "")
+        comment_type = data.get("comment_type", "")
+        new_prompt = delete_comment(prompt, comment_type)
+        token_counter = TokenCounter()
+        count, _ = token_counter.count_tokens(new_prompt)
+    except Exception as e:
+        print(f"Error in token counter API: {str(e)}")
+        count = 0
+
+    # JSON応答を返す
+    json_data = json.dumps({"count": count})
+    return web.Response(text=json_data, content_type='application/json')
+
+
+
+"""
+
+D2 Prompt
+トークン計算機能とコメント削除機能がついたテキスト入力
+
+"""
+class D2_Prompt:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING",{"multiline": True},),
+                "comment_type": (["# + // + /**/","# only","// only","/* */ only","None"],),
+            },
+            "optional": {
+                "counter": ("D2_TOKEN_COUNTER", {})
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    ######
+    def run(self, prompt, comment_type, counter = ""):
+        new_prompt = delete_comment(prompt, comment_type)
+        return (new_prompt,)
+
 
 
 """
@@ -535,4 +619,5 @@ NODE_CLASS_MAPPINGS = {
     "D2 List To String": D2_ListToString,
     "D2 Filename Template": D2_FilenameTemplate,
     "D2 Delete Comment": D2_DeleteComment,
+    "D2 Prompt": D2_Prompt,
 }
