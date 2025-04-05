@@ -569,7 +569,7 @@ class D2_XYModelList:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model_type": (["checkpoints", "loras", "samplers", "schedulers"],),
+                "model_type": (["checkpoints", "loras", "samplers", "schedulers", "bbox_segm"],),
                 "filter": ("STRING", {"default":""}),
                 "mode": (["simple", "a1111"],),
                 "sort_by": (["Name", "Date"], {"default":"Name"}),
@@ -603,17 +603,27 @@ async def route_d2_model_list_get_list(request):
         mode = request.query.get('mode')
         sort_by = request.query.get('sort_by')
         order_by = request.query.get('order_by')
+        print("//////", type)
 
         if type == "samplers":
             file_list = comfy.samplers.KSampler.SAMPLERS
         elif type == "schedulers":
             file_list = comfy.samplers.KSampler.SCHEDULERS
+        elif type == "bbox_segm":
+            bboxs = ["bbox/"+x for x in folder_paths.get_filename_list("ultralytics_bbox")]
+            segms = ["segm/"+x for x in folder_paths.get_filename_list("ultralytics_segm")]
+            file_list = bboxs + segms
         else:
             file_list = folder_paths.get_filename_list(type)
 
+        print(file_list)
+
         filtered_list = [s for s in file_list if re.search(filter, s, re.IGNORECASE)]
 
-        if type in ["samplers", "schedulers"]:
+        print("-------")
+        print(filtered_list)
+
+        if type in ["samplers", "schedulers", "bbox_segm"]:
             sorted_list = filtered_list
         else:
             model_list = []
