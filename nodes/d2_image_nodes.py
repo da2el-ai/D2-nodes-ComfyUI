@@ -448,20 +448,163 @@ async def route_d2_grid_image_reset_image_count(request):
 
 
 
+"""
+
+D2 Mosaic Filter
+モザイクをかける
+
+"""
+class D2_MosaicFilter:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": { 
+                "images": ("IMAGE",),
+                "dot_size": ("INT", {"default": 20, "min":1, "max":512},),
+                "color_mode": (["average", "original"],),
+                "opacity": ("FLOAT", {"default": 1, "min":0, "max":1},),
+                "brightness": ("INT", {"default": 0, "min":-100, "max":100},),
+                "invert_color": ("BOOLEAN", {"default": False},),
+            }
+        }
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "run"
+    CATEGORY = "D2/Image"
+
+    def run(self, images, dot_size, color_mode, opacity, brightness, invert_color):
+        """
+        images の画像を全てモザイク処理する
+        dot_size: ドットの大きさ
+        color_mode: ドットの色
+            average=ドット領域の平均的な色 / original=ドット領域の中央の色 
+        opacity: モザイクを重ねる時の透明度
+        brightness: モザイクの明るさ。初期値:0 / -100=真っ黒 / 100=真っ白
+        invert_color: 色を反転する 
+        """
+        import torch
+        import torch.nn.functional as F
+        
+        # 結果を格納するリスト
+        result_images = []
+        
+        # 各画像を処理
+        for image in images:
+            # 元の画像をコピー
+            original_image = image.clone()
+            
+            # モザイク処理を適用
+            mosaic_image = self._apply_mosaic_to_image(
+                image, 
+                dot_size, 
+                color_mode, 
+                brightness, 
+                invert_color
+            )
+            
+            # 元の画像とモザイク画像をopacityに基づいてブレンド
+            if opacity < 1.0:
+                mosaic_image = opacity * mosaic_image + (1 - opacity) * original_image
+            
+            # 処理した画像を結果リストに追加
+            result_images.append(mosaic_image)
+        
+        # すべての画像を結合して返す
+        return (torch.stack(result_images),)
+
+    def _apply_mosaic_to_image(self, image, dot_size, color_mode, brightness, invert_color):
+        """
+        単一の画像にモザイク効果を適用する内部関数
+        
+        Args:
+            image: 入力画像テンソル [batch, height, width, channels] または [height, width, channels]
+            dot_size: ドットの大きさ
+            color_mode: 色のモード ("average" または "original")
+            brightness: 明るさ調整 (-100 から 100)
+            invert_color: 色を反転するかどうか
+            
+        Returns:
+            モザイク効果を適用した画像テンソル
+        """
+        import torch
+        
+        # 画像の形状を取得
+        shape = image.shape
+        
+        # バッチ次元がない場合（3次元テンソル）は一時的にバッチ次元を追加
+        is_3d = len(shape) == 3
+        if is_3d:
+            # [height, width, channels] -> [1, height, width, channels]
+            image = image.unsqueeze(0)
+            shape = image.shape
+            
+        # ComfyUIの画像テンソルは [batch, height, width, channels] の形式
+        batch_size, height, width, channels = shape
+        
+        # dot_sizeが1より小さい場合は1に制限
+        dot_size = max(1, dot_size)
+        
+        # 結果画像の初期化
+        mosaic_image = torch.zeros_like(image)
+        
+        # グリッドの数を計算（上限は切り上げて全体をカバー）
+        grid_h = (height + dot_size - 1) // dot_size
+        grid_w = (width + dot_size - 1) // dot_size
+        
+        # 各グリッドセルを処理
+        for i in range(grid_h):
+            for j in range(grid_w):
+                # セルの範囲（画像の境界を超えないように制限）
+                start_h = i * dot_size
+                end_h = min(start_h + dot_size, height)
+                start_w = j * dot_size
+                end_w = min(start_w + dot_size, width)
+                
+                # セル内のピクセルを取得
+                cell = image[:, start_h:end_h, start_w:end_w, :]
+                
+                if color_mode == "average":
+                    # セル内の色の平均を計算 (チャンネルごとに)
+                    avg_color = torch.mean(cell, dim=(1, 2))  # [batch_size, channels]
+                    cell_color = avg_color.unsqueeze(1).unsqueeze(2)  # [batch_size, 1, 1, channels]
+                else:  # "original"
+                    # セルの中央のピクセルの色を使用（境界を超えないように）
+                    center_h = min(start_h + (end_h - start_h) // 2, height - 1)
+                    center_w = min(start_w + (end_w - start_w) // 2, width - 1)
+                    cell_color = image[:, center_h:center_h+1, center_w:center_w+1, :]
+                
+                # 明るさ調整
+                if brightness != 0:
+                    # -100～100 の範囲を -1～1 に変換
+                    brightness_factor = brightness / 100.0
+                    if brightness_factor > 0:
+                        # 明るくする（白に近づける）
+                        cell_color = cell_color + (1 - cell_color) * brightness_factor
+                    else:
+                        # 暗くする（黒に近づける）
+                        cell_color = cell_color * (1 + brightness_factor)
+                
+                # 色を反転
+                if invert_color:
+                    cell_color = 1.0 - cell_color
+                
+                # モザイクセルを結果画像に適用
+                mosaic_image[:, start_h:end_h, start_w:end_w, :] = cell_color
+            
+        # 元の形状に戻す（3次元テンソルだった場合）
+        if is_3d:
+            mosaic_image = mosaic_image.squeeze(0)
+            
+        return mosaic_image
+
 
 
 NODE_CLASS_MAPPINGS = {
     "D2 Preview Image": D2_PreviewImage,
     "D2 Load Image": D2_LoadImage,
     "D2 Folder Image Queue": D2_FolderImageQueue,
-    # "D2 KSampler": D2_KSampler,
-    # "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
-    # "D2 Checkpoint Loader": D2_CheckpointLoader,
-    # "D2 Controlnet Loader": D2_ControlnetLoader,
-    # "D2 Load Lora": D2_LoadLora,
     "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
     "D2 Grid Image": D2_GridImage,
     "D2 Image Stack": D2_ImageStack,
     "D2 Load Folder Images": D2_LoadFolderImages,
-    # "D2 Pipe": D2_Pipe,
+    "D2 Mosaic Filter": D2_MosaicFilter,
 }
