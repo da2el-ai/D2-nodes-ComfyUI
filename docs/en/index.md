@@ -110,6 +110,9 @@ If you have installed any of the following custom nodes previously, please remov
   - Outputs images directly
 - <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
   - Outputs EmptyImage with alpha channel (transparency)
+- <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
+  - Applies a mosaic filter to images
+
 
 ### XY Plot
 
@@ -155,6 +158,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.04.06**
+
+- `D2 Mosaic Filter`: Newly added
 
 **2025.04.02**
 

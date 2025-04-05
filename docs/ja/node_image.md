@@ -171,4 +171,17 @@ Node
 - EmptyImage にαチャンネル（透明度）を追加
 
 
+---
+
+
+### D2 Mosaic Filter
+
+<figure>
+<img src="../img/mosaic.png">
+</figure>
+
+- モザイクフィルターをかける
+- 透明度、明るさ、色の反転などを設定可能
+
+
 

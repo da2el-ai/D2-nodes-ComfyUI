@@ -110,6 +110,8 @@ D2 Nodes ComfyUI
   - 画像を直接出力する
 - <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
   - αチャンネル（透明度）付きの EmptyImage を出力
+- <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
+  - 画像にモザイクフィルターをかける
 
 
 ### XY Plot
@@ -157,6 +159,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.04.06**
+
+- `D2 Mosaic Filter`: 新規追加
 
 **2025.04.02**
 

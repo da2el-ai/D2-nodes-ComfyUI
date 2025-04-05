@@ -113,6 +113,8 @@
   - 直接輸出圖像
 - <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
   - 輸出帶有 α 通道（透明度）的 EmptyImage
+- <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
+  - 為圖像添加馬賽克濾鏡效果
 
 
 ### XY Plot
@@ -157,6 +159,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.04.06**
+
+- `D2 Mosaic Filter`: 新增功能
 
 **2025.04.02**
 

@@ -159,3 +159,18 @@
 </figure>
 
 - 為 EmptyImage 添加 α 通道（透明度）
+
+
+---
+
+
+### D2 Mosaic Filter
+
+<figure>
+<img src="../img/mosaic.png">
+</figure>
+
+- 添加馬賽克濾鏡效果
+- 可調整透明度、亮度和顏色反轉等設置
+
+

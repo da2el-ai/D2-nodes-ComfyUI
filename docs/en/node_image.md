@@ -156,3 +156,17 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 </figure>
 
 - Adds alpha channel (transparency) to EmptyImage
+
+
+---
+
+
+### D2 Mosaic Filter
+
+<figure>
+<img src="../img/mosaic.png">
+</figure>
+
+- Applies a mosaic filter
+- Adjustable transparency, brightness, and color inversion options
+
