@@ -133,27 +133,46 @@ function handleWidgetsVisibility(node, countValue, targets) {
 
 /**
  * 番号付き入力の追加・削除
+ * params = [{name:`input名`, type:`input型`}]
  */
-function handleInputsVisibility(node, countValue, targets, type) {
-    // 全ての入力について処理
-    for (let i = 1; i <= 50; i++) {
-        // 同じ番号が付いた関連入力を対象にする
-        targets.forEach((target) => {
-            const name = `${target}_${i}`;
-            const input = findInputByName(node, name);
+function handleInputsVisibility(node, countValue, params) {
+    const inputsToRemove = [];
+    // 削除対象のインデックスをリストアップ
+    for (let i = 0; i < node.inputs.length; i++) {
+        const input = node.inputs[i];
+        // params に定義されたプレフィックスで始まるかチェック
+        const paramMatch = params.find(p => input.name.startsWith(p.name + "_"));
+        if (paramMatch) {
+            // 末尾の番号を取得
+            const match = input.name.match(/_(\d+)$/);
+            if (match) {
+                const index = parseInt(match[1], 10);
+                // 番号が countValue より大きい場合は削除対象
+                if (index > countValue) {
+                    inputsToRemove.push(i);
+                }
+            }
+        }
+    }
 
-            if(input){
-                if (i > countValue) {
-                    node.removeInput(i);
-                    node.inputs.length = node.inputs.length -1;
-                }
-            }else{
-                if (i <= countValue) {
-                    node.addInput(name, type);
-                }
+    // インデックスがずれないように逆順で削除
+    inputsToRemove.sort((a, b) => b - a); // 降順ソート
+    inputsToRemove.forEach(index => {
+        node.removeInput(index);
+    });
+
+    // 必要な入力がなければ追加
+    for (let i = 1; i <= countValue; i++) {
+        params.forEach((param) => {
+            const name = `${param.name}_${i}`;
+            // 既に存在しない場合のみ追加
+            if (!findInputByName(node, name)) {
+                node.addInput(name, param.type);
             }
         });
     }
+    // ノードの表示を更新
+    node.setDirtyCanvas(true, true);
 }
 
 

@@ -1,16 +1,31 @@
 import { app } from "/scripts/app.js";
 import { findWidgetByName, handleInputsVisibility } from "./utils.js";
 
+const changeInputVisibility = (node, val) => {
+  if (node.constructor.title == "D2 Image Mask Stack"){
+    handleInputsVisibility(node, val, [
+      {name:"image", type:"IMAGE"},
+      {name:"mask", type:"MASK"},
+    ])
+  }else{
+    handleInputsVisibility(node, val, [
+      {name:"image", type:"IMAGE"},
+    ])
+  }
+};
 
+///////////////////////////
+///////////////////////////
 app.registerExtension({
   name: "Comfy.D2.D2_ImageStack",
 
   nodeCreated(node) {
-    if (node.constructor.title == "D2 Image Stack"){
+    if (node.constructor.title == "D2 Image Stack" || node.constructor.title == "D2 Image Mask Stack"){
       if (node.widgets){
         const countWidget = findWidgetByName(node, "image_count");
         let widgetValue = countWidget.value;
-        handleInputsVisibility(node, widgetValue, ["image"], "IMAGE")
+
+        changeInputVisibility(node, widgetValue);
 
         // lora_count.value の再定義
         Object.defineProperty(countWidget, 'value', {
@@ -20,7 +35,7 @@ app.registerExtension({
           set(newVal) {
             if (newVal !== widgetValue) {
               widgetValue = newVal;
-              handleInputsVisibility(node, newVal, ["image"], "IMAGE")
+              changeInputVisibility(node, newVal);
             }
           }
         });

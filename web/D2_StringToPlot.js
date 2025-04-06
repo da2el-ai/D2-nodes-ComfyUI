@@ -10,7 +10,10 @@ app.registerExtension({
       if (node.widgets){
         const countWidget = findWidgetByName(node, "string_count");
         let widgetValue = countWidget.value;
-        handleInputsVisibility(node, widgetValue, ["string"], "STRING")
+        handleInputsVisibility(node, widgetValue, [
+          {name:"string", type:"STRING"},
+        ])
+    
 
         // string_count.value の再定義
         Object.defineProperty(countWidget, 'value', {
@@ -20,7 +23,9 @@ app.registerExtension({
           set(newVal) {
             if (newVal !== widgetValue) {
               widgetValue = newVal;
-              handleInputsVisibility(node, newVal, ["string"], "STRING")
+              handleInputsVisibility(node, newVal, [
+                {name:"string", type:"STRING"},
+              ])
             }
           }
         });
