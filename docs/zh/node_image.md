@@ -134,6 +134,7 @@
 - `Reset Images`
   - 清除所有輸入的圖片
 
+
 ---
 
 ### D2 Image Stack
@@ -142,13 +143,22 @@
 <img src="../img/image_stack.png">
 </figure>
 
-- 將輸入的多個圖像一起輸出
-- 最多可輸入 50 個
+- 將多個輸入圖像合併為一個批次
+- 可與 D2 Grid Image 等一起使用
+- 最多支持50個輸入
 
-#### Input
 
-- `image_count`
-  - 可增減輸入數量，最多 50 個
+---
+
+### D2 Image Mask Stack
+
+<figure>
+<img src="../img/image_mask_stack.png">
+</figure>
+
+- 將多個輸入圖像和遮罩合併為一個批次
+- 基本上是 D2 Image Stack 加上遮罩支持功能
+
 
 ---
 

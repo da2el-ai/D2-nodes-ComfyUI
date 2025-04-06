@@ -106,8 +106,9 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node_image.md#D2-Grid-Image">`D2 Grid Image`</a>
   - Generates grid images
 - <a href="node_image.md#D2-Image-Stack">`D2 Image Stack`</a>
-  - Node for stacking multiple images to pass to D2 Grid Image
-  - Outputs images directly
+  - Combines multiple images into a batch
+- <a href="node_image.md#D2-Image-Mask-Stack">`D2 Image Mask Stack`</a>
+  - Combines multiple images and masks into a batch
 - <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
   - Outputs EmptyImage with alpha channel (transparency)
 - <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
@@ -161,7 +162,9 @@ If you have installed any of the following custom nodes previously, please remov
 
 **2025.04.06**
 
+- `D2 Image Mask Stack`: Newly added
 - `D2 Mosaic Filter`: Newly added
+
 
 **2025.04.02**
 

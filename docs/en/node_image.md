@@ -131,6 +131,7 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 - `Reset Images`
   - Discards all input images
 
+
 ---
 
 ### D2 Image Stack
@@ -139,13 +140,22 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 <img src="../img/image_stack.png">
 </figure>
 
-- Outputs multiple input images together
-- Can input up to 50 images
+- Combines multiple input images into a batch
+- Can be used with D2 Grid Image and others
+- Maximum of 50 inputs
 
-#### Input
 
-- `image_count`
-  - Can increase/decrease number of inputs. Maximum 50
+---
+
+### D2 Image Mask Stack
+
+<figure>
+<img src="../img/image_mask_stack.png">
+</figure>
+
+- Combines multiple input images and masks into a batch
+- Essentially D2 Image Stack with added mask support
+
 
 ---
 

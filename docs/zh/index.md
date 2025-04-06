@@ -109,8 +109,9 @@
 - <a href="node_image.md#D2-Grid-Image">`D2 Grid Image`</a>
   - 生成網格圖像
 - <a href="node_image.md#D2-Image-Stack">`D2 Image Stack`</a>
-  - 用於堆疊多個圖像並傳遞給 `D2 Grid Image` 的節點
-  - 直接輸出圖像
+  - 將多個圖像合併為一個批次
+- <a href="node_image.md#D2-Image-Mask-Stack">`D2 Image Mask Stack`</a>
+  - 將多個圖像和遮罩合併為一個批次
 - <a href="node_image.md#D2-EmptyImage-Alpha">`D2 EmptyImage Alpha`</a>
   - 輸出帶有 α 通道（透明度）的 EmptyImage
 - <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
@@ -162,6 +163,7 @@
 
 **2025.04.06**
 
+- `D2 Image Mask Stack`: 新增功能
 - `D2 Mosaic Filter`: 新增功能
 
 **2025.04.02**

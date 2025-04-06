@@ -150,14 +150,21 @@ Node
 <img src="../img/image_stack.png">
 </figure>
 
-- 入力された複数の画像をまとめて出力する
-- 最大50個入力できる
+- 入力された複数の画像をバッチにまとめる
+- D2 Grid Image などで使える
+- 最大50個入力まで
 
-#### Input
 
-- `image_count`
-  - 入力数を増減できる。最大50
+---
 
+### D2 Image Mask Stack
+
+<figure>
+<img src="../img/image_mask_stack.png">
+</figure>
+
+- 入力された複数の画像とマスクをバッチにまとめる
+- D2 Image Stack にマスクを追加したもの
 
 ---
 
