@@ -183,6 +183,50 @@ class D2_ImageStack:
 
         return (None,)
 
+
+
+"""
+
+D2 Image and Mask Stack
+
+"""
+class D2_ImageMaskStack:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+            }
+        }
+
+    
+    RETURN_TYPES = ("IMAGE", "MASK",)
+    FUNCTION = "stack_image_mask"
+    CATEGORY = "D2/Image"
+
+    def stack_image_mask(self, image_count, **kwargs):
+
+        image_list = []
+        mask_list = []
+        
+        for i in range(1, image_count + 1):
+            image = kwargs.get(f"image_{i}")
+            mask = kwargs.get(f"mask_{i}")
+            if image is not None and mask is not None:
+                image_list.append(image)
+                mask_list.append(mask)
+
+        if len(image_list) > 0:
+            image_batch = torch.cat(image_list, dim=0)
+            mask_batch = torch.cat(mask_list, dim=0)
+
+            return (image_batch, mask_batch,)
+
+        return (None, None,)
+
+
+
 """
 
 D2 Folder Image Queue
@@ -605,6 +649,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
     "D2 Grid Image": D2_GridImage,
     "D2 Image Stack": D2_ImageStack,
+    "D2 Image Mask Stack": D2_ImageMaskStack,
     "D2 Load Folder Images": D2_LoadFolderImages,
     "D2 Mosaic Filter": D2_MosaicFilter,
 }
