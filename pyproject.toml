@@ -2,7 +2,7 @@
 description = "This is a collection of custom nodes that make ComfyUI slightly more convenient."
 license = {file = "LICENSE"}
 name = "d2-nodes-comfyui"
-version = "17.0.1"
+version = "17.1.0"
 
 [project.urls]
 Repository = "https://github.com/da2el-ai/D2-nodes-ComfyUI"

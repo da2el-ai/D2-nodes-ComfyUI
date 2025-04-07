@@ -111,6 +111,12 @@ app.registerExtension({
         nodeType.prototype.onExecuted = async function (message) {
             onExecuted?.apply(this, arguments);
 
+            // seed更新
+            const seedWidget = findWidgetByName(this, "queue_seed");
+            if(seedWidget){
+                seedWidget.setValue(Math.floor(Math.random()*100000));
+            }
+            
             const imageCount = message["image_count"][0];
             const startAt = message["start_at"][0];
             folderImageQueue.onExecuted(imageCount, startAt);
@@ -159,6 +165,18 @@ app.registerExtension({
                 node.addCustomWidget(widget);
                 return widget;
             },
-        };
+            D2_FOLDER_IMAGE_SEED(node, inputName, inputData, app) {
+                const widget = getReadOnlyWidgetBase(node, "D2_FOLDER_IMAGE_SEED", inputName, 0);
+        
+                widget.draw = function(ctx, node, width, y) {
+                  const text = `Seed: ${this.value}`;
+                  ctx.fillStyle = "#ffffff";
+                  ctx.font = "12px Arial";
+                  ctx.fillText(text, 20, y + 20);
+                };
+                node.addCustomWidget(widget);
+                return widget;
+              },
+                };
     },
 });
