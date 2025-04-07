@@ -177,8 +177,22 @@ class D2_ImageStack:
                 image_list.append(image)
 
         if len(image_list) > 0:
+            # 各画像のチャンネル数を確認
+            channels = [img.shape[-1] for img in image_list]
+            if len(set(channels)) > 1:
+                # すべての画像を同じチャンネル数に変換
+                target_channels = max(set(channels))  # 最大のチャンネル数を使用
+                for i in range(len(image_list)):
+                    if image_list[i].shape[-1] != target_channels:
+                        if target_channels == 4 and image_list[i].shape[-1] == 3:
+                            # RGB -> RGBA に変換（アルファチャンネルを1.0で追加）
+                            alpha = torch.ones((*image_list[i].shape[:-1], 1), device=image_list[i].device)
+                            image_list[i] = torch.cat([image_list[i], alpha], dim=-1)
+                        elif target_channels == 3 and image_list[i].shape[-1] == 4:
+                            # RGBA -> RGB に変換（アルファチャンネルを削除）
+                            image_list[i] = image_list[i][..., :3]
+            
             image_batch = torch.cat(image_list, dim=0)
-
             return (image_batch,)
 
         return (None,)
@@ -218,6 +232,21 @@ class D2_ImageMaskStack:
                 mask_list.append(mask)
 
         if len(image_list) > 0:
+            # 各画像のチャンネル数を確認
+            channels = [img.shape[-1] for img in image_list]
+            if len(set(channels)) > 1:
+                # すべての画像を同じチャンネル数に変換
+                target_channels = max(set(channels))  # 最大のチャンネル数を使用
+                for i in range(len(image_list)):
+                    if image_list[i].shape[-1] != target_channels:
+                        if target_channels == 4 and image_list[i].shape[-1] == 3:
+                            # RGB -> RGBA に変換（アルファチャンネルを1.0で追加）
+                            alpha = torch.ones((*image_list[i].shape[:-1], 1), device=image_list[i].device)
+                            image_list[i] = torch.cat([image_list[i], alpha], dim=-1)
+                        elif target_channels == 3 and image_list[i].shape[-1] == 4:
+                            # RGBA -> RGB に変換（アルファチャンネルを削除）
+                            image_list[i] = image_list[i][..., :3]
+            
             image_batch = torch.cat(image_list, dim=0)
             mask_batch = torch.cat(mask_list, dim=0)
 
