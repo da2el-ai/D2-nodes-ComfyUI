@@ -532,9 +532,14 @@ D2 Filename Template
 class D2_FilenameTemplate:
     @classmethod
     def INPUT_TYPES(cls):
+        tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
+                  "Node param -- %node:{id}.{key}%\n" \
+                  "arg_1-3 -- %arg_1%\n" \
+                  "Delete .safetensors -- %arg_1:ckpt_name"
+
         return {
             "required": {
-                "format": ("STRING",{},),
+                "format": ("STRING",{"tooltip": tooltip},),
             },
             "optional": {
                 "arg_1": (AnyType("*"), {"forceInput": True}),
