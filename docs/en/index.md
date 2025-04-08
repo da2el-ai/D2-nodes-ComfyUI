@@ -160,11 +160,15 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.09**
+
+- `D2_LoadImage`: Added output of filename and file path
+- `D2_FilenameTemplate`: Added tooltip to `format` (displayed on mouse hover)
+
 **2025.04.06**
 
 - `D2 Image Mask Stack`: Newly added
 - `D2 Mosaic Filter`: Newly added
-
 
 **2025.04.02**
 

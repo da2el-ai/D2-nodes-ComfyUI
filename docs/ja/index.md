@@ -161,6 +161,12 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.04.09**
+
+- `D2_LoadImage`: ファイル名とファイルパスの出力を追加
+- `D2_FilenameTemplate`: `format`にツールチップを追加（マウスホバーで表示）
+
+
 **2025.04.06**
 
 - `D2 Image Mask Stack`: 新規追加

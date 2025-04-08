@@ -161,6 +161,11 @@
 
 ## :blossom: 更新日誌
 
+**2025.04.09**
+
+- `D2_LoadImage`: 新增檔案名稱和檔案路徑的輸出
+- `D2_FilenameTemplate`: 為`format`新增工具提示（滑鼠懸停時顯示）
+
 **2025.04.06**
 
 - `D2 Image Mask Stack`: 新增功能
