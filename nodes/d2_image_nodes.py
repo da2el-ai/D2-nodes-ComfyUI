@@ -87,8 +87,8 @@ class D2_LoadImage(LoadImage):
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING", "STRING" )
-    RETURN_NAMES = ("IMAGE", "MASK", "width", "height", "positive", "negative")
+    RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING", "STRING", "STRING", "STRING", )
+    RETURN_NAMES = ("IMAGE", "MASK", "width", "height", "positive", "negative", "filename", "filepath" )
     FUNCTION = "load_image"
     CATEGORY = "D2/Image"
 
@@ -106,8 +106,10 @@ class D2_LoadImage(LoadImage):
             width = img.size[0]
             height = img.size[1]
             prompt = pnginfo_util.get_prompt(img)
+
+        filename = os.path.basename(image_path)
         
-        return (output_images, output_masks, width, height, prompt["positive"], prompt["negative"])
+        return (output_images, output_masks, width, height, prompt["positive"], prompt["negative"], filename, image_path)
 
 
 """
