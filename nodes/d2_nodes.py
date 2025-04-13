@@ -192,8 +192,8 @@ class D2_KSamplerAdvanced(D2_KSampler):
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", )
+    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
 
     OUTPUT_NODE = True
     FUNCTION = "run"
