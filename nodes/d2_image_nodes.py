@@ -2,10 +2,9 @@ from typing import Optional
 import torch
 import os
 import json
-# import re
 import random
 from PIL import Image, ImageOps, ImageSequence, ImageFile
-# import numpy as np
+import numpy as np
 from aiohttp import web
 from torchvision import transforms
 import numpy as np
@@ -15,6 +14,7 @@ import folder_paths
 # import comfy.sd
 # import comfy.samplers
 from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
+from comfy.cli_args import args
 
 from comfy_execution.graph_utils import GraphBuilder
 from comfy_execution.graph import ExecutionBlocker
@@ -28,6 +28,7 @@ from .modules import util
 # from .modules import checkpoint_util
 from .modules import pnginfo_util
 from .modules import grid_image_util
+# from .modules import impactpack_util as impact
 # from .modules.template_util import replace_template
 
 
@@ -673,6 +674,398 @@ class D2_MosaicFilter:
         return mosaic_image
 
 
+"""
+マスク処理のユーティリティ関数
+"""
+
+
+def apply_mask_to_image(img, mask):
+    """
+    マスクを画像に適用する
+    
+    Args:
+        img (torch.Tensor): 適用する画像 [height, width, channels]
+        mask (torch.Tensor): 適用するマスク [height, width]
+        
+    Returns:
+        torch.Tensor: マスクが適用された画像 [height, width, 4] (RGBA)
+    """
+    # チャンネル数を取得
+    channels = img.shape[-1]
+    rect_height, rect_width = img.shape[0], img.shape[1]
+    
+    # マスクで切り抜く - RGBA形式を確保
+    if channels == 4:  # 既にRGBA
+        # マスクをアルファチャンネルとして適用
+        result = img.clone()
+        result[:, :, 3] = result[:, :, 3] * mask
+    else:  # RGBをRGBAに変換
+        # 新しいRGBA画像を作成
+        result = torch.zeros((rect_height, rect_width, 4), dtype=img.dtype, device=img.device)
+        result[:, :, :3] = img  # RGB部分をコピー
+        
+        # マスクの形状を確認して適切に適用
+        if mask.shape[0] == rect_height and mask.shape[1] == rect_width:
+            result[:, :, 3] = mask  # マスクをアルファとして使用
+        else:
+            print(f"Mask crop shape mismatch: mask={mask.shape}, rect={rect_height}x{rect_width}")
+            # 簡易的な対応: 一律透明度を適用
+            result[:, :, 3] = 1.0
+    
+    return result
+
+def adjust_mask_dimensions(mask):
+    """
+    マスクの次元を確認して調整する
+    
+    Args:
+        mask (torch.Tensor): 調整するマスク
+        
+    Returns:
+        torch.Tensor: 調整されたマスク
+    """
+    # マスクの次元を確認して調整
+    if len(mask.shape) == 3 and mask.shape[0] == 1:
+        # バッチ次元のあるマスク [1, height, width] → [height, width]
+        mask = mask.squeeze(0)
+        print(f"Adjusted mask shape: {mask.shape}")
+    
+    return mask
+
+def check_mask_image_compatibility(mask, height, width):
+    """
+    マスク形状が画像に合っているか確認し、必要に応じて調整する
+    
+    Args:
+        mask (torch.Tensor): 確認するマスク
+        height (int): 画像の高さ
+        width (int): 画像の幅
+        
+    Returns:
+        torch.Tensor: 調整されたマスク
+    """
+    if mask.shape[0] != height or mask.shape[1] != width:
+        print(f"Warning: Image dimensions ({height}x{width}) and mask dimensions ({mask.shape[0]}x{mask.shape[1]}) don't match.")
+        # マスクのリサイズまたはトランスポーズが必要かもしれない
+        if mask.shape[0] == width and mask.shape[1] == height:
+            # 次元が逆の場合、転置する
+            mask = mask.transpose(0, 1)
+            print(f"Transposed mask shape: {mask.shape}")
+        # 他のケースでのリサイズ処理も必要に応じて追加
+    
+    return mask
+
+def adjust_rectangle_dimensions(x_min, y_min, x_max, y_max, width, height, padding=0, min_width=0, min_height=0):
+    """
+    矩形領域の寸法を調整する
+    
+    Args:
+        x_min (int): 矩形の左端のX座標
+        y_min (int): 矩形の上端のY座標
+        x_max (int): 矩形の右端のX座標
+        y_max (int): 矩形の下端のY座標
+        width (int): 画像の幅
+        height (int): 画像の高さ
+        padding (int): 矩形を拡張するピクセル数
+        min_width (int): 矩形の最小幅
+        min_height (int): 矩形の最小高さ
+        
+    Returns:
+        list: [x_min, y_min, rect_width, rect_height] の形式の調整された矩形領域
+    """
+    # 矩形の幅と高さを計算
+    rect_width = x_max - x_min + 1
+    rect_height = y_max - y_min + 1
+    
+    # 中心座標を計算
+    center_x = (x_min + x_max) // 2
+    center_y = (y_min + y_max) // 2
+    
+    # padding適用
+    if padding > 0:
+        rect_width += padding * 2
+        rect_height += padding * 2
+    
+    # 最小幅・高さ制約適用
+    if rect_width < min_width:
+        rect_width = min_width
+    if rect_height < min_height:
+        rect_height = min_height
+    
+    # 中心座標から新しい範囲を計算
+    x_min = max(0, center_x - rect_width // 2)
+    y_min = max(0, center_y - rect_height // 2)
+    x_max = min(width - 1, x_min + rect_width - 1)
+    y_max = min(height - 1, y_min + rect_height - 1)
+    
+    # 範囲を再調整（境界チェック後）
+    rect_width = x_max - x_min + 1
+    rect_height = y_max - y_min + 1
+    
+    return [int(x_min), int(y_min), int(rect_width), int(rect_height)]
+
+def create_rectangle_from_mask(mask_np, width, height, padding=0, min_width=0, min_height=0):
+    """
+    マスクから矩形領域を作成する
+    
+    Args:
+        mask_np (numpy.ndarray): マスクのNumPy配列
+        width (int): 画像の幅
+        height (int): 画像の高さ
+        padding (int): マスクエリアを拡張するピクセル数
+        min_width (int): マスクサイズの最小幅
+        min_height (int): マスクサイズの最小高さ
+        
+    Returns:
+        list: [x_min, y_min, rect_width, rect_height] の形式の矩形領域
+    """
+    # マスクのある範囲を取得（非ゼロの部分）
+    non_zero_indices = np.nonzero(mask_np)
+    
+    if len(non_zero_indices[0]) == 0:
+        # マスクが空の場合、全体を範囲とする
+        print("Empty mask detected, using full image dimensions")
+        return [0, 0, width, height]
+    
+    # マスクからRectangle作成
+    y_min, y_max = non_zero_indices[0].min(), non_zero_indices[0].max()
+    x_min, x_max = non_zero_indices[1].min(), non_zero_indices[1].max()
+    
+    # 矩形の寸法を調整
+    return adjust_rectangle_dimensions(
+        x_min, y_min, x_max, y_max, 
+        width, height, 
+        padding, min_width, min_height
+    )
+
+
+# 矩形領域の定数
+MIN_RECT_DIMENSION = 10
+BORDER_MARGIN = 11  # MIN_RECT_DIMENSION + 1
+
+def validate_rectangle(rect, center_x, center_y, width, height, min_width=0, min_height=0):
+    """
+    矩形領域が有効かどうか確認し、無効な場合は調整する
+    
+    Args:
+        rect (list): [x_min, y_min, rect_width, rect_height] の形式の矩形領域
+        center_x (int): マスクの中心X座標
+        center_y (int): マスクの中心Y座標
+        width (int): 画像の幅
+        height (int): 画像の高さ
+        min_width (int): 最小幅
+        min_height (int): 最小高さ
+        
+    Returns:
+        list: 調整された矩形領域
+    """
+    x_min, y_min, rect_width, rect_height = rect
+    
+    # 範囲が有効かどうか確認
+    if rect_width <= 0 or rect_height <= 0:
+        print("Invalid rectangle dimensions, using minimal dimensions")
+        x_min = min(center_x, width - BORDER_MARGIN)
+        y_min = min(center_y, height - BORDER_MARGIN)
+        rect_width = max(MIN_RECT_DIMENSION, min_width)
+        rect_height = max(MIN_RECT_DIMENSION, min_height)
+        x_max = min(width - 1, x_min + rect_width - 1)
+        y_max = min(height - 1, y_min + rect_height - 1)
+        rect_width = x_max - x_min + 1
+        rect_height = y_max - y_min + 1
+    
+    return [int(x_min), int(y_min), int(rect_width), int(rect_height)]
+
+"""
+マスクから画像を切り出すノード
+class名: D2_CutByMask
+
+input require:
+- images: 切り出し元画像
+- mask: マスク
+- cut_type: 切り取る画像の形状
+    - mask: マスクの形状通りに切り取る
+    - rectangle: マスク形状から長方形を算出して切り取る
+- output_size: 出力する画像サイズ
+    - mask_size: マスクのサイズ
+    - image_size: 入力画像のサイズ（入力画像の位置を保持した状態で周囲が透明になる）
+
+input optional:
+- padding: マスクエリアを拡張するピクセル数（初期値 0）
+- min_width: マスクサイズの最小幅（初期値 0）
+- min_height: マスクサイズの最小高さ（初期値 0）
+
+output:
+- image: マスク領域で切り取った画像
+- mask: マスク
+- rect: 切り取った座標(x, y, width, height)
+"""
+class D2_CutByMask:
+    """
+    マスクから画像を切り出すノード
+    """
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE",),
+                "mask": ("MASK",),
+                "cut_type": (["mask", "rectangle"],),
+                "output_size": (["mask_size", "image_size"],),
+            },
+            "optional": {
+                "padding": ("INT", {"default": 0, "min": 0, "max": 1000}),
+                "min_width": ("INT", {"default": 0, "min": 0, "max": 10000}),
+                "min_height": ("INT", {"default": 0, "min": 0, "max": 10000}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE", "MASK", "INT",)
+    RETURN_NAMES = ("image", "mask", "rect",)
+    FUNCTION = "cut_by_mask"
+    CATEGORY = "D2 Image Tools"
+
+    def cut_by_mask(self, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0):
+        # ComfyUIでの画像形状: [batch, height, width, channels]
+        # マスク形状: [batch, height, width] または [height, width]
+        
+        # 画像形状チェック - ComfyUI形式を確認
+        batch_size = images.shape[0]
+        height = images.shape[1]
+        width = images.shape[2]
+        channels = images.shape[3]
+        
+        print(f"Debug - Image shape: {images.shape}, Mask shape: {mask.shape}")
+        
+        # ユーティリティ関数を使用してマスクを調整
+        mask = adjust_mask_dimensions(mask)
+        mask = check_mask_image_compatibility(mask, height, width)
+        print(f"Debug - After compatibility check: mask shape={mask.shape}")
+        
+        # マスクのある範囲を取得（非ゼロの部分）
+        mask_np = mask.cpu().numpy()
+        non_zero_indices = np.nonzero(mask_np)
+        
+        if len(non_zero_indices[0]) == 0:
+            # マスクが空の場合、元の画像とマスクを返す
+            print("Empty mask detected, returning original image")
+            # データ型と形状を保持したテンソルを返す
+            rect_tensor = torch.tensor([0, 0, width, height], dtype=torch.int32)
+            return (images, mask, rect_tensor)
+        
+        # マスクから矩形領域を作成
+        rect = create_rectangle_from_mask(mask_np, width, height, padding, min_width, min_height)
+        
+        # 中心座標を計算（矩形の検証に必要）
+        if len(non_zero_indices[0]) > 0:
+            y_min, y_max = non_zero_indices[0].min(), non_zero_indices[0].max()
+            x_min, x_max = non_zero_indices[1].min(), non_zero_indices[1].max()
+            center_x = (x_min + x_max) // 2
+            center_y = (y_min + y_max) // 2
+        else:
+            center_x = width // 2
+            center_y = height // 2
+        
+        # 矩形領域を検証
+        rect = validate_rectangle(rect, center_x, center_y, width, height, min_width, min_height)
+        
+        # 矩形領域を取得
+        x_min, y_min, rect_width, rect_height = rect
+        print(f"Rectangle: x={rect[0]}, y={rect[1]}, w={rect[2]}, h={rect[3]}")
+        print(f"Debug - Rect dimensions: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
+        
+        # バッチ処理のための出力準備
+        output_images = []
+        
+        for b in range(batch_size):
+            # 2. & 3. マスクと画像のクローンを作成し、矩形領域でトリミング
+            
+            # 入力画像の取得 [height, width, channels]
+            img = images[b]
+            
+            # マスクのクローン作成とトリミング [rect_height, rect_width]
+            mask_crop = mask[y_min:y_min+rect_height, x_min:x_min+rect_width].clone()
+            
+            # 画像のクローン作成とトリミング [rect_height, rect_width, channels]
+            img_crop = img[y_min:y_min+rect_height, x_min:x_min+rect_width].clone()
+            
+            # デバッグ情報を表示
+            print(f"Debug - Crop dimensions: mask_crop={mask_crop.shape}, img_crop={img_crop.shape}")
+            
+            # 4. cut_type に基づいて処理
+            if cut_type == "mask":
+                # マスクを画像に適用
+                img_crop = apply_mask_to_image(img_crop, mask_crop)
+            else:  # rectangle
+                # 長方形領域を切り出す - 領域外は透明にする
+                if channels != 4:  # 既にRGBA
+                    # RGBをRGBAに変換
+                    # 新しいRGBA画像を作成
+                    rgba_img = torch.zeros((rect_height, rect_width, 4), dtype=img.dtype, device=img.device)
+                    print(f"Debug - RGBA image size: {rgba_img.shape}, img_crop size: {img_crop.shape}")
+                    rgba_img[:, :, :3] = img_crop  # RGB部分をコピー
+                    rgba_img[:, :, 3] = 1.0  # 矩形領域は完全不透明に
+                    img_crop = rgba_img
+            
+            # 5. output_size に基づいて出力画像を生成
+            if output_size == "mask_size":
+                # トリミングした画像をそのまま使用
+                output_img = img_crop
+                output_mask = mask_crop
+            else:  # image_size
+                # 元の画像サイズに合わせた透明な画像を生成
+                # RGBかRGBAかに関わらず、出力は必ずRGBAにする
+                output_img = torch.zeros((height, width, 4), 
+                                         dtype=img.dtype, device=img.device)
+                
+                # 切り抜いた画像を適切な位置に配置
+                output_img[y_min:y_min+rect_height, x_min:x_min+rect_width, :] = img_crop
+                
+                output_mask = mask
+            
+            output_images.append(output_img)
+        
+        # 出力を適切な形式に変換
+        output_tensor = torch.stack(output_images, dim=0)
+        rect_tensor = torch.tensor(rect, dtype=torch.int32)
+        
+        return (output_tensor, output_mask if output_size == "mask_size" else mask, rect_tensor)
+
+
+"""
+マスクと領域を指定して画像を結合するノード
+class名: D2_PasteByMask
+
+input require:
+- img_base: 下地になる画像（batch対応）
+- img_paste: 貼りつける画像（batch対応）
+- paste_mode: img_paste のトリミング方法と貼り付け座標を決める
+    - mask: img_paste を mask_opt でマスキングして x=0, y=0 の位置に貼りつける（マスク形状貼り付け）
+    - rect_full: img_paste を rect_opt のサイズでトリミングして rect_opt の位置に貼りつける（短形貼り付け）
+    - rect_position: img_paste を rect_opt の位置に貼りつける（短形貼り付け）
+    - rect_pos_mask: img_paste を mask_opt でマスキングして rect_opt の位置に貼りつける（マスク形状貼り付け）
+- multi_mode: img_base, img_paste のどちらか、または両方が複数枚だった時の処理
+    - pair_last: img_base, img_paste を先頭から同じインデックスのペアで処理する。片方の数が少ない時は最後の画像が採用される
+    - pair_only: pair_lastと同じ。片方の数が少ない時は処理前にエラーを表示して止まる
+    - cross: 全ての組み合わせを処理する
+
+input optional:
+- mask_opt: D2_CutByMaskが出力する mask
+- rect_opt: D2_CutByMaskが出力する rect
+- feather: 貼りつける時にエッジをボカす px数（初期値 0）
+
+output:
+- image: 合成した画像
+
+実装内容:
+1. paste_mode によってトリミングと貼り付け位置を分岐する
+2. feather > 0 の時はアルファチャンネルをボカシてなじませる
+    - `rect_full` `rect_position` の時は短形のマスクを作ってからぼかす
+3. img_base、img_paste いずれかが複数枚なら multi_mode に従って次の画像を処理する
+
+注意点:
+- img_base、img_paste が RGB / RGBA 両方あることを考慮する
+"""
 
 NODE_CLASS_MAPPINGS = {
     "D2 Preview Image": D2_PreviewImage,
@@ -684,4 +1077,5 @@ NODE_CLASS_MAPPINGS = {
     "D2 Image Mask Stack": D2_ImageMaskStack,
     "D2 Load Folder Images": D2_LoadFolderImages,
     "D2 Mosaic Filter": D2_MosaicFilter,
+    "D2 Cut By Mask": D2_CutByMask,
 }
