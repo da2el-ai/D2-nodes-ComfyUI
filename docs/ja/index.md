@@ -113,6 +113,10 @@ D2 Nodes ComfyUI
   - αチャンネル（透明度）付きの EmptyImage を出力
 - <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
   - 画像にモザイクフィルターをかける
+- <a href="node_image.md#D2-Cut-By-Mask">`D2 Cut By Mask`</a>
+  - マスクを使って画像をカットする
+- <a href="node_image.md#D2-Paste-By-Mask">`D2 Paste By Mask`</a>
+  - マスクを使って画像をペーストする
 
 
 ### XY Plot
@@ -160,6 +164,13 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.04.14**
+
+- `D2 Cut By Mask`: 新規追加
+- `D2 Paste By Mask`: 新規追加
+- `D2 XY Model List`: アップスケーラーモデルに対応
+- `D2 KSampler Advanced`: 出力に d2_pipe を追加
 
 **2025.04.09**
 

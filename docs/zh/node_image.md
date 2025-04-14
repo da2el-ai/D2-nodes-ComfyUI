@@ -184,3 +184,88 @@
 - 可調整透明度、亮度和顏色反轉等設置
 
 
+---
+
+
+### D2 Cut By Mask
+
+<figure>
+<img src="../img/cut-by-mask.png">
+</figure>
+
+- 使用遮罩裁剪圖像
+- 可以指定輸出形狀、尺寸、邊距等
+
+
+#### Input
+
+- `images`: 要裁剪的原始圖像
+- `mask`: 遮罩
+- `cut_type`: 裁剪圖像的形狀
+    - `mask`: 按照遮罩形狀裁剪
+    - `rectangle`: 從遮罩形狀計算並裁剪出矩形
+- `output_size`: 輸出圖像尺寸
+    - `mask_size`: 遮罩尺寸
+    - `image_size`: 輸入圖像尺寸（保持輸入圖像位置的同時周圍變為透明）
+- `padding`: 擴展遮罩area的像素數（預設值 0）
+- `min_width`: 遮罩尺寸的最小寬度（預設值 0）
+- `min_height`: 遮罩尺寸的最小高度（預設值 0）
+
+#### output
+- `image`: 通過遮罩區域裁剪的圖像
+- `mask`: 遮罩
+- `rect`: 裁剪的矩形區域
+
+
+
+---
+
+
+### D2 Paste By Mask
+
+<figure>
+<img src="../img/paste-by-mask.png">
+</figure>
+
+- 使用由 D2 Paste By Mask 創建的遮罩或矩形區域合成圖像
+- 可以指定模糊寬度、貼上形狀等
+
+#### Input
+
+- `img_base`: 底層圖像（支援批次處理）
+- `img_paste`: 要貼上的圖像（支援批次處理）
+- `paste_mode`: 決定如何裁剪 img_paste 以及貼上座標
+    - `mask`: 用 mask_opt 遮罩 img_paste 並在位置 x=0, y=0 貼上（遮罩形狀貼上）
+    - `rect_full`: 將 img_paste 裁剪為 rect_opt 的尺寸並在 rect_opt 位置貼上（矩形貼上）
+    - `rect_position`: 在 rect_opt 位置貼上 img_paste（矩形貼上）
+    - `rect_pos_mask`: 用 mask_opt 遮罩 img_paste 並在 rect_opt 位置貼上（遮罩形狀貼上）
+- `multi_mode`: 當 img_base、img_paste 其中一個或兩者都有多張圖像時的處理方式
+    - `pair_last`: 從頭開始以相同索引處理 img_base 和 img_paste 對。如果其中一個圖像較少，則使用最後一張圖像
+    - `pair_only`: 與 pair_last 相同。如果其中一個圖像較少，則在處理前顯示錯誤並停止
+    - `cross`: 處理所有組合
+
+input `optional`:
+- `mask_opt`: 遮罩
+- `rect_opt`: 矩形區域
+- `feather`: 邊緣模糊的像素數（預設值 0）
+
+
+#### output
+
+- `image`: 合成的圖像
+
+#### 關於 multi_mode
+
+`pair_last` 和 `pair_only` 將 `img_base` 和 `img_paste` 中相同順序的圖像作為一對輸出。
+
+<figure>
+<img src="../img/paste-by-mask_pair.png">
+</figure>
+
+`cross` 輸出所有組合。
+
+<figure>
+<img src="../img/paste-by-mask_cross.png">
+</figure>
+
+

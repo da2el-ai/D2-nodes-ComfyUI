@@ -116,6 +116,10 @@
   - 輸出帶有 α 通道（透明度）的 EmptyImage
 - <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
   - 為圖像添加馬賽克濾鏡效果
+- <a href="node_image.md#D2-Cut-By-Mask">`D2 Cut By Mask`</a>
+  - 使用遮罩裁剪圖像
+- <a href="node_image.md#D2-Paste-By-Mask">`D2 Paste By Mask`</a>
+  - 使用遮罩貼上圖像
 
 
 ### XY Plot
@@ -160,6 +164,13 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.04.14**
+
+- `D2 Cut By Mask`: 新增功能
+- `D2 Paste By Mask`: 新增功能
+- `D2 XY Model List`: 支援升頻模型
+- `D2 KSampler Advanced`: 輸出增加 d2_pipe
 
 **2025.04.09**
 

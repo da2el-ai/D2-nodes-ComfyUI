@@ -180,3 +180,87 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 - Applies a mosaic filter
 - Adjustable transparency, brightness, and color inversion options
 
+
+---
+
+
+### D2 Cut By Mask
+
+<figure>
+<img src="../img/cut-by-mask.png">
+</figure>
+
+- Cut an image using a mask
+- Can specify the output shape, size, margins, etc.
+
+
+#### Input
+
+- `images`: Source image to cut from
+- `mask`: Mask
+- `cut_type`: Shape of the cut image
+    - `mask`: Cut according to the mask shape
+    - `rectangle`: Calculate and cut a rectangle from the mask shape
+- `output_size`: Output image size
+    - `mask_size`: Mask size
+    - `image_size`: Input image size (surroundings become transparent while preserving the input image position)
+- `padding`: Number of pixels to expand the mask area (default 0)
+- `min_width`: Minimum width of mask size (default 0)
+- `min_height`: Minimum height of mask size (default 0)
+
+#### output
+- `image`: Image cut by the mask area
+- `mask`: Mask
+- `rect`: Cut rectangular area
+
+
+
+---
+
+
+### D2 Paste By Mask
+
+<figure>
+<img src="../img/paste-by-mask.png">
+</figure>
+
+- Composite images using masks or rectangular areas created with D2 Paste By Mask
+- Can specify blur width, paste shape, etc.
+
+#### Input
+
+- `img_base`: Base image (batch compatible)
+- `img_paste`: Image to paste (batch compatible)
+- `paste_mode`: Determines how to trim img_paste and the paste coordinates
+    - `mask`: Mask img_paste with mask_opt and paste at position x=0, y=0 (mask shape pasting)
+    - `rect_full`: Trim img_paste to the size of rect_opt and paste at the position of rect_opt (rectangular pasting)
+    - `rect_position`: Paste img_paste at the position of rect_opt (rectangular pasting)
+    - `rect_pos_mask`: Mask img_paste with mask_opt and paste at the position of rect_opt (mask shape pasting)
+- `multi_mode`: Processing method when either or both of img_base and img_paste have multiple images
+    - `pair_last`: Process img_base and img_paste pairs from the beginning with the same index. If one has fewer images, the last image is used
+    - `pair_only`: Same as pair_last. If one has fewer images, an error is displayed and processing stops
+    - `cross`: Process all combinations
+
+input `optional`:
+- `mask_opt`: Mask
+- `rect_opt`: Rectangular area
+- `feather`: Number of pixels to blur the edge (default 0)
+
+
+#### output
+
+- `image`: Composited image
+
+#### About multi_mode
+
+`pair_last` and `pair_only` output the same ordered images from `img_base` and `img_paste` as pairs.
+
+<figure>
+<img src="../img/paste-by-mask_pair.png">
+</figure>
+
+`cross` outputs all combinations.
+
+<figure>
+<img src="../img/paste-by-mask_cross.png">
+</figure>

@@ -113,6 +113,10 @@ If you have installed any of the following custom nodes previously, please remov
   - Outputs EmptyImage with alpha channel (transparency)
 - <a href="node_image.md#D2-Mosaic-Filter">`D2 Mosaic Filter`</a>
   - Applies a mosaic filter to images
+- <a href="node_image.md#D2-Cut-By-Mask">`D2 Cut By Mask`</a>
+  - Cut an image using a mask
+- <a href="node_image.md#D2-Paste-By-Mask">`D2 Paste By Mask`</a>
+  - Paste an image using a mask
 
 
 ### XY Plot
@@ -159,6 +163,13 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.04.14**
+
+- `D2 Cut By Mask`: Newly added
+- `D2 Paste By Mask`: Newly added
+- `D2 XY Model List`: Added support for upscaler models
+- `D2 KSampler Advanced`: Added d2_pipe to outputs
 
 **2025.04.09**
 

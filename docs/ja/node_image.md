@@ -192,3 +192,87 @@ Node
 
 
 
+
+---
+
+
+### D2 Cut By Mask
+
+<figure>
+<img src="../img/cut-by-mask.png">
+</figure>
+
+- マスクで画像をカットする
+- 出力する形状、サイズ、余白などを指定できる
+
+
+#### Input
+
+- `images`: 切り出し元画像
+- `mask`: マスク
+- `cut_type`: 切り取る画像の形状
+    - `mask`: マスクの形状通りに切り取る
+    - `rectangle`: マスク形状から長方形を算出して切り取る
+- `output_size`: 出力する画像サイズ
+    - `mask_size`: マスクのサイズ
+    - `image_size`: 入力画像のサイズ（入力画像の位置を保持した状態で周囲が透明になる）
+- `padding`: マスクエリアを拡張するピクセル数（初期値 0）
+- `min_width`: マスクサイズの最小幅（初期値 0）
+- `min_height`: マスクサイズの最小高さ（初期値 0）
+
+#### output
+- `image`: マスク領域で切り取った画像
+- `mask`: マスク
+- `rect`: 切り取った短形領域
+
+
+
+---
+
+
+### D2 Paste By Mask
+
+<figure>
+<img src="../img/paste-by-mask.png">
+</figure>
+
+- D2 Paste By Mask で作成したマスクや短形領域を使って画像を合成する
+- ボカし幅、貼り付け形状などが指定できる
+
+#### Input
+
+- `img_base`: 下地になる画像（batch対応）
+- `img_paste`: 貼りつける画像（batch対応）
+- `paste_mode`: img_paste のトリミング方法と貼り付け座標を決める
+    - `mask`: img_paste を mask_opt でマスキングして x=0, y=0 の位置に貼りつける（マスク形状貼り付け）
+    - `rect_full`: img_paste を rect_opt のサイズでトリミングして rect_opt の位置に貼りつける（短形貼り付け）
+    - `rect_position`: img_paste を rect_opt の位置に貼りつける（短形貼り付け）
+    - `rect_pos_mask`: img_paste を mask_opt でマスキングして rect_opt の位置に貼りつける（マスク形状貼り付け）
+- `multi_mode`: img_base, img_paste のどちらか、または両方が複数枚だった時の処理
+    - `pair_last`: img_base, img_paste を先頭から同じインデックスのペアで処理する。片方の数が少ない時は最後の画像が採用される
+    - `pair_only`: pair_lastと同じ。片方の数が少ない時は処理前にエラーを表示して止まる
+    - `cross`: 全ての組み合わせを処理する
+
+input `optional`:
+- `mask_opt`: マスク
+- `rect_opt`: 短形領域
+- `feather`: エッジをボカすpx数（初期値 0）
+
+
+#### output
+
+- `image`: 合成した画像
+
+#### multi_mode について
+
+`pair_last` `pair_only` は `img_base` と `img_paste` の同じ順番の画像でペアとして出力する。
+
+<figure>
+<img src="../img/paste-by-mask_pair.png">
+</figure>
+
+`cross` は全ての組み合わせを出力する。
+
+<figure>
+<img src="../img/paste-by-mask_cross.png">
+</figure>
