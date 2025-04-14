@@ -207,6 +207,7 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 - `padding`: Number of pixels to expand the mask area (default 0)
 - `min_width`: Minimum width of mask size (default 0)
 - `min_height`: Minimum height of mask size (default 0)
+- `output_alpha`: Whether to include alpha channel in the output image
 
 #### output
 - `image`: Image cut by the mask area

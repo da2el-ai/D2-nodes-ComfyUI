@@ -210,6 +210,7 @@
 - `padding`: 擴展遮罩area的像素數（預設值 0）
 - `min_width`: 遮罩尺寸的最小寬度（預設值 0）
 - `min_height`: 遮罩尺寸的最小高度（預設值 0）
+- `output_alpha`: 是否在輸出圖像中包含透明度通道
 
 #### output
 - `image`: 通過遮罩區域裁剪的圖像
