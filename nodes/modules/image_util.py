@@ -54,7 +54,7 @@ def adjust_mask_dimensions(mask):
     if len(mask.shape) == 3 and mask.shape[0] == 1:
         # バッチ次元のあるマスク [1, height, width] → [height, width]
         mask = mask.squeeze(0)
-        print(f"Adjusted mask shape: {mask.shape}")
+        # print(f"Adjusted mask shape: {mask.shape}")
     
     return mask
 
