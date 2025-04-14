@@ -693,6 +693,7 @@ class D2_CutByMask:
     - padding: マスクエリアを拡張するピクセル数（初期値 0）
     - min_width: マスクサイズの最小幅（初期値 0）
     - min_height: マスクサイズの最小高さ（初期値 0）
+    - output_alpha: 出力画像にαチャンネルを含めるか
 
     output:
     - image: マスク領域で切り取った画像
@@ -713,6 +714,7 @@ class D2_CutByMask:
                 "padding": ("INT", {"default": 0, "min": 0, "max": 1000}),
                 "min_width": ("INT", {"default": 0, "min": 0, "max": 10000}),
                 "min_height": ("INT", {"default": 0, "min": 0, "max": 10000}),
+                "output_alpha": ("BOOLEAN", {"default":True})
             }
         }
 
@@ -721,7 +723,7 @@ class D2_CutByMask:
     FUNCTION = "cut_by_mask"
     CATEGORY = "D2 Image Tools"
 
-    def cut_by_mask(self, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0):
+    def cut_by_mask(self, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0, output_alpha=True):
         # ComfyUIでの画像形状: [batch, height, width, channels]
         # マスク形状: [batch, height, width] または [height, width]
         
@@ -813,6 +815,9 @@ class D2_CutByMask:
                 
                 output_mask = mask
             
+            if output_alpha == False:
+                output_img = image_util.convert_to_rgba_or_rgb(output_img, "rgb")
+
             output_images.append(output_img)
         
         # 出力を適切な形式に変換
@@ -972,10 +977,10 @@ class D2_PasteByMask:
             torch.Tensor: 合成した画像 [height, width, channels]
         """
         # ベース画像をRGBAに変換（必要な場合）
-        img_base_rgba = image_util.convert_to_rgba(img_base)
+        img_base_rgba = image_util.convert_to_rgba_or_rgb(img_base, "rgba")
         
         # 貼り付け画像の準備と変換
-        img_paste_rgba = image_util.convert_to_rgba(img_paste)
+        img_paste_rgba = image_util.convert_to_rgba_or_rgb(img_paste, "rgba")
         
         # 矩形情報を取得
         x, y, rect_width, rect_height = rect_opt.tolist()

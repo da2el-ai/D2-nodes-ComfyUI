@@ -84,28 +84,40 @@ def check_mask_image_compatibility(mask, height, width):
 
 
 
-def convert_to_rgba(img):
+def convert_to_rgba_or_rgb(img, mode="rgba"):
     """
-    RGBまたはRGBA画像を確実にRGBA形式に変換
+    RGBまたはRGBA形式に変換
     
     Args:
         img (torch.Tensor): 変換する画像 [height, width, channels]
         
     Returns:
-        torch.Tensor: RGBA形式の画像 [height, width, 4]
+        torch.Tensor: RGBA形式の画像 [height, width, 3 or 4]
     """
     # チャンネル数を取得
+    if len(img.shape) < 3:
+        raise ValueError("入力画像は少なくとも3次元である必要があります [height, width, channels]")
+
     channels = img.shape[-1]
     height, width = img.shape[0], img.shape[1]
     
-    if channels == 4:  # 既にRGBA
+    if mode == "rgba" and channels == 4:  # 既にRGBA
         return img
-    else:  # RGBをRGBAに変換
-        # 新しいRGBA画像を作成
+    elif mode == "rgb" and channels == 3:  # 既にRGB
+        return img
+    elif channels == 1:  
+        # グレースケールをRGBに変換
+        return img.repeat(1, 1, 3)
+    elif mode == "rgba":
+        # RGBをRGBAに変換
         result = torch.zeros((height, width, 4), dtype=img.dtype, device=img.device)
         result[:, :, :3] = img  # RGB部分をコピー
         result[:, :, 3] = 1.0   # アルファチャンネルは完全不透明に
         return result
+    else:
+        # RGBAをRGBに変換
+        # 最初の3チャンネル（RGB部分）のみを取得
+        return img[:, :, :3]  
 
 
 def apply_simple_inner_feathering(mask, feather_radius):
