@@ -6,6 +6,7 @@ import folder_paths
 
 from .modules import util
 from .modules import size_util
+from .modules import image_util
 
 
 """
@@ -95,7 +96,7 @@ class D2_ImageResize:
 
         for img in image:
             resized_image, new_width, new_height = size_util.apply_resize_image(
-                util.tensor2pil(img), 
+                image_util.tensor2pil(img), 
                 mode = mode, 
                 rescale_factor = rescale_factor, 
                 resize_width = resize_width, 
@@ -106,7 +107,7 @@ class D2_ImageResize:
                 resampling = resampling, 
                 preset = preset
             )
-            scaled_images.append(util.pil2tensor(resized_image))
+            scaled_images.append(image_util.pil2tensor(resized_image))
 
         scaled_images = torch.cat(scaled_images, dim=0)
 

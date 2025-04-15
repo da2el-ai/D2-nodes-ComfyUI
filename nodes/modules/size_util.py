@@ -11,6 +11,7 @@ import numpy as np
 
 from comfy_extras.nodes_upscale_model import UpscaleModelLoader, ImageUpscaleWithModel
 from . import util
+from . import image_util
 
 D2_TResizeMethod = Literal["None", "none", "Floor", "floor", "Ceil", "ceil", "Round", "round"]
 
@@ -162,12 +163,12 @@ def apply_resize_image(
         model_loader = UpscaleModelLoader()
         model = model_loader.load_model(upscale_model)[0]
 
-        img_tensor =util.pil2tensor(image)
+        img_tensor =image_util.pil2tensor(image)
                
         upscaler = ImageUpscaleWithModel()
         image_tensor = upscaler.upscale(model, img_tensor)[0]
 
-        image = util.tensor2pil(image_tensor)
+        image = image_util.tensor2pil(image_tensor)
 
     # Resize the image using the given resampling filter
     resized_image = image.resize((new_width, new_height), resample=Image.Resampling(RESAMPLE_FILTERS[resampling]))

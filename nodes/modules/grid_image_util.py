@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
-# from .util import pil2tensor, tensor2pil
 
 
 FONT_PATH = str(Path(__file__).parent.parent.parent / "static" / "Roboto-Regular.ttf")

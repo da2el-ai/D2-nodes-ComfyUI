@@ -1,5 +1,6 @@
 from typing import Optional
 import torch
+import torch.nn.functional as F
 import os
 import json
 import random
@@ -187,12 +188,10 @@ class D2_ImageStack:
                 for i in range(len(image_list)):
                     if image_list[i].shape[-1] != target_channels:
                         if target_channels == 4 and image_list[i].shape[-1] == 3:
-                            # RGB -> RGBA に変換（アルファチャンネルを1.0で追加）
-                            alpha = torch.ones((*image_list[i].shape[:-1], 1), device=image_list[i].device)
-                            image_list[i] = torch.cat([image_list[i], alpha], dim=-1)
+                            image_list[i] = image_util.convert_to_rgba_or_rgb(image_list[i], "rgba")
                         elif target_channels == 3 and image_list[i].shape[-1] == 4:
                             # RGBA -> RGB に変換（アルファチャンネルを削除）
-                            image_list[i] = image_list[i][..., :3]
+                            image_list[i] = image_util.convert_to_rgba_or_rgb(image_list[i], "rgb")
             
             image_batch = torch.cat(image_list, dim=0)
             return (image_batch,)
@@ -243,11 +242,10 @@ class D2_ImageMaskStack:
                     if image_list[i].shape[-1] != target_channels:
                         if target_channels == 4 and image_list[i].shape[-1] == 3:
                             # RGB -> RGBA に変換（アルファチャンネルを1.0で追加）
-                            alpha = torch.ones((*image_list[i].shape[:-1], 1), device=image_list[i].device)
-                            image_list[i] = torch.cat([image_list[i], alpha], dim=-1)
+                            image_list[i] = image_util.convert_to_rgba_or_rgb(image_list[i], "rgba")
                         elif target_channels == 3 and image_list[i].shape[-1] == 4:
                             # RGBA -> RGB に変換（アルファチャンネルを削除）
-                            image_list[i] = image_list[i][..., :3]
+                            image_list[i] = image_util.convert_to_rgba_or_rgb(image_list[i], "rgb")
             
             image_batch = torch.cat(image_list, dim=0)
             mask_batch = torch.cat(mask_list, dim=0)
@@ -557,8 +555,6 @@ class D2_MosaicFilter:
         brightness: モザイクの明るさ。初期値:0 / -100=真っ黒 / 100=真っ白
         invert_color: 色を反転する 
         """
-        import torch
-        import torch.nn.functional as F
         
         # 結果を格納するリスト
         result_images = []
@@ -569,7 +565,7 @@ class D2_MosaicFilter:
             original_image = image.clone()
             
             # モザイク処理を適用
-            mosaic_image = self._apply_mosaic_to_image(
+            mosaic_image = image_util.apply_mosaic_to_image(
                 image, 
                 dot_size, 
                 color_mode, 
@@ -587,90 +583,6 @@ class D2_MosaicFilter:
         # すべての画像を結合して返す
         return (torch.stack(result_images),)
 
-    def _apply_mosaic_to_image(self, image, dot_size, color_mode, brightness, invert_color):
-        """
-        単一の画像にモザイク効果を適用する内部関数
-        
-        Args:
-            image: 入力画像テンソル [batch, height, width, channels] または [height, width, channels]
-            dot_size: ドットの大きさ
-            color_mode: 色のモード ("average" または "original")
-            brightness: 明るさ調整 (-100 から 100)
-            invert_color: 色を反転するかどうか
-            
-        Returns:
-            モザイク効果を適用した画像テンソル
-        """
-        import torch
-        
-        # 画像の形状を取得
-        shape = image.shape
-        
-        # バッチ次元がない場合（3次元テンソル）は一時的にバッチ次元を追加
-        is_3d = len(shape) == 3
-        if is_3d:
-            # [height, width, channels] -> [1, height, width, channels]
-            image = image.unsqueeze(0)
-            shape = image.shape
-            
-        # ComfyUIの画像テンソルは [batch, height, width, channels] の形式
-        batch_size, height, width, channels = shape
-        
-        # dot_sizeが1より小さい場合は1に制限
-        dot_size = max(1, dot_size)
-        
-        # 結果画像の初期化
-        mosaic_image = torch.zeros_like(image)
-        
-        # グリッドの数を計算（上限は切り上げて全体をカバー）
-        grid_h = (height + dot_size - 1) // dot_size
-        grid_w = (width + dot_size - 1) // dot_size
-        
-        # 各グリッドセルを処理
-        for i in range(grid_h):
-            for j in range(grid_w):
-                # セルの範囲（画像の境界を超えないように制限）
-                start_h = i * dot_size
-                end_h = min(start_h + dot_size, height)
-                start_w = j * dot_size
-                end_w = min(start_w + dot_size, width)
-                
-                # セル内のピクセルを取得
-                cell = image[:, start_h:end_h, start_w:end_w, :]
-                
-                if color_mode == "average":
-                    # セル内の色の平均を計算 (チャンネルごとに)
-                    avg_color = torch.mean(cell, dim=(1, 2))  # [batch_size, channels]
-                    cell_color = avg_color.unsqueeze(1).unsqueeze(2)  # [batch_size, 1, 1, channels]
-                else:  # "original"
-                    # セルの中央のピクセルの色を使用（境界を超えないように）
-                    center_h = min(start_h + (end_h - start_h) // 2, height - 1)
-                    center_w = min(start_w + (end_w - start_w) // 2, width - 1)
-                    cell_color = image[:, center_h:center_h+1, center_w:center_w+1, :]
-                
-                # 明るさ調整
-                if brightness != 0:
-                    # -100～100 の範囲を -1～1 に変換
-                    brightness_factor = brightness / 100.0
-                    if brightness_factor > 0:
-                        # 明るくする（白に近づける）
-                        cell_color = cell_color + (1 - cell_color) * brightness_factor
-                    else:
-                        # 暗くする（黒に近づける）
-                        cell_color = cell_color * (1 + brightness_factor)
-                
-                # 色を反転
-                if invert_color:
-                    cell_color = 1.0 - cell_color
-                
-                # モザイクセルを結果画像に適用
-                mosaic_image[:, start_h:end_h, start_w:end_w, :] = cell_color
-            
-        # 元の形状に戻す（3次元テンソルだった場合）
-        if is_3d:
-            mosaic_image = mosaic_image.squeeze(0)
-            
-        return mosaic_image
 
 
 
