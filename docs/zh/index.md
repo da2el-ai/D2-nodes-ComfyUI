@@ -165,6 +165,12 @@
 
 ## :blossom: 更新日誌
 
+**2025.04.16**
+
+- `D2_Prompt`：添加LoRA插入按鈕
+- `D2_KSampler` / `D2_KSamplerAdvanced`：支援A1111方式的LoRA載入提示詞。在KSampler內部進行LoRA載入
+- `D2_LoadLora`：輸出的 `prompt` 更改為不刪除A1111方式的LoRA載入提示詞。傳統的輸出已重新命名為 `formatted_prompt`
+
 **2025.04.14**
 
 - `D2 Cut By Mask`: 新增功能

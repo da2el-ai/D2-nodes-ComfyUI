@@ -22,28 +22,29 @@ Node
 ### D2 KSampler / D2 KSampler(Advanced)
 
 <figure>
-<img src="../img/ksampler_2.png">
+<img src="../img/ksampler_3.png">
 </figure>
 
 - プロンプトを STRING で入力できる KSampler
+- A1111方式のLoRA読み込みプロンプトに対応
+  - ※`D2 KSampler Advanced` に `positive_cond` / `negative_cond` を入力した場合はCLIPにLoRAは適用されません。
 
 #### Input
 
-- `cnet_stack`
-  - `D2 Controlnet Loader` 接続用
-- `model` / `clip` / `vae` / ..etc
-    - 標準の KSampler と同じ
-- `negative` / `positive`
-    - STRING 形式のプロンプト
+- `cnet_stack`: `D2 Controlnet Loader` 接続用
+- `model` / `clip` / `vae` / ..etc: 標準の KSampler と同じ
+- `negative` / `positive`: STRING 形式のプロンプト
 
 #### Output
 
-- `IMAGE`
-    - 画像出力
-- `positive` / `negative`
-    - Input のパススルー
+- `MODEL` / `CLIP`: LoRA適用済み
+- `positive` / `negative`: Input のパススルー
+- `formatted_positive`: A1111方式のLoRA読み込みを削除したpositiveプロンプト
+- `d2_pipe`: パラメーターをまとめたもの
+
 
 ---
+
 
 ### D2 Pipe
 
@@ -135,6 +136,12 @@ Node
 - `mode`
   - `a1111`: StableDiffusion webui A1111と同じ書式が使用可能なモード
   - `simple`: LoRA名を並べるだけのシンプルなモード。このモードでは output の `STRING` は使わない
+
+#### Output
+
+- `MODEL` / `CLIP`: LoRA適用済みのMODEL、CLIP
+- `prompt`: 入力されたテキストをそのまま出力
+- `formatted_prompt`: LoRA指定部分が削除されたテキスト
 
 
 #### モードによる書式の違い

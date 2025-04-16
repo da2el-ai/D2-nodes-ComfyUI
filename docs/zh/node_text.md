@@ -211,6 +211,7 @@ Output text
   <img src="../img/prompt.png">
 </figure>
 
+- 您可以從 `CHOOSE` 按鈕選擇LoRA，並插入A1111方式的LoRA提示詞
 - 刪除文字中的註解
 - 包括行首「#」、行首「//」以及「/*」至「*/」之間的內容
 - 在底部顯示令牌數量

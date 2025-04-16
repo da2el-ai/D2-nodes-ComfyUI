@@ -164,6 +164,12 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.16**
+
+- `D2_Prompt`: Add LoRA insertion button
+- `D2_KSampler` / `D2_KSamplerAdvanced`: Support A1111-style LoRA loading prompts. Load LoRA inside KSampler
+- `D2_LoadLora`: Changed the output `prompt` to output A1111-style LoRA loading prompts without removing them. The conventional output has been renamed to `formatted_prompt`
+
 **2025.04.14**
 
 - `D2 Cut By Mask`: Newly added

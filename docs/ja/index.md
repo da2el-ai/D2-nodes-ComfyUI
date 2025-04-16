@@ -165,6 +165,12 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.04.16**
+
+- `D2_Prompt`: LoRA挿入ボタンを追加
+- `D2_KSampler` / `D2_KSamplerAdvanced`: A1111方式のLoRA読み込みプロンプトに対応。KSampler内部でLoRA読み込みをする
+- `D2_LoadLora`: outputの `prompt` はA1111方式のLoRA読み込みプロンプトを消さずに出力するように変更。従来のものは `formatted_prompt` に名称変更
+
 **2025.04.14**
 
 - `D2 Cut By Mask`: 新規追加

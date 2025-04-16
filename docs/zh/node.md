@@ -20,27 +20,25 @@
 ### D2 KSampler / D2 KSampler(Advanced)
 
 <figure>
-<img src="../img/ksampler_2.png">
+<img src="../img/ksampler_3.png">
 </figure>
 
-- 可以用 STRING 格式輸入提示詞的 KSampler
+- 可以用STRING格式輸入提示詞的KSampler
+- 支援A1111方式的LoRA載入提示詞
+  - 註：當在`D2 KSampler Advanced`中輸入`positive_cond` / `negative_cond`時，LoRA將不會套用到CLIP。
 
 #### Input
 
-- `cnet_stack`
-  - 用於連接 `D2 Controlnet Loader`
-- `model` / `clip` / `vae` / ..etc
-    - 與標準 KSampler 相同
-- `negative` / `positive`
-    - STRING 格式的提示詞
+- `cnet_stack`：用於連接`D2 Controlnet Loader`
+- `model` / `clip` / `vae` / ..etc：與標準KSampler相同
+- `negative` / `positive`：STRING格式的提示詞
 
 #### Output
 
-- `IMAGE`
-    - 圖像輸出
-- `positive` / `negative`
-    - Input 的直通
-
+- `MODEL` / `CLIP`：已套用LoRA
+- `positive` / `negative`：輸入的直接傳遞
+- `formatted_positive`：已刪除A1111方式LoRA載入的positive提示詞
+- `d2_pipe`：整合後的參數
 
 ---
 
@@ -124,12 +122,17 @@
 - 具體使用方法請參考<a href="workflow.md">範例工作流程</a>
 
 
-#### 輸入
+#### Input
 
 - `mode`
   - `a1111`: 可以使用與StableDiffusion webui A1111相同格式的模式
   - `simple`: 僅列出LoRA名稱的簡單模式。在此模式下，不使用輸出中的`STRING`
 
+#### Output
+
+- `MODEL` / `CLIP`: 已套用LoRA的MODEL、CLIP
+- `prompt`: 直接輸出輸入的文字
+- `formatted_prompt`: 已刪除LoRA指定部分的文字
 
 #### 不同模式下的格式差異
 

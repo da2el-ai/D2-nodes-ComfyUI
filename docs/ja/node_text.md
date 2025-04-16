@@ -216,9 +216,10 @@ Output text
 ### D2 Prompt
 
 <figure>
-  <img src="../img/prompt.png">
+  <img src="../img/prompt.png?2">
 </figure>
 
+- `CHOOSE`ボタンからLoRAを選択し、A1111方式のLoRAプロンプトを挿入できる
 - テキスト内のコメントを削除する
 - 行頭「#」、行頭「//」、「/\*」〜「\*/」の間が対象
 - トークン数を下部に表示

@@ -17,29 +17,29 @@
 ### D2 KSampler / D2 KSampler(Advanced)
 
 <figure>
-<img src="../img/ksampler_2.png">
+<img src="../img/ksampler_3.png">
 </figure>
 
-- KSampler that can input prompts as STRING
+- KSampler that can input prompts in STRING format
+- Supports A1111-style LoRA loading prompts
+  - Note: When inputting `positive_cond` / `negative_cond` to `D2 KSampler Advanced`, LoRA will not be applied to CLIP.
 
 #### Input
 
-- `cnet_stack`
-  - For connecting to `D2 Controlnet Loader`
-- `model` / `clip` / `vae` / ..etc
-    - Same as standard KSampler
-- `negative` / `positive`
-    - Prompts in STRING format
+- `cnet_stack`: For connecting to `D2 Controlnet Loader`
+- `model` / `clip` / `vae` / ..etc: Same as standard KSampler
+- `negative` / `positive`: Prompts in STRING format
 
 #### Output
 
-- `IMAGE`
-    - Image output
-- `positive` / `negative`
-    - Input passthrough
-
+- `MODEL` / `CLIP`: With LoRA applied
+- `positive` / `negative`: Input passthrough
+- `formatted_positive`: Positive prompt with A1111-style LoRA loading removed
+- `d2_pipe`: Consolidated parameters
 
 ---
+
+
 
 ### D2 Pipe
 
@@ -127,6 +127,11 @@
   - `a1111`: Mode that allows using the same format as StableDiffusion webui A1111
   - `simple`: Simple mode that just lists LoRA names. In this mode, the `STRING` output is not used
 
+#### Output
+
+- `MODEL` / `CLIP`: MODEL and CLIP with LoRA applied
+- `prompt`: Outputs the input text as is
+- `formatted_prompt`: Text with LoRA specification parts removed
 
 #### Format differences based on mode
 
