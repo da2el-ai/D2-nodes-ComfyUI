@@ -407,7 +407,7 @@ class D2_GridImage:
 
             # タイトル結合
             finish_image = self.__class__.create_grid_title_image(grid_image, title_text, font_size)
-            finish_image = util.pil2tensor(finish_image)
+            finish_image = image_util.pil2tensor(finish_image)
             D2_GridImage_ImageStocker.reset_images(unique_id)
 
             return {

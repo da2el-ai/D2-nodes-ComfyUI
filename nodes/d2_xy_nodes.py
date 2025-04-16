@@ -24,6 +24,8 @@ from server import PromptServer
 from .modules import util
 from .modules.util import AnyType, D2_TD2Pipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe
 from .modules import grid_image_util
+from .modules import image_util
+
 
 
 
@@ -407,7 +409,7 @@ class D2_XYGridImage:
                 grid_gap = grid_gap, 
                 swap_dimensions = swap_dimensions
             )
-            grid_image = util.pil2tensor(grid_image)
+            grid_image = image_util.pil2tensor(grid_image)
             self.finished = True
             self.image_batch = None
 
