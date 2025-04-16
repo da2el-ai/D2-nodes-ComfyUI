@@ -11,7 +11,7 @@ app.registerExtension({
     // loraを選択してテキストエリアに埋め込む
     const defaultValue = "CHOOSE";
     const chooserWidget = findWidgetByName(node, "insert_lora");
-    const textWidget =  findWidgetByName(node, "lora_text");
+    const promptWidget =  findWidgetByName(node, "prompt");
     const modeWidget =  findWidgetByName(node, "mode");
 
     Object.defineProperty(chooserWidget, 'value', {
@@ -21,12 +21,12 @@ app.registerExtension({
       set(newVal) {
         if (newVal !== defaultValue) {
           if(modeWidget.value === "simple"){
-            textWidget.value += `\n${newVal}:1`;
+            promptWidget.value += `\n${newVal}:1`;
           } else {
-            textWidget.value += `\n<lora:${newVal}:1>`;
+            promptWidget.value += `\n<lora:${newVal}:1>`;
           }
           chooserWidget.value = "CHOOSE";
-          textWidget.inputEl.focus();
+          promptWidget.inputEl.focus();
         }
       }
     });

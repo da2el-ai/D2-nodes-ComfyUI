@@ -335,7 +335,7 @@ class D2_LoadLora:
             "required": {
                 "model": ("MODEL",),
                 "clip": ("CLIP",),
-                "lora_text": ("STRING", {"multiline": True}),
+                "prompt": ("STRING", {"multiline": True}),
                 "mode": (["a1111", "simple"],),
                 "insert_lora": (["CHOOSE"] + folder_paths.get_filename_list("loras"),)
             },
@@ -347,16 +347,16 @@ class D2_LoadLora:
     CATEGORY = "D2"
 
     ######
-    def run(self, model, clip, lora_text, mode, insert_lora):
+    def run(self, model, clip, prompt, mode, insert_lora):
         if mode == "simple":
-            processed_params = self.__class__.get_params_simple(lora_text)
-            formated_text = ""
+            processed_params = self.__class__.get_params_simple(prompt)
+            formated_prompt = ""
         else:
-            processed_params, formated_text = self.__class__.get_params_a1111(lora_text)
+            processed_params, formated_prompt = self.__class__.get_params_a1111(prompt)
 
         model, clip = self.__class__.apply_lora(model, clip, processed_params)
 
-        return (model, clip, lora_text, formated_text,)
+        return (model, clip, prompt, formated_prompt,)
 
     ######
     @classmethod
