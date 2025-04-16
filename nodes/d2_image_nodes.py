@@ -633,7 +633,7 @@ class D2_CutByMask:
     RETURN_TYPES = ("IMAGE", "MASK", "INT",)
     RETURN_NAMES = ("image", "mask", "rect",)
     FUNCTION = "cut_by_mask"
-    CATEGORY = "D2 Image Tools"
+    CATEGORY = "D2/Image"
 
     def cut_by_mask(self, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0, output_alpha=True):
         # ComfyUIでの画像形状: [batch, height, width, channels]
@@ -785,7 +785,7 @@ class D2_PasteByMask:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("image",)
     FUNCTION = "paste_by_mask"
-    CATEGORY = "D2 Image Tools"
+    CATEGORY = "D2/Image"
 
     def paste_by_mask(self, img_base, img_paste, paste_mode, multi_mode, mask_opt=None, rect_opt=None, feather=0, feather_type="simple"):
         """
