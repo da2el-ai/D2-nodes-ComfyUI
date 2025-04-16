@@ -81,7 +81,7 @@ class D2_KSampler:
         }
 
     RETURN_TYPES = ("IMAGE", "LATENT", "MODEL", "CLIP", "STRING", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formated_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formatted_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
     OUTPUT_NODE = True
     FUNCTION = "run"
     CATEGORY = "D2"
@@ -113,14 +113,14 @@ class D2_KSampler:
                 d2_pipe.negative = negative
 
         # lora 適用を試みる
-        lora_params, formated_positive = D2_LoadLora.get_params_a1111(d2_pipe.positive)
+        lora_params, formatted_positive = D2_LoadLora.get_params_a1111(d2_pipe.positive)
         lora_model, lora_clip = D2_LoadLora.apply_lora(model, clip, lora_params)
 
         # コンディショニングが入力されていたらそちらを優先する
         if positive_cond != None:
             positive_encoded = positive_cond
         else:
-            (positive_encoded,) = CLIPTextEncode().encode(lora_clip, formated_positive)
+            (positive_encoded,) = CLIPTextEncode().encode(lora_clip, formatted_positive)
         
         if negative_cond != None:
             negative_encoded = negative_cond
@@ -154,7 +154,7 @@ class D2_KSampler:
 
         return {
             "ui": {"images": results_images},
-            "result": (samp_images, latent, lora_model, lora_clip, d2_pipe.positive, formated_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
+            "result": (samp_images, latent, lora_model, lora_clip, d2_pipe.positive, formatted_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
         }
 
 
@@ -197,7 +197,7 @@ class D2_KSamplerAdvanced(D2_KSampler):
         }
 
     RETURN_TYPES = ("IMAGE", "LATENT", "MODEL", "CLIP", "STRING", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formated_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formatted_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
 
     OUTPUT_NODE = True
     FUNCTION = "run"
@@ -342,7 +342,7 @@ class D2_LoadLora:
         }
 
     RETURN_TYPES = ("MODEL", "CLIP", "STRING", "STRING",)
-    RETURN_NAMES = ("MODEL", "CLIP", "prompt", "formated_prompt",)
+    RETURN_NAMES = ("MODEL", "CLIP", "prompt", "formatted_prompt",)
     FUNCTION = "run"
     CATEGORY = "D2"
 
@@ -350,13 +350,13 @@ class D2_LoadLora:
     def run(self, model, clip, prompt, mode, insert_lora):
         if mode == "simple":
             processed_params = self.__class__.get_params_simple(prompt)
-            formated_prompt = ""
+            formatted_prompt = ""
         else:
-            processed_params, formated_prompt = self.__class__.get_params_a1111(prompt)
+            processed_params, formatted_prompt = self.__class__.get_params_a1111(prompt)
 
         model, clip = self.__class__.apply_lora(model, clip, processed_params)
 
-        return (model, clip, prompt, formated_prompt,)
+        return (model, clip, prompt, formatted_prompt,)
 
     ######
     @classmethod
