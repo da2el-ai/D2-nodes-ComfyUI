@@ -920,9 +920,9 @@ class D2_PasteByMask:
             )
         else:
             raise ValueError(f"Unknown paste mode: {paste_mode}")
-        
         return output_img
-    
+
+
     def _process_mode_mask(self, img_base_rgba, img_paste_rgba, mask_opt, base_height, base_width, feather, feather_type):
         """マスクモード - マスクでマスキングして x=0, y=0 の位置に貼りつける"""
         if mask_opt is None:
@@ -930,238 +930,101 @@ class D2_PasteByMask:
         
         # マスクと画像の互換性をチェック
         mask_for_paste = image_util.check_mask_image_compatibility(mask_opt, img_paste_rgba.shape[0], img_paste_rgba.shape[1])
-        
-        # マスクを適用
-        masked_paste = image_util.apply_mask_to_image(img_paste_rgba, mask_for_paste)
-        
+
         # マスクをフェザリング（必要な場合）
         if feather > 0:
-            alpha_mask = masked_paste[:, :, 3].clone()
-            alpha_mask = image_util.apply_feathering(alpha_mask, feather, feather_type)
-            masked_paste[:, :, 3] = alpha_mask
-        
-        # 出力サイズのRGBA画像を作成
-        output_img = torch.zeros((base_height, base_width, 4), dtype=img_base_rgba.dtype, device=img_base_rgba.device)
-        
-        # ベース画像をコピー
-        output_img[:, :, :] = img_base_rgba
-        
-        # 貼り付け画像のサイズを確認
-        paste_height, paste_width = masked_paste.shape[0], masked_paste.shape[1]
-        
-        # 貼り付け範囲を調整
-        max_paste_height = min(base_height, paste_height)
-        max_paste_width = min(base_width, paste_width)
-        
-        # アルファブレンディングで合成
-        alpha_paste = masked_paste[:max_paste_height, :max_paste_width, 3:4]
-        output_img[:max_paste_height, :max_paste_width, :3] = (
-            output_img[:max_paste_height, :max_paste_width, :3] * (1 - alpha_paste) + 
-            masked_paste[:max_paste_height, :max_paste_width, :3] * alpha_paste
-        )
-        
-        # アルファチャンネルを更新
-        output_img[:max_paste_height, :max_paste_width, 3:4] = torch.clamp(
-            output_img[:max_paste_height, :max_paste_width, 3:4] + alpha_paste, 0, 1
-        )
+            # 元のマスク形状を保持してフェザリング
+            alpha_mask_feathered = image_util.apply_feathering(mask_for_paste.clone(), feather, feather_type)
+        else:
+            alpha_mask_feathered = mask_for_paste.clone() # フェザリングしない場合は元のマスク
+
+        # 共通のアルファブレンディング処理を呼び出す
+        # img_paste_rgba はマスキングせず、alpha_mask_feathered で形状を制御
+        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask_feathered, 0, 0)
         
         return output_img
     
     def _process_mode_rect_full(self, img_base_rgba, img_paste_rgba, x, y, rect_width, rect_height,
                               base_height, base_width, feather, feather_type):
-        """矩形フルモード - img_paste を rect_opt の width,height でトリミングして img_base の x,y に貼り付ける"""
-        # 出力サイズのRGBA画像を作成
-        output_img = torch.zeros((base_height, base_width, 4), dtype=img_base_rgba.dtype, device=img_base_rgba.device)
-        
-        # ベース画像をコピー
-        output_img[:, :, :] = img_base_rgba
-        
-        # img_paste からトリミングする範囲を計算
+        """短形フルモード - 貼り付けエリアのマスクを作り x=0, y=0 に貼りつける"""
+        # img_paste の寸法を取得
         paste_height, paste_width = img_paste_rgba.shape[0], img_paste_rgba.shape[1]
         
-        # トリミング範囲が画像内に収まるようにする
-        crop_x = min(max(0, x), paste_width - 1)
-        crop_y = min(max(0, y), paste_height - 1)
-        crop_width = min(rect_width, paste_width - crop_x)
-        crop_height = min(rect_height, paste_height - crop_y)
-        
-        # トリミング範囲が有効かチェック
-        if crop_width <= 0 or crop_height <= 0:
-            print(f"Warning: Invalid crop dimensions: {crop_width}x{crop_height}")
-            return img_base_rgba  # トリミング不可能な場合はベース画像を返す
-        
-        # img_pasteを rect_opt の x,y 座標からトリミング
-        paste_cropped = img_paste_rgba[crop_y:crop_y+crop_height, crop_x:crop_x+crop_width].clone()
-
-        # フェザリング用のマスクを作成
-        paste_mask = torch.ones((crop_height, crop_width), dtype=torch.float32, device=img_base_rgba.device)
+        # 矩形サイズが有効かチェック
+        if rect_width <= 0 or rect_height <= 0:
+            print(f"Warning: Invalid rectangle dimensions: {rect_width}x{rect_height}")
+            return img_base_rgba
+            
+        # img_paste サイズのマスクを作成
+        paste_mask = image_util.create_rectangle_mask(
+            height=paste_height,
+            width=paste_width,
+            x=x,
+            y=y,
+            rect_width=rect_width,
+            rect_height=rect_height,
+        )
         
         # マスクをフェザリング（必要な場合）
         if feather > 0:
             paste_mask = image_util.apply_feathering(paste_mask, feather, feather_type)
-
-        # フェザリングをアルファチャンネルに適用 (Vectorized)
-        paste_cropped[:, :, 3] = paste_cropped[:, :, 3] * paste_mask
-
-        # トリミングした画像をベース画像の指定座標に貼り付け (Vectorized)
-        # 貼り付け先の範囲を計算（ベース画像の範囲内に収める）
-        target_y_start = max(0, y)
-        target_y_end = min(base_height, y + crop_height)
-        target_x_start = max(0, x)
-        target_x_end = min(base_width, x + crop_width)
-
-        # 貼り付け元（paste_cropped）の範囲を計算
-        source_y_start = target_y_start - y
-        source_y_end = target_y_end - y
-        source_x_start = target_x_start - x
-        source_x_end = target_x_end - x
-
-        # 実際の貼り付けサイズ
-        paste_actual_height = target_y_end - target_y_start
-        paste_actual_width = target_x_end - target_x_start
-
-        if paste_actual_height > 0 and paste_actual_width > 0:
-            # 関連するスライスを取得
-            target_slice = output_img[target_y_start:target_y_end, target_x_start:target_x_end, :]
-            source_slice = paste_cropped[source_y_start:source_y_end, source_x_start:source_x_end, :]
-
-            # アルファチャンネルを取得
-            alpha = source_slice[:, :, 3:4]
-
-            # アルファブレンディング
-            target_slice[:, :, :3] = target_slice[:, :, :3] * (1 - alpha) + source_slice[:, :, :3] * alpha
-
-            # アルファチャンネルを更新
-            target_slice[:, :, 3:4] = torch.clamp(target_slice[:, :, 3:4] + alpha, 0, 1)
-
-            # 結果を書き戻し
-            output_img[target_y_start:target_y_end, target_x_start:target_x_end, :] = target_slice
-        else:
-             print(f"[D2_PasteByMask] _process_mode_rect_full: Warning - Paste area is outside the base image bounds.")
-
+        
+        # 共通のアルファブレンディング処理を呼び出す
+        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, paste_mask, 0, 0)
+        
         return output_img
 
     def _process_mode_rect_position(self, img_base_rgba, img_paste_rgba, x, y,
                                   base_height, base_width, feather, feather_type):
-        """矩形位置モード - img_paste を rect_opt の位置に貼りつける"""
-        # 出力サイズのRGBA画像を作成
-        output_img = torch.zeros((base_height, base_width, 4), dtype=img_base_rgba.dtype, device=img_base_rgba.device)
-        
-        # ベース画像をコピー
-        output_img[:, :, :] = img_base_rgba
-        
-        # 矩形マスクの作成
-        rect_mask = image_util.create_rectangle_mask(base_height, base_width, x, y, 
-                                         img_paste_rgba.shape[1], img_paste_rgba.shape[0])
-        
-        # マスクをフェザリング（必要な場合）
-        if feather > 0:
-            rect_mask = image_util.apply_feathering(rect_mask, feather, feather_type)
-
+        """
+        矩形位置モード - img_paste を rect_opt の位置に貼りつける
+        img_paste_rgba はトリミング済みを想定
+        """
         # 貼り付け画像の寸法
         paste_height, paste_width = img_paste_rgba.shape[0], img_paste_rgba.shape[1]
-        
-        # 貼り付け画像をベース画像に矩形領域で貼り付け (Vectorized)
-        # 貼り付け先の範囲を計算（ベース画像の範囲内に収める）
-        target_y_start = max(0, y)
-        target_y_end = min(base_height, y + paste_height)
-        target_x_start = max(0, x)
-        target_x_end = min(base_width, x + paste_width)
 
-        # 貼り付け元（img_paste_rgba）の範囲を計算
-        source_y_start = target_y_start - y
-        source_y_end = target_y_end - y
-        source_x_start = target_x_start - x
-        source_x_end = target_x_end - x
+        # フェザリング用のマスクを作成 (貼り付け画像のサイズで)
+        paste_mask = image_util.create_rectangle_mask(
+            height=paste_height,
+            width=paste_width,
+            x=0,
+            y=0,
+            rect_width=paste_width,
+            rect_height=paste_height,
+        )
 
-        # 実際の貼り付けサイズ
-        paste_actual_height = target_y_end - target_y_start
-        paste_actual_width = target_x_end - target_x_start
+        # マスクをフェザリング（必要な場合）
+        if feather > 0:
+            paste_mask = image_util.apply_feathering(paste_mask, feather, feather_type)
 
-        if paste_actual_height > 0 and paste_actual_width > 0:
-            # 関連するスライスを取得
-            target_slice = output_img[target_y_start:target_y_end, target_x_start:target_x_end, :]
-            source_slice = img_paste_rgba[source_y_start:source_y_end, source_x_start:source_x_end, :]
-            mask_slice = rect_mask[target_y_start:target_y_end, target_x_start:target_x_end] # フェザリングされたマスク
-
-            # アルファチャンネルを計算 (貼り付け画像のアルファ * フェザリングマスク)
-            alpha = source_slice[:, :, 3:4] * mask_slice.unsqueeze(-1)
-
-            # アルファブレンディング
-            target_slice[:, :, :3] = target_slice[:, :, :3] * (1 - alpha) + source_slice[:, :, :3] * alpha
-
-            # アルファチャンネルを更新
-            target_slice[:, :, 3:4] = torch.clamp(target_slice[:, :, 3:4] + alpha, 0, 1)
-
-            # 結果を書き戻し
-            output_img[target_y_start:target_y_end, target_x_start:target_x_end, :] = target_slice
-        else:
-            print(f"[D2_PasteByMask] _process_mode_rect_position: Warning - Paste area is outside the base image bounds.")
+        # 共通のアルファブレンディング処理を呼び出す
+        # 元の img_paste_rgba と paste_mask を使用し、rect_opt の x, y に貼り付け
+        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, paste_mask, x, y)
 
         return output_img
 
     def _process_mode_rect_pos_mask(self, img_base_rgba, img_paste_rgba, mask_opt, x, y,
                                    base_height, base_width, feather, feather_type):
-        """矩形位置マスクモード - img_paste を mask_opt でマスキングして rect_opt の位置に貼りつける"""
+        """
+        矩形位置マスクモード - img_paste を mask_opt でマスキングして rect_opt の位置に貼りつける
+        img_paste_rgba はトリミング済みを想定
+        """
         if mask_opt is None:
             raise ValueError("Mask is required for 'rect_pos_mask' paste mode")
-        
+
         # マスクと画像の互換性をチェック
         mask_for_paste = image_util.check_mask_image_compatibility(mask_opt, img_paste_rgba.shape[0], img_paste_rgba.shape[1])
-        
-        # マスクを適用
-        masked_paste = image_util.apply_mask_to_image(img_paste_rgba, mask_for_paste)
 
         # マスクをフェザリング（必要な場合）
         if feather > 0:
-            alpha_mask = masked_paste[:, :, 3].clone()
-            alpha_mask = image_util.apply_feathering(alpha_mask, feather, feather_type)
-            masked_paste[:, :, 3] = alpha_mask
-        
-        # 出力サイズのRGBA画像を作成
-        output_img = torch.zeros((base_height, base_width, 4), dtype=img_base_rgba.dtype, device=img_base_rgba.device)
-        
-        # ベース画像をコピー
-        output_img[:, :, :] = img_base_rgba
-        
-        # 貼り付け画像の寸法
-        paste_height, paste_width = masked_paste.shape[0], masked_paste.shape[1]
-        
-        # 貼り付け画像をベース画像に矩形領域で貼り付け (Vectorized)
-        # 貼り付け先の範囲を計算（ベース画像の範囲内に収める）
-        target_y_start = max(0, y)
-        target_y_end = min(base_height, y + paste_height)
-        target_x_start = max(0, x)
-        target_x_end = min(base_width, x + paste_width)
-
-        # 貼り付け元（masked_paste）の範囲を計算
-        source_y_start = target_y_start - y
-        source_y_end = target_y_end - y
-        source_x_start = target_x_start - x
-        source_x_end = target_x_end - x
-
-        # 実際の貼り付けサイズ
-        paste_actual_height = target_y_end - target_y_start
-        paste_actual_width = target_x_end - target_x_start
-
-        if paste_actual_height > 0 and paste_actual_width > 0:
-            # 関連するスライスを取得
-            target_slice = output_img[target_y_start:target_y_end, target_x_start:target_x_end, :]
-            source_slice = masked_paste[source_y_start:source_y_end, source_x_start:source_x_end, :]
-
-            # アルファチャンネルを取得
-            alpha = source_slice[:, :, 3:4]
-
-            # アルファブレンディング
-            target_slice[:, :, :3] = target_slice[:, :, :3] * (1 - alpha) + source_slice[:, :, :3] * alpha
-
-            # アルファチャンネルを更新
-            target_slice[:, :, 3:4] = torch.clamp(target_slice[:, :, 3:4] + alpha, 0, 1)
-
-            # 結果を書き戻し
-            output_img[target_y_start:target_y_end, target_x_start:target_x_end, :] = target_slice
+             # 元のマスク形状を保持してフェザリング
+            alpha_mask_feathered = image_util.apply_feathering(mask_for_paste.clone(), feather, feather_type)
         else:
-            print(f"[D2_PasteByMask] _process_mode_rect_pos_mask: Warning - Paste area is outside the base image bounds.")
+            alpha_mask_feathered = mask_for_paste.clone() # フェザリングしない場合は元のマスク
+
+        # 共通のアルファブレンディング処理を呼び出す
+        # img_paste_rgba はマスキングせず、alpha_mask_feathered で形状を制御し、rect_opt の x, y に貼り付け
+        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask_feathered, x, y)
 
         return output_img
 

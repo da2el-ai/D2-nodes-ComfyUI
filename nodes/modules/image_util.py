@@ -271,6 +271,74 @@ def apply_feathering(mask, feather_radius, feather_type="simple"):
 
 
 
+def alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask, x, y):
+    """
+    共通のアルファブレンディング処理
+
+    Args:
+        img_base_rgba (torch.Tensor): ベース画像 (RGBA) [H, W, 4]
+        img_paste_rgba (torch.Tensor): 貼り付け画像 (RGBA) [pH, pW, 4]
+        alpha_mask (torch.Tensor): 貼り付けに使用するアルファマスク [pH, pW] or [pH, pW, 1]
+                                    (フェザリング適用済み想定)
+        x (int): 貼り付け先のX座標
+        y (int): 貼り付け先のY座標
+
+    Returns:
+        torch.Tensor: 合成後の画像 (RGBA) [H, W, 4]
+    """
+    base_height, base_width = img_base_rgba.shape[:2]
+    paste_height, paste_width = img_paste_rgba.shape[:2]
+    output_img = img_base_rgba.clone() # クローンを作成して直接変更
+
+    # 貼り付け先の範囲を計算（ベース画像の範囲内に収める）
+    target_y_start = max(0, y)
+    target_y_end = min(base_height, y + paste_height)
+    target_x_start = max(0, x)
+    target_x_end = min(base_width, x + paste_width)
+
+    # 貼り付け元（img_paste_rgba と alpha_mask）の範囲を計算
+    source_y_start = target_y_start - y
+    source_y_end = target_y_end - y
+    source_x_start = target_x_start - x
+    source_x_end = target_x_end - x
+
+    # 実際の貼り付けサイズ
+    paste_actual_height = target_y_end - target_y_start
+    paste_actual_width = target_x_end - target_x_start
+
+    if paste_actual_height > 0 and paste_actual_width > 0:
+        # 関連するスライスを取得
+        target_slice = output_img[target_y_start:target_y_end, target_x_start:target_x_end, :]
+        source_slice = img_paste_rgba[source_y_start:source_y_end, source_x_start:source_x_end, :]
+
+        # alpha_mask は 2D (H, W) または 3D (H, W, 1) を想定
+        if alpha_mask.dim() == 2:
+            mask_slice = alpha_mask[source_y_start:source_y_end, source_x_start:source_x_end].unsqueeze(-1)
+        elif alpha_mask.dim() == 3:
+            mask_slice = alpha_mask[source_y_start:source_y_end, source_x_start:source_x_end, :]
+        else:
+            raise ValueError(f"Unexpected alpha_mask dimension: {alpha_mask.dim()}")
+
+        # アルファチャンネルを計算 (貼り付け画像のアルファ * マスク)
+        # source_sliceをRGBAに変換 (必要な場合)
+        source_slice_rgba = convert_to_rgba_or_rgb(source_slice, "rgba")
+
+        alpha = source_slice_rgba[:, :, 3:4] * mask_slice
+
+        # アルファブレンディング
+        target_slice[:, :, :3] = target_slice[:, :, :3] * (1 - alpha) + source_slice_rgba[:, :, :3] * alpha
+
+        # アルファチャンネルを更新 (ベースのアルファと貼り付けアルファを加算、最大1にクランプ)
+        target_slice[:, :, 3:4] = torch.clamp(target_slice[:, :, 3:4] + alpha, 0, 1)
+
+        # 結果を書き戻し (クローンなので不要、直接変更されている)
+        # output_img[target_y_start:target_y_end, target_x_start:target_x_end, :] = target_slice
+    else:
+        print(f"alpha_blend_paste: Warning - Paste area is outside the base image bounds or has zero size ({paste_actual_width}x{paste_actual_height}).")
+
+    return output_img
+
+
 
 def adjust_rectangle_dimensions(x_min, y_min, x_max, y_max, width, height, padding=0, min_width=0, min_height=0):
     """
@@ -323,7 +391,7 @@ def adjust_rectangle_dimensions(x_min, y_min, x_max, y_max, width, height, paddi
 
 
 
-def create_rectangle_mask(height, width, x, y, rect_width, rect_height):
+def create_rectangle_mask(height, width, x, y, rect_width, rect_height, alpha=1.0):
     """
     指定した座標と大きさの矩形マスクを作成
     
@@ -334,6 +402,7 @@ def create_rectangle_mask(height, width, x, y, rect_width, rect_height):
         y (int): 矩形の左上Y座標
         rect_width (int): 矩形の幅
         rect_height (int): 矩形の高さ
+        alpha (float): マスクの不透明度（初期値 1.0）
         
     Returns:
         torch.Tensor: 矩形マスク [height, width]
@@ -346,9 +415,9 @@ def create_rectangle_mask(height, width, x, y, rect_width, rect_height):
     x = max(0, x)
     y = max(0, y)
     
-    # 矩形領域を1.0（完全不透明）に設定
+    # 矩形領域を指定された不透明度に設定
     if x < x_end and y < y_end:
-        mask[y:y_end, x:x_end] = 1.0
+        mask[y:y_end, x:x_end] = alpha
     
     return mask
 
