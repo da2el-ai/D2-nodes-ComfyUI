@@ -479,8 +479,9 @@ class D2_Prompt:
             "required": {
                 "prompt": ("STRING",{"multiline": True},),
                 "comment_type": (["# + // + /**/","# only","// only","/* */ only","None"],),
-            },
-            "optional": {
+            # },
+            # "optional": {
+                "insert_lora": (["CHOOSE"] + folder_paths.get_filename_list("loras"),),
                 "counter": ("D2_TOKEN_COUNTER", {})
             }
         }
@@ -491,7 +492,7 @@ class D2_Prompt:
     CATEGORY = "D2"
 
     ######
-    def run(self, prompt, comment_type, counter = ""):
+    def run(self, prompt, comment_type, insert_lora="", counter = ""):
         new_prompt = delete_comment(prompt, comment_type)
         return (new_prompt,)
 
