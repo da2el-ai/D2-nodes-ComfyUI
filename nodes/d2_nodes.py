@@ -338,7 +338,7 @@ class D2_LoadLora:
         }
 
     RETURN_TYPES = ("MODEL", "CLIP", "STRING", "STRING",)
-    RETURN_NAMES = ("MODEL", "CLIP", "prompt", "unformated_prompt",)
+    RETURN_NAMES = ("MODEL", "CLIP", "prompt", "formated_prompt",)
     FUNCTION = "run"
     CATEGORY = "D2"
 
@@ -351,8 +351,8 @@ class D2_LoadLora:
             processed_params, formated_text = self.__class__.get_params_a1111(lora_text)
 
         model, clip = self.__class__.apply_lora(model, clip, processed_params)
-        
-        return (model, clip, formated_text, lora_text,)
+
+        return (model, clip, lora_text, formated_text,)
 
     ######
     @classmethod
