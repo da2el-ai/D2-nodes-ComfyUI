@@ -80,8 +80,8 @@ class D2_KSampler:
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
+    RETURN_TYPES = ("IMAGE", "LATENT", "MODEL", "CLIP", "STRING", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formated_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
     OUTPUT_NODE = True
     FUNCTION = "run"
     CATEGORY = "D2"
@@ -112,16 +112,20 @@ class D2_KSampler:
             if not d2_pipe.negative:
                 d2_pipe.negative = negative
 
+        # lora 適用を試みる
+        lora_params, formated_positive = D2_LoadLora.get_params_a1111(d2_pipe.positive)
+        lora_model, lora_clip = D2_LoadLora.apply_lora(model, clip, lora_params)
+
         # コンディショニングが入力されていたらそちらを優先する
         if positive_cond != None:
             positive_encoded = positive_cond
         else:
-            (positive_encoded,) = CLIPTextEncode().encode(clip, d2_pipe.positive)
+            (positive_encoded,) = CLIPTextEncode().encode(lora_clip, formated_positive)
         
         if negative_cond != None:
             negative_encoded = negative_cond
         else:
-            (negative_encoded,) = CLIPTextEncode().encode(clip, d2_pipe.negative)
+            (negative_encoded,) = CLIPTextEncode().encode(lora_clip, d2_pipe.negative)
 
         # control net
         if isinstance(cnet_stack, list):
@@ -138,7 +142,7 @@ class D2_KSampler:
 
         # KSampler実行
         latent = common_ksampler(
-            model, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, 
+            lora_model, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, 
             positive_encoded, negative_encoded, latent_image, 
             denoise=d2_pipe.denoise, disable_noise=disable_noise, 
             start_step=start_at_step, last_step=end_at_step, force_full_denoise=force_full_denoise
@@ -150,7 +154,7 @@ class D2_KSampler:
 
         return {
             "ui": {"images": results_images},
-            "result": (samp_images, latent, d2_pipe.positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
+            "result": (samp_images, latent, lora_model, lora_clip, d2_pipe.positive, formated_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
         }
 
 
@@ -192,8 +196,8 @@ class D2_KSamplerAdvanced(D2_KSampler):
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
+    RETURN_TYPES = ("IMAGE", "LATENT", "MODEL", "CLIP", "STRING", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
+    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formated_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
 
     OUTPUT_NODE = True
     FUNCTION = "run"
