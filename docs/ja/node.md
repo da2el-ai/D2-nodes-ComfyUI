@@ -34,6 +34,10 @@ Node
 - `cnet_stack`: `D2 Controlnet Loader` 接続用
 - `model` / `clip` / `vae` / ..etc: 標準の KSampler と同じ
 - `negative` / `positive`: STRING 形式のプロンプト
+- `weight_interpretation` / `token_normalization`
+  - プロンプトのウェイト調整方法。D2 KSampler Advancedで利用可能
+  - 利用するには [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/) が必要
+
 
 #### Output
 

@@ -165,6 +165,11 @@
 
 ## :blossom: 更新日誌
 
+**2025.04.18**
+
+- `D2_KSamplerAdvanced`: 添加了參數 `weight_interpretation` 和 `token_normalization` 用於調整提示詞權重
+  - 使用需要安裝 [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/)。
+
 **2025.04.16**
 
 - `D2_Prompt`：添加LoRA插入按鈕

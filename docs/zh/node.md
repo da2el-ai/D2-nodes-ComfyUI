@@ -32,6 +32,9 @@
 - `cnet_stack`：用於連接`D2 Controlnet Loader`
 - `model` / `clip` / `vae` / ..etc：與標準KSampler相同
 - `negative` / `positive`：STRING格式的提示詞
+- `weight_interpretation` / `token_normalization`
+  - 提示詞權重調整方法。可在 D2 KSampler Advanced 中使用
+  - 使用需要安裝 [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/)
 
 #### Output
 

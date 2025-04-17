@@ -164,6 +164,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.18**
+
+- `D2_KSamplerAdvanced`: Added parameters `weight_interpretation` and `token_normalization` to adjust prompt weights
+  - Requires [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/) to use.
+
 **2025.04.16**
 
 - `D2_Prompt`: Add LoRA insertion button

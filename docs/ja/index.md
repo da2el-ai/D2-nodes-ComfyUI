@@ -165,6 +165,11 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.04.18**
+
+- `D2_KSamplerAdvanced`: プロンプトのウェイトを調整するパラメーター `weight_interpretation` `token_normalization` を追加
+  - 利用するには [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/) が必要です。 
+
 **2025.04.16**
 
 - `D2_Prompt`: LoRA挿入ボタンを追加

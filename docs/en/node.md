@@ -29,6 +29,9 @@
 - `cnet_stack`: For connecting to `D2 Controlnet Loader`
 - `model` / `clip` / `vae` / ..etc: Same as standard KSampler
 - `negative` / `positive`: Prompts in STRING format
+- `weight_interpretation` / `token_normalization`
+  - Methods for adjusting prompt weights. Available in D2 KSampler Advanced
+  - Requires [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/) to use
 
 #### Output
 
