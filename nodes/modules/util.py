@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal, Optional
 import os
+from pathlib import Path
 import yaml
 # import math
 import re
@@ -21,6 +22,12 @@ MAX_RESOLUTION = 16384
 MAX_SEED = 0xffffffffffffffff
 LINE_BREAK = "Line break"
 SEPARATOR = [LINE_BREAK, ",", ";"]
+
+D2_MODULE_PATH = Path(__file__)
+D2_ROOT_PATH = D2_MODULE_PATH.parent.parent.parent.absolute()
+D2_WEB_PATH = D2_ROOT_PATH / "web"
+COMFYUI_PATH = D2_ROOT_PATH.parent.parent.absolute()
+
 
 @dataclass
 class D2_TAnnotation:
