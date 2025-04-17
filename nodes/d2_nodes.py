@@ -1,9 +1,7 @@
 from typing import Optional
-import torch
 import os
-import json
+import sys
 import re
-import random
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 from aiohttp import web
@@ -25,8 +23,6 @@ from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 from .modules import util
 from .modules.util import D2_TD2Pipe, AnyType
 from .modules import checkpoint_util
-from .modules import pnginfo_util
-from .modules import grid_image_util
 from .modules.template_util import replace_template
 
 
@@ -90,7 +86,8 @@ class D2_KSampler:
     def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
             preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, 
             d2_pipe:Optional[D2_TD2Pipe]=None, prompt=None, extra_pnginfo=None, my_unique_id=None,
-            add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular"):
+            add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular", 
+            token_normalization="none", weight_interpretation="comfy"):
 
         util.set_preview_method(preview_method)
 
@@ -116,16 +113,18 @@ class D2_KSampler:
         lora_params, formatted_positive = D2_LoadLora.get_params_a1111(d2_pipe.positive)
         lora_model, lora_clip = D2_LoadLora.apply_lora(model, clip, lora_params)
 
+        # コンディショニング作成
         # コンディショニングが入力されていたらそちらを優先する
         if positive_cond != None:
             positive_encoded = positive_cond
         else:
-            (positive_encoded,) = CLIPTextEncode().encode(lora_clip, formatted_positive)
+            positive_encoded = self.__class__._create_conditioning(lora_clip, formatted_positive, token_normalization, weight_interpretation)
         
         if negative_cond != None:
             negative_encoded = negative_cond
         else:
-            (negative_encoded,) = CLIPTextEncode().encode(lora_clip, d2_pipe.negative)
+            negative_encoded = self.__class__._create_conditioning(lora_clip, d2_pipe.negative, token_normalization, weight_interpretation)
+
 
         # control net
         if isinstance(cnet_stack, list):
@@ -156,8 +155,30 @@ class D2_KSampler:
             "ui": {"images": results_images},
             "result": (samp_images, latent, lora_model, lora_clip, d2_pipe.positive, formatted_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
         }
+    
+    @classmethod
+    def _create_conditioning(cls, clip, prompt, token_normalization="none", weight_interpretation="comfy", affect_pooled='disable'):
+        """
+        コンディショニングを作成
+        """
+        if token_normalization != "none" or weight_interpretation != "comfy":
+            # CLIP weight調整
+            try:
+                adv_clip_path = str(util.COMFYUI_PATH / "custom_nodes/ComfyUI_ADV_CLIP_emb")
+                sys.path.append(adv_clip_path)
+                import adv_encode
+                embeddings_final, pooled = adv_encode.advanced_encode(clip, prompt, token_normalization, weight_interpretation, w_max=1.0, apply_to_pooled=affect_pooled=='enable')
+                encoded = [[embeddings_final, {"pooled_output": pooled}]]
+                
+            except (ImportError, AttributeError, ValueError) as e:
+                print(f"[D2 KSampler] Error: {e} //////////////" )
+                print("ComfyUI_ADV_CLIP_emb を読み込めませんでした。\ntoken_normalization, weight_interpretation を変更するには ComfyUI_ADV_CLIP_emb をインストールする必要があります。\nhttps://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/")
+                (encoded,) = CLIPTextEncode().encode(clip, prompt)
 
+        else:
+            (encoded,) = CLIPTextEncode().encode(clip, prompt)
 
+        return encoded
 
 """
 
@@ -183,6 +204,8 @@ class D2_KSamplerAdvanced(D2_KSampler):
                 "start_at_step": ("INT", {"default": 0, "min": 0, "max": 10000}),
                 "end_at_step": ("INT", {"default": 10000, "min": 0, "max": 10000}),
                 "return_with_leftover_noise": (["disable", "enable"],),
+                "token_normalization": (["none", "mean", "length", "length+mean"],),
+                "weight_interpretation": (["comfy", "A1111", "compel", "comfy++" ,"down_weight"],),
                 "preview_method": (["auto", "latent2rgb", "taesd", "vae_decoded_only", "none"],),
                 "positive": ("STRING", {"default": "","multiline": True}),
                 "negative": ("STRING", {"default": "", "multiline": True}),
@@ -205,11 +228,15 @@ class D2_KSamplerAdvanced(D2_KSampler):
 
     def run(self, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 
             start_at_step, end_at_step, return_with_leftover_noise,
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, d2_pipe=None, prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, d2_pipe=None, 
+            token_normalization="none", weight_interpretation="comfy",
+            prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
 
         return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
             preview_method, positive, negative, positive_cond, negative_cond, cnet_stack, d2_pipe, prompt, extra_pnginfo, my_unique_id,
-            add_noise, start_at_step, end_at_step, return_with_leftover_noise, sampler_type="advanced")
+            add_noise, start_at_step, end_at_step, return_with_leftover_noise, 
+            token_normalization=token_normalization, weight_interpretation=weight_interpretation,
+            sampler_type="advanced")
 
 
 
