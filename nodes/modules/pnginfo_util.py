@@ -58,6 +58,11 @@ def get_prompt(img:Image.Image) -> dict[str, str]:
     # print("TYPE: nai")
     (prompt['positive'], prompt['negative']) = _get_prompt_nai(items)
 
+  elif "parameters" in items:
+    # print("assuming A1111-style parameters")
+    comment = items["parameters"]
+    (prompt['positive'], prompt['negative']) = _get_prompt_a1111(comment)
+
   return prompt
 
 # 
