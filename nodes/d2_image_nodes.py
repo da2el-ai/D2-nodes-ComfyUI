@@ -600,6 +600,7 @@ class D2_CutByMask:
     - output_size: 出力する画像サイズ
         - mask_size: マスクのサイズ
         - image_size: 入力画像のサイズ（入力画像の位置を保持した状態で周囲が透明になる）
+        - square_thumb: サムネイル用途。マスクエリアを中心に最大サイズの正方形を切り取る。padding, min_width/height は無視される
 
     input optional:
     - padding: マスクエリアを拡張するピクセル数（初期値 0）
@@ -619,7 +620,7 @@ class D2_CutByMask:
             "required": {
                 "images": ("IMAGE",),
                 "mask": ("MASK",),
-                "cut_type": (["mask", "rectangle"],),
+                "cut_type": (["mask", "rectangle", "square_thumb"],),
                 "output_size": (["mask_size", "image_size"],),
             },
             "optional": {
@@ -656,15 +657,42 @@ class D2_CutByMask:
         mask_np = mask.cpu().numpy()
         non_zero_indices = np.nonzero(mask_np)
         
-        if len(non_zero_indices[0]) == 0:
+
+        if cut_type == "square_thumb":
+            # 正方形サムネイルモードの時は正方形でマスクを作成する
+            size = min(width, height)
+
+            if len(non_zero_indices[0]) == 0:
+                # マスクがない時は中心に正方形マスクを作成
+                rect = [(width - size) // 2, (height - size) // 2, size, size]
+                mask = image_util.create_rectangle_mask(rect[3], rect[2], rect[0], rect[1], width, height)
+            else:
+                # マスクから矩形領域を作成 (paddingなどは適用しない元々のマスク範囲)
+                # この関数は [x_min, y_min, rect_width, rect_height] を返す
+                mask_rect = image_util.create_rectangle_from_mask(mask_np, width, height, padding=0, min_width=0, min_height=0)
+                # 取得した矩形から中心座標を計算
+                center_x = mask_rect[0] + mask_rect[2] // 2
+                center_y = mask_rect[1] + mask_rect[3] // 2
+                # 正方形
+                rect = [
+                    center_x - (size // 2),
+                    center_y - (size // 2),
+                    size, size
+                ]
+                # 画像範囲内に収まるように調整
+                rect = image_util.adjust_rectangle_to_area(rect, width, height)
+
+        elif len(non_zero_indices[0]) == 0:
             # マスクが空の場合、画像全体を矩形として扱う
             print("Empty mask detected, treating the entire image as the rectangle.")
             mask = image_util.create_rectangle_mask(height, width, 0, 0, width, height)
             rect = [0, 0, width, height]
             cut_type = "rectangle"
         else:
-            # マスクから矩形領域を作成 (既存の処理)
+            # マスクから矩形領域を作成
             rect = image_util.create_rectangle_from_mask(mask_np, width, height, padding, min_width, min_height)
+            print(f"Debug - Rect from Mask: x={rect[0]}, y={rect[1]}, width={rect[2]}, height={rect[3]}")
+
             # 中心座標を計算（矩形の検証に必要）
             y_min_nz, y_max_nz = non_zero_indices[0].min(), non_zero_indices[0].max()
             x_min_nz, x_max_nz = non_zero_indices[1].min(), non_zero_indices[1].max()

@@ -340,15 +340,12 @@ def alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask, x, y):
 
 
 
-def adjust_rectangle_dimensions(x_min, y_min, x_max, y_max, width, height, padding=0, min_width=0, min_height=0):
+def adjust_rectangle_dimensions(rect, width, height, padding=0, min_width=0, min_height=0):
     """
     矩形領域の寸法を調整する
     
     Args:
-        x_min (int): 矩形の左端のX座標
-        y_min (int): 矩形の上端のY座標
-        x_max (int): 矩形の右端のX座標
-        y_max (int): 矩形の下端のY座標
+        rect (list): [x, y, width, height]
         width (int): 画像の幅
         height (int): 画像の高さ
         padding (int): 矩形を拡張するピクセル数
@@ -359,12 +356,15 @@ def adjust_rectangle_dimensions(x_min, y_min, x_max, y_max, width, height, paddi
         list: [x_min, y_min, rect_width, rect_height] の形式の調整された矩形領域
     """
     # 矩形の幅と高さを計算
-    rect_width = x_max - x_min + 1
-    rect_height = y_max - y_min + 1
-    
+    x_min = rect[0]
+    y_min = rect[1]
+    rect_width = rect[2]
+    rect_height = rect[3]
+    print(f"Debug - adjust_rectangle_dimensions()1: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
+
     # 中心座標を計算
-    center_x = (x_min + x_max) // 2
-    center_y = (y_min + y_max) // 2
+    center_x = x_min + rect_width // 2
+    center_y = y_min + rect_height // 2
     
     # padding適用
     if padding > 0:
@@ -387,8 +387,50 @@ def adjust_rectangle_dimensions(x_min, y_min, x_max, y_max, width, height, paddi
     rect_width = x_max - x_min + 1
     rect_height = y_max - y_min + 1
     
+    print(f"Debug - adjust_rectangle_dimensions()2: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
     return [int(x_min), int(y_min), int(rect_width), int(rect_height)]
 
+
+def adjust_rectangle_to_area(rect, area_width, area_height):
+    """
+    矩形がエリア内に収まるように調整する関数
+    
+    サイズを優先し、座標を調整する。
+    エリアをはみ出る場合は切り落とす。
+    
+    Args:
+        rect (list): [x, y, width, height]
+        area_width (int): エリアの幅
+        area_height (int): エリアの高さ
+        
+    Returns:
+        list: [x, y, width, height] の形式の調整された矩形
+    """
+    rect_x = rect[0]
+    rect_y = rect[1]
+    rect_width = rect[2]
+    rect_height = rect[3]
+    print(f"Debug - adjust_rectangle_to_area(): rect_x={rect_x}, rect_y={rect_y}, rect_width={rect_width}, rect_height={rect_height}, area_width={area_width}, area_height={area_height}")
+
+    # まずサイズの調整（エリアサイズを超えないように）
+    adjusted_width = min(rect_width, area_width)
+    adjusted_height = min(rect_height, area_height)
+    
+    # 座標の調整（矩形全体がエリア内に入るように）
+    # 右端/下端がエリアを超える場合、左上の座標を調整
+    if rect_x + adjusted_width > area_width:
+        adjusted_x = max(0, area_width - adjusted_width)
+    else:
+        adjusted_x = max(0, rect_x)
+        
+    if rect_y + adjusted_height > area_height:
+        adjusted_y = max(0, area_height - adjusted_height)
+    else:
+        adjusted_y = max(0, rect_y)
+    
+    print(f"Debug - adjust_rectangle_to_area(): adjusted_x={adjusted_x}, adjusted_y={adjusted_y}, adjusted_width={adjusted_width}, adjusted_height={adjusted_height}")
+    
+    return [int(adjusted_x), int(adjusted_y), int(adjusted_width), int(adjusted_height)]
 
 
 def create_rectangle_mask(height, width, x, y, rect_width, rect_height, alpha=1.0):
@@ -449,10 +491,19 @@ def create_rectangle_from_mask(mask_np, width, height, padding=0, min_width=0, m
     # マスクからRectangle作成
     y_min, y_max = non_zero_indices[0].min(), non_zero_indices[0].max()
     x_min, x_max = non_zero_indices[1].min(), non_zero_indices[1].max()
+    print(f"Debug - create_rectangle_from_mask()1: x_min={x_min}, x_max={x_max}, y_min={y_min}, y_max={y_max}")
+    
+    rect = [
+        x_min, 
+        y_min, 
+        x_max - x_min + 1, 
+        y_max - y_min + 1
+    ]
+    print(f"Debug - create_rectangle_from_mask()2: rect={rect}")
     
     # 矩形の寸法を調整
     return adjust_rectangle_dimensions(
-        x_min, y_min, x_max, y_max, 
+        rect,
         width, height, 
         padding, min_width, min_height
     )
