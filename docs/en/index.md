@@ -164,6 +164,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.22**
+
+- `D2_CutByMask`: Added `square_thumb` mode to cut with maximum-sized square
+
 **2025.04.18**
 
 - `D2_KSamplerAdvanced`: Added parameters `weight_interpretation` and `token_normalization` to adjust prompt weights

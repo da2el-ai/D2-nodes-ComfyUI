@@ -165,6 +165,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.04.22**
+
+- `D2_CutByMask`: 新增了 `square_thumb` 模式，可使用最大尺寸的正方形進行裁剪
+
 **2025.04.18**
 
 - `D2_KSamplerAdvanced`: 添加了參數 `weight_interpretation` 和 `token_normalization` 用於調整提示詞權重

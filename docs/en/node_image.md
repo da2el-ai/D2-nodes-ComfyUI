@@ -201,6 +201,7 @@ Note: Prompts may not be retrievable depending on workflow configuration. For ex
 - `cut_type`: Shape of the cut image
     - `mask`: Cut according to the mask shape
     - `rectangle`: Calculate and cut a rectangle from the mask shape
+    - `square_thumb`: Cuts out the maximum-sized square. A mode intended for thumbnails
 - `output_size`: Output image size
     - `mask_size`: Mask size
     - `image_size`: Input image size (surroundings become transparent while preserving the input image position)

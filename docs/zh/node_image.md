@@ -204,9 +204,11 @@
 - `cut_type`: 裁剪圖像的形狀
     - `mask`: 按照遮罩形狀裁剪
     - `rectangle`: 從遮罩形狀計算並裁剪出矩形
+    - `square_thumb`: 以最大尺寸的正方形進行裁剪。適用於縮略圖的模式
 - `output_size`: 輸出圖像尺寸
     - `mask_size`: 遮罩尺寸
     - `image_size`: 輸入圖像尺寸（保持輸入圖像位置的同時周圍變為透明）
+- `square_thumb`: 以最大尺寸的正方形進行裁剪。適用於縮略圖的模式
 - `padding`: 擴展遮罩area的像素數（預設值 0）
 - `min_width`: 遮罩尺寸的最小寬度（預設值 0）
 - `min_height`: 遮罩尺寸的最小高度（預設值 0）

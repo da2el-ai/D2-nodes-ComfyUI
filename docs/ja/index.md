@@ -165,6 +165,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.04.22**
+
+- `D2_CutByMask`: 最大サイズの正方形でカットするモード `square_thumb` を追加
+
 **2025.04.18**
 
 - `D2_KSamplerAdvanced`: プロンプトのウェイトを調整するパラメーター `weight_interpretation` `token_normalization` を追加
