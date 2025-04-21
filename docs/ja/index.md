@@ -168,6 +168,8 @@ D2 Nodes ComfyUI
 **2025.04.22**
 
 - `D2_CutByMask`: 最大サイズの正方形でカットするモード `square_thumb` を追加
+- `D2_XYFolderImages` / `D2_LoadFolderImages`: 毎回画像リストを更新するように変更。画像枚数の表示を追加
+- `D2_LoadImage`: A1111で作成したPNG画像のプロンプトが出力されない不具合を修正
 
 **2025.04.18**
 

@@ -168,6 +168,8 @@
 **2025.04.22**
 
 - `D2_CutByMask`: 新增了 `square_thumb` 模式，可使用最大尺寸的正方形進行裁剪
+- `D2_XYFolderImages` / `D2_LoadFolderImages`: 修改為每次更新圖像列表。新增顯示圖像數量
+- `D2_LoadImage`: 修復了在A1111中創建的PNG圖像提示無法輸出的錯誤
 
 **2025.04.18**
 

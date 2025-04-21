@@ -167,6 +167,8 @@ If you have installed any of the following custom nodes previously, please remov
 **2025.04.22**
 
 - `D2_CutByMask`: Added `square_thumb` mode to cut with maximum-sized square
+- `D2_XYFolderImages` / `D2_LoadFolderImages`: Changed to update the image list every time. Added display of image count
+- `D2_LoadImage`: Fixed a bug where prompts from PNG images created in A1111 were not being output
 
 **2025.04.18**
 
