@@ -127,6 +127,10 @@ class D2_LoadFolderImages():
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
             },
+            "optional": {
+                "image_count": ("D2_FOLDER_IMAGE_COUNT", {}),
+                "queue_seed": ("D2_FOLDER_IMAGE_SEED", {}),
+            },
         }
 
     RETURN_TYPES = ("IMAGE",)
@@ -135,7 +139,7 @@ class D2_LoadFolderImages():
     CATEGORY = "D2/Image"
 
     ######
-    def run(self, folder = "", extension="*.*"):
+    def run(self, folder = "", extension="*.*", image_count="", queue_seed=0):
         files = util.get_files(folder, extension)
         load_image = LoadImage()
         image_list = []
@@ -146,7 +150,13 @@ class D2_LoadFolderImages():
             image_list.append(output_images)
 
         image_batch = torch.cat(image_list, dim=0)
-        return (image_batch,)
+
+        return {
+            "result": (image_batch,),
+            "ui": {
+                "image_count": (len(files),),
+            }
+        }
 
 
 """

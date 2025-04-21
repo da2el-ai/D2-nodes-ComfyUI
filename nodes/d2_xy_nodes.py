@@ -907,6 +907,10 @@ class D2_XYFolderImages:
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
             },
+            "optional": {
+                "image_count": ("D2_FOLDER_IMAGE_COUNT", {}),
+                "queue_seed": ("D2_FOLDER_IMAGE_SEED", {}),
+            },
         }
 
     RETURN_TYPES = ("STRING", "LIST",)
@@ -915,11 +919,15 @@ class D2_XYFolderImages:
     CATEGORY = "D2/XY Plot"
 
     ######
-    def run(self, folder, extension):
+    def run(self, folder, extension, image_count="", queue_seed=0):
         files = util.get_files(folder, extension)
         output = util.list_to_text(files, util.LINE_BREAK)
+
         return {
             "result": (output, files,),
+            "ui": {
+                "image_count": (len(files),),
+            }
         }
 
 
