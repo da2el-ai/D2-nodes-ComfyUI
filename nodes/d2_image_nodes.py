@@ -349,7 +349,9 @@ class D2_EmptyImageAlpha:
                 "width": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
                 "height": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
-                "color": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFF, "step": 1, "display": "color"}),
+                "red": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
+                "green": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
+                "blue": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
                 "alpha": ("FLOAT", {"default": 1.0, "min": 0, "max": 1.0, "step": 0.001, "display": "alpha"}),
             }
         }
@@ -357,10 +359,13 @@ class D2_EmptyImageAlpha:
     FUNCTION = "run"
     CATEGORY = "D2/Image"
 
-    def run(self, width, height, batch_size=1, color=0, alpha=1.0):
-        r = torch.full([batch_size, height, width, 1], ((color >> 16) & 0xFF) / 0xFF)
-        g = torch.full([batch_size, height, width, 1], ((color >> 8) & 0xFF) / 0xFF)
-        b = torch.full([batch_size, height, width, 1], ((color) & 0xFF) / 0xFF)
+    def run(self, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0):
+        r = torch.full([batch_size, height, width, 1], red / 255.0)
+        g = torch.full([batch_size, height, width, 1], green / 255.0)
+        b = torch.full([batch_size, height, width, 1], blue / 255.0)
+        print("r - ", red)
+        print("g - ", green)
+        print("b - ", blue)
         # アルファチャンネル追加
         a = torch.full([batch_size, height, width, 1], alpha)
         # RGBAを結合
