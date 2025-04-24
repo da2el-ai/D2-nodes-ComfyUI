@@ -353,13 +353,16 @@ class D2_EmptyImageAlpha:
                 "green": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
                 "blue": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
                 "alpha": ("FLOAT", {"default": 1.0, "min": 0, "max": 1.0, "step": 0.001, "display": "alpha"}),
+            },
+            "optional": {
+                "sample": ("D2_COLOR_CANVAS", {}),
             }
         }
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "run"
     CATEGORY = "D2/Image"
 
-    def run(self, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0):
+    def run(self, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0, sample=""):
         r = torch.full([batch_size, height, width, 1], red / 255.0)
         g = torch.full([batch_size, height, width, 1], green / 255.0)
         b = torch.full([batch_size, height, width, 1], blue / 255.0)
