@@ -46,29 +46,26 @@ def replace_template(text: str, arg_1=None, arg_2=None, arg_3=None, prompt={}) -
     # 現在の日時を取得
     now = datetime.now()
     
-    # date形式の置換
-    # %date:yyyyMMdd% 形式を検索
-    date_patterns = re.findall(r'%date:([^%]+)%', text)
-    for pattern in date_patterns:
-        text = text.replace(f'%date:{pattern}%', _get_date_str(now, pattern))
+    # date形式の置換 (%date:yyyyMMdd% 形式)
+    def replace_date(match):
+        pattern = match.group(1)
+        return _get_date_str(now, pattern)
+    text = re.sub(r'%date:([^%]+)%', replace_date, text)
 
-    # ノードパターンの置換
-    if node_pattern := re.search('%node:(\d+)\.([^%]+)%', text):
-        node_id = node_pattern.group(1)  # 数字部分を取得
-        node_key = node_pattern.group(2)  # キー部分を取得
-        pattern = f'%node:{node_id}.{node_key}%'
-        text = text.replace(pattern, _get_node_value(prompt, node_id, node_key))
+    # ノードパターンの置換 (%node:ID.key% 形式)
+    def replace_node(match):
+        node_id = match.group(1)
+        node_key = match.group(2)
+        return _get_node_value(prompt, node_id, node_key)
+    text = re.sub(r'%node:(\d+)\.([^%]+)%', replace_node, text)
 
     # 引数の置換
-    for key in ["arg_1", "arg_2", "arg_3"]:
-        val = locals()[key]
-
+    args = {"arg_1": arg_1, "arg_2": arg_2, "arg_3": arg_3}
+    for key, val in args.items():
         if val is not None:
-            # ckpt_name パターンの置換
-            if f'%{key}:ckpt_name%' in text:
-                text = text.replace(f'%{key}:ckpt_name%', _replace_ckpt_name(str(val)))
+            # ckpt_name パターンの置換 (%arg_N:ckpt_name%)
+            text = re.sub(f'%{key}:ckpt_name%', _replace_ckpt_name(str(val)), text)
+            # 通常の置換 (%arg_N%)
+            text = re.sub(f'%{key}%', str(val), text)
 
-            # 通常の置換
-            text = text.replace(f'%{key}%', str(val))
-    
     return text

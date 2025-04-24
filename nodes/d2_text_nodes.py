@@ -106,7 +106,7 @@ class D2_RegexSwitcher:
         combined_text = "".join(parts)
 
         return {
-            "ui": {"text": (text,)}, 
+            "ui": {"text": (text,)},
             "result": (combined_text, prefix, suffix, match_index)
         }
 
@@ -127,7 +127,7 @@ class D2_RegexSwitcher:
 
     """
     regex_and_output を -- で分割し、ペアにする
-    """    
+    """
     @staticmethod
     def get_regex_list(text:str):
         pairs = text.split('--')
@@ -188,7 +188,7 @@ class D2_RegexReplace:
             result_text = D2_RegexReplace._repalace_tag(text, replace_pairs)
         else:
             result_text = D2_RegexReplace._repalace_advanced(text, replace_pairs)
-        
+
         return {"result": (result_text,)}
 
 
@@ -203,7 +203,7 @@ class D2_RegexReplace:
             tags = [tag.strip() for tag in re.split('[,\n]', result_text)]
             # 空の要素を削除
             tags = [tag for tag in tags if tag]
-            
+
             # 各タグに対して正規表現による置換を適用
             new_tags = []
             for tag in tags:
@@ -213,17 +213,17 @@ class D2_RegexReplace:
                         new_tag = re.sub(search_pattern, replace_pattern, new_tag)
                     except re.error as e:
                         return f"Regex error in tag '{tag}': {str(e)}"
-                
+
                 # 置換後のタグが空でない場合のみ追加
                 if new_tag.strip():
                     new_tags.append(new_tag)
-            
+
             # カンマ区切りで結合して返す
             return ', '.join(new_tags)
-        
+
         except Exception as e:
             return f"Error during tag replacement: {str(e)}"
-        
+
 
     @classmethod
     def _repalace_advanced(cls, result_text, replace_pairs):
@@ -237,7 +237,7 @@ class D2_RegexReplace:
                 return {"result": (f"Regex error: {str(e)}",)}
             except Exception as e:
                 return {"result": (f"Error during replacement: {str(e)}",)}
-            
+
         return result_text
 
 
@@ -248,7 +248,7 @@ class D2_RegexReplace:
         """
         if not regex_replace.strip():
             return []
-        
+
         parts = [p.strip("\n\t") for p in regex_replace.split('--')]
         pairs = []
 
@@ -257,7 +257,7 @@ class D2_RegexReplace:
             if search:  # 検索文字があれば
                 replace = parts[i + 1] if i + 1 < len(parts) else ""
                 pairs.append((search, replace))
-        
+
         return pairs
 
 
@@ -326,7 +326,7 @@ class TokenCounter:
         # 明示的に初期化
         self.tokenizer = None
         self.loaded_tokenizer_name = None
-    
+
     def load_tokenizer(self, clip_name):
         """正しいCLIPトークナイザーを読み込む"""
         if clip_name == "ViT-L/14":
@@ -337,7 +337,7 @@ class TokenCounter:
             tokenizer_name = "openai/clip-vit-base-patch16"
         else:
             raise ValueError(f"Unknown CLIP model: {clip_name}")
-        
+
         # 新しいトークナイザーが必要な場合のみロードする
         if self.tokenizer is None or self.loaded_tokenizer_name != tokenizer_name:
             try:
@@ -350,26 +350,26 @@ class TokenCounter:
                 self.tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
                 self.loaded_tokenizer_name = "openai/clip-vit-large-patch14"
                 print("Loaded fallback tokenizer: openai/clip-vit-large-patch14")
-        
+
         # トークナイザーが正しくロードされたことを確認
         if self.tokenizer is None:
             raise ValueError("Failed to load tokenizer")
-    
+
     def count_tokens(self, text, clip_name="ViT-L/14"):
         """
         テキストをトークン化して、トークン数とトークン化された結果を返す
         """
         # トークナイザーをロード
         self.load_tokenizer(clip_name)
-        
+
         # トークナイザーが正しくロードされていることを確認
         if self.tokenizer is None:
             raise ValueError("Tokenizer is not loaded")
-        
+
         # テキストをトークン化
         tokens = self.tokenizer.encode(text)
         token_count = len(tokens)
-        
+
         # トークン化の詳細結果を取得
         tokenized_words = []
         for word in text.split():
@@ -377,22 +377,22 @@ class TokenCounter:
             # BPEトークナイザーの場合は先頭に特殊トークンが付くことがあるので除去
             if len(word_tokens) > 0 and word_tokens[0] == self.tokenizer.bos_token_id:
                 word_tokens = word_tokens[1:]
-            
+
             # トークンIDからテキスト表現に変換
             token_texts = [self.tokenizer.decode([t]) for t in word_tokens]
-            
+
             tokenized_words.append({
                 "word": word,
                 "token_count": len(word_tokens),
                 "tokens": token_texts
             })
-        
+
         # 人間が読みやすい形式でトークン化結果を整形
         result_text = f"合計トークン数: {token_count}\n\n"
         result_text += "トークン化された単語:\n"
         for item in tokenized_words:
             result_text += f"「{item['word']}」({item['token_count']}トークン): {', '.join(item['tokens'])}\n"
-        
+
         # 特殊トークンとその意味について説明
         result_text += "\n特殊トークン情報:\n"
         special_tokens = {
@@ -404,7 +404,7 @@ class TokenCounter:
         for token, description in special_tokens.items():
             if token:  # Noneでないことを確認
                 result_text += f"{token}: {description}\n"
-        
+
         return (token_count, result_text)
 
 
@@ -415,10 +415,10 @@ D2 TokenCounter
 
 """
 class D2_TokenCounter:
-    
+
     def __init__(self):
         self.token_counter = TokenCounter()
-    
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -427,12 +427,12 @@ class D2_TokenCounter:
                 "clip_name": (["ViT-L/14", "ViT-B/32", "ViT-B/16"], {"default": "ViT-L/14"}),
             }
         }
-    
+
     RETURN_TYPES = ("INT", "STRING")
     RETURN_NAMES = ("token_count", "tokenized_result")
     FUNCTION = "count_tokens"
     CATEGORY = "D2"
-    
+
     def count_tokens(self, text, clip_name):
         """
         テキストをトークン化して、トークン数とトークン化された結果を返す
@@ -563,6 +563,43 @@ class D2_FilenameTemplate:
 
 
 
+"""
+
+D2 Filename Template2
+
+"""
+class D2_FilenameTemplate2:
+    @classmethod
+    def INPUT_TYPES(cls):
+        tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
+                  "Node param -- %node:{id}.{key}%\n" \
+                  "arg_1-3 -- %arg_1%\n" \
+                  "Delete .safetensors -- %arg_1:ckpt_name"
+
+        return {
+            "required": {
+                "format": ("STRING",{"tooltip": tooltip, "multiline":True},),
+            },
+            "optional": {
+                "arg_1": (AnyType("*"), {"forceInput": True}),
+                "arg_2": (AnyType("*"), {"forceInput": True}),
+                "arg_3": (AnyType("*"), {"forceInput": True}),
+            },
+            "hidden": {"prompt": "PROMPT"},
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("STRING",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, format, arg_1=None, arg_2=None, arg_3=None, prompt={}):
+        text = replace_template(format, arg_1, arg_2, arg_3, prompt)
+        return {
+            "result": (text,),
+        }
+
+
 
 NODE_CLASS_MAPPINGS = {
     "D2 Regex Switcher": D2_RegexSwitcher,
@@ -571,5 +608,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Multi Output": D2_MultiOutput,
     "D2 List To String": D2_ListToString,
     "D2 Filename Template": D2_FilenameTemplate,
+    "D2 Filename Template2": D2_FilenameTemplate2,
     "D2 Prompt": D2_Prompt,
 }
