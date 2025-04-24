@@ -165,6 +165,11 @@
 
 ## :blossom: 更新日誌
 
+**2025.04.24**
+
+- `D2_FilenameTemplate2`：新增功能。支援多行的 `D2_FilenameTemplate` 版本
+- `D2 EmptyImage Alpha` 顏色指定改為 red green blue。同時新增顏色樣本
+
 **2025.04.22**
 
 - `D2_CutByMask`: 新增了 `square_thumb` 模式，可使用最大尺寸的正方形進行裁剪

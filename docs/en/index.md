@@ -164,6 +164,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.24**
+
+- `D2_FilenameTemplate2`: Newly added. Multiple line support version of `D2_FilenameTemplate`
+- `D2 EmptyImage Alpha` color specification changed to red green blue. Color samples also added
+
 **2025.04.22**
 
 - `D2_CutByMask`: Added `square_thumb` mode to cut with maximum-sized square

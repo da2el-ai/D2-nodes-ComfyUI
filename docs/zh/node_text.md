@@ -164,7 +164,7 @@ Output text
 
 ---
 
-### D2 Filename Template
+### D2 Filename Template / D2 Filename Template2
 
 <figure>
   <img src="../img/filename_template.png">
@@ -172,6 +172,7 @@ Output text
 
 - 用於創建文件名的節點
 - 可以引入外部元素
+- `D2 Filename Template2` 是支援多行的版本
 
 #### Input
 

@@ -138,7 +138,7 @@ Output text
 
 ---
 
-### D2 Filename Template
+### D2 Filename Template / D2 Filename Template2
 
 <figure>
   <img src="../img/filename_template.png">
@@ -146,6 +146,7 @@ Output text
 
 - A node for creating filenames
 - Can incorporate external elements
+- `D2 Filename Template2` is a version that supports multiple lines
 
 #### Input
 

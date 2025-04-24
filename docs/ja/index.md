@@ -165,6 +165,11 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.04.24**
+
+- `D2_FilenameTemplate2`: 新規追加。`D2_FilenameTemplate` の複数行対応版
+- `D2 EmptyImage Alpha` 色の指定を red green blue に変更。色見本も追加
+
 **2025.04.22**
 
 - `D2_CutByMask`: 最大サイズの正方形でカットするモード `square_thumb` を追加

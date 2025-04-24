@@ -175,7 +175,7 @@ Output text
 
 ---
 
-### D2 Filename Template
+### D2 Filename Template / D2 Filename Template2
 
 <figure>
   <img src="../img/filename_template.png">
@@ -183,6 +183,7 @@ Output text
 
 - ファイル名を作るためのノード
 - 外部の要素を取り込むことが可能
+- `D2 Filename Template2` は複数行対応版です
 
 #### Input
 
