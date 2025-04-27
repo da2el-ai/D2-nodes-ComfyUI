@@ -48,7 +48,7 @@ app.registerExtension({
 
             // seed更新
             const seedWidget = findWidgetByName(this, "xy_seed");
-            seedWidget.setValue(Math.floor(Math.random() * 100000));
+            seedWidget.updateSeed();
 
             // まだ残りがあるならキューを入れる
             if (index + 1 < total && total >= 2) {

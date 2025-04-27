@@ -84,9 +84,7 @@ app.registerExtension({
 
             // seed更新
             const seedWidget = findWidgetByName(this, "queue_seed");
-            if(seedWidget){
-                seedWidget.setValue(Math.floor(Math.random()*100000));
-            }
+            seedWidget.updateSeed();
             
             const imageCount = message["image_count"][0];
             folderImageController.imageCount = imageCount;

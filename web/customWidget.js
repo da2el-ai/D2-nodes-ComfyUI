@@ -37,6 +37,11 @@ app.registerExtension({
             D2_SEED(node, inputName, inputData, app) {
                 const widget = getReadOnlyWidgetBase(node, "D2_SEED", inputName, 0);
 
+                // seed更新
+                widget.updateSeed = () => {
+                    widget.setValue(Math.floor(Math.random()*100000));
+                };
+
                 widget.draw = function (ctx, node, width, y) {
                     customWidgetDrawText(ctx, y, `Seed: ${this.value}`);
                 };
