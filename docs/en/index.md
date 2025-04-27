@@ -164,6 +164,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.28**
+
+- `D2_FolderImageQueue`: Changed start number from `1` to `0`
+
 **2025.04.24**
 
 - `D2_FilenameTemplate2`: Newly added. Multiple line support version of `D2_FilenameTemplate`

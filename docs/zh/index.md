@@ -165,6 +165,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.04.28**
+
+- `D2_FolderImageQueue`: 將起始編號從 `1` 更改為 `0`
+
 **2025.04.24**
 
 - `D2_FilenameTemplate2`：新增功能。支援多行的 `D2_FilenameTemplate` 版本

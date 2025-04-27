@@ -165,6 +165,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.04.2８**
+
+- `D2_FolderImageQueue`: 開始番号を `1` から `0` に変更
+
 **2025.04.24**
 
 - `D2_FilenameTemplate2`: 新規追加。`D2_FilenameTemplate` の複数行対応版
