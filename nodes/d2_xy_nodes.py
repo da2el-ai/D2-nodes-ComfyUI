@@ -89,7 +89,7 @@ class D2_XYPlot:
                 "reset": ("D2_XYPLOT_RESET", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
                 "remaining_time": ("D2_XYPLOT_REMAINING_TIME", {}),
-                "xy_seed": ("D2_XYPLOT_SEED", {}),
+                "xy_seed": ("D2_SEED", {}),
             }
 
         }
@@ -185,8 +185,9 @@ class D2_XYPlotEasy:
             "optional": {
                 "reset": ("D2_XYPLOT_RESET", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
-                "remaining_time": ("D2_XYPLOT_REMAINING_TIME", {}),
-                "xy_seed": ("D2_XYPLOT_SEED", {}),
+                "remaining_time": ("D2_REMAINING_TIME", {}),
+                "xy_seed": ("D2_SEED", {}),
+                "progress_bar": ("D2_PROGRESS_BAR", {}),
             }
         }
    
@@ -201,13 +202,13 @@ class D2_XYPlotEasy:
 
 
     def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0):
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0):
         return self.run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, "full")
+            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "full")
 
 
     def run_xy(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, mode="full"):
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0, mode="full"):
         
         org_values = {
             "positive": positive,
@@ -337,9 +338,9 @@ class D2_XYPlotEasyMini(D2_XYPlotEasy):
         "d2_pipe", "grid_pipe", "positive", "negative", "ckpt_name", "x_other", "y_other",)
 
     def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0):
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0):
         return self.run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, "mini")
+            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "mini")
 
 
 """

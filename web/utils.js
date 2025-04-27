@@ -1,3 +1,5 @@
+
+
 /**
  * 指定ミリ秒待機
  */
@@ -177,7 +179,7 @@ function handleInputsVisibility(node, countValue, params) {
 
 
 /**
- * 表示線用ウィジェットのベース
+ * 表示専用ウィジェットのベース
  */
 function getReadOnlyWidgetBase(node, type, inputName, value) {
     return {
@@ -217,6 +219,17 @@ function getReadOnlyWidgetBase(node, type, inputName, value) {
     };
 }
 
+/**
+ * カスタムウィジェット
+ * テキスト描画共通部分
+ */
+const customWidgetDrawText = (ctx, y, text) => {
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "12px Arial";
+    ctx.fillText(text, 20, y + 20);
+};
+
+
 export {
     sleep,
     findWidgetByName,
@@ -229,4 +242,5 @@ export {
     handleWidgetsVisibility,
     handleInputsVisibility,
     getReadOnlyWidgetBase,
+    customWidgetDrawText,
 };
