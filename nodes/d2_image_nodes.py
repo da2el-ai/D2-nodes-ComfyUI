@@ -284,7 +284,7 @@ class D2_FolderImageQueue:
             },
             "optional": {
                 "image_count": ("D2_FOLDER_IMAGE_COUNT", {}),
-                "queue_seed": ("D2_FOLDER_IMAGE_SEED", {}),
+                "queue_seed": ("D2_SEED", {}),
                 "progress_bar": ("D2_PROGRESS_BAR", {}),
             },
         }

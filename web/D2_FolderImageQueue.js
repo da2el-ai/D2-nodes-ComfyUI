@@ -1,6 +1,5 @@
 import { app } from "/scripts/app.js";
-import { $el } from "../../../scripts/ui.js";
-import { findWidgetByName, sleep, getReadOnlyWidgetBase } from "./modules/utils.js";
+import { findWidgetByName, sleep, getReadOnlyWidgetBase, customWidgetDrawText } from "./modules/utils.js";
 
 const API_BASE_URL = "/D2/folder-image-queue/";
 
@@ -170,26 +169,11 @@ app.registerExtension({
                 const widget = getReadOnlyWidgetBase(node, "D2_FOLDER_IMAGE_COUNT", inputName, 0);
 
                 widget.draw = function (ctx, node, width, y) {
-                    const text = `Image count: ${this.value}`;
-                    ctx.fillStyle = "#ffffff";
-                    ctx.font = "12px Arial";
-                    ctx.fillText(text, 20, y + 20);
+                    customWidgetDrawText(ctx, y, `Image count: ${this.value}`);
                 };
                 node.addCustomWidget(widget);
                 return widget;
             },
-            D2_FOLDER_IMAGE_SEED(node, inputName, inputData, app) {
-                const widget = getReadOnlyWidgetBase(node, "D2_FOLDER_IMAGE_SEED", inputName, 0);
-        
-                widget.draw = function(ctx, node, width, y) {
-                  const text = `Seed: ${this.value}`;
-                  ctx.fillStyle = "#ffffff";
-                  ctx.font = "12px Arial";
-                  ctx.fillText(text, 20, y + 20);
-                };
-                node.addCustomWidget(widget);
-                return widget;
-              },
-                };
+        };
     },
 });
