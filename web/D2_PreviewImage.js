@@ -1,7 +1,7 @@
 import { app } from "/scripts/app.js";
 // import { ComfyWidgets } from "/scripts/widgets.js";
-// import { findWidgetByName } from "./utils.js";
-import { D2Lightbox } from "./util_lightbox.js";
+// import { findWidgetByName } from "./modules/utils.js";
+import { D2Lightbox } from "./modules/util_lightbox.js";
 
 
 app.registerExtension({

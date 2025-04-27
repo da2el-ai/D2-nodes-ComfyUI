@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { findWidgetByName, handleWidgetsVisibility } from "./utils.js";
+import { findWidgetByName, handleWidgetsVisibility } from "./modules/utils.js";
 
 
 app.registerExtension({

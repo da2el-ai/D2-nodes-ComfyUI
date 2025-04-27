@@ -2,7 +2,7 @@
  * ボタンを並べた小さいフロートウィンドウのクラス
  */
 
-import { setCookie, getCookie, loadCssFile } from "./utils.js";
+import { setCookie, getCookie, loadCssFile } from "./modules/utils.js";
 
 
 class D2_FloatContainer {

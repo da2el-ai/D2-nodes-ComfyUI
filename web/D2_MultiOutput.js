@@ -1,7 +1,7 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 import { ComfyWidgets } from "/scripts/widgets.js";
-import { findWidgetByName } from "./utils.js";
+import { findWidgetByName } from "./modules/utils.js";
 
 const BUTTON_NAME = "Add Random";
 const MAX_SEED = 2 ** 32 - 1; // 4,294,967,295

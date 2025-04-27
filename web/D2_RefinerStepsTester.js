@@ -1,6 +1,6 @@
 import { app } from "/scripts/app.js";
 // import { ComfyWidgets } from "/scripts/widgets.js";
-import { findWidgetByName } from "./utils.js";
+import { findWidgetByName } from "./modules/utils.js";
 
 app.registerExtension({
   name: "Comfy.D2.D2_RefinerStepsTester",

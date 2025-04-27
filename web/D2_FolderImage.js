@@ -1,6 +1,6 @@
 import { app } from "/scripts/app.js";
 // import { $el } from "../../../scripts/ui.js";
-import { findWidgetByName, sleep, getReadOnlyWidgetBase } from "./utils.js";
+import { findWidgetByName, sleep, getReadOnlyWidgetBase } from "./modules/utils.js";
 
 const API_BASE_URL = "/D2/folder-image-queue/";
 

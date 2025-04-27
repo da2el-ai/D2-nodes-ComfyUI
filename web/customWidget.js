@@ -2,7 +2,7 @@
  * 汎用カスタムウィジェット
  */
 import { app } from "/scripts/app.js";
-import { getReadOnlyWidgetBase, customWidgetDrawText } from "./utils.js";
+import { getReadOnlyWidgetBase, customWidgetDrawText } from "./modules/utils.js";
 import { RemainingTimeController } from "./modules/RemainingTimeController.js";
 
 app.registerExtension({

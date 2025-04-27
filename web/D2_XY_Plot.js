@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { sleep, findWidgetByName, getReadOnlyWidgetBase, customWidgetDrawText } from "./utils.js";
+import { sleep, findWidgetByName, getReadOnlyWidgetBase, customWidgetDrawText } from "./modules/utils.js";
 import { RemainingTimeController } from "./modules/RemainingTimeController.js";
 
 app.registerExtension({

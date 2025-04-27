@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { sleep, findWidgetByName, getReadOnlyWidgetBase } from "./utils.js";
+import { sleep, findWidgetByName, getReadOnlyWidgetBase } from "./modules/utils.js";
 
 const resetImageCount = (id) => {
   return new Promise(async (resolve) => {

@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { findWidgetByName, handleInputsVisibility } from "./utils.js";
+import { findWidgetByName, handleInputsVisibility } from "./modules/utils.js";
 
 const changeInputVisibility = (node, val) => {
   if (node.constructor.title == "D2 Image Mask Stack"){
