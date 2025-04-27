@@ -78,6 +78,23 @@ const loadCssFile = (filePath) => {
     document.head.appendChild(link);
 };
 
+
+/**
+ * ミリ秒を hh:mm:ss に変換
+ * @param {int} time ミリ秒
+ * @returns str
+ */
+const formatTime = (time) => {
+    const hours = Math.floor(time / (1000 * 60 * 60));
+    const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((time % (1000 * 60)) / 1000);
+    const timeStr = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+    return timeStr;
+};
+
+
 /**
  * widget inputs に存在するか
  */
@@ -239,6 +256,7 @@ export {
     setCookie,
     getCookie,
     loadCssFile,
+    formatTime,
     handleWidgetsVisibility,
     handleInputsVisibility,
     getReadOnlyWidgetBase,

@@ -2,7 +2,7 @@
  * 汎用カスタムウィジェット
  */
 import { app } from "/scripts/app.js";
-import { getReadOnlyWidgetBase, customWidgetDrawText } from "./modules/utils.js";
+import { getReadOnlyWidgetBase, customWidgetDrawText, formatTime } from "./modules/utils.js";
 import { RemainingTimeController } from "./modules/RemainingTimeController.js";
 
 app.registerExtension({
@@ -68,12 +68,14 @@ app.registerExtension({
 
             /**
              * 残り時間表示
+             * value にミリ秒を渡すと hh:mm:ss で出力する
              */
-            D2_REMAINING_TIME(node, inputName, inputData, app) {
-                const widget = getReadOnlyWidgetBase( node, "D2_REMAINING_TIME", inputName, RemainingTimeController.INIT_TIME);
+            D2_TIME(node, inputName, inputData, app) {
+                const widget = getReadOnlyWidgetBase( node, "D2_TIME", inputName, 0);
 
                 widget.draw = function (ctx, node, width, y) {
-                    customWidgetDrawText(ctx, y, `Remaining Time: ${this.value}`);
+                    const timeStr = formatTime(this.value);
+                    customWidgetDrawText(ctx, y, `Remaining Time: ${timeStr}`);
                 };
                 node.addCustomWidget(widget);
                 // return widget;

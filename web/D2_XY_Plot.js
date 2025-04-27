@@ -29,8 +29,8 @@ app.registerExtension({
             };
 
             // 残り時間表示ウィジェットとコントローラー
-            const remTimeWidget = findWidgetByName(this, "remaining_time");
-            this.d2_remTimeController = new RemainingTimeController(remTimeWidget);
+            const timeWidget = findWidgetByName(this, "remaining_time");
+            this.d2_remTimeController = new RemainingTimeController(timeWidget);
 
             return r;
         };
@@ -52,7 +52,7 @@ app.registerExtension({
             const progressBarWidget = findWidgetByName(this, "progress_bar");
 
             // 残り時間計算
-            this.d2_remTimeController.calculateRemainingTime(index, total);
+            this.d2_remTimeController.setTimeWithCount(index, total);
 
             // seed更新
             const seedWidget = findWidgetByName(this, "xy_seed");
