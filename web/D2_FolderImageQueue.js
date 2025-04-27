@@ -10,6 +10,7 @@ class FolderImageQueue {
     startAtWidget;
     imageCountWidget;
     autoQueueWidget;
+    progressBarWidget;
     imageCount = 0;
     id = 0;
 
@@ -45,21 +46,30 @@ class FolderImageQueue {
     }
 
     /**
-     * キューが実行された
+     * キュー実行処理
+     * 残り画像があるなら次のキューを入れる
+     * imageCount = 1 だったら何もしない
+     * @param {int} imageCount 実行回数 (1から開始)
+     * @param {int} startAt 現在の回数 (0から開始のインデックス)
      */
     async onExecuted(imageCount, startAt) {
-        // まだ残りがあるならキューを入れる
-        if (startAt + 1 <= imageCount && imageCount >= 2) {
+        // 「まだ残りがある」条件: 現在の実行回数 (startAt + 1) が総実行回数 (imageCount) より小さい場合
+        if (startAt + 1 < imageCount) {
             this.startAtWidget.value = startAt + 1;
+            this.progressBarWidget.setValue((startAt + 1) / imageCount);
 
+            // 自動キューが有効なら次のキューを実行
             if (this.autoQueueWidget.value) {
                 await sleep(200);
                 app.queuePrompt(0, 1);
             }
         }
-        // 最後までいった
+        // 「最後までいった」条件: 現在の実行回数 (startAt + 1) が総実行回数 (imageCount) と同じかそれ以上の場合
         else if (startAt + 1 >= imageCount) {
-            this.startAtWidget.value = 1;
+            console.log(`D2 Folder Image Queue: 最後までいった (${startAt + 1} / ${imageCount})`);
+            // 開始インデックスとプログレスバーをリセット
+            this.startAtWidget.value = 0;
+            this.progressBarWidget.setValue(0);
         }
     }
 
@@ -67,13 +77,14 @@ class FolderImageQueue {
      * 入力フィールドのイベント設定
      * パス、拡張子が入力されたら枚数を取得する
      */
-    initWidget(id, folderWidget, extensionWidget, startAtWidget, imageCountWidget, autoQueueWidget) {
+    initWidget(id, folderWidget, extensionWidget, startAtWidget, imageCountWidget, autoQueueWidget, progressBarWidget) {
         this.id = id;
         this.folderWidget = folderWidget;
         this.extensionWidget = extensionWidget;
         this.startAtWidget = startAtWidget;
         this.imageCountWidget = imageCountWidget;
         this.autoQueueWidget = autoQueueWidget;
+        this.progressBarWidget = progressBarWidget;
 
         // イベント登録
         folderWidget.callback = async () => {
@@ -130,6 +141,7 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
+            const progressBarWidget = findWidgetByName(this, "progress_bar");
             const folderWidget = findWidgetByName(this, "folder");
             const extensionWidget = findWidgetByName(this, "extension");
             const startAtWidget = findWidgetByName(this, "start_at");
@@ -141,7 +153,8 @@ app.registerExtension({
                 extensionWidget,
                 startAtWidget,
                 imageCountWidget,
-                autoQueueWidget
+                autoQueueWidget,
+                progressBarWidget
             );
 
             return r;
