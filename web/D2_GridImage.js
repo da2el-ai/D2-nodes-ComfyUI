@@ -26,9 +26,10 @@ app.registerExtension({
       const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
       const indexWidget = findWidgetByName(this, "count");
-      const resetBtnWidget = findWidgetByName(this, "reset");
+      indexWidget.textTemplate = "Image count: <%value%>";
 
       // ストック画像をリセット
+      const resetBtnWidget = findWidgetByName(this, "reset");
       resetBtnWidget.callback = async () => {
         const image_count = await resetImageCount(this.id);
         indexWidget.setValue(image_count);
@@ -53,22 +54,4 @@ app.registerExtension({
     };
 
   },
-
-  getCustomWidgets(app) {
-    return {
-      D2_GRID_COUNT(node, inputName, inputData, app) {
-        const widget = getReadOnlyWidgetBase(node, "D2_GRID_COUNT", inputName, 0);
-
-        widget.draw = function(ctx, node, width, y) {
-          const text = `Image count: ${this.value}`;
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "12px Arial";
-          ctx.fillText(text, 20, y + 20);
-        };
-        node.addCustomWidget(widget);
-        // return widget;
-      },
-    };
-  },
-
 });

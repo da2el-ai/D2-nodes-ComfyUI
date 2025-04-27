@@ -396,7 +396,7 @@ class D2_GridImage:
             "optional": {
                 "title_text": ("STRING", {},),
                 "font_size": ("INT", {"default":24},),
-                "count": ("D2_GRID_COUNT", {}),
+                "count": ("D2_SIMPLE_TEXT", {}),
                 "reset": ("D2_BUTTON", {}),
             },
             "hidden": {

@@ -482,7 +482,7 @@ class D2_Prompt:
             # },
             # "optional": {
                 "insert_lora": (["CHOOSE"] + folder_paths.get_filename_list("loras"),),
-                "counter": ("D2_TOKEN_COUNTER", {})
+                "counter": ("D2_SIMPLE_TEXT", {})
             }
         }
 

@@ -38,11 +38,13 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
             
-            const counterWidget = findWidgetByName(this, "counter");
             const promptWidget = findWidgetByName(this, "prompt");
             const commentTypeWidget = findWidgetByName(this, "comment_type");
             const commentTypeValue = commentTypeWidget.value;
-        
+
+            const counterWidget = findWidgetByName(this, "counter");
+            counterWidget.textTemplate = "Token count: <%value%>";
+            
             // commentTypeWidget.value の再定義
             Object.defineProperty(commentTypeWidget, 'value', {
                 get() {
@@ -83,22 +85,5 @@ app.registerExtension({
         
             return r;
         }
-    },
-
-    getCustomWidgets(app) {
-        return {
-            D2_TOKEN_COUNTER(node, inputName, inputData, app) {
-                const widget = getReadOnlyWidgetBase(node, "D2_TOKEN_COUNTER", inputName, 0);
-        
-                widget.draw = function(ctx, node, width, y) {
-                    const text = `Token count: ${this.value}`;
-                    ctx.fillStyle = "#ffffff";
-                    ctx.font = "12px Arial";
-                    ctx.fillText(text, 20, y + 20);
-                };
-                node.addCustomWidget(widget);
-                return widget;
-            },
-        };
     },
 });
