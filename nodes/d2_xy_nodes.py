@@ -88,7 +88,7 @@ class D2_XYPlot:
             "optional": {
                 "reset": ("D2_BUTTON", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
-                "remaining_time": ("D2_XYPLOT_REMAINING_TIME", {}),
+                "remaining_time": ("D2_REMAINING_TIME", {}),
                 "xy_seed": ("D2_SEED", {}),
             }
 
