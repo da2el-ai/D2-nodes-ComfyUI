@@ -116,36 +116,4 @@ app.registerExtension({
             return r;
         };
     },
-
-    /**
-     * D2_FOLDER_IMAGE_COUNT 画像枚数を表示
-     */
-    // getCustomWidgets(app) {
-    //     return {
-    //         D2_FOLDER_IMAGE_COUNT(node, inputName, inputData, app) {
-    //             const widget = getReadOnlyWidgetBase(node, "D2_FOLDER_IMAGE_COUNT", inputName, 0);
-
-    //             widget.draw = function (ctx, node, width, y) {
-    //                 const text = `Image count: ${this.value}`;
-    //                 ctx.fillStyle = "#ffffff";
-    //                 ctx.font = "12px Arial";
-    //                 ctx.fillText(text, 20, y + 20);
-    //             };
-    //             node.addCustomWidget(widget);
-    //             return widget;
-    //         },
-    //         D2_FOLDER_IMAGE_SEED(node, inputName, inputData, app) {
-    //             const widget = getReadOnlyWidgetBase(node, "D2_FOLDER_IMAGE_SEED", inputName, 0);
-        
-    //             widget.draw = function(ctx, node, width, y) {
-    //               const text = `Seed: ${this.value}`;
-    //               ctx.fillStyle = "#ffffff";
-    //               ctx.font = "12px Arial";
-    //               ctx.fillText(text, 20, y + 20);
-    //             };
-    //             node.addCustomWidget(widget);
-    //             return widget;
-    //           },
-    //             };
-    // },
 });
