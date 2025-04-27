@@ -3,25 +3,8 @@ import { api } from "../../scripts/api.js";
 import { ComfyWidgets } from "/scripts/widgets.js";
 import { findWidgetByName } from "./modules/utils.js";
 
-const BUTTON_NAME = "Add Random";
 const MAX_SEED = 2 ** 32 - 1; // 4,294,967,295
 
-class D2_MultiOutputClass {
-    btnWidget = undefined;
-    typeWidget = undefined;
-    inputWidget = undefined;
-
-    // seed生成ボタンの表示切り替え
-    changeBtnVisible(value) {
-        if (value === "SEED") {
-            this.btnWidget.type = "button";
-        } else {
-            this.btnWidget.type = "converted-widget";
-        }
-    }
-}
-
-const d2mo = new D2_MultiOutputClass();
 
 app.registerExtension({
     name: "Comfy.D2.D2_MultiOutput",
@@ -32,46 +15,35 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
-            d2mo.btnWidget = findWidgetByName(this, BUTTON_NAME);
-            d2mo.typeWidget = findWidgetByName(this, "type");
-            d2mo.inputWidget = findWidgetByName(this, "parameter");
+            const typeWidget = findWidgetByName(this, "type");
+            const inputWidget = findWidgetByName(this, "parameter");
+            const btnWidget = findWidgetByName(this, "create_seed");
+            
+            btnWidget.name = "Add Random";
+            btnWidget.callback = () => {
+                const seed = Math.floor(Math.random() * MAX_SEED);
+                inputWidget.value += inputWidget.value.length >= 1 ? "\n" : "";
+                inputWidget.value += seed;
+            };
 
             // seed生成ボタンの表示切り替え
-            if (d2mo.typeWidget !== undefined) {
-                d2mo.typeWidget.callback = (value) => {
-                    d2mo.changeBtnVisible(value);
-                };
+            const changeBtnVisible = (value) => {
+                if (value === "SEED") {
+                    btnWidget.type = "button";
+                } else {
+                    btnWidget.type = "converted-widget";
+                }
+            };
 
-                setTimeout(() => {
-                    d2mo.changeBtnVisible(d2mo.typeWidget.value);
-                }, 200);
-            }
+            // seed生成ボタンの表示切り替え
+            typeWidget.callback = (value) => {
+                changeBtnVisible(value);
+            };
 
-            // const r = origOnNodeCreated
-            //     ? origOnNodeCreated.apply(this)
-            //     : undefined;
-            // for (const w of this.widgets) {
-            //     if (w.name === "seed") {
-            //         w.type = "converted-widget";
-            //         if (!w.linkedWidgets) continue;
-            //         for (const lw of w.linkedWidgets) {
-            //             lw.type = "converted-widget";
-            //         }
-            //     }
-            // }
+            setTimeout(() => {
+                changeBtnVisible(typeWidget.value);
+            }, 200);
             return r;
-        };
-    },
-    getCustomWidgets(app) {
-        return {
-            D2RESET(node, inputName, inputData, app) {
-                const widget = node.addWidget("button", BUTTON_NAME, 0, () => {
-                    const seed = Math.floor(Math.random() * MAX_SEED);
-                    d2mo.inputWidget.value += d2mo.inputWidget.value.length >= 1 ? "\n" : "";
-                    d2mo.inputWidget.value += seed;
-                });
-                return widget;
-            },
         };
     },
 });

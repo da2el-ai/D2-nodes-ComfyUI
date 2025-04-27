@@ -11,6 +11,13 @@ app.registerExtension({
     getCustomWidgets(app) {
         return {
             /**
+             * 汎用ボタン
+             */
+            D2_BUTTON(node, inputName, inputData, app) {
+                const widget = node.addWidget("button", inputName, 0, () => {});
+                return widget;
+            },
+            /**
              * プログレスバー
              */
             D2_PROGRESS_BAR(node, inputName, inputData, app) {

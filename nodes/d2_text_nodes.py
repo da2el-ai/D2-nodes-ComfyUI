@@ -282,7 +282,7 @@ class D2_MultiOutput:
                 ),
             },
             "optional": {
-                "reset": ("D2RESET", {})
+                "create_seed": ("D2_BUTTON", {})
             }
         }
 
