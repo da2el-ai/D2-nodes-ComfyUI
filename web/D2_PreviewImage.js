@@ -1,7 +1,6 @@
 import { app } from "/scripts/app.js";
-// import { ComfyWidgets } from "/scripts/widgets.js";
-// import { findWidgetByName } from "./modules/utils.js";
 import { D2Lightbox } from "./modules/util_lightbox.js";
+import { findWidgetByName } from "./modules/utils.js";
 
 
 app.registerExtension({
@@ -12,23 +11,17 @@ app.registerExtension({
     const origOnNodeCreated = nodeType.prototype.onNodeCreated;
     nodeType.prototype.onNodeCreated = function () {
         const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
-        this.lightBox = new D2Lightbox();
-        return r;
-    };
-  },
 
-  getCustomWidgets(app) {
+        const lightBox = new D2Lightbox();
 
-    return {
-      D2_PREVIEW_IMAGE(node, inputName, inputData, app) {
-        const widget = node.addWidget("button", "Popup Image", "", () => {
-          if(node.images.length >= 1){
-            node.lightBox.openLightbox(node.images, 0);
+        const previewBtnWidget = findWidgetByName(this, "popup_image");
+        previewBtnWidget.callback = () => {
+          if(this.images && this.images.length >= 1){
+            lightBox.openLightbox(this.images, 0);
           }
-        });
-        // node.addCustomWidget(widget);
-        return widget;
-      },
+        };
+
+        return r;
     };
   },
 });

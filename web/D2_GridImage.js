@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { sleep, findWidgetByName, getReadOnlyWidgetBase } from "./modules/utils.js";
+import { findInputByName, findWidgetByName, getReadOnlyWidgetBase } from "./modules/utils.js";
 
 const resetImageCount = (id) => {
   return new Promise(async (resolve) => {
@@ -16,6 +16,27 @@ app.registerExtension({
 
   async beforeRegisterNodeDef(nodeType, nodeData, app) {
     if (nodeData.name !== "D2 Grid Image") return;
+
+
+    /**
+     * ノード作成された
+     */
+    const origOnNodeCreated = nodeType.prototype.onNodeCreated;
+    nodeType.prototype.onNodeCreated = function () {
+      const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+
+      const indexWidget = findWidgetByName(this, "count");
+      const resetBtnWidget = findWidgetByName(this, "reset");
+
+      // ストック画像をリセット
+      resetBtnWidget.callback = async () => {
+        const image_count = await resetImageCount(this.id);
+        indexWidget.setValue(image_count);
+      };
+
+      return r;
+    };
+    
 
     /**
      * ノード実行時
@@ -35,19 +56,6 @@ app.registerExtension({
 
   getCustomWidgets(app) {
     return {
-      /**
-       * リセットボタン
-       */
-      D2_GRID_RESET(node, inputName, inputData, app) {
-        
-        const widget = node.addWidget("button", "Reset Images", "", async () => {
-          const image_count = await resetImageCount(node.id);
-          const indexWidget = findWidgetByName(node, "count");
-          indexWidget.setValue(image_count);
-        });
-        // node.addCustomWidget(widget);
-        return widget;
-      },
       D2_GRID_COUNT(node, inputName, inputData, app) {
         const widget = getReadOnlyWidgetBase(node, "D2_GRID_COUNT", inputName, 0);
 

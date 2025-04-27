@@ -1,6 +1,6 @@
 import { app } from "/scripts/app.js";
-import { $el } from "../../../scripts/ui.js";
-import { findWidgetByName, sleep, getReadOnlyWidgetBase } from "./modules/utils.js";
+// import { $el } from "../../../scripts/ui.js";
+import { findWidgetByName } from "./modules/utils.js";
 
 
 app.registerExtension({
@@ -26,7 +26,7 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
-            const btn = findWidgetByName(this, "get_list");
+            const getBtnWidget = findWidgetByName(this, "get_list");
             const typeWidget = findWidgetByName(this, "model_type");
             const filterWidget = findWidgetByName(this, "filter");
             const modeWidget = findWidgetByName(this, "mode");
@@ -34,7 +34,8 @@ app.registerExtension({
             const orderByWidget = findWidgetByName(this, "order_by");
             const modelListWidget = findWidgetByName(this, "model_list");
 
-            btn.callback = async () => {
+            getBtnWidget.name = "Get model list";
+            getBtnWidget.callback = async () => {
                 const modelList = await getModelFiles(
                     typeWidget.value, 
                     filterWidget.value,
@@ -46,15 +47,6 @@ app.registerExtension({
             };
 
             return r;
-        };
-    },
-
-    getCustomWidgets(app) {
-        return {
-            D2_GET_MODEL_BTN(node, inputName, inputData, app) {
-                const widget = node.addWidget("button", "get_list", 0, () => {});
-                return widget;
-            },
         };
     },
 });

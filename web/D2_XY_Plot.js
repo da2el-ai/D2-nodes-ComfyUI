@@ -20,6 +20,14 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
+            const startIndexWidget = findWidgetByName(this, "start_index");
+            const indexWidget = findWidgetByName(this, "index");
+            const resetBtnWidget = findWidgetByName(this, "reset");
+            resetBtnWidget.name = "Set start index";
+            resetBtnWidget.callback = () => {
+                indexWidget.setValue(startIndexWidget.value);
+            };
+
             // 残り時間表示ウィジェットとコントローラー
             const remTimeWidget = findWidgetByName(this, "remaining_time");
             this.d2_remTimeController = new RemainingTimeController(remTimeWidget);
@@ -70,16 +78,6 @@ app.registerExtension({
 
     getCustomWidgets(app) {
         return {
-            D2_XYPLOT_RESET(node, inputName, inputData, app) {
-                const widget = node.addWidget("button", "Set start index", "", () => {
-                    const startIndexWidget = findWidgetByName(node, "start_index");
-                    const indexWidget = findWidgetByName(node, "index");
-                    indexWidget.setValue(startIndexWidget.value);
-                });
-                // node.addCustomWidget(widget);
-                // return widget;
-            },
-
             D2_XYPLOT_INDEX(node, inputName, inputData, app) {
                 const widget = getReadOnlyWidgetBase(node, "D2_XYPLOT_INDEX", inputName, 0);
                 node.total = 0;

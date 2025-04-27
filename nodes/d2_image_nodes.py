@@ -54,7 +54,7 @@ class D2_PreviewImage(SaveImage):
         return {
             "required": {"images": ("IMAGE", ), },
             "optional": {
-                "popup_image": ("D2_PREVIEW_IMAGE", {}, )
+                "popup_image": ("D2_BUTTON", {}, )
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
@@ -84,7 +84,7 @@ class D2_LoadImage(LoadImage):
             },
             "optional": {
                 "image_path": ("STRING", {"forceInput": True}),
-                "editor": ("D2MASKEDITOR", {})
+                "editor": ("D2_BUTTON", {})
             }
         }
 
@@ -397,7 +397,7 @@ class D2_GridImage:
                 "title_text": ("STRING", {},),
                 "font_size": ("INT", {"default":24},),
                 "count": ("D2_GRID_COUNT", {}),
-                "reset": ("D2_GRID_RESET", {}),
+                "reset": ("D2_BUTTON", {}),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID",

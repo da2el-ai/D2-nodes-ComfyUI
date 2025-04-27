@@ -86,7 +86,7 @@ class D2_XYPlot:
                 "start_index": ("INT", {"default": 0},),
             },
             "optional": {
-                "reset": ("D2_XYPLOT_RESET", {"default":""}),
+                "reset": ("D2_BUTTON", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
                 "remaining_time": ("D2_XYPLOT_REMAINING_TIME", {}),
                 "xy_seed": ("D2_SEED", {}),
@@ -183,7 +183,7 @@ class D2_XYPlotEasy:
                 "start_index": ("INT", {"default": 0},),
             },
             "optional": {
-                "reset": ("D2_XYPLOT_RESET", {"default":""}),
+                "reset": ("D2_BUTTON", {"default":""}),
                 "index": ("D2_XYPLOT_INDEX", {}),
                 "remaining_time": ("D2_REMAINING_TIME", {}),
                 "xy_seed": ("D2_SEED", {}),
@@ -577,7 +577,7 @@ class D2_XYModelList:
                 "mode": (["simple", "a1111"],),
                 "sort_by": (["Name", "Date"], {"default":"Name"}),
                 "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-                "get_list": ("D2_GET_MODEL_BTN", {}),
+                "get_list": ("D2_BUTTON", {}),
                 "model_list": ("STRING", {"multiline": True}),
             }
         }
