@@ -142,8 +142,10 @@ app.registerExtension({
             const folderWidget = findWidgetByName(this, "folder");
             const extensionWidget = findWidgetByName(this, "extension");
             const startAtWidget = findWidgetByName(this, "start_at");
-            const imageCountWidget = findWidgetByName(this, "image_count");
             const autoQueueWidget = findWidgetByName(this, "auto_queue");
+            const imageCountWidget = findWidgetByName(this, "image_count");
+            imageCountWidget.textTemplate = "Image count: <%value%>"
+
             folderImageQueue.initWidget(
                 this.id,
                 folderWidget,
@@ -158,20 +160,4 @@ app.registerExtension({
         };
     },
 
-    /**
-     * D2_FOLDER_IMAGE_COUNT 画像枚数を表示
-     */
-    getCustomWidgets(app) {
-        return {
-            D2_FOLDER_IMAGE_COUNT(node, inputName, inputData, app) {
-                const widget = getReadOnlyWidgetBase(node, "D2_FOLDER_IMAGE_COUNT", inputName, 0);
-
-                widget.draw = function (ctx, node, width, y) {
-                    customWidgetDrawText(ctx, y, `Image count: ${this.value}`);
-                };
-                node.addCustomWidget(widget);
-                return widget;
-            },
-        };
-    },
 });

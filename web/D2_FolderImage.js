@@ -76,6 +76,31 @@ app.registerExtension({
         const folderImageController = new FolderImageController();
 
         /**
+         * ノード作成された
+         * ウィジェット登録と初期設定
+         */
+        const origOnNodeCreated = nodeType.prototype.onNodeCreated;
+        nodeType.prototype.onNodeCreated = function () {
+            const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+
+            const folderWidget = findWidgetByName(this, "folder");
+            const extensionWidget = findWidgetByName(this, "extension");
+            const autoQueueWidget = findWidgetByName(this, "auto_queue");
+            const imageCountWidget = findWidgetByName(this, "image_count");
+            imageCountWidget.textTemplate = "Image count: <%value%>"
+
+            folderImageController.initWidget(
+                this.id,
+                folderWidget,
+                extensionWidget,
+                imageCountWidget,
+                autoQueueWidget
+            );
+
+            return r;
+        };
+        
+        /**
          * ノード実行時
          */
         const onExecuted = nodeType.prototype.onExecuted;
@@ -89,29 +114,6 @@ app.registerExtension({
             const imageCount = message["image_count"][0];
             folderImageController.imageCount = imageCount;
             folderImageController.refreshImageCount();
-        };
-
-        /**
-         * ノード作成された
-         * ウィジェット登録と初期設定
-         */
-        const origOnNodeCreated = nodeType.prototype.onNodeCreated;
-        nodeType.prototype.onNodeCreated = function () {
-            const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
-
-            const folderWidget = findWidgetByName(this, "folder");
-            const extensionWidget = findWidgetByName(this, "extension");
-            const imageCountWidget = findWidgetByName(this, "image_count");
-            const autoQueueWidget = findWidgetByName(this, "auto_queue");
-            folderImageController.initWidget(
-                this.id,
-                folderWidget,
-                extensionWidget,
-                imageCountWidget,
-                autoQueueWidget
-            );
-
-            return r;
         };
     },
 });

@@ -17,6 +17,23 @@ app.registerExtension({
                 const widget = node.addWidget("button", inputName, 0, () => {});
                 return widget;
             },
+            
+            /**
+             * 汎用テキストウィジェット
+             */
+            D2_SIMPLE_TEXT(node, inputName, inputData, app) {
+                const widget = getReadOnlyWidgetBase( node, "D2_SIMPLE_TEXT", inputName, "");
+
+                widget.textTemplate = "<%value%>";
+                widget.draw = function (ctx, node, width, y) {
+                    const text = widget.textTemplate.replace("<%value%>", this.value);
+                    customWidgetDrawText(ctx, y, text);
+                };
+                
+                node.addCustomWidget(widget);
+                // return widget;
+            },
+            
             /**
              * プログレスバー
              */

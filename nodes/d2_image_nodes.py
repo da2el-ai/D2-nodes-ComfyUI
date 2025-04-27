@@ -283,7 +283,7 @@ class D2_FolderImageQueue:
                 "auto_queue": ("BOOLEAN", {"default": True},),
             },
             "optional": {
-                "image_count": ("D2_FOLDER_IMAGE_COUNT", {}),
+                "image_count": ("D2_SIMPLE_TEXT", {}),
                 "queue_seed": ("D2_SEED", {}),
                 "progress_bar": ("D2_PROGRESS_BAR", {}),
             },

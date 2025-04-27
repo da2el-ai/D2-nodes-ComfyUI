@@ -909,7 +909,7 @@ class D2_XYFolderImages:
                 "extension": ("STRING", {"default": "*.*"}),
             },
             "optional": {
-                "image_count": ("D2_FOLDER_IMAGE_COUNT", {}),
+                "image_count": ("D2_SIMPLE_TEXT", {}),
                 "queue_seed": ("D2_SEED", {}),
             },
         }
