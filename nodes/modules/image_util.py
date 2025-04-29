@@ -360,7 +360,7 @@ def adjust_rectangle_dimensions(rect, width, height, padding=0, min_width=0, min
     y_min = rect[1]
     rect_width = rect[2]
     rect_height = rect[3]
-    print(f"Debug - adjust_rectangle_dimensions()1: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
+    # print(f"Debug - adjust_rectangle_dimensions()1: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
 
     # 中心座標を計算
     center_x = x_min + rect_width // 2
@@ -387,7 +387,7 @@ def adjust_rectangle_dimensions(rect, width, height, padding=0, min_width=0, min
     rect_width = x_max - x_min + 1
     rect_height = y_max - y_min + 1
     
-    print(f"Debug - adjust_rectangle_dimensions()2: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
+    # print(f"Debug - adjust_rectangle_dimensions()2: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
     return [int(x_min), int(y_min), int(rect_width), int(rect_height)]
 
 
@@ -410,7 +410,7 @@ def adjust_rectangle_to_area(rect, area_width, area_height):
     rect_y = rect[1]
     rect_width = rect[2]
     rect_height = rect[3]
-    print(f"Debug - adjust_rectangle_to_area(): rect_x={rect_x}, rect_y={rect_y}, rect_width={rect_width}, rect_height={rect_height}, area_width={area_width}, area_height={area_height}")
+    # print(f"Debug - adjust_rectangle_to_area(): rect_x={rect_x}, rect_y={rect_y}, rect_width={rect_width}, rect_height={rect_height}, area_width={area_width}, area_height={area_height}")
 
     # まずサイズの調整（エリアサイズを超えないように）
     adjusted_width = min(rect_width, area_width)
@@ -428,7 +428,7 @@ def adjust_rectangle_to_area(rect, area_width, area_height):
     else:
         adjusted_y = max(0, rect_y)
     
-    print(f"Debug - adjust_rectangle_to_area(): adjusted_x={adjusted_x}, adjusted_y={adjusted_y}, adjusted_width={adjusted_width}, adjusted_height={adjusted_height}")
+    # print(f"Debug - adjust_rectangle_to_area(): adjusted_x={adjusted_x}, adjusted_y={adjusted_y}, adjusted_width={adjusted_width}, adjusted_height={adjusted_height}")
     
     return [int(adjusted_x), int(adjusted_y), int(adjusted_width), int(adjusted_height)]
 
@@ -491,7 +491,7 @@ def create_rectangle_from_mask(mask_np, width, height, padding=0, min_width=0, m
     # マスクからRectangle作成
     y_min, y_max = non_zero_indices[0].min(), non_zero_indices[0].max()
     x_min, x_max = non_zero_indices[1].min(), non_zero_indices[1].max()
-    print(f"Debug - create_rectangle_from_mask()1: x_min={x_min}, x_max={x_max}, y_min={y_min}, y_max={y_max}")
+    # print(f"Debug - create_rectangle_from_mask()1: x_min={x_min}, x_max={x_max}, y_min={y_min}, y_max={y_max}")
     
     rect = [
         x_min, 
@@ -499,7 +499,7 @@ def create_rectangle_from_mask(mask_np, width, height, padding=0, min_width=0, m
         x_max - x_min + 1, 
         y_max - y_min + 1
     ]
-    print(f"Debug - create_rectangle_from_mask()2: rect={rect}")
+    # print(f"Debug - create_rectangle_from_mask()2: rect={rect}")
     
     # 矩形の寸法を調整
     return adjust_rectangle_dimensions(
