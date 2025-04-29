@@ -89,6 +89,16 @@ app.registerExtension({
             const imageCountWidget = findWidgetByName(this, "image_count");
             imageCountWidget.textTemplate = "Image count: <%value%>"
 
+            // seed と画像点数をリフレッシュ
+            const seedWidget = findWidgetByName(this, "queue_seed");
+            const refreshBtnWidget = findWidgetByName(this, "refresh_btn");
+            refreshBtnWidget.name = "Get image count";
+            refreshBtnWidget.callback = async () => {
+                seedWidget.updateSeed();
+                await folderImageController.getImageCount();
+                folderImageController.refreshImageCount();
+            };
+
             folderImageController.initWidget(
                 this.id,
                 folderWidget,
@@ -107,9 +117,9 @@ app.registerExtension({
         nodeType.prototype.onExecuted = async function (message) {
             onExecuted?.apply(this, arguments);
 
-            // seed更新
-            const seedWidget = findWidgetByName(this, "queue_seed");
-            seedWidget.updateSeed();
+            // // seed更新
+            // const seedWidget = findWidgetByName(this, "queue_seed");
+            // seedWidget.updateSeed();
             
             const imageCount = message["image_count"][0];
             folderImageController.imageCount = imageCount;

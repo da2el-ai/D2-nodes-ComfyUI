@@ -112,12 +112,25 @@ def get_config_path(filename) -> Path:
 """
 ファイルリスト取得
 """
-def get_files(folder, extension) -> list[str]:
+def get_files(folder, extension, sort_by="Name", order_by="A-Z") -> list[str]:
     search_pattern = os.path.join(folder, extension)
     file_list = glob.glob(search_pattern)
-    # ソートして絶対パスに変換
-    file_list = sorted(file_list, key=lambda x: os.path.basename(x))
+    
+    # 絶対パスに変換
     file_list = [os.path.abspath(file) for file in file_list]
+    
+    # sort_byに基づいてソート
+    if sort_by == "Name":
+        file_list = sorted(file_list, key=lambda x: os.path.basename(x))
+    elif sort_by == "Date":
+        file_list = sorted(file_list, key=lambda x: os.path.getmtime(x))
+    elif sort_by == "Random":
+        random.shuffle(file_list)
+    
+    # order_byに基づいて順序を反転（Randomの場合は適用しない）
+    if order_by == "Z-A" and sort_by != "Random":
+        file_list.reverse()
+    
     return file_list
 
 

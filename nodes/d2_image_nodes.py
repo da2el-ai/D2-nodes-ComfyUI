@@ -126,10 +126,13 @@ class D2_LoadFolderImages():
             "required":{
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
+                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
+                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
             },
             "optional": {
                 "image_count": ("D2_SIMPLE_TEXT", {}),
                 "queue_seed": ("D2_SEED", {}),
+                "refresh_btn": ("D2_BUTTON", {})
             },
         }
 
@@ -139,8 +142,8 @@ class D2_LoadFolderImages():
     CATEGORY = "D2/Image"
 
     ######
-    def run(self, folder = "", extension="*.*", image_count="", queue_seed=0):
-        files = util.get_files(folder, extension)
+    def run(self, folder = "", extension="*.*", sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, refresh_btn=""):
+        files = util.get_files(folder, extension, sort_by, order_by)
         load_image = LoadImage()
         image_list = []
 
@@ -273,6 +276,11 @@ D2 Folder Image Queue
 
 """
 class D2_FolderImageQueue:
+
+    def __init__(self):
+        self.is_finished = False
+        self.files = []
+    
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -281,11 +289,14 @@ class D2_FolderImageQueue:
                 "extension": ("STRING", {"default": "*.*"}),
                 "start_at": ("INT", {"default": 0, "min": 0}),
                 "auto_queue": ("BOOLEAN", {"default": True},),
+                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
+                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
             },
             "optional": {
                 "image_count": ("D2_SIMPLE_TEXT", {}),
                 "queue_seed": ("D2_SEED", {}),
                 "progress_bar": ("D2_PROGRESS_BAR", {}),
+                "refresh_btn": ("D2_BUTTON", {})
             },
         }
 
@@ -295,14 +306,21 @@ class D2_FolderImageQueue:
     CATEGORY = "D2/Image"
 
     ######
-    def run(self, folder = "", extension="*.*", start_at=1, auto_queue=True, image_count="", queue_seed=0, progress_bar=0):
-        files = util.get_files(folder, extension)
-        image_path = files[start_at]
+    def run(self, folder = "", extension="*.*", start_at=1, auto_queue=True, sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, progress_bar=0, refresh_btn=""):
+        if(len(self.files) <= 0):
+            self.files = util.get_files(folder, extension, sort_by, order_by)
+            self.is_finished = False
+
+        image_path = self.files[start_at]
+
+        if(len(self.files) <= start_at + 1):
+            self.is_finished = True
+            self.files = []
 
         return {
             "result": (image_path,),
             "ui": {
-                "image_count": (len(files),),
+                "image_count": (len(self.files),),
                 "start_at": (start_at,),
             }
         }

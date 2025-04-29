@@ -115,22 +115,6 @@ app.registerExtension({
         const folderImageQueue = new FolderImageQueue();
 
         /**
-         * ノード実行時
-         */
-        const onExecuted = nodeType.prototype.onExecuted;
-        nodeType.prototype.onExecuted = async function (message) {
-            onExecuted?.apply(this, arguments);
-
-            // seed更新
-            const seedWidget = findWidgetByName(this, "queue_seed");
-            seedWidget.updateSeed();
-            
-            const imageCount = message["image_count"][0];
-            const startAt = message["start_at"][0];
-            folderImageQueue.onExecuted(imageCount, startAt);
-        };
-
-        /**
          * ノード作成された
          * ウィジェット登録と初期設定
          */
@@ -146,6 +130,14 @@ app.registerExtension({
             const imageCountWidget = findWidgetByName(this, "image_count");
             imageCountWidget.textTemplate = "Image count: <%value%>"
 
+            // 画像点数をリフレッシュ
+            const refreshBtnWidget = findWidgetByName(this, "refresh_btn");
+            refreshBtnWidget.name = "Get image count";
+            refreshBtnWidget.callback = async () => {
+                await folderImageQueue.getImageCount();
+                folderImageQueue.refreshImageCount();
+            };
+            
             folderImageQueue.initWidget(
                 this.id,
                 folderWidget,
@@ -157,6 +149,22 @@ app.registerExtension({
             );
 
             return r;
+        };
+
+        /**
+         * ノード実行時
+         */
+        const onExecuted = nodeType.prototype.onExecuted;
+        nodeType.prototype.onExecuted = async function (message) {
+            onExecuted?.apply(this, arguments);
+
+            // seed更新
+            const seedWidget = findWidgetByName(this, "queue_seed");
+            seedWidget.updateSeed();
+            
+            const imageCount = message["image_count"][0];
+            const startAt = message["start_at"][0];
+            folderImageQueue.onExecuted(imageCount, startAt);
         };
     },
 

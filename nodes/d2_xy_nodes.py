@@ -907,10 +907,13 @@ class D2_XYFolderImages:
             "required":{
                 "folder": ("STRING", {"default": ""}),
                 "extension": ("STRING", {"default": "*.*"}),
+                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
+                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
             },
             "optional": {
                 "image_count": ("D2_SIMPLE_TEXT", {}),
                 "queue_seed": ("D2_SEED", {}),
+                "refresh_btn": ("D2_BUTTON", {})
             },
         }
 
@@ -920,8 +923,8 @@ class D2_XYFolderImages:
     CATEGORY = "D2/XY Plot"
 
     ######
-    def run(self, folder, extension, image_count="", queue_seed=0):
-        files = util.get_files(folder, extension)
+    def run(self, folder, extension, sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, refresh_btn=""):
+        files = util.get_files(folder, extension, sort_by, order_by)
         output = util.list_to_text(files, util.LINE_BREAK)
 
         return {
