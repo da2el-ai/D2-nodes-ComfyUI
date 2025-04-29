@@ -165,7 +165,11 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
-**2025.04.2８**
+**2025.04.30**
+
+- `D2_FolderImageQueue` `D2_FolderImages` `D2_LoadFolderImages`: ソート機能を追加
+
+**2025.04.28**
 
 - `D2_FolderImageQueue`: 開始番号を `1` から `0` に変更
 

@@ -164,6 +164,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.04.30**
+
+- `D2_FolderImageQueue` `D2_FolderImages` `D2_LoadFolderImages`: Added sorting functionality
+
 **2025.04.28**
 
 - `D2_FolderImageQueue`: Changed start number from `1` to `0`

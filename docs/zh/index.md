@@ -165,6 +165,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.04.30**
+
+- `D2_FolderImageQueue` `D2_FolderImages` `D2_LoadFolderImages`: 添加排序功能
+
 **2025.04.28**
 
 - `D2_FolderImageQueue`: 將起始編號從 `1` 更改為 `0`
