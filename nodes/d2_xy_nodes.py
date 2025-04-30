@@ -577,6 +577,8 @@ class D2_XYModelList:
                 "mode": (["simple", "a1111"],),
                 "sort_by": (["Name", "Date"], {"default":"Name"}),
                 "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
+            },
+            "optional": {
                 "get_list": ("D2_BUTTON", {}),
                 "model_list": ("STRING", {"multiline": True}),
             }
