@@ -57,3 +57,22 @@ Node
 
 
 
+
+
+---
+
+
+
+### D2 Progress Preview
+
+<figure>
+<img src="../img/progress-preview.png">
+</figure>
+
+- 生成中イメージ、生成後のイメージを表示
+- 生成後のイメージはクリックするとギャラリー（Lightbox風）が起動する
+- 全ての出力ノードを対象としているので、内容が重複することがあります
+- `settings > D2 > Show progress preview` を有効にすると表示する（デフォルトでは表示）
+
+
+

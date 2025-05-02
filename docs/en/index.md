@@ -158,11 +158,17 @@ If you have installed any of the following custom nodes previously, please remov
   - Button that generates specified number of images (Batch count)
 - <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
   - Dialog for converting weights between NovelAI and StableDiffusion
-
+- <a href="node_float.md#D2-Progress-Preview">`D2 Progress Preview`</a>
+  - A palette that displays images during generation
 
 
 
 ## :blossom: Changelog
+
+
+**2025.05.02**
+
+- `D2_ProgressPreview`: Newly added.
 
 **2025.04.30**
 

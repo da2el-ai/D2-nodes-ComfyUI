@@ -161,9 +161,15 @@
   - 生成指定數量（Batch count）的按鈕
 - <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
   - `NovelAI` 和 `StableDiffusion` 權重互相轉換的對話框
+- <a href="node_float.md#D2-Progress-Preview">`D2 Progress Preview`</a>
+  - 顯示生成中圖像的面板
 
 
 ## :blossom: 更新日誌
+
+**2025.05.02**
+
+- `D2_ProgressPreview`: 新增功能。
 
 **2025.04.30**
 

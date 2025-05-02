@@ -159,11 +159,17 @@ D2 Nodes ComfyUI
   - 指定した枚数（Batch count）を生成するボタン
 - <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a>
   - NovelAI と StableDiffusion の weight を相互変換するダイアログ
+- <a href="node_float.md#D2-Progress-Preview">`D2 Progress Preview`</a>
+  - 生成中の画像を表示するパレット
 
 
 
 
 ## :blossom: Changelog
+
+**2025.05.02**
+
+- `D2_ProgressPreview`: 新規追加。
 
 **2025.04.30**
 

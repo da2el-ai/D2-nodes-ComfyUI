@@ -45,3 +45,15 @@
 - Hidden by default
 - Enable display by activating `settings > D2 > Show prompt convert button`
 
+---
+
+### D2 Progress Preview
+
+<figure>
+<img src="../img/progress-preview.png">
+</figure>
+
+- Displays images during generation and after generation
+- Images after generation can be clicked to launch a gallery (Lightbox style)
+- Targets all output nodes, so content may sometimes be duplicated
+- Enable display by activating `settings > D2 > Show progress preview` (shown by default)

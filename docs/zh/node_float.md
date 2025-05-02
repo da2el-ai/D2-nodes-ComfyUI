@@ -48,3 +48,14 @@
 - 啟用 `settings > D2 > Show prompt convert button` 後顯示
 
 ---
+
+### D2 Progress Preview
+
+<figure>
+<img src="../img/progress-preview.png">
+</figure>
+
+- 顯示生成中的圖像和生成後的圖像
+- 生成後的圖像點擊後會啟動畫廊（類似Lightbox效果）
+- 針對所有輸出節點，因此內容可能會重複
+- 啟用 `settings > D2 > Show progress preview` 可顯示此功能（預設為顯示）
