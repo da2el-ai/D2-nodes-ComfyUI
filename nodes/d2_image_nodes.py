@@ -28,9 +28,6 @@ from .modules import util
 from .modules import pnginfo_util
 from .modules import grid_image_util
 from .modules import image_util
-# from .modules import impactpack_util as impact
-# from .modules.template_util import replace_template
-
 
 
 
@@ -94,9 +91,8 @@ class D2_LoadImage(LoadImage):
     CATEGORY = "D2/Image"
 
     def load_image(self, image, image_path=None):
-
         if image_path != None:
-            image = image_path
+            image = image_path.strip()
             
         # オリジナルのLoadImage処理
         output_images, output_masks = super().load_image(image)
