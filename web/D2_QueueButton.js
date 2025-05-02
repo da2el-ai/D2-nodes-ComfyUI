@@ -32,7 +32,7 @@ class D2_QueueButton {
    * ボタンリセット
    */
   resetButton() {
-    this.floatContainer.removeButtons();
+    this.floatContainer.removeAllContent();
     this._createButtons();
   }
 
@@ -46,7 +46,7 @@ class D2_QueueButton {
       const button = document.createElement("button");
       button.classList.add("p-button");
       button.textContent = count;
-      this.floatContainer.addButton(button);
+      this.floatContainer.addContent(button);
 
       button.addEventListener("click", function (event) {
         app.queuePrompt(event.shiftKey ? -1 : 0, count);

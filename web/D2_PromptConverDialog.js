@@ -223,7 +223,7 @@ class D2_PromptConvertButton {
         const button = document.createElement("button");
         button.classList.add("p-button");
         button.textContent = "Prompt convert";
-        this.floatContainer.addButton(button);
+        this.floatContainer.addContent(button);
 
         button.addEventListener("click", () => {
           this.dialog.showModal();
