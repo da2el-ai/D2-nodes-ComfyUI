@@ -2,7 +2,6 @@
 import { loadCssFile } from "./utils.js";
 
 const CSS_FILEPATH = "/D2/assets/css/D2_Lightbox.css";
-const IMAGE_URL = '/api/view?filename={filename}&subfolder=&type=temp&rand={random}';
 
 loadCssFile(CSS_FILEPATH);
 
@@ -33,9 +32,8 @@ const _initLightboxBase = () => {
     document.body.appendChild(container);
 
     const bg = document.createElement('div');
-    bg.classList.add('d2-lightbox__bg'); // 背景クリックで閉じるイベントはここに移動するかも
+    bg.classList.add('d2-lightbox__bg');
     container.appendChild(bg);
-    bg.addEventListener('click', D2Lightbox.closeLightbox); // 背景クリックで閉じる
 
     const content = document.createElement('div');
     content.classList.add('d2-lightbox__content');
@@ -44,7 +42,7 @@ const _initLightboxBase = () => {
     const galleryContainer = document.createElement('div');
     galleryContainer.classList.add('d2-lightbox__gallery');
     content.appendChild(galleryContainer);
-    // galleryContainer のクリックイベントは削除（背景で閉じるため）
+    galleryContainer.addEventListener('click', D2Lightbox.closeLightbox); // クリックで閉じる
 
     const galleryImage = document.createElement('img');
     galleryImage.classList.add('d2-lightbox__gallery-image');
@@ -70,14 +68,14 @@ class D2Lightbox {
 
     // constructor は不要
 
-    static openLightbox(imageObjects, imageIndex = 0) {
+    static openLightbox(imageUrls, imageIndex = 0) {
         // 初回呼び出し時に要素を初期化
         if (!lightboxElements) {
             _initLightboxBase();
         }
 
         D2Lightbox._removeListImages();
-        D2Lightbox._addListimageObjects(imageObjects);
+        D2Lightbox._addListimageObjects(imageUrls);
         D2Lightbox._clickListImage(imageIndex);
         lightboxElements.container.style.display = 'block';
 
@@ -197,16 +195,16 @@ class D2Lightbox {
 
     /**
      * リスト画像を追加
-     * @param {Array<{filename: string}>} imageObjects
+     * @param {Array<string>} imageUrls
      */
-    static _addListimageObjects(imageObjects) {
+    static _addListimageObjects(imageUrls) {
         if (!lightboxElements) return;
         images = []; // リストをクリア
         lightboxElements.listContainer.innerHTML = ''; // コンテナをクリア
 
-        imageObjects.forEach((imgObj, index) => {
-            let url = IMAGE_URL.replace('{filename}', imgObj.filename);
-            url = url.replace('{random}', Math.random());
+        imageUrls.forEach((url, index) => {
+            // let url = IMAGE_URL.replace('{filename}', imgObj.filename);
+            // url = url.replace('{random}', Math.random());
 
             const img = document.createElement('img');
             img.classList.add('d2-lightbox__list-image');
