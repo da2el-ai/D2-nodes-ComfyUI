@@ -1,6 +1,6 @@
 import { app } from "/scripts/app.js";
 import { D2Lightbox } from "./modules/util_lightbox.js";
-import { findWidgetByName } from "./modules/utils.js";
+import { findWidgetByName, getImageUrlFromApi } from "./modules/utils.js";
 
 
 app.registerExtension({
@@ -15,7 +15,11 @@ app.registerExtension({
         const previewBtnWidget = findWidgetByName(this, "popup_image");
         previewBtnWidget.callback = () => {
           if(this.images && this.images.length >= 1){
-            D2Lightbox.openLightbox(this.images, 0);
+
+            const imageUrls = this.images.map((imgObj) => {
+              return getImageUrlFromApi(imgObj.filename, imgObj.type, imgObj.subfolder);
+            });
+            D2Lightbox.openLightbox(imageUrls, 0);
           }
         };
 
