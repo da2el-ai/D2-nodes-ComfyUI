@@ -1,3 +1,4 @@
+import { api } from "../../../scripts/api.js";
 
 
 /**
@@ -35,6 +36,19 @@ const findWidgetOrInputsByName = (node, name) => {
 const findWidgetByType = (node, type) => {
     return node.widgets ? node.widgets.find((w) => w.type === type) : null;
 };
+
+/**
+ * APIから画像を取得するURL
+ * @param {*} filename 
+ * @param {*} type "temp" or ""
+ */
+const getImageUrlFromApi = (filename, type="", subfolder="") => {
+    const previewParam = type === "temp" ? '&type=temp' : '';
+    const subfolderParam = type !== "" ? `&subfolder=${subfolder}` : '';
+    const url = api.apiURL(`/view?filename=${filename}${previewParam}${subfolderParam}`);
+    return url;
+};
+
 
 /**
  * クッキーに保存
@@ -253,6 +267,7 @@ export {
     findWidgetOrInputsByName,
     findWidgetByType,
     findInputByName,
+    getImageUrlFromApi,
     setCookie,
     getCookie,
     loadCssFile,
