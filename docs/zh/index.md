@@ -147,6 +147,8 @@
   - 輸出 Checkpoint / Lora 列表
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
   - 輸出資料夾內文件列表
+- <a href="node_xy.md#D2-XY-Upload-Image">`D2 XY Upload Image`</a>
+  - 通過拖放上傳多個圖像
 - <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
   - 創建在 `D2 Grid Image` 顯示的標題文字
 - <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
@@ -170,6 +172,7 @@
 **2025.05.02**
 
 - `D2_ProgressPreview`: 新增功能。
+- `D2_XYUploadImage`: 新增加。
 
 **2025.04.30**
 

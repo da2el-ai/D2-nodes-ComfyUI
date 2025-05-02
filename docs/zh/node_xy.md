@@ -255,6 +255,21 @@
 ---
 
 
+### D2 XY Upload Image
+
+<figure>
+  <img src="../img/xy_upload_image.png?2">
+</figure>
+
+- 一次性上傳多個圖像文件的節點
+- 可以通過拖放文件將其上傳到臨時文件夾
+- 上傳文件的路徑顯示在文本區域中
+- 設計為通過 `D2 XY Plot Easy` 連接到 `D2 Load Image`
+
+
+---
+
+
 ### D2 XY Folder Images
 
 <figure>

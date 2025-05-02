@@ -144,6 +144,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Outputs a list of Checkpoints / Loras
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
   - Outputs list of files in folder
+- <a href="node_xy.md#D2-XY-Upload-Image">`D2 XY Upload Image`</a>
+  - Upload multiple images by drag and drop
 - <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
   - Creates header text for display in D2 Grid Image
 - <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
@@ -169,6 +171,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2025.05.02**
 
 - `D2_ProgressPreview`: Newly added.
+- `D2_XYUploadImage`: Newly added.
 
 **2025.04.30**
 

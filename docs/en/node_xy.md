@@ -248,6 +248,22 @@
   - Button to retrieve model list
 
 
+
+---
+
+
+### D2 XY Upload Image
+
+<figure>
+  <img src="../img/xy_upload_image.png?2">
+</figure>
+
+- A node for uploading multiple image files at once
+- Files can be uploaded to a temporary folder by drag and drop
+- The paths of uploaded files are displayed in the text area
+- Designed to be connected to `D2 Load Image` via `D2 XY Plot Easy`
+
+
 ---
 
 

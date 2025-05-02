@@ -144,6 +144,8 @@ D2 Nodes ComfyUI
   - Checkpoint / Lora のリストを出力する
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
   - フォルダ内ファイルのリストを出力する
+- <a href="node_xy.md#D2-XY-Upload-Image">`D2 XY Upload Image`</a>
+  - 複数画像をドラッグ・ドロップでアップロードする
 - <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
   - D2 Grid Image で表示する見出しテキストを作成
 - <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
@@ -170,6 +172,8 @@ D2 Nodes ComfyUI
 **2025.05.02**
 
 - `D2_ProgressPreview`: 新規追加。
+- `D2_XYUploadImage`: 新規追加。
+
 
 **2025.04.30**
 
