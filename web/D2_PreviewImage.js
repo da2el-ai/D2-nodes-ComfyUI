@@ -12,12 +12,10 @@ app.registerExtension({
     nodeType.prototype.onNodeCreated = function () {
         const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
-        const lightBox = new D2Lightbox();
-
         const previewBtnWidget = findWidgetByName(this, "popup_image");
         previewBtnWidget.callback = () => {
           if(this.images && this.images.length >= 1){
-            lightBox.openLightbox(this.images, 0);
+            D2Lightbox.openLightbox(this.images, 0);
           }
         };
 
