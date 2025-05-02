@@ -25,6 +25,7 @@ from .modules import util
 from .modules.util import AnyType, D2_TD2Pipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe
 from .modules import grid_image_util
 from .modules import image_util
+from .modules import network_util
 
 
 
@@ -938,6 +939,34 @@ class D2_XYFolderImages:
 
 
 
+"""
+
+D2 Upload Image
+
+"""
+class D2_UploadImage():
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "image_list": ("STRING", {"multiline":True, "default":""}), 
+            },
+            "optional": {
+                "status": ("D2_SIMPLE_TEXT", {}),
+            },
+        }
+
+    RETURN_TYPES = ("LIST", "STRING",)
+    RETURN_NAMES = ("LIST", "x / y_list",)
+    FUNCTION = "send_image_path"
+    CATEGORY = "D2/XY Plot"
+
+    def send_image_path(self, image_list, status=""):
+        # 入力文字列を改行で分割
+        image_batch = image_list.strip().split('\n')
+        return (image_batch, image_list,)
+
+
 
 
 NODE_CLASS_MAPPINGS = {
@@ -953,6 +982,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY List To Plot": D2_XYListToPlot,
     "D2 XY String To Plot": D2_XYStringToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
+    "D2 XY Upload Image": D2_UploadImage,
     "D2 XY Seed": D2_XYSeed,
     "D2 XY Seed2": D2_XYSeed2,
     "D2 XY Annotation": D2_XYAnnotation,
