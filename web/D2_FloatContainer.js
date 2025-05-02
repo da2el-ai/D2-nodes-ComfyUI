@@ -6,10 +6,10 @@ import { setCookie, getCookie, loadCssFile } from "./modules/utils.js";
 
 
 class D2_FloatContainer {
-    static CSS_FILEPATH = "/D2/assets/css/D2_FloatContainer.css";
+    static CSS_FILEPATH = "/D2/assets/css/D2_FloatContainer.css?2";
 
     container = undefined;
-    buttonContainer = undefined;
+    body = undefined;
     cookieNameBase = "";
 
     constructor(cookieNameBase, default_left = 50, default_top = 50) {
@@ -30,18 +30,18 @@ class D2_FloatContainer {
     }
 
     /**
-     * ボタン追加
+     * 内容物追加
      * @param {HTMLElement} button 
      */
-    addButton(button) {
-        this.buttonContainer.appendChild(button);
+    addContent(button) {
+        this.body.appendChild(button);
     }
 
     /**
-     * ボタン全削除
+     * 内容物全削除
      */
-    removeButtons() {
-        this.buttonContainer.innerHTML = "";
+    removeAllContent() {
+        this.body.innerHTML = "";
     }
 
     /**
@@ -50,6 +50,7 @@ class D2_FloatContainer {
     changeVisible(bool) {
         this.container.style.display = bool ? "block" : "none";
     }
+
 
     ///////////////////////////////////////////////
     // private method
@@ -62,17 +63,17 @@ class D2_FloatContainer {
         this.container.classList.add("p-panel", "d2-float-container");
         document.querySelector("body").appendChild(this.container);
 
-        const content = document.createElement("div");
-        content.classList.add("p-panel-content", "flex", "flex-nowrap", "items-center", "d2-float-container__content");
-        this.container.appendChild(content);
+        const frame = document.createElement("div");
+        frame.classList.add("p-panel-content", "flex", "flex-nowrap", "items-center", "d2-float-container__frame");
+        this.container.appendChild(frame);
 
         const dragHandle = document.createElement("span");
-        dragHandle.classList.add("drag-handle", "cursor-move", "mr-2");
-        content.appendChild(dragHandle);
+        dragHandle.classList.add("drag-handle", "cursor-move", "mr-2", "d2-float-container__drag-handle");
+        frame.appendChild(dragHandle);
 
-        this.buttonContainer = document.createElement("div");
-        this.buttonContainer.classList.add("flex", "flex-nowrap", "items-center", "d2-float-container__button-container");
-        content.appendChild(this.buttonContainer);
+        this.body = document.createElement("div");
+        this.body.classList.add("flex", "flex-nowrap", "items-center", "d2-float-container__body");
+        frame.appendChild(this.body);
 
         // ドラッグ設定
         this._dragSetting(dragHandle, this.container);

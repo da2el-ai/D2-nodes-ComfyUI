@@ -3,10 +3,10 @@
   z-index: 2000;
 }
 
-.d2-float-container__content {
+.d2-float-container__frame {
   padding: 0.25rem;
 }
 
-.d2-float-container__button-container {
+.d2-float-container__body {
   gap: 0.25rem;
 }
