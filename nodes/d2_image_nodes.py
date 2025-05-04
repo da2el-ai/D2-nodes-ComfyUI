@@ -132,8 +132,8 @@ class D2_LoadFolderImages():
             },
         }
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
+    RETURN_TYPES = ("IMAGE", "INT",)
+    RETURN_NAMES = ("images", "image_count",)
     FUNCTION = "run"
     CATEGORY = "D2/Image"
 
@@ -151,7 +151,7 @@ class D2_LoadFolderImages():
         image_batch = torch.cat(image_list, dim=0)
 
         return {
-            "result": (image_batch,),
+            "result": (image_batch, len(files),),
             "ui": {
                 "image_count": (len(files),),
             }
@@ -296,8 +296,8 @@ class D2_FolderImageQueue:
             },
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("image_path",)
+    RETURN_TYPES = ("STRING", "INT",)
+    RETURN_NAMES = ("image_path", "image_count",)
     FUNCTION = "run"
     CATEGORY = "D2/Image"
 
@@ -308,15 +308,16 @@ class D2_FolderImageQueue:
             self.is_finished = False
 
         image_path = self.files[start_at]
+        image_count = len(self.files)
 
         if(len(self.files) <= start_at + 1):
             self.is_finished = True
             self.files = []
 
         return {
-            "result": (image_path,),
+            "result": (image_path, image_count,),
             "ui": {
-                "image_count": (len(self.files),),
+                "image_count": (image_count,),
                 "start_at": (start_at,),
             }
         }

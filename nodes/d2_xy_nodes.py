@@ -920,8 +920,8 @@ class D2_XYFolderImages:
             },
         }
 
-    RETURN_TYPES = ("STRING", "LIST",)
-    RETURN_NAMES = ("x / y_list", "LIST",)
+    RETURN_TYPES = ("STRING", "LIST", "INT",)
+    RETURN_NAMES = ("x / y_list", "LIST", "image_count",)
     FUNCTION = "run"
     CATEGORY = "D2/XY Plot"
 
@@ -931,7 +931,7 @@ class D2_XYFolderImages:
         output = util.list_to_text(files, util.LINE_BREAK)
 
         return {
-            "result": (output, files,),
+            "result": (output, files, len(files),),
             "ui": {
                 "image_count": (len(files),),
             }
