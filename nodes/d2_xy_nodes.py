@@ -952,19 +952,26 @@ class D2_XYUploadImage():
                 "image_list": ("STRING", {"multiline":True, "default":""}), 
             },
             "optional": {
-                "status": ("D2_SIMPLE_TEXT", {}),
+                "image_count": ("D2_SIMPLE_TEXT", {"default":0}),
+                "status": ("D2_SIMPLE_TEXT", {"default":""}),
             },
         }
 
-    RETURN_TYPES = ("LIST", "STRING",)
-    RETURN_NAMES = ("LIST", "x / y_list",)
+    RETURN_TYPES = ("LIST", "STRING", "INT",)
+    RETURN_NAMES = ("LIST", "x / y_list", "image_count",)
     FUNCTION = "send_image_path"
     CATEGORY = "D2/XY Plot"
 
-    def send_image_path(self, image_list, status=""):
+    def send_image_path(self, image_list, image_count=0, status=""):
         # 入力文字列を改行で分割
         image_batch = image_list.strip().split('\n')
-        return (image_batch, image_list,)
+
+        return {
+            "result": (image_batch, image_list, image_count,),
+            "ui": {
+                "image_count": (len(image_batch),),
+            }
+        }
 
 
 

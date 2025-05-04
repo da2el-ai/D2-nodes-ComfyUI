@@ -4,11 +4,14 @@ import { findWidgetByName } from "./modules/utils.js";
 
 class D2FileUploader {
     imageListWidget = undefined;
+    imageCountWidget = undefined;
     statusWidget = undefined;
 
-    constructor(imageListWidget, statusWidget) {
+    init(imageListWidget, statusWidget, imageCountWidget) {
         this.imageListWidget = imageListWidget;
         this.statusWidget = statusWidget;
+        this.imageCountWidget = imageCountWidget;
+        // this.updateImageCount(); // 初期値を設定
 
         const textarea = imageListWidget.inputEl;
 
@@ -92,7 +95,8 @@ class D2FileUploader {
             });
             
             this.imageListWidget.value = outputText;
-
+            this.updateImageCount();
+            
         })
         .catch(error => {
             console.error("Upload error occurred:"); // エラーログを明確化
@@ -103,6 +107,14 @@ class D2FileUploader {
             this.statusWidget.setValue('Upload failed: ' + errorMessage);
         });
     }
+
+    // 画像の行数をカウントしてウィジェットを更新する関数
+    updateImageCount() {
+        const outputText = this.imageListWidget.value || "";
+        // 空行は対象外として行数をカウント
+        const image_count = outputText.split("\n").filter(line => line.trim() !== "").length;
+        this.imageCountWidget.setValue(image_count);
+    }
 }
 
 
@@ -111,6 +123,9 @@ app.registerExtension({
 
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "D2 XY Upload Image") return;
+
+        // ファイルアップロードクラスのインスタンスを作成
+        const fileUploader = new D2FileUploader();
 
         /**
          * ノード作成された
@@ -122,9 +137,27 @@ app.registerExtension({
 
             const statusWidget =  findWidgetByName(this, "status");
             const imageListWidget = findWidgetByName(this, "image_list");
-            const fileUploader = new D2FileUploader(imageListWidget, statusWidget);
+            const imageCountWidget = findWidgetByName(this, "image_count");
+            imageCountWidget.textTemplate = "Image count: <%value%>"
+
+            fileUploader.init(imageListWidget, statusWidget, imageCountWidget);
+
 
             return r;
         };
+
+        /**
+         * ノード実行時
+         */
+        const onExecuted = nodeType.prototype.onExecuted;
+        nodeType.prototype.onExecuted = async function (message) {
+            onExecuted?.apply(this, arguments);
+
+            const imageCount = message["image_count"][0];
+            const imageCountWidget = findWidgetByName(this, "image_count");
+            imageCountWidget.setValue(imageCount);
+        };
     },
+
+
 });
