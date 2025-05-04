@@ -944,7 +944,7 @@ class D2_XYFolderImages:
 D2 Upload Image
 
 """
-class D2_UploadImage():
+class D2_XYUploadImage():
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -982,7 +982,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY List To Plot": D2_XYListToPlot,
     "D2 XY String To Plot": D2_XYStringToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
-    "D2 XY Upload Image": D2_UploadImage,
+    "D2 XY Upload Image": D2_XYUploadImage,
     "D2 XY Seed": D2_XYSeed,
     "D2 XY Seed2": D2_XYSeed2,
     "D2 XY Annotation": D2_XYAnnotation,
