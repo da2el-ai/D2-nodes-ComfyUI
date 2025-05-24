@@ -91,6 +91,7 @@ class D2_XYPlot:
                 "index": ("D2_XYPLOT_INDEX", {}),
                 "remaining_time": ("D2_TIME", {}),
                 "xy_seed": ("D2_SEED", {}),
+                "progress_bar": ("D2_PROGRESS_BAR", {}),
             }
 
         }
@@ -101,7 +102,7 @@ class D2_XYPlot:
     CATEGORY = "D2/XY Plot"
 
 
-    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, start_index, reset="", index=0, remaining_time=0, xy_seed=0):
+    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, start_index, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0):
         x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
         y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
 
