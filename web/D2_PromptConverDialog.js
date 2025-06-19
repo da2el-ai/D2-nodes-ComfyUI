@@ -8,71 +8,112 @@ import { loadCssFile } from "./modules/utils.js";
  */
 
 class D2_PromptConvert {
-  static RATE = 1.05;
+    static RATE = 1.05;
 
-  /**
-   * StableDiffusionのweightをNAI方式に変換
-   */
-  static convertToNai(srcPrompt) {
-      const tempPrompt = srcPrompt.replace(/\n/g, '');
-      const convertedPrompt = tempPrompt.replace(/\([^)]+:\s*[0-9.]+\s*\)/g, D2_PromptConvert.$_convertToNai);
-      return convertedPrompt;
-  }
+    /**
+     * StableDiffusionのweightをNAI方式に変換
+     */
+    static convertToNai (srcPrompt, convertType = "old") {
+        // 改行位置を記録するためのプレースホルダーを使用
+        const lineBreakPlaceholder = '___LINEBREAK___';
+        const tempPrompt = srcPrompt.replace(/\n/g, lineBreakPlaceholder);
 
-  static $_convertToNai(prompt) {
-      const parts = prompt.substring(1, prompt.length - 1).split(':');
-      const text = parts.slice(0, -1).join(':').trim();
-      const weightStr = parts[parts.length - 1].trim();
-      const weight = parseFloat(weightStr);
-      const n = Math.round(Math.log(weight) / Math.log(D2_PromptConvert.RATE));
-      const count = Math.abs(n);
+        const convertedPrompt = tempPrompt.replace(/\([^)]+:\s*[0-9.]+\s*\)/g, (match) => {
+            return D2_PromptConvert.$_convertToNai(match, convertType);
+        });
 
-      let openBra, closeBra;
-      if (weight < 1) {
-          openBra = '[';
-          closeBra = ']';
-      } else {
-          openBra = '{';
-          closeBra = '}';
-      }
+        // 改行を復元
+        return convertedPrompt.replace(new RegExp(lineBreakPlaceholder, 'g'), '\n');
+    }
 
-      return openBra.repeat(count) + text + closeBra.repeat(count);
-  }
+    static $_convertToNai (prompt, convertType = "old") {
+        const parts = prompt.substring(1, prompt.length - 1).split(':');
+        const text = parts.slice(0, -1).join(':').trim();
+        const weightStr = parts[parts.length - 1].trim();
+        const weight = parseFloat(weightStr);
 
-  /**
-   * NAIのweightをStableDiffusion方式に変換
-   */
-  static convertToSd(srcPrompt) {
-      let tempPrompt = srcPrompt.replace(/\n/g, '');
-      let convertedPrompt = tempPrompt.replace(/[\[{]+[^\]}]+[\]}]+/g, D2_PromptConvert.$_convertToSd);
-      return convertedPrompt;
-  }
+        if (convertType === "new") {
+            // 新方式: 1.2::aaa::: という変換
+            return `${weight}::${text}:::`;
+        } else {
+            // 旧方式: (aaa:1.2) を {{{aaa}}} という変換
+            const n = Math.round(Math.log(weight) / Math.log(D2_PromptConvert.RATE));
+            const count = Math.abs(n);
 
-  static $_convertToSd(prompt) {
-      const braType = prompt.substring(0, 1);
-      const braCount = (prompt.match(/[\[{]/g) || []).length;
-      let weight = 0;
+            let openBra, closeBra;
+            if (weight < 1) {
+                openBra = '[';
+                closeBra = ']';
+            } else {
+                openBra = '{';
+                closeBra = '}';
+            }
 
-      if (braType === '{') {
-          weight = 1 * Math.pow(D2_PromptConvert.RATE, braCount);
-      } else {
-          weight = 1 * Math.pow(1 / D2_PromptConvert.RATE, braCount);
-      }
+            return openBra.repeat(count) + text + closeBra.repeat(count);
+        }
+    }
 
-      let weightAdjust;
+    /**
+     * NAIのweightをStableDiffusion方式に変換
+     */
+    static convertToSd (srcPrompt, convertType = "old") {
+        // 改行位置を記録するためのプレースホルダーを使用
+        const lineBreakPlaceholder = '___LINEBREAK___';
+        let tempPrompt = srcPrompt.replace(/\n/g, lineBreakPlaceholder);
 
-      // 四捨五入して小数点２位にするか、
-      // 四捨五入せず小数点３位で切り捨てるか
-      weightAdjust = Math.round(weight * 10) / 10;
-      // if (opts.d2_npc_enable_rounding) {
-      //     weightAdjust = Math.round(weight * 10) / 10;
-      // } else {
-      //     weightAdjust = Math.floor(weight * 100) / 100;
-      // }
+        if (convertType === "new") {
+            // 新方式: 1.2::aaa::: を (aaa:1.2) に変換
+            tempPrompt = tempPrompt.replace(/([0-9.]+)::([^:]+):::/g, (match) => {
+                return D2_PromptConvert.$_convertToSd(match, convertType);
+            });
+        } else {
+            // 旧方式: {{{aaa}}} を (aaa:1.2) に変換
+            tempPrompt = tempPrompt.replace(/[\[{]+[^\]}]+[\]}]+/g, (match) => {
+                return D2_PromptConvert.$_convertToSd(match, convertType);
+            });
+        }
 
-      const text = prompt.replace(/[\[\]{}]+/g, '');
-      return `(${text}:${weightAdjust})`;
-  }
+        // 改行を復元
+        return tempPrompt.replace(new RegExp(lineBreakPlaceholder, 'g'), '\n');
+    }
+
+    static $_convertToSd (prompt, convertType = "old") {
+        if (convertType === "new") {
+            // 新方式: 1.2::aaa::: を (aaa:1.2) に変換
+            const match = prompt.match(/([0-9.]+)::([^:]+):::/);
+            if (match) {
+                const weight = parseFloat(match[1]);
+                const text = match[2].trim();
+                return `(${text}:${weight})`;
+            }
+            return prompt;
+        } else {
+            // 旧方式: {{{aaa}}} を (aaa:1.2) に変換
+            const braType = prompt.substring(0, 1);
+            const braCount = (prompt.match(/[\[{]/g) || []).length;
+            let weight = 0;
+
+            if (braType === '{') {
+                weight = 1 * Math.pow(D2_PromptConvert.RATE, braCount);
+            } else {
+                weight = 1 * Math.pow(1 / D2_PromptConvert.RATE, braCount);
+            }
+
+            let weightAdjust;
+
+            // 四捨五入して小数点２位にするか、
+            // 四捨五入せず小数点３位で切り捨てるか
+            weightAdjust = Math.round(weight * 10) / 10;
+            // if (opts.d2_npc_enable_rounding) {
+            //     weightAdjust = Math.round(weight * 10) / 10;
+            // } else {
+            //     weightAdjust = Math.floor(weight * 100) / 100;
+            // }
+
+            const text = prompt.replace(/[\[\]{}]+/g, '');
+            return `(${text}:${weightAdjust})`;
+        }
+    }
 }
 
 /////////////////////////////////////////////
@@ -86,6 +127,7 @@ class D2_PromptConvertDialog {
     static CSS_FILEPATH = "/D2/assets/css/D2_PromptConvertDialog.css";
 
     container = undefined;
+    convertType = "new"; // デフォルト値
 
     constructor() {
         this._createDialog();
@@ -95,13 +137,13 @@ class D2_PromptConvertDialog {
     /**
      * モーダルの表示
      */
-    showModal() {
+    showModal () {
         // this.container.showModal();
-        this.container.style.display   = "block";
-      }
-  
-    _createDialog() {
-      this.container = document.createElement("div");
+        this.container.style.display = "block";
+    }
+
+    _createDialog () {
+        this.container = document.createElement("div");
         this.container.classList.add("comfy-modal", "d2-prompt-convert");
         document.body.appendChild(this.container);
 
@@ -118,7 +160,7 @@ class D2_PromptConvertDialog {
         // SD > NAI 変換ボタン
         const sdToNaiBtn = D2_PromptConvertDialog.createButton("SD to NAI", () => {
             const prompt = sdPrompt.value;
-            const newPrompt = D2_PromptConvert.convertToNai(prompt);
+            const newPrompt = D2_PromptConvert.convertToNai(prompt, this.convertType);
             naiPrompt.value = newPrompt;
         });
         content.appendChild(sdToNaiBtn);
@@ -126,7 +168,7 @@ class D2_PromptConvertDialog {
         // NAI > SD 変換ボタン
         const naiToSdBtn = D2_PromptConvertDialog.createButton("NAI to SD", () => {
             const prompt = naiPrompt.value;
-            const newPrompt = D2_PromptConvert.convertToSd(prompt);
+            const newPrompt = D2_PromptConvert.convertToSd(prompt, this.convertType);
             sdPrompt.value = newPrompt;
         });
         content.appendChild(naiToSdBtn);
@@ -154,6 +196,11 @@ class D2_PromptConvertDialog {
             this.container.style.display = "none";
         });
         content.appendChild(closeBtn);
+
+        // 方式切り替えラジオボタン
+        const radioButtons = this.createRadioButtons();
+        content.appendChild(radioButtons);
+
     }
 
     /**
@@ -161,7 +208,7 @@ class D2_PromptConvertDialog {
      * @param {string} placeholder 
      * @returns HTMLElement
      */
-    static createPromptArea(placeholder) {
+    static createPromptArea (placeholder) {
         const textArea = document.createElement("textarea");
         textArea.classList.add("comfy-multiline-input", "d2-prompt-convert__prompt-area");
         textArea.placeholder = placeholder;
@@ -174,7 +221,7 @@ class D2_PromptConvertDialog {
      * @param {function} onClick 
      * @returns 
      */
-    static createButton(text, onClick) {
+    static createButton (text, onClick) {
         const btn = document.createElement("button");
         btn.classList.add("d2-prompt-convert__btn");
         btn.textContent = text;
@@ -182,6 +229,72 @@ class D2_PromptConvertDialog {
             onClick();
         });
         return btn;
+    }
+
+    /**
+     * ラジオボタンコンテナ作成
+     * @returns HTMLElement
+     */
+    createRadioButtons () {
+        const radioContainer = document.createElement("div");
+        radioContainer.classList.add("d2-prompt-convert__radio-container");
+        radioContainer.style.cssText = `
+            margin: 10px 0;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            grid-column: span 2;
+        `;
+
+        const oldTypeLabel = document.createElement("label");
+        oldTypeLabel.htmlFor = "oldType";
+        oldTypeLabel.textContent = "Old Type";
+        oldTypeLabel.style.cssText = `
+            margin-left: 5px;
+            cursor: pointer;
+            color: var(--input-text);
+        `;
+
+        const oldTypeRadio = document.createElement("input");
+        oldTypeRadio.type = "radio";
+        oldTypeRadio.name = "convertType";
+        oldTypeRadio.id = "oldType";
+        oldTypeRadio.value = "old";
+        oldTypeRadio.checked = false;
+        oldTypeRadio.addEventListener("change", () => {
+            if (oldTypeRadio.checked) {
+                this.convertType = "old";
+            }
+        });
+        oldTypeLabel.prepend(oldTypeRadio);
+
+        const newTypeLabel = document.createElement("label");
+        newTypeLabel.htmlFor = "newType";
+        newTypeLabel.textContent = "New Type";
+        newTypeLabel.style.cssText = `
+            margin-left: 5px;
+            cursor: pointer;
+            color: var(--input-text);
+        `;
+
+        const newTypeRadio = document.createElement("input");
+        newTypeRadio.type = "radio";
+        newTypeRadio.name = "convertType";
+        newTypeRadio.id = "newType";
+        newTypeRadio.value = "new";
+        newTypeRadio.checked = true;
+        newTypeRadio.addEventListener("change", () => {
+            if (newTypeRadio.checked) {
+                this.convertType = "new";
+            }
+        });
+        newTypeLabel.prepend(newTypeRadio);
+
+        radioContainer.appendChild(newTypeLabel);
+        radioContainer.appendChild(oldTypeLabel);
+
+        return radioContainer;
     }
 }
 
@@ -212,21 +325,21 @@ class D2_PromptConvertButton {
     /**
      * 表示切り替え
      */
-    changeVisible(bool) {
+    changeVisible (bool) {
         this.floatContainer.changeVisible(bool);
     }
 
     /**
      * ボタン作成
      */
-    _createButton() {
+    _createButton () {
         const button = document.createElement("button");
         button.classList.add("p-button");
         button.textContent = "Prompt convert";
         this.floatContainer.addContent(button);
 
         button.addEventListener("click", () => {
-          this.dialog.showModal();
+            this.dialog.showModal();
         });
     }
 }
@@ -239,7 +352,7 @@ class D2_PromptConvertButton {
         name: "Show prompt convert button",
         type: "boolean",
         defaultValue: false,
-        onChange(value) {
+        onChange (value) {
             promptConvertButton.changeVisible(value);
         },
     });

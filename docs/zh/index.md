@@ -169,6 +169,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.06.19**
+
+- `D2_PromptConvert`: 支援NovelAI4的新權重方式
+
 **2025.05.02**
 
 - `D2_ProgressPreview`: 新增功能。

@@ -169,6 +169,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.06.19**
+
+- `D2_PromptConvert`: NovelAI4の新しいウェイト方式に対応
+
 **2025.05.02**
 
 - `D2_ProgressPreview`: 新規追加。

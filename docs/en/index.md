@@ -167,6 +167,9 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.06.19**
+
+- `D2_PromptConvert`: Support new weight format for NovelAI4
 
 **2025.05.02**
 
