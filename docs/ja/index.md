@@ -94,6 +94,10 @@ D2 Nodes ComfyUI
 
 ### Image
 
+- <a href="node_image.md#D2-Preview-Image">`D2 Preview Image`</a>
+  - ギャラリー機能付き画像プレビュー
+- <a href="node_image.md#D2-Save-Image">`D2 Save Image`</a>
+  - ギャラリー機能付き画像保存
 - <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
   - 画像からプロンプトを取得できる Load Image
   - StableDiffusion webui A1111、NovelAI で作成した画像にも対応
@@ -168,6 +172,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.06.22**
+
+- `D2_SaveImage`: 新規追加
 
 **2025.06.19**
 

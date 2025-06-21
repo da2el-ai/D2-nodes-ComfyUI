@@ -94,6 +94,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ### Image
 
+- <a href="node_image.md#D2-Preview-Image">`D2 Preview Image`</a>
+  - Image preview with gallery functionality
+- <a href="node_image.md#D2-Save-Image">`D2 Save Image`</a>
+  - Image saving with gallery functionality
 - <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
   - Load Image that can extract prompts from images
   - Compatible with images created in StableDiffusion webui A1111 and NovelAI
@@ -166,6 +170,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.06.22**
+
+- `D2_SaveImage`: Newly added
 
 **2025.06.19**
 

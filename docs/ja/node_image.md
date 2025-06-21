@@ -24,7 +24,22 @@ Node
 <img src="../img/preview_image_2.png">
 </figure>
 
-- `Popup Image` ボタンをクリックすると全画面ギャラリーが表示される
+- `Popup Image`: ボタンをクリックすると全画面ギャラリーが表示される
+
+---
+
+### D2 Save Image
+
+<figure>
+<img src="../img/save_image.png">
+</figure>
+
+- `D2 Preview Image` と同じく、全画面ギャラリー機能を搭載した画像保存ノード
+
+#### Input
+
+- `Popup Image`: ボタンをクリックすると全画面ギャラリーが表示される
+- `preview_only`: true 時は画像を保存せず、プレビュー表示だけになる
 
 ---
 

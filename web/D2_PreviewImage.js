@@ -5,25 +5,25 @@ import { findWidgetByName, getImageUrlFromApi } from "./modules/utils.js";
 
 app.registerExtension({
   name: "Comfy.D2.D2_PreviewImage",
-  async beforeRegisterNodeDef(nodeType, nodeData, app) {
-    if (nodeData.name !== "D2 Preview Image") return;
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeData.name !== "D2 Preview Image" && nodeData.name !== "D2 Save Image") return;
 
     const origOnNodeCreated = nodeType.prototype.onNodeCreated;
     nodeType.prototype.onNodeCreated = function () {
-        const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+      const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
 
-        const previewBtnWidget = findWidgetByName(this, "popup_image");
-        previewBtnWidget.callback = () => {
-          if(this.images && this.images.length >= 1){
+      const previewBtnWidget = findWidgetByName(this, "popup_image");
+      previewBtnWidget.callback = () => {
+        if (this.images && this.images.length >= 1) {
 
-            const imageUrls = this.images.map((imgObj) => {
-              return getImageUrlFromApi(imgObj.filename, imgObj.type, imgObj.subfolder);
-            });
-            D2Lightbox.openLightbox(imageUrls, 0);
-          }
-        };
+          const imageUrls = this.images.map((imgObj) => {
+            return getImageUrlFromApi(imgObj.filename, imgObj.type, imgObj.subfolder);
+          });
+          D2Lightbox.openLightbox(imageUrls, 0);
+        }
+      };
 
-        return r;
+      return r;
     };
   },
 });

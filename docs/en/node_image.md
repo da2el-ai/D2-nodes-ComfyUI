@@ -26,6 +26,20 @@
 
 ---
 
+### D2 Save Image
+
+<figure>
+<img src="../img/save_image.png">
+</figure>
+
+- An image saving node with full-screen gallery functionality, similar to `D2 Preview Image`
+
+#### Input
+
+- `Popup Image`: Clicking the button displays a full-screen gallery
+- `preview_only`: When true, images are only previewed without being saved
+---
+
 ### D2 Load Image
 
 <figure>

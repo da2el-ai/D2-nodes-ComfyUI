@@ -97,6 +97,10 @@
 
 ### 圖像
 
+- <a href="node_image.md#D2-Preview-Image">`D2 Preview Image`</a>
+  - 具備圖庫功能的圖像預覽
+- <a href="node_image.md#D2-Save-Image">`D2 Save Image`</a>
+  - 具備圖庫功能的圖像保存
 - <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
   - 可從圖像獲取提示詞的 Load Image
   - 支援 `StableDiffusion webui A1111`、`NovelAI` 創建的圖像
@@ -168,6 +172,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.06.22**
+
+- `D2_SaveImage`: 新增功能
 
 **2025.06.19**
 

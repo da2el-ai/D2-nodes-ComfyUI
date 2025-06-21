@@ -32,6 +32,45 @@ from .modules import image_util
 
 
 
+"""
+
+D2 Save Image
+画像クリックでポップアップする Save Image
+
+"""
+class D2_SaveImage(SaveImage):
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "images": ("IMAGE", ), 
+                "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."}),
+                "preview_only": ("BOOLEAN", {"default": False},),
+            },
+            "optional": {
+                "popup_image": ("D2_BUTTON", {}, )
+            },
+            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
+        }
+
+    CATEGORY = "D2/Image"
+    def save_images(self, images, filename_prefix="ComfyUI", preview_only=False, popup_image="", prompt=None, extra_pnginfo=None):
+        print("[save_images]----", preview_only)
+        if preview_only == True:
+            # 保存せずプレビューのみ
+            self.output_dir = folder_paths.get_temp_directory()
+            self.type = "temp"
+            self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+            self.compress_level = 1
+        else:
+            # 保存
+            self.output_dir = folder_paths.get_output_directory()
+            self.type = "output"
+            self.prefix_append = ""
+            self.compress_level = 4
+
+        return super().save_images(images, filename_prefix, prompt, extra_pnginfo)
+
 
 """
 
@@ -1091,6 +1130,7 @@ class D2_PasteByMask:
         return output_img
 
 NODE_CLASS_MAPPINGS = {
+    "D2 Save Image": D2_SaveImage,
     "D2 Preview Image": D2_PreviewImage,
     "D2 Load Image": D2_LoadImage,
     "D2 Folder Image Queue": D2_FolderImageQueue,

@@ -28,6 +28,21 @@
 
 ---
 
+### D2 Save Image
+
+<figure>
+<img src="../img/save_image.png">
+</figure>
+
+- 與 `D2 Preview Image` 相同，搭載全螢幕圖庫功能的圖像保存節點
+
+#### Input
+
+- `Popup Image`: 點擊按鈕時顯示全螢幕圖庫
+- `preview_only`: 為 true 時僅顯示預覽，不保存圖像
+
+---
+
 
 ### D2 Load Image
 
