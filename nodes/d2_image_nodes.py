@@ -55,7 +55,6 @@ class D2_SaveImage(SaveImage):
 
     CATEGORY = "D2/Image"
     def save_images(self, images, filename_prefix="ComfyUI", preview_only=False, popup_image="", prompt=None, extra_pnginfo=None):
-        print("[save_images]----", preview_only)
         if preview_only == True:
             # 保存せずプレビューのみ
             self.output_dir = folder_paths.get_temp_directory()
