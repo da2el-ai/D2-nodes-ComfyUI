@@ -574,7 +574,7 @@ class D2_XYModelList:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model_type": (["checkpoints", "loras", "samplers", "schedulers", "upscaler", "bbox_segm"],),
+                "model_type": (["checkpoints", "loras", "samplers", "schedulers", "upscaler", "bbox_segm", "controlnet"],),
                 "filter": ("STRING", {"default":""}),
                 "mode": (["simple", "a1111"],),
                 "sort_by": (["Name", "Date"], {"default":"Name"}),
