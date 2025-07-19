@@ -254,10 +254,10 @@ Lines that start with "//" or "#" are ignored.
 ### D2 Image Resize
 
 <figure>
-<img src="../img/image_resize_2.png">
+<img src="../img/image_resize_3.png">
 </figure>
 
-- Image resizing and rotation
+- Image and mask resizing and rotation
 - Precision up to 3 decimal places for scaling
 - Can select rounding, floor, or ceiling for decimal handling
 - Capable of upscaling using upscale models

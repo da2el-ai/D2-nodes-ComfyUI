@@ -170,7 +170,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2025.07.19**
 
 - `D2_CheckpointList` / `D2_LoraList`: Removed
-- `D2_ImageResize`: Added rotation functionality
+- `D2_ImageResize`: Added rotation functionality. Also supports masks
 
 **2025.06.22**
 

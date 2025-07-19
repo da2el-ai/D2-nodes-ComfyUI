@@ -67,12 +67,13 @@ class D2_ImageResize:
                 "use_tiled_vae": ("BOOLEAN", {"default":False}),
             },
             "optional": {
+                "mask": ("MASK",),
                 "vae": ("VAE",),
             },
         }
 
-    RETURN_TYPES = ("IMAGE", "INT", "INT", "FLOAT", "LATENT")
-    RETURN_NAMES = ("image", "width", "height", "rescale_factor", "latent")
+    RETURN_TYPES = ("IMAGE", "INT", "INT", "FLOAT", "LATENT", "MASK")
+    RETURN_NAMES = ("image", "width", "height", "rescale_factor", "latent", "mask")
     FUNCTION = "run"
     CATEGORY = "D2"
 
@@ -89,27 +90,74 @@ class D2_ImageResize:
             upscale_model = 'None', 
             resampling = "lanczos",
             use_tiled_vae = False,
+            mask = None, 
             vae = None,
         ):
 
         scaled_images = []
+        scaled_masks = []
 
+        # 画像のリサイズ
         for img in image:
-            resized_image, new_width, new_height = size_util.apply_resize_image(
+            # 新しいサイズを取得
+            new_width, new_height = size_util.get_new_size(
+                mode = mode,
+                rescale_factor = rescale_factor,
+                resize_width = resize_width,
+                resize_height = resize_height,
+                round_method = round_method,
+                org_width = img.shape[1],
+                org_height = img.shape[0],
+                preset = preset
+            )
+
+            # 回転とリサイズ
+            resized_image, resized_width, resized_height = size_util.apply_resize_image(
                 image_util.tensor2pil(img), 
-                mode = mode, 
-                rescale_factor = rescale_factor, 
-                resize_width = resize_width, 
-                resize_height = resize_height, 
+                resize_width = new_width, 
+                resize_height = new_height, 
                 rotate = rotate, 
-                round_method = round_method, 
                 upscale_model = upscale_model, 
                 resampling = resampling, 
-                preset = preset
             )
             scaled_images.append(image_util.pil2tensor(resized_image))
 
         scaled_images = torch.cat(scaled_images, dim=0)
+
+        # マスクのリサイズ
+        if mask is not None:
+            for m in mask:
+                # マスクをPIL Imageに変換
+                mask_pil = image_util.tensor2pil(m.unsqueeze(0))
+
+                # 新しいサイズを取得
+                new_width, new_height = size_util.get_new_size(
+                    mode = mode,
+                    rescale_factor = rescale_factor,
+                    resize_width = resize_width,
+                    resize_height = resize_height,
+                    round_method = round_method,
+                    org_width = img.shape[1],
+                    org_height = img.shape[0],
+                    preset = preset
+                )
+
+                # マスクのリサイズと回転
+                resized_mask, _, _ = size_util.apply_resize_mask(
+                    mask_pil,
+                    resize_width = new_width,
+                    resize_height = new_height,
+                    rotate = rotate,
+                    resampling = resampling,
+                )
+                
+                # マスクをテンソルに戻す
+                mask_tensor = image_util.pil2tensor(resized_mask)
+                scaled_masks.append(mask_tensor.squeeze(0))
+            
+            scaled_masks = torch.cat(scaled_masks, dim=0)
+        else:
+            scaled_masks = None
 
         latent = None
 
@@ -120,7 +168,8 @@ class D2_ImageResize:
                 l = vae.encode(scaled_images[:,:,:,:3])
             latent = {"samples":l}
 
-        return (scaled_images, new_width, new_height, rescale_factor, latent,)
+        return (scaled_images, resized_width, resized_height, rescale_factor, latent, scaled_masks)
+
 
 
 """
@@ -222,5 +271,3 @@ NODE_CLASS_MAPPINGS = {
     "D2 Get Image Size": D2_GetImageSize,
     "D2 Size Slector": D2_SizeSelector,
 }
-
-

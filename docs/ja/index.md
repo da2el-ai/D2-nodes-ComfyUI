@@ -172,7 +172,7 @@ D2 Nodes ComfyUI
 **2025.07.19**
 
 - `D2_CheckpointList` / `D2_LoraList`: 削除
-- `D2_ImageResize`: 回転機能を追加
+- `D2_ImageResize`: 回転機能を追加。マスクも対応
 
 **2025.06.22**
 

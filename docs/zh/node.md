@@ -257,10 +257,10 @@ foo:0.5,bar
 ### D2 Image Resize
 
 <figure>
-<img src="../img/image_resize_2.png">
+<img src="../img/image_resize_3.png">
 </figure>
 
-- 圖像縮放和旋轉
+- 圖像和遮罩的縮放和旋轉
 - 縮放可指定到小數點後3位
 - 可選擇四捨五入、無條件捨去、無條件進位處理小數點
 - 可使用放大模型進行放大

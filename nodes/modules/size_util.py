@@ -124,32 +124,12 @@ def get_new_size(
 """
 def apply_resize_image(
     image: Image.Image, 
-    mode = "rescale", 
-    rescale_factor = 2, 
     resize_width = 1024, 
     resize_height = 1024, 
     rotate = "None", 
-    round_method:D2_TResizeMethod = "Floor", 
     upscale_model = "None",
     resampling = "lanczos", 
-    preset = "custom",
 ):
-    # 最終的に仕上げるサイズ。ここでは回転しない
-    org_width, org_height = image.size
-    new_width, new_height = get_new_size(
-        mode = mode,
-        rescale_factor = rescale_factor,
-        resize_width = resize_width,
-        resize_height = resize_height,
-        round_method = round_method,
-        org_width = org_width,
-        org_height = org_height,
-        preset = preset
-    )
-    
-    # # Apply supersample
-    # if supersample:
-    #     image = image.resize((new_width * 8, new_height * 8), resample=Image.Resampling(util.RESAMPLE_FILTERS[resampling]))
 
     # # UpscaleModelを使う
     if upscale_model != "None":
@@ -164,18 +144,46 @@ def apply_resize_image(
         image = image_util.tensor2pil(image_tensor)
 
     # Resize the image using the given resampling filter
-    resized_image = image.resize((new_width, new_height), resample=Image.Resampling(RESAMPLE_FILTERS[resampling]))
+    resized_image = image.resize((resize_width, resize_height), resample=Image.Resampling(RESAMPLE_FILTERS[resampling]))
 
     # 回転
-    # resized_image、new_width、new_height を更新する
+    # resized_image、resize_width、resize_height を更新する
     if rotate == '90 deg':
         resized_image = resized_image.rotate(-90, expand=True)
-        new_width, new_height = new_height, new_width
+        resize_width, resize_height = resize_height, resize_width
     elif rotate == '180 deg':
         resized_image = resized_image.rotate(-180, expand=True)
         # 180度回転では幅と高さは変わらない
     elif rotate == '270 deg':
         resized_image = resized_image.rotate(-270, expand=True)
-        new_width, new_height = new_height, new_width
+        resize_width, resize_height = resize_height, resize_width
 
-    return resized_image, new_width, new_height
+    return resized_image, resize_width, resize_height
+
+
+"""
+マスクリサイズ、回転を実行
+"""
+def apply_resize_mask(
+    mask: Image.Image, 
+    resize_width = 1024, 
+    resize_height = 1024, 
+    rotate = "None", 
+    resampling = "lanczos", 
+):
+    # Resize the mask using the given resampling filter
+    resized_mask = mask.resize((resize_width, resize_height), resample=Image.Resampling(RESAMPLE_FILTERS[resampling]))
+
+    # 回転
+    # resized_mask、resize_width、resize_height を更新する
+    if rotate == '90 deg':
+        resized_mask = resized_mask.rotate(-90, expand=True)
+        resize_width, resize_height = resize_height, resize_width
+    elif rotate == '180 deg':
+        resized_mask = resized_mask.rotate(-180, expand=True)
+        # 180度回転では幅と高さは変わらない
+    elif rotate == '270 deg':
+        resized_mask = resized_mask.rotate(-270, expand=True)
+        resize_width, resize_height = resize_height, resize_width
+
+    return resized_mask, resize_width, resize_height

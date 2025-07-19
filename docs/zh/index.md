@@ -172,7 +172,7 @@
 **2025.07.19**
 
 - `D2_CheckpointList` / `D2_LoraList`: 已刪除
-- `D2_ImageResize`: 新增旋轉功能
+- `D2_ImageResize`: 新增旋轉功能。也支援遮罩
 
 **2025.06.22**
 

@@ -271,10 +271,10 @@ foo:0.5,bar
 ### D2 Image Resize
 
 <figure>
-<img src="../img/image_resize_2.png">
+<img src="../img/image_resize_3.png">
 </figure>
 
-- 画像のリサイズおよび回転
+- 画像とマスクのリサイズおよび回転
 - 倍率は小数点３位まで指定可能
 - 小数点の四捨五入、切り捨て、切り上げが選択できる
 - アップスケールモデルを使ったアップスケールが可能
