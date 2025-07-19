@@ -143,10 +143,6 @@
   - 輸出 SEED 列表
 - <a href="node_xy.md#D2-XY-Seed2">`D2 XY Seed2`</a>
   - 輸出指定數量的SEED列表
-- <a href="node_xy.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
-  - 輸出 Checkpoint 列表
-- <a href="node_xy.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
-  - 輸出 Lora 列表
 - <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
   - 輸出 Checkpoint / Lora 列表
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
@@ -172,6 +168,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.07.19**
+
+- `D2_CheckpointList` / `D2_LoraList`: 已刪除
 
 **2025.06.22**
 
@@ -406,4 +406,3 @@
 - 整合現有節點創建
 
 </details>
-

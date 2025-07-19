@@ -198,12 +198,7 @@
 
 ### D2 XY Checkpoint List / D2 XY Lora List
 
-<figure>
-<img src="../img/xy_checkpoint_list.png">
-</figure>
-
-- 傳遞 Checkpoint / Lora 到 `D2 XY Plot` 的節點
-- 最多可指定 50 個
+已刪除。請使用 `D2 XY Model List` 代替。
 
 ---
 

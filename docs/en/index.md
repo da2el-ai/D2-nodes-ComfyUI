@@ -140,10 +140,6 @@ If you have installed any of the following custom nodes previously, please remov
   - Outputs list of SEEDs
 - <a href="node_xy.md#D2-XY-Seed2">`D2 XY Seed2`</a>
   - Outputs a list of SEEDs with specified count
-- <a href="node_xy.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
-  - Outputs list of Checkpoints
-- <a href="node_xy.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
-  - Outputs list of Loras
 - <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
   - Outputs a list of Checkpoints / Loras
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
@@ -170,6 +166,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.07.19**
+
+- `D2_CheckpointList` / `D2_LoraList`: Removed
 
 **2025.06.22**
 

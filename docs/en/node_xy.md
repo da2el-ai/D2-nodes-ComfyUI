@@ -218,12 +218,7 @@
 
 ### D2 XY Checkpoint List / D2 XY Lora List
 
-<figure>
-<img src="../img/xy_checkpoint_list.png">
-</figure>
-
-- Node to pass Checkpoint/Lora to `D2 XY Plot`
-- Can specify up to 50
+Removed. Please use `D2 XY Model List` instead.
 
 ---
 

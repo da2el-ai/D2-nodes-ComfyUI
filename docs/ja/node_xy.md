@@ -232,12 +232,7 @@ Node
 
 ### D2 XY Checkpoint List / D2 XY Lora List
 
-<figure>
-  <img src="../img/xy_checkpoint_list.png">
-</figure>
-
-- Checkpoint / Lora を `D2 XY Plot` に渡すノード
-- 最大50個まで指定できる
+削除しました。今後は `D2 XY Model List` をご利用ください。
 
 ---
 

@@ -501,67 +501,6 @@ class D2_XYGridImage:
 
 
 
-"""
-
-D2 XY Checkpoint List
-
-"""
-class D2_XYCheckpointList:
-    @classmethod
-    def INPUT_TYPES(cls):
-        ckpt_input = ["None"] +folder_paths.get_filename_list("checkpoints")
-        inputs = {
-            "required": {
-                "ckpt_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
-        for i in range(1, 50):
-            inputs["required"][f"ckpt_name_{i}"] = (ckpt_input,)
-
-        return inputs
-
-    RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("x / y_list", "LIST")
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    def run(self, ckpt_count, **kwargs):
-        ckpt_list = [kwargs.get(f"ckpt_name_{i}") for i in range(1, ckpt_count + 1)]
-        ckpt_list_str = util.list_to_text(ckpt_list, util.LINE_BREAK)
-        return (ckpt_list_str, ckpt_list,)
-
-
-"""
-
-D2 XY Lora List
-
-"""
-class D2_XYLoraList:
-    @classmethod
-    def INPUT_TYPES(cls):
-        lora_input = ["None"] +folder_paths.get_filename_list("loras")
-        inputs = {
-            "required": {
-                "lora_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
-        for i in range(1, 50):
-            inputs["required"][f"lora_name_{i}"] = (lora_input,)
-
-        return inputs
-
-    RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("x / y_list", "LIST")
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    def run(self, lora_count, **kwargs):
-        lora_list = [kwargs.get(f"lora_name_{i}") for i in range(1, lora_count + 1)]
-        lora_list_str = util.list_to_text(lora_list, util.LINE_BREAK)
-        return (lora_list_str, lora_list,)
-
-
-
 
 
 """

@@ -140,10 +140,6 @@ D2 Nodes ComfyUI
   - SEED のリストを出力する
 - <a href="node_xy.md#D2-XY-Seed2">`D2 XY Seed2`</a>
   - 指定した個数の SEED のリストを出力する
-- <a href="node_xy.md#D2-XY-Checkpoint-List">`D2 XY Checkpoint List`</a>
-  - Checkpoint のリストを出力する
-- <a href="node_xy.md#D2-XY-Lora-List">`D2 XY Lora List`</a>
-  - Lora のリストを出力する
 - <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
   - Checkpoint / Lora のリストを出力する
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
@@ -172,6 +168,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.07.19**
+
+- `D2_CheckpointList` / `D2_LoraList`: 削除
 
 **2025.06.22**
 
