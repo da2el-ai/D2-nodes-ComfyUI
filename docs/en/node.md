@@ -254,14 +254,15 @@ Lines that start with "//" or "#" are ignored.
 ### D2 Image Resize
 
 <figure>
-<img src="../img/image_resize.png">
+<img src="../img/image_resize_2.png">
 </figure>
 
-- Simple image resizing
-- Precision up to 3 decimal places
-- Can select rounding, floor, or ceiling
+- Image resizing and rotation
+- Precision up to 3 decimal places for scaling
+- Can select rounding, floor, or ceiling for decimal handling
 - Capable of upscaling using upscale models
 - Latent output is also possible (requires VAE)
+- Rotation options: 90 / 180 / 270 degrees
 
 ---
 
@@ -355,5 +356,3 @@ Lines that start with "//" or "#" are ignored.
 - A node that combines ModelMergeSDXL and CLIPMergeSimple
 - Allows comma-separated weight specifications for easier use with XYPlot
 - In this figure, `0.85,0.85,1,1,0.4,0.4,1,0.4,0.4,0.4,1,0.4,0.4,0.4,0,0.55,0.85,0.85,0.85,0.85,0.85,0.85,1,1,0.65` is specified
-
-

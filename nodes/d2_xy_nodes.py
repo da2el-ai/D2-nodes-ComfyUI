@@ -921,8 +921,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY Plot Easy": D2_XYPlotEasy,
     "D2 XY Plot Easy Mini": D2_XYPlotEasyMini,
     "D2 XY Grid Image": D2_XYGridImage,
-    "D2 XY Checkpoint List": D2_XYCheckpointList,
-    "D2 XY Lora List": D2_XYLoraList,
     "D2 XY Model List": D2_XYModelList,
     "D2 XY Prompt SR": D2_XYPromptSR,
     "D2 XY Prompt SR2": D2_XYPromptSR2,

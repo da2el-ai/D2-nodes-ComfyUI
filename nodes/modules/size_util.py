@@ -80,7 +80,6 @@ def rescale_calc(width, height, rescale_factor=2, method:D2_TResizeMethod='Floor
 mode: resize か rescale か
 rescale_factor: 倍率指定
 resize_width / resize_height: 数値指定
-swap_dimensions: サイズの縦横を入れ替えるか
 round_method: Floor / Round/ Ceil
 org_width: rescale で使う変更前のサイズ（主に画像から取得）
 preset: サイズプリセット
@@ -90,7 +89,6 @@ def get_new_size(
         rescale_factor = 2, 
         resize_width = 1024, 
         resize_height = 1024, 
-        swap_dimensions = False, 
         round_method:D2_TResizeMethod = "Floor", 
         org_width = 0, 
         org_height = 0, 
@@ -117,16 +115,12 @@ def get_new_size(
         """
         new_width, new_height = rescale_calc(org_width, org_height, rescale_factor, round_method)
 
-    # 縦横入れ替え
-    if swap_dimensions:
-        new_width, new_height = new_height, new_width
-
     return new_width, new_height
 
 
 
 """
-画像リサイズを実行
+画像リサイズ、回転を実行
 """
 def apply_resize_image(
     image: Image.Image, 
@@ -134,20 +128,19 @@ def apply_resize_image(
     rescale_factor = 2, 
     resize_width = 1024, 
     resize_height = 1024, 
-    swap_dimensions = False, 
+    rotate = "None", 
     round_method:D2_TResizeMethod = "Floor", 
     upscale_model = "None",
     resampling = "lanczos", 
     preset = "custom",
 ):
-    # 最終的に仕上げるサイズ
+    # 最終的に仕上げるサイズ。ここでは回転しない
     org_width, org_height = image.size
     new_width, new_height = get_new_size(
         mode = mode,
         rescale_factor = rescale_factor,
         resize_width = resize_width,
         resize_height = resize_height,
-        swap_dimensions = swap_dimensions,
         round_method = round_method,
         org_width = org_width,
         org_height = org_height,
@@ -173,6 +166,16 @@ def apply_resize_image(
     # Resize the image using the given resampling filter
     resized_image = image.resize((new_width, new_height), resample=Image.Resampling(RESAMPLE_FILTERS[resampling]))
 
+    # 回転
+    # resized_image、new_width、new_height を更新する
+    if rotate == '90 deg':
+        resized_image = resized_image.rotate(-90, expand=True)
+        new_width, new_height = new_height, new_width
+    elif rotate == '180 deg':
+        resized_image = resized_image.rotate(-180, expand=True)
+        # 180度回転では幅と高さは変わらない
+    elif rotate == '270 deg':
+        resized_image = resized_image.rotate(-270, expand=True)
+        new_width, new_height = new_height, new_width
+
     return resized_image, new_width, new_height
-
-
