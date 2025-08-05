@@ -167,6 +167,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.08.5**
+
+- `D2_SaveImage`: Added support for WEBP, animated WEBP, and JPEG formats
+
 **2025.07.19**
 
 - `D2_CheckpointList` / `D2_LoraList`: Removed

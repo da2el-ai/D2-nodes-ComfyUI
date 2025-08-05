@@ -31,15 +31,26 @@
 ### D2 Save Image
 
 <figure>
-<img src="../img/save_image.png">
+<img src="../img/save_image_2.png?2">
 </figure>
 
 - 與 `D2 Preview Image` 相同，搭載全螢幕圖庫功能的圖像保存節點
+- 支援 PNG / JPEG / WEBP / 動畫WEBP 圖像格式
 
 #### Input
 
 - `Popup Image`: 點擊按鈕時顯示全螢幕圖庫
+- `images`: 要保存的圖像
+- `filename_prefix`: 檔案名格式
 - `preview_only`: 為 true 時僅顯示預覽，不保存圖像
+- `format`: 從 `png` / `jpeg` / `webp` / `animated_webp` 中選擇圖像格式
+- `lossless`: `true`: 無損壓縮 / `false`: 有損壓縮。適用於 `webp` 和 `animated_webp`
+- `quality`: 圖像壓縮率。適用於 `jpeg` 或 `webp`、`animated_webp` 且 `lossless:false` 時
+- `fps`: `animated_webp` 的幀率
+
+#### Output
+
+- `filenames`: 保存的圖像文件完整路徑陣列
 
 ---
 
@@ -285,5 +296,3 @@ input `optional`:
 <figure>
 <img src="../img/paste-by-mask_cross.png">
 </figure>
-
-

@@ -31,15 +31,27 @@ Node
 ### D2 Save Image
 
 <figure>
-<img src="../img/save_image.png">
+<img src="../img/save_image_2.png?2">
 </figure>
 
 - `D2 Preview Image` と同じく、全画面ギャラリー機能を搭載した画像保存ノード
+- 画像フォーマットは PNG / JPEG / WEBP / アニメーションWEBP に対応
 
 #### Input
 
 - `Popup Image`: ボタンをクリックすると全画面ギャラリーが表示される
+- `preview_only`: 
+- `images`: 保存する画像
+- `filename_prefix`: ファイルネーム書式
 - `preview_only`: true 時は画像を保存せず、プレビュー表示だけになる
+- `format`: 画像フォーマットを `png` / `jpeg` / `webp` / `animated_webp` から選択
+- `lossless`: `true`:可逆圧縮 / `false`:不可逆圧縮。`webp`、`animated_webp` の時に適用。
+- `quality`: 画像圧縮率。`jpeg` または `webp`、`animated_webp` で `losless:false` の時に適用
+- `fps`: `animated_webp` のフレームレート
+
+#### Output
+
+- `filenames`: 保存した画像ファイルのフルパス配列
 
 ---
 

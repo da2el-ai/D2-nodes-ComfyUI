@@ -29,15 +29,26 @@
 ### D2 Save Image
 
 <figure>
-<img src="../img/save_image.png">
+<img src="../img/save_image_2.png?2">
 </figure>
 
 - An image saving node with full-screen gallery functionality, similar to `D2 Preview Image`
+- Supports PNG / JPEG / WEBP / animated WEBP image formats
 
 #### Input
 
 - `Popup Image`: Clicking the button displays a full-screen gallery
+- `images`: Images to save
+- `filename_prefix`: Filename format
 - `preview_only`: When true, images are only previewed without being saved
+- `format`: Select image format from `png` / `jpeg` / `webp` / `animated_webp`
+- `lossless`: `true`: lossless compression / `false`: lossy compression. Applied for `webp` and `animated_webp`.
+- `quality`: Image compression ratio. Applied for `jpeg` or `webp`, `animated_webp` with `lossless:false`
+- `fps`: Frame rate for `animated_webp`
+
+#### Output
+
+- `filenames`: Array of full paths of saved image files
 ---
 
 ### D2 Load Image

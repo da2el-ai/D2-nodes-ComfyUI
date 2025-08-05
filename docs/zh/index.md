@@ -169,6 +169,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.08.5**
+
+- `D2_SaveImage`: 新增對 WEBP、動畫WEBP 和 JPEG 格式的支援
+
 **2025.07.19**
 
 - `D2_CheckpointList` / `D2_LoraList`: 已刪除

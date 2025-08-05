@@ -169,6 +169,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.08.5**
+
+- `D2_SaveImage`: WEBP、アニメーションWEBP、JPEG形式に対応
+
 **2025.07.19**
 
 - `D2_CheckpointList` / `D2_LoraList`: 削除
