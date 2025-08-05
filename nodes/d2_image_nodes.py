@@ -5,6 +5,7 @@ import os
 import json
 import random
 from PIL import Image, ImageOps, ImageSequence, ImageFile
+from PIL.PngImagePlugin import PngInfo
 import numpy as np
 from aiohttp import web
 from torchvision import transforms
@@ -36,9 +37,15 @@ from .modules import image_util
 
 D2 Save Image
 画像クリックでポップアップする Save Image
+複数フォーマット対応（png / jpeg / webp / アニメーションwebp）
 
 """
-class D2_SaveImage(SaveImage):
+class D2_SaveImage:
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
+        self.prefix_append = ""
+    
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -46,6 +53,10 @@ class D2_SaveImage(SaveImage):
                 "images": ("IMAGE", ), 
                 "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."}),
                 "preview_only": ("BOOLEAN", {"default": False},),
+                "format": (["png", "webp", "jpeg", "animated_webp"],),
+                "lossless": ("BOOLEAN", {"default": True}),
+                "quality": ("INT", {"default": 80, "min": 0, "max": 100}),
+                "fps": ("FLOAT", {"default": 6.0, "min": 0.01, "max": 1000.0, "step": 0.01}),
             },
             "optional": {
                 "popup_image": ("D2_BUTTON", {}, )
@@ -53,22 +64,172 @@ class D2_SaveImage(SaveImage):
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
 
+    RETURN_TYPES = ("LIST",)
+    RETURN_NAMES = ("filenames",)
+    FUNCTION = "save_images"
+    OUTPUT_NODE = True
     CATEGORY = "D2/Image"
-    def save_images(self, images, filename_prefix="ComfyUI", preview_only=False, popup_image="", prompt=None, extra_pnginfo=None):
+
+    def save_images(self, images, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, popup_image="", prompt=None, extra_pnginfo=None):
+        # プレビューモードか保存モードかの設定
         if preview_only == True:
             # 保存せずプレビューのみ
             self.output_dir = folder_paths.get_temp_directory()
             self.type = "temp"
             self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
-            self.compress_level = 1
+            compress_level = 1
         else:
             # 保存
             self.output_dir = folder_paths.get_output_directory()
             self.type = "output"
             self.prefix_append = ""
-            self.compress_level = 4
+            compress_level = 4
 
-        return super().save_images(images, filename_prefix, prompt, extra_pnginfo)
+        # ファイル名プレフィックスの設定
+        filename_prefix += self.prefix_append
+        
+        # 保存先フォルダとファイル名の取得
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        
+        # 結果を格納するリスト
+        results = []
+        # 保存したファイルのフルパスを格納するリスト
+        file_paths = []
+        
+        # 画像をPIL形式に変換
+        pil_images = []
+        for image in images:
+            i = 255. * image.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+            pil_images.append(img)
+        
+        # アニメーションwebpの場合
+        if format == "animated_webp":
+            if len(pil_images) <= 1:
+                # 画像が1枚以下の場合はエラーメッセージを表示
+                raise ValueError("Cannot create animated WebP with only one image. Please provide multiple images for animation.")
+            
+            # 複数画像がある場合の処理
+            # メタデータの設定
+            metadata = pil_images[0].getexif()
+            if not args.disable_metadata:
+                if prompt is not None:
+                    metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
+                if extra_pnginfo is not None:
+                    inital_exif = 0x010f
+                    for x in extra_pnginfo:
+                        metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
+                        inital_exif -= 1
+            
+            # ファイル名の設定
+            file = f"{filename}_{counter:05}_.webp"
+            file_path = os.path.join(full_output_folder, file)
+            
+            # アニメーションwebpとして保存
+            pil_images[0].save(
+                file_path, 
+                save_all=True, 
+                duration=int(1000.0/fps), 
+                append_images=pil_images[1:], 
+                exif=metadata, 
+                lossless=lossless, 
+                quality=quality, 
+                method=4  # default method
+            )
+            
+            # 結果リストに追加
+            results.append({
+                "filename": file,
+                "subfolder": subfolder,
+                "type": self.type
+            })
+            
+            # ファイルパスリストに追加
+            file_paths.append(file_path)
+            
+            # アニメーションフラグを設定
+            animated = True
+        
+        # 静止画の場合（単一画像または複数画像を個別に保存）
+        else:
+            for i, img in enumerate(pil_images):
+                # ファイル名の設定
+                file = f"{filename}_{counter:05}_.{format}"
+                file_path = os.path.join(full_output_folder, file)
+                
+                # フォーマットに応じたメタデータと保存処理
+                if format == "png":
+                    # PNGメタデータの設定
+                    metadata = None
+                    if not args.disable_metadata:
+                        metadata = PngInfo()
+                        if prompt is not None:
+                            metadata.add(b"comf", "prompt".encode("latin-1", "strict") + b"\0" + json.dumps(prompt).encode("latin-1", "strict"), after_idat=True)
+                            
+                        if extra_pnginfo is not None:
+                            for x in extra_pnginfo:
+                                metadata.add(b"comf", x.encode("latin-1", "strict") + b"\0" + json.dumps(extra_pnginfo[x]).encode("latin-1", "strict"), after_idat=True)
+                    
+                    # PNG形式で保存
+                    img.save(file_path, pnginfo=metadata, compress_level=compress_level)
+                
+                elif format == "webp":
+                    # WEBPメタデータの設定
+                    metadata = img.getexif()
+                    if not args.disable_metadata:
+                        if prompt is not None:
+                            metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
+                        if extra_pnginfo is not None:
+                            inital_exif = 0x010f
+                            for x in extra_pnginfo:
+                                metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
+                                inital_exif -= 1
+                    
+                    # WEBP形式で保存
+                    img.save(file_path, exif=metadata, lossless=lossless, quality=quality)
+                
+                elif format == "jpeg":
+                    # JPEGメタデータの設定
+                    metadata = img.getexif()
+                    if not args.disable_metadata:
+                        if prompt is not None:
+                            metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
+                        if extra_pnginfo is not None:
+                            inital_exif = 0x010f
+                            for x in extra_pnginfo:
+                                metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
+                                inital_exif -= 1
+                    
+                    # JPEG形式で保存
+                    img.save(file_path, exif=metadata, quality=quality)
+                
+                # 結果リストに追加
+                results.append({
+                    "filename": file,
+                    "subfolder": subfolder,
+                    "type": self.type
+                })
+                
+                # ファイルパスリストに追加
+                file_paths.append(file_path)
+                
+                counter += 1
+            
+            # アニメーションフラグを設定
+            animated = False
+
+        print("path")
+        print(file_paths)
+        
+        # 結果を返す
+        return {
+            "result": (file_paths,),
+            "ui": {
+                "images": results,
+                "animated": (animated,)
+            }
+        }
+            
 
 
 """
