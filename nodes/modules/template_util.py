@@ -42,7 +42,7 @@ Args:
 Returns:
     str: 置換後の文字列
 """
-def replace_template(text: str, arg_1=None, arg_2=None, arg_3=None, prompt={}) -> str:
+def replace_template(text: str, args={}, prompt={}) -> str:
     # 現在の日時を取得
     now = datetime.now()
     
@@ -60,7 +60,6 @@ def replace_template(text: str, arg_1=None, arg_2=None, arg_3=None, prompt={}) -
     text = re.sub(r'%node:(\d+)\.([^%]+)%', replace_node, text)
 
     # 引数の置換
-    args = {"arg_1": arg_1, "arg_2": arg_2, "arg_3": arg_3}
     for key, val in args.items():
         if val is not None:
             # ckpt_name パターンの置換 (%arg_N:ckpt_name%)

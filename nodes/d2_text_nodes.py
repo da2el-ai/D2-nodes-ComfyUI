@@ -541,11 +541,8 @@ class D2_FilenameTemplate:
         return {
             "required": {
                 "format": ("STRING",{"tooltip": tooltip},),
-            },
-            "optional": {
-                "arg_1": (AnyType("*"), {"forceInput": True}),
-                "arg_2": (AnyType("*"), {"forceInput": True}),
-                "arg_3": (AnyType("*"), {"forceInput": True}),
+                "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
             "hidden": {"prompt": "PROMPT"},
         }
@@ -555,8 +552,17 @@ class D2_FilenameTemplate:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, format, arg_1=None, arg_2=None, arg_3=None, prompt={}):
-        text = replace_template(format, arg_1, arg_2, arg_3, prompt)
+    def run(self, format, arg_count, seed, prompt, **kwargs):
+
+        args = {}
+
+        for i in range(1, arg_count + 1):
+            key = f"arg_{i}"
+            arg = kwargs.get(key)
+            if arg is not None:
+                args[key] = arg
+
+        text = replace_template(format, args, prompt)
         return {
             "result": (text,),
         }
@@ -568,7 +574,7 @@ class D2_FilenameTemplate:
 D2 Filename Template2
 
 """
-class D2_FilenameTemplate2:
+class D2_FilenameTemplate2(D2_FilenameTemplate):
     @classmethod
     def INPUT_TYPES(cls):
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
@@ -579,26 +585,11 @@ class D2_FilenameTemplate2:
         return {
             "required": {
                 "format": ("STRING",{"tooltip": tooltip, "multiline":True},),
-            },
-            "optional": {
-                "arg_1": (AnyType("*"), {"forceInput": True}),
-                "arg_2": (AnyType("*"), {"forceInput": True}),
-                "arg_3": (AnyType("*"), {"forceInput": True}),
+                "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
             "hidden": {"prompt": "PROMPT"},
         }
-
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, format, arg_1=None, arg_2=None, arg_3=None, prompt={}):
-        text = replace_template(format, arg_1, arg_2, arg_3, prompt)
-        return {
-            "result": (text,),
-        }
-
 
 
 NODE_CLASS_MAPPINGS = {
