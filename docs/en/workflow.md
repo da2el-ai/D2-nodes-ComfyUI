@@ -17,23 +17,32 @@ Drop images into ComfyUI to recreate workflows.
 
 ## :card_index_dividers: Simple txt2img
 
-<a href="../../workflow/simple_t2i_20241218.png"><img src="../../workflow/simple_t2i_20241218.png"></a>
+<a href="../../workflow/simple_t2i_20250806.png"><img src="../../workflow/simple_t2i_20250806.png"></a>
 
 - Simple txt2img without using Lora or Controlnet.
 
 
 ## :card_index_dividers: txt2img with LoRA
 
-<a href="../../workflow/lora_t2i_20250323.png"><img src="../../workflow/lora_t2i_20250323.png"></a>
+<a href="../../workflow/lora_t2i_20250806.png"><img src="../../workflow/lora_t2i_20250806.png"></a>
 
 - txt2img that uses Lora with the same format as StableDiffusion webui A1111.
+- D2 Prompt makes it easier to use Lora
 
 
 ## :card_index_dividers: txt2img + Hires fix
 
-<a href="../../workflow/hiresfix_20241218.png"><img src="../../workflow/hiresfix_20241218.png"></a>
+<a href="../../workflow/hiresfix_20250806.png"><img src="../../workflow/hiresfix_20250806.png"></a>
 
 - Hires fix using two D2 KSamplers with D2 Image Resize in between, using SwinR_4x.
+
+
+## :card_index_dividers: Include generation parameters in filename
+
+<a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
+
+- Generate filenames using D2 Filename Template
+- D2 Send File Eagle is included in a separate custom node <a href="https://github.com/da2el-ai/ComfyUI-d2-send-eagle" target="_blank">ComfyUI-d2-send-eagle</a>
 
 
 ## :card_index_dividers: Batch Upscale Images in Folder
@@ -53,7 +62,7 @@ Drop images into ComfyUI to recreate workflows.
 
 ## :card_index_dividers: XY Plot: Lora
 
-<a href="../../workflow/xy_easy_lora_20250227.png"><img src="../../workflow/xy_easy_lora_20250227.png"></a>
+<a href="../../workflow/xy_easy_lora_20250806.png"><img src="../../workflow/xy_easy_lora_20250806.png"></a>
 
 - Lora test
 

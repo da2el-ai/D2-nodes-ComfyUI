@@ -16,21 +16,29 @@
 
 ## :card_index_dividers: 簡單的 txt2img
 
-<a href="../../workflow/simple_t2i_20241218.png"><img src="../../workflow/simple_t2i_20241218.png"></a>
+<a href="../../workflow/simple_t2i_20250806.png"><img src="../../workflow/simple_t2i_20250806.png"></a>
 
 - 不使用 Lora 或 Controlnet 的簡單 txt2img。
 
 ## :card_index_dividers: 使用LoRA的txt2img
 
-<a href="../../workflow/lora_t2i_20250323.png"><img src="../../workflow/lora_t2i_20250323.png"></a>
+<a href="../../workflow/lora_t2i_20250806.png"><img src="../../workflow/lora_t2i_20250806.png"></a>
 
 - 使用與StableDiffusion webui A1111相同格式的Lora的txt2img。
+- 使用D2 Prompt可以更容易地使用Lora
 
 ## :card_index_dividers: txt2img + Hires fix
 
-<a href="../../workflow/hiresfix_20241218.png"><img src="../../workflow/hiresfix_20241218.png"></a>
+<a href="../../workflow/hiresfix_20250806.png"><img src="../../workflow/hiresfix_20250806.png"></a>
 
 - 使用兩個 D2 KSampler，中間加入 D2 Image Resize，使用 SwinR_4x 的 Hires fix。
+
+## :card_index_dividers: 在檔案名中包含生成參數
+
+<a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
+
+- 使用D2 Filename Template生成檔案名
+- D2 Send File Eagle包含在另一個自定義節點 <a href="https://github.com/da2el-ai/ComfyUI-d2-send-eagle" target="_blank">ComfyUI-d2-send-eagle</a> 中
 
 
 ## :card_index_dividers: 批量放大資料夾內的圖像
@@ -51,7 +59,7 @@
 
 ## :card_index_dividers: XY Plot: Lora
 
-<a href="../../workflow/xy_easy_lora_20250227.png"><img src="../../workflow/xy_easy_lora_20250227.png"></a>
+<a href="../../workflow/xy_easy_lora_20250806.png"><img src="../../workflow/xy_easy_lora_20250806.png"></a>
 
 - Lora 的測試
 
@@ -77,4 +85,3 @@
 ## :card_index_dividers: Refiner: 切換檢查點的 Hires.fix
 
 <a href="../../workflow/Refiner_20241218.png"><img src="../../workflow/Refiner_20241218.png"></a>
-

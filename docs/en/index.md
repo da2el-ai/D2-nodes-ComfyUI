@@ -167,7 +167,12 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
-**2025.08.5**
+**2025.08.06**
+
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: Added feature to increase/decrease input items. Added seed
+- Updated several sample workflows
+
+**2025.08.05**
 
 - `D2_SaveImage`: Added support for WEBP, animated WEBP, and JPEG formats
 

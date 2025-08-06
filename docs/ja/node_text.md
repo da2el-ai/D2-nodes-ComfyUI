@@ -178,7 +178,7 @@ Output text
 ### D2 Filename Template / D2 Filename Template2
 
 <figure>
-  <img src="../img/filename_template.png">
+  <img src="../img/filename_template_2.png">
 </figure>
 
 - ファイル名を作るためのノード
@@ -187,7 +187,7 @@ Output text
 
 #### Input
 
-- `arg_1` `arg_2` `arg_3`
+- `arg_{数字}`
   - 他のノードから値を取り込む
 - `format`
     - `%date:{yyyy/MM/dd/hh/mm/ss}%`
@@ -200,10 +200,12 @@ Output text
     - `%node:{id}.{key}%`
       - ノードIDと、項目名を指定して値を取得する
       - 例：`%node:8.width%`: ID 8 のノードから width を取得
-    - `%arg_1%`（2、3も同様）
+    - `%arg_{数字}%`
       - 入力した値を埋め込む
-    - `%arg_1:ckpt_name%`（2、3も同様）
+    - `%arg_{数字}:ckpt_name%`
       - チェックポイント名から `.safetensors` を除外したものを埋め込む
+- `arg_count`
+  - 入力項目の増減
 
 #### Example
 ```

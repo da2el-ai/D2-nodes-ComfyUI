@@ -169,7 +169,12 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
-**2025.08.5**
+**2025.08.06**
+
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 入力項目の増減機能を追加。seed追加
+- サンプルワークフローをいくつか更新
+
+**2025.08.05**
 
 - `D2_SaveImage`: WEBP、アニメーションWEBP、JPEG形式に対応
 

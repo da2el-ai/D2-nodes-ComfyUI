@@ -167,7 +167,7 @@ Output text
 ### D2 Filename Template / D2 Filename Template2
 
 <figure>
-  <img src="../img/filename_template.png">
+  <img src="../img/filename_template_2.png">
 </figure>
 
 - 用於創建文件名的節點
@@ -176,7 +176,7 @@ Output text
 
 #### Input
 
-- `arg_1` `arg_2` `arg_3`
+- `arg_{數字}`
   - 從其他節點導入值
 - `format`
     - `%date:{yyyy/MM/dd/hh/mm/ss}%`
@@ -189,10 +189,14 @@ Output text
     - `%node:{id}.{key}%`
       - 通過指定節點ID和項目名稱來獲取值
       - 示例：`%node:8.width%`: 從ID為8的節點獲取width值
-    - `%arg_1%`（2和3相同）
+    - `%arg_{數字}%`
       - 嵌入輸入的值
-    - `%arg_1:ckpt_name%`（2和3相同）
+    - `%arg_{數字}:ckpt_name%`
       - 嵌入移除 `.safetensors` 後的檢查點名稱
+    - `%seed%`
+      - 嵌入種子值
+- `arg_count`
+  - 增加或減少輸入項目的數量
 
 #### Example
 
@@ -209,7 +213,7 @@ Output text
 ### D2 Prompt
 
 <figure>
-  <img src="../img/prompt.png">
+  <img src="../img/prompt.png?2">
 </figure>
 
 - 您可以從 `CHOOSE` 按鈕選擇LoRA，並插入A1111方式的LoRA提示詞
@@ -234,4 +238,3 @@ Output text
 </figure>
 
 - 計算提示詞的標記數量
-

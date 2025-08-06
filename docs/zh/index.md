@@ -169,7 +169,12 @@
 
 ## :blossom: 更新日誌
 
-**2025.08.5**
+**2025.08.06**
+
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 新增增減輸入項目功能。新增seed
+- 更新了多個範例工作流程
+
+**2025.08.05**
 
 - `D2_SaveImage`: 新增對 WEBP、動畫WEBP 和 JPEG 格式的支援
 

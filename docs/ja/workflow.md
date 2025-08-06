@@ -19,25 +19,34 @@ Workflow
 
 ## :card_index_dividers: シンプルな txt2img
 
-<a href="../../workflow/simple_t2i_20241218.png"><img src="../../workflow/simple_t2i_20241218.png"></a>
+<a href="../../workflow/simple_t2i_20250806.png"><img src="../../workflow/simple_t2i_20250806.png"></a>
 
 - Lora も Controlnet も使わないシンプルな txt2img。
 
 
 ## :card_index_dividers: LoRA を使用した txt2img
 
-<a href="../../workflow/lora_t2i_20250323.png"><img src="../../workflow/lora_t2i_20250323.png"></a>
+<a href="../../workflow/lora_t2i_20250806.png"><img src="../../workflow/lora_t2i_20250806.png"></a>
 
 - StableDiffusion webui A1111 と同じ書式で Lora を利用する txt2img。
-
+- D2 Prompt を使うと Loraを呼び出しやすいです
 
 
 ## :card_index_dividers: txt2img + Hires fix
 
-<a href="../../workflow/hiresfix_20241218.png"><img src="../../workflow/hiresfix_20241218.png"></a>
+<a href="../../workflow/hiresfix_20250806.png"><img src="../../workflow/hiresfix_20250806.png"></a>
 
 - D2 KSampler を2個、間に D2 Image Resize を入れて SwinR_4x を使用した Hires fix。
 
+
+
+## :card_index_dividers: 生成パラメーターをファイル名に入れる
+
+<a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
+
+- D2 Filename Template を使ってファイル名を生成
+- D2 Send File Eagle は別のカスタムノード <a href="https://github.com/da2el-ai/ComfyUI-d2-send-eagle" target="_blank">ComfyUI-d2-send-eagle</a>
+ に収録されています
 
 
 ## :card_index_dividers: フォルダー内画像を一括でアップスケール
@@ -58,7 +67,7 @@ Workflow
 
 ## :card_index_dividers: XY Plot: Lora
 
-<a href="../../workflow/xy_easy_lora_20250323.png"><img src="../../workflow/xy_easy_lora_20250323.png"></a>
+<a href="../../workflow/xy_easy_lora_20250806.png"><img src="../../workflow/xy_easy_lora_20250806.png"></a>
 
 - Lora のテスト
 

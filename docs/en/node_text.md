@@ -141,7 +141,7 @@ Output text
 ### D2 Filename Template / D2 Filename Template2
 
 <figure>
-  <img src="../img/filename_template.png">
+  <img src="../img/filename_template_2.png">
 </figure>
 
 - A node for creating filenames
@@ -150,7 +150,7 @@ Output text
 
 #### Input
 
-- `arg_1` `arg_2` `arg_3`
+- `arg_{number}`
   - Import values from other nodes
 - `format`
     - `%date:{yyyy/MM/dd/hh/mm/ss}%`
@@ -163,10 +163,14 @@ Output text
     - `%node:{id}.{key}%`
       - Retrieves values by specifying node ID and item name
       - Example: `%node:8.width%`: Get width from node ID 8
-    - `%arg_1%` (same for 2 and 3)
+    - `%arg_{number}%`
       - Embed input values
-    - `%arg_1:ckpt_name%` (same for 2 and 3)
+    - `%arg_{number}:ckpt_name%`
       - Embed checkpoint name with `.safetensors` removed
+    - `%seed%`
+      - Embed seed value
+- `arg_count`
+  - Increase or decrease the number of input items
 
 #### Example
 ```
@@ -183,10 +187,11 @@ Output text
 ### D2 Prompt
 
 <figure>
-  <img src="../img/prompt.png">
+  <img src="../img/prompt.png?2">
 </figure>
 
-- You can select LoRA from the `CHOOSE` button and insert an A1111-style LoRA prompt- Delete comments in text
+- You can select LoRA from the `CHOOSE` button and insert an A1111-style LoRA prompt
+- Delete comments in text
 - Targets lines starting with "#", lines starting with "//", and text between "/*" and "*/"
 - Displays token count at the bottom
 - Uses "ViT-L/14" CLIP for token count measurement. Please use `D2 Token Counter` if you want to use other CLIP models
