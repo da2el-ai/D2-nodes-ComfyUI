@@ -2,6 +2,10 @@ import torch
 from PIL import Image, ImageOps, ImageSequence, ImageFile
 import numpy as np
 from scipy.ndimage import gaussian_filter
+import os
+import json
+from comfy.cli_args import args
+from PIL.PngImagePlugin import PngInfo
 
 def tensor2pil(image):
     """
@@ -83,8 +87,6 @@ def convert_batch_dimension(img, add_batch):
             return img
         else:
             raise ValueError(f"予期しない入力形状: {img.shape}。3次元または4次元の画像を期待しています。")
-
-
 
 
 def apply_mosaic_to_image(image, dot_size, color_mode, brightness, invert_color):
@@ -171,3 +173,122 @@ def apply_mosaic_to_image(image, dot_size, color_mode, brightness, invert_color)
         mosaic_image = mosaic_image.squeeze(0)
         
     return mosaic_image
+
+
+# 画像保存関数
+
+def save_image(format, pil_image, file_path, compress_level=4, lossless=True, quality=80, prompt=None, extra_pnginfo=None):
+    """
+    PNG/JPEG/WEBP形式で画像を保存する
+    
+    Args:
+        pil_image (PIL.Image): 保存する画像
+        file_path (str): 保存先のファイルパス
+        compress_level (int, optional): 圧縮レベル (0-9) / PNG用
+        lossless (bool, optional): 可逆圧縮を使用するかどうか / WEBP用
+        quality (int, optional): 画質 (0-100)、lossless=Falseの場合に使用 / JPEG・WEBP用
+    """
+    if format == "png":
+        metadata = prepare_metadata_png(prompt, extra_pnginfo)
+        pil_image.save(file_path, pnginfo=metadata, compress_level=compress_level)
+
+    elif format == "jpeg":
+        metadata = prepare_metadata_exif(prompt, extra_pnginfo, pil_image)
+        pil_image.save(file_path, exif=metadata, quality=quality)
+
+    elif format == "webp":
+        metadata = prepare_metadata_exif(prompt, extra_pnginfo, pil_image)
+        pil_image.save(file_path, exif=metadata, lossless=lossless, quality=quality)
+
+
+def save_image_animated_webp(pil_images, file_path, fps=6.0, lossless=True, quality=80, method=4, prompt=None, extra_pnginfo=None):
+    """
+    アニメーションWEBP形式で画像を保存する
+    
+    Args:
+        pil_images (list): 保存する画像のリスト
+        file_path (str): 保存先のファイルパス
+        fps (float, optional): フレームレート
+        metadata (PIL.Image.Exif, optional): メタデータ情報
+        lossless (bool, optional): 可逆圧縮を使用するかどうか
+        quality (int, optional): 画質 (0-100)、lossless=Falseの場合に使用
+        method (int, optional): 圧縮方法 (0-6)
+        
+    Returns:
+        str: 保存したファイルのパス
+    """
+    if len(pil_images) <= 1:
+        raise ValueError("Cannot create animated WebP with only one image. Please provide multiple images for animation.")
+
+    # メタデータの設定
+    metadata = prepare_metadata_exif(prompt, extra_pnginfo, pil_images[0])
+
+    # 最初の画像を保存し、残りの画像を追加
+    pil_images[0].save(
+        file_path, 
+        save_all=True, 
+        duration=int(1000.0/fps), 
+        append_images=pil_images[1:], 
+        exif=metadata, 
+        lossless=lossless, 
+        quality=quality, 
+        method=method
+    )
+    return file_path
+
+
+def prepare_metadata_png(prompt=None, extra_pnginfo=None):
+    """
+    PNG形式のメタデータを準備する
+    
+    Args:
+        prompt (dict, optional): プロンプト情報
+        extra_pnginfo (dict, optional): 追加のメタデータ情報
+        
+    Returns:
+        PngInfo: PNG形式のメタデータ
+    """
+    if args.disable_metadata:
+        return None
+    
+    metadata = PngInfo()
+    if prompt is not None:
+        metadata.add(b"comf", "prompt".encode("latin-1", "strict") + b"\0" + json.dumps(prompt).encode("latin-1", "strict"), after_idat=True)
+    
+    if extra_pnginfo is not None:
+        for x in extra_pnginfo:
+            metadata.add(b"comf", x.encode("latin-1", "strict") + b"\0" + json.dumps(extra_pnginfo[x]).encode("latin-1", "strict"), after_idat=True)
+    
+    return metadata
+
+
+def prepare_metadata_exif(prompt=None, extra_pnginfo=None, base_image=None):
+    """
+    EXIF形式のメタデータを準備する
+    
+    Args:
+        prompt (dict, optional): プロンプト情報
+        extra_pnginfo (dict, optional): 追加のメタデータ情報
+        base_image (PIL.Image, optional): メタデータのベースとなる画像
+        
+    Returns:
+        PIL.Image.Exif: EXIF形式のメタデータ
+    """
+    if args.disable_metadata:
+        return None
+    
+    if base_image is not None:
+        metadata = base_image.getexif()
+    else:
+        metadata = Image.Exif()
+    
+    if prompt is not None:
+        metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
+    
+    if extra_pnginfo is not None:
+        inital_exif = 0x010f
+        for x in extra_pnginfo:
+            metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
+            inital_exif -= 1
+    
+    return metadata

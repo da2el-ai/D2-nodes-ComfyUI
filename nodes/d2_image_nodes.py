@@ -106,36 +106,15 @@ class D2_SaveImage:
         
         # アニメーションwebpの場合
         if format == "animated_webp":
-            if len(pil_images) <= 1:
-                # 画像が1枚以下の場合はエラーメッセージを表示
-                raise ValueError("Cannot create animated WebP with only one image. Please provide multiple images for animation.")
-            
-            # 複数画像がある場合の処理
-            # メタデータの設定
-            metadata = pil_images[0].getexif()
-            if not args.disable_metadata:
-                if prompt is not None:
-                    metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
-                if extra_pnginfo is not None:
-                    inital_exif = 0x010f
-                    for x in extra_pnginfo:
-                        metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
-                        inital_exif -= 1
-            
             # ファイル名の設定
             file = f"{filename}_{counter:05}_.webp"
             file_path = os.path.join(full_output_folder, file)
             
             # アニメーションwebpとして保存
-            pil_images[0].save(
-                file_path, 
-                save_all=True, 
-                duration=int(1000.0/fps), 
-                append_images=pil_images[1:], 
-                exif=metadata, 
-                lossless=lossless, 
-                quality=quality, 
-                method=4  # default method
+            file_path = image_util.save_image_animated_webp(
+                pil_images, file_path, fps, lossless, quality,
+                prompt=prompt,
+                extra_pnginfo=extra_pnginfo,
             )
             
             # 結果リストに追加
@@ -147,7 +126,6 @@ class D2_SaveImage:
             
             # ファイルパスリストに追加
             file_paths.append(file_path)
-            
             # アニメーションフラグを設定
             animated = True
         
@@ -158,51 +136,12 @@ class D2_SaveImage:
                 file = f"{filename}_{counter:05}_.{format}"
                 file_path = os.path.join(full_output_folder, file)
                 
-                # フォーマットに応じたメタデータと保存処理
-                if format == "png":
-                    # PNGメタデータの設定
-                    metadata = None
-                    if not args.disable_metadata:
-                        metadata = PngInfo()
-                        if prompt is not None:
-                            metadata.add(b"comf", "prompt".encode("latin-1", "strict") + b"\0" + json.dumps(prompt).encode("latin-1", "strict"), after_idat=True)
-                            
-                        if extra_pnginfo is not None:
-                            for x in extra_pnginfo:
-                                metadata.add(b"comf", x.encode("latin-1", "strict") + b"\0" + json.dumps(extra_pnginfo[x]).encode("latin-1", "strict"), after_idat=True)
-                    
-                    # PNG形式で保存
-                    img.save(file_path, pnginfo=metadata, compress_level=compress_level)
-                
-                elif format == "webp":
-                    # WEBPメタデータの設定
-                    metadata = img.getexif()
-                    if not args.disable_metadata:
-                        if prompt is not None:
-                            metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
-                        if extra_pnginfo is not None:
-                            inital_exif = 0x010f
-                            for x in extra_pnginfo:
-                                metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
-                                inital_exif -= 1
-                    
-                    # WEBP形式で保存
-                    img.save(file_path, exif=metadata, lossless=lossless, quality=quality)
-                
-                elif format == "jpeg":
-                    # JPEGメタデータの設定
-                    metadata = img.getexif()
-                    if not args.disable_metadata:
-                        if prompt is not None:
-                            metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
-                        if extra_pnginfo is not None:
-                            inital_exif = 0x010f
-                            for x in extra_pnginfo:
-                                metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
-                                inital_exif -= 1
-                    
-                    # JPEG形式で保存
-                    img.save(file_path, exif=metadata, quality=quality)
+                # 各画像形式で保存
+                image_util.save_image(
+                    format, img, file_path, compress_level, lossless, quality,
+                    prompt=prompt,
+                    extra_pnginfo=extra_pnginfo,
+                )
                 
                 # 結果リストに追加
                 results.append({
@@ -213,14 +152,10 @@ class D2_SaveImage:
                 
                 # ファイルパスリストに追加
                 file_paths.append(file_path)
-                
                 counter += 1
             
             # アニメーションフラグを設定
             animated = False
-
-        print("path")
-        print(file_paths)
         
         # 結果を返す
         return {
