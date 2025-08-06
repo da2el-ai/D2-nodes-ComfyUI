@@ -29,6 +29,7 @@ from .modules import util
 from .modules import pnginfo_util
 from .modules import grid_image_util
 from .modules import image_util
+from .modules import mask_util
 
 
 
@@ -882,8 +883,8 @@ class D2_CutByMask:
         # print(f"Debug - Image shape: {images.shape}, Mask shape: {mask.shape}")
         
         # ユーティリティ関数を使用してマスクを調整
-        mask = image_util.adjust_mask_dimensions(mask)
-        mask = image_util.check_mask_image_compatibility(mask, height, width)
+        mask = mask_util.adjust_mask_dimensions(mask)
+        mask = mask_util.check_mask_image_compatibility(mask, height, width)
         # print(f"Debug - After compatibility check: mask shape={mask.shape}")
         
         # マスクのある範囲を取得（非ゼロの部分）
@@ -898,11 +899,11 @@ class D2_CutByMask:
             if len(non_zero_indices[0]) == 0:
                 # マスクがない時は中心に正方形マスクを作成
                 rect = [(width - size) // 2, (height - size) // 2, size, size]
-                mask = image_util.create_rectangle_mask(rect[3], rect[2], rect[0], rect[1], width, height)
+                mask = mask_util.create_rectangle_mask(rect[3], rect[2], rect[0], rect[1], width, height)
             else:
                 # マスクから矩形領域を作成 (paddingなどは適用しない元々のマスク範囲)
                 # この関数は [x_min, y_min, rect_width, rect_height] を返す
-                mask_rect = image_util.create_rectangle_from_mask(mask_np, width, height, padding=0, min_width=0, min_height=0)
+                mask_rect = mask_util.create_rectangle_from_mask(mask_np, width, height, padding=0, min_width=0, min_height=0)
                 # 取得した矩形から中心座標を計算
                 center_x = mask_rect[0] + mask_rect[2] // 2
                 center_y = mask_rect[1] + mask_rect[3] // 2
@@ -913,17 +914,17 @@ class D2_CutByMask:
                     size, size
                 ]
                 # 画像範囲内に収まるように調整
-                rect = image_util.adjust_rectangle_to_area(rect, width, height)
+                rect = mask_util.adjust_rectangle_to_area(rect, width, height)
 
         elif len(non_zero_indices[0]) == 0:
             # マスクが空の場合、画像全体を矩形として扱う
             print("Empty mask detected, treating the entire image as the rectangle.")
-            mask = image_util.create_rectangle_mask(height, width, 0, 0, width, height)
+            mask = mask_util.create_rectangle_mask(height, width, 0, 0, width, height)
             rect = [0, 0, width, height]
             cut_type = "rectangle"
         else:
             # マスクから矩形領域を作成
-            rect = image_util.create_rectangle_from_mask(mask_np, width, height, padding, min_width, min_height)
+            rect = mask_util.create_rectangle_from_mask(mask_np, width, height, padding, min_width, min_height)
             print(f"Debug - Rect from Mask: x={rect[0]}, y={rect[1]}, width={rect[2]}, height={rect[3]}")
 
             # 中心座標を計算（矩形の検証に必要）
@@ -932,7 +933,7 @@ class D2_CutByMask:
             center_x = (x_min_nz + x_max_nz) // 2
             center_y = (y_min_nz + y_max_nz) // 2
             # 矩形領域を検証
-            rect = image_util.validate_rectangle(rect, center_x, center_y, width, height, min_width, min_height)
+            rect = mask_util.validate_rectangle(rect, center_x, center_y, width, height, min_width, min_height)
 
         # 矩形領域を取得 (この部分は共通化)
         x_min, y_min, rect_width, rect_height = rect
@@ -960,7 +961,7 @@ class D2_CutByMask:
             # 4. cut_type に基づいて処理
             if cut_type == "mask":
                 # マスクを画像に適用
-                img_crop = image_util.apply_mask_to_image(img_crop, mask_crop)
+                img_crop = mask_util.apply_mask_to_image(img_crop, mask_crop)
             else:  # rectangle
                 # 長方形領域を切り出す - 領域外は透明にする
                 if channels != 4:  # 既にRGBA
@@ -1083,7 +1084,7 @@ class D2_PasteByMask:
         
         # マスクの調整（必要な場合）
         if mask_opt is not None:
-            mask_opt = image_util.adjust_mask_dimensions(mask_opt)
+            mask_opt = mask_util.adjust_mask_dimensions(mask_opt)
             # print(f"Debimage_util.ug - Mask shape after adjustment: {mask_opt.shape}")
         
         # rect_opt の検証（ない場合は初期値を設定）
@@ -1190,18 +1191,18 @@ class D2_PasteByMask:
             raise ValueError("Mask is required for 'mask' paste mode")
         
         # マスクと画像の互換性をチェック
-        mask_for_paste = image_util.check_mask_image_compatibility(mask_opt, img_paste_rgba.shape[0], img_paste_rgba.shape[1])
+        mask_for_paste = mask_util.check_mask_image_compatibility(mask_opt, img_paste_rgba.shape[0], img_paste_rgba.shape[1])
 
         # マスクをフェザリング（必要な場合）
         if feather > 0:
             # 元のマスク形状を保持してフェザリング
-            alpha_mask_feathered = image_util.apply_feathering(mask_for_paste.clone(), feather, feather_type)
+            alpha_mask_feathered = mask_util.apply_feathering(mask_for_paste.clone(), feather, feather_type)
         else:
             alpha_mask_feathered = mask_for_paste.clone() # フェザリングしない場合は元のマスク
 
         # 共通のアルファブレンディング処理を呼び出す
         # img_paste_rgba はマスキングせず、alpha_mask_feathered で形状を制御
-        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask_feathered, 0, 0)
+        output_img = mask_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask_feathered, 0, 0)
         
         return output_img
     
@@ -1217,7 +1218,7 @@ class D2_PasteByMask:
             return img_base_rgba
             
         # img_paste サイズのマスクを作成
-        paste_mask = image_util.create_rectangle_mask(
+        paste_mask = mask_util.create_rectangle_mask(
             height=paste_height,
             width=paste_width,
             x=x,
@@ -1228,10 +1229,10 @@ class D2_PasteByMask:
         
         # マスクをフェザリング（必要な場合）
         if feather > 0:
-            paste_mask = image_util.apply_feathering(paste_mask, feather, feather_type)
+            paste_mask = mask_util.apply_feathering(paste_mask, feather, feather_type)
         
         # 共通のアルファブレンディング処理を呼び出す
-        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, paste_mask, 0, 0)
+        output_img = mask_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, paste_mask, 0, 0)
         
         return output_img
 
@@ -1245,7 +1246,7 @@ class D2_PasteByMask:
         paste_height, paste_width = img_paste_rgba.shape[0], img_paste_rgba.shape[1]
 
         # フェザリング用のマスクを作成 (貼り付け画像のサイズで)
-        paste_mask = image_util.create_rectangle_mask(
+        paste_mask = mask_util.create_rectangle_mask(
             height=paste_height,
             width=paste_width,
             x=0,
@@ -1256,11 +1257,11 @@ class D2_PasteByMask:
 
         # マスクをフェザリング（必要な場合）
         if feather > 0:
-            paste_mask = image_util.apply_feathering(paste_mask, feather, feather_type)
+            paste_mask = mask_util.apply_feathering(paste_mask, feather, feather_type)
 
         # 共通のアルファブレンディング処理を呼び出す
         # 元の img_paste_rgba と paste_mask を使用し、rect_opt の x, y に貼り付け
-        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, paste_mask, x, y)
+        output_img = mask_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, paste_mask, x, y)
 
         return output_img
 
@@ -1274,18 +1275,18 @@ class D2_PasteByMask:
             raise ValueError("Mask is required for 'rect_pos_mask' paste mode")
 
         # マスクと画像の互換性をチェック
-        mask_for_paste = image_util.check_mask_image_compatibility(mask_opt, img_paste_rgba.shape[0], img_paste_rgba.shape[1])
+        mask_for_paste = mask_util.check_mask_image_compatibility(mask_opt, img_paste_rgba.shape[0], img_paste_rgba.shape[1])
 
         # マスクをフェザリング（必要な場合）
         if feather > 0:
              # 元のマスク形状を保持してフェザリング
-            alpha_mask_feathered = image_util.apply_feathering(mask_for_paste.clone(), feather, feather_type)
+            alpha_mask_feathered = mask_util.apply_feathering(mask_for_paste.clone(), feather, feather_type)
         else:
             alpha_mask_feathered = mask_for_paste.clone() # フェザリングしない場合は元のマスク
 
         # 共通のアルファブレンディング処理を呼び出す
         # img_paste_rgba はマスキングせず、alpha_mask_feathered で形状を制御し、rect_opt の x, y に貼り付け
-        output_img = image_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask_feathered, x, y)
+        output_img = mask_util.alpha_blend_paste(img_base_rgba, img_paste_rgba, alpha_mask_feathered, x, y)
 
         return output_img
 
