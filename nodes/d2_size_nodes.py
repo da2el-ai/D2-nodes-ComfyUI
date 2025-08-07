@@ -269,5 +269,5 @@ NODE_CLASS_MAPPINGS = {
     "D2 Image Resize": D2_ImageResize,
     "D2 Resize Calculator": D2_ResizeCalculator,
     "D2 Get Image Size": D2_GetImageSize,
-    "D2 Size Slector": D2_SizeSelector,
+    "D2 Size Selector": D2_SizeSelector,
 }
