@@ -45,7 +45,7 @@ Returns:
 def replace_template(text: str, args={}, prompt={}) -> str:
     # 現在の日時を取得
     now = datetime.now()
-    
+
     # date形式の置換 (%date:yyyyMMdd% 形式)
     def replace_date(match):
         pattern = match.group(1)
@@ -63,8 +63,8 @@ def replace_template(text: str, args={}, prompt={}) -> str:
     for key, val in args.items():
         if val is not None:
             # ckpt_name パターンの置換 (%arg_N:ckpt_name%)
-            text = re.sub(f'%{key}:ckpt_name%', _replace_ckpt_name(str(val)), text)
+            text = re.sub(f'%{key}:ckpt_name%', re.escape(_replace_ckpt_name(str(val))), text)
             # 通常の置換 (%arg_N%)
-            text = re.sub(f'%{key}%', str(val), text)
+            text = re.sub(f'%{key}%', re.escape(str(val)), text)
 
     return text
