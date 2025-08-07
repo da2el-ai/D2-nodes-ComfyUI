@@ -37,8 +37,9 @@
 
 <a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
 
-- 使用D2 Filename Template生成檔案名
-- D2 Send File Eagle包含在另一個自定義節點 <a href="https://github.com/da2el-ai/ComfyUI-d2-send-eagle" target="_blank">ComfyUI-d2-send-eagle</a> 中
+- 此範例使用 `D2 Save Image Eagle` 保存文件
+- 使用 `D2 Filename Template` 生成檔案名
+- 使用 `D2 Filename Template2` 生成Eagle備忘錄
 
 
 ## :card_index_dividers: 批量放大資料夾內的圖像

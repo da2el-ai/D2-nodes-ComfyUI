@@ -98,6 +98,10 @@ D2 Nodes ComfyUI
   - ギャラリー機能付き画像プレビュー
 - <a href="node_image.md#D2-Save-Image">`D2 Save Image`</a>
   - ギャラリー機能付き画像保存
+- <a href="node_image.md#D2-Save-Image-Eagle">`D2 Save Image Eagle`</a>
+  - `D2 Save Image` にEagle登録機能を付けたもの
+- <a href="node_image.md#D2-Send-File-Eagle">`D2 Send File Eagle`</a>
+  - 与えられたパスのファイルをEagleに登録する
 - <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
   - 画像からプロンプトを取得できる Load Image
   - StableDiffusion webui A1111、NovelAI で作成した画像にも対応
@@ -168,6 +172,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.08.07**
+
+- `D2_SaveImageEagle` / `D2_SendFileEagle`: 新規追加
 
 **2025.08.06**
 

@@ -101,6 +101,10 @@
   - 具備圖庫功能的圖像預覽
 - <a href="node_image.md#D2-Save-Image">`D2 Save Image`</a>
   - 具備圖庫功能的圖像保存
+- <a href="node_image.md#D2-Save-Image-Eagle">`D2 Save Image Eagle`</a>
+  - 具有Eagle註冊功能的 `D2 Save Image`
+- <a href="node_image.md#D2-Send-File-Eagle">`D2 Send File Eagle`</a>
+  - 將指定路徑的文件註冊到Eagle
 - <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
   - 可從圖像獲取提示詞的 Load Image
   - 支援 `StableDiffusion webui A1111`、`NovelAI` 創建的圖像
@@ -168,6 +172,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.08.07**
+
+- `D2_SaveImageEagle` / `D2_SendFileEagle`: 新增功能
 
 **2025.08.06**
 

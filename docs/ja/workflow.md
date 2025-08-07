@@ -44,9 +44,9 @@ Workflow
 
 <a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
 
-- D2 Filename Template を使ってファイル名を生成
-- D2 Send File Eagle は別のカスタムノード <a href="https://github.com/da2el-ai/ComfyUI-d2-send-eagle" target="_blank">ComfyUI-d2-send-eagle</a>
- に収録されています
+- この例ではファイルの保存に `D2 Save Image Eagle` を使用
+- `D2 Filename Template` を使ってファイル名を生成
+- `D2 Filename Template2` を使ってEagle用のメモを生成
 
 
 ## :card_index_dividers: フォルダー内画像を一括でアップスケール

@@ -54,6 +54,98 @@
 
 ---
 
+### D2 Save Image Eagle
+
+<figure>
+<img src="../img/save_image_eagle.png?2">
+</figure>
+
+- 具有Eagle註冊功能的 `D2 Save Image`
+- <a href="https://eagle.cool/" target="_blank">Eagle官方網站</a>
+
+#### 與 `D2 Send Eagle` 的區別
+
+- 支援動畫WEBP
+- 全螢幕圖庫功能
+- 檔案名規則符合標準 `Save Image`
+- 排除了標籤保存功能
+- 生成參數備忘錄可以自由創建
+  - 需要使用 `D2 Filename Template2` 等工具創建
+  - 隨著視頻和Flux等各種生成環境的增加，現有的生成參數保存方法已不足以應對
+
+#### Input
+
+- `eagle_folder`: Eagle註冊資料夾。可以使用資料夾名稱或資料夾ID
+- `memo_text`: 在Eagle中註冊為備忘錄的文本
+
+#### 在Eagle備忘錄中記錄A1111 webui風格的參數
+
+<figure>
+<img src="../img/save_image_eagle_2.png?2">
+</figure>
+
+使用 `D2 Filename Template2` 創建模板，並將其輸入到 `D2 Save Image Eagle` 的 `memo_text` 中。
+
+在上面的示例中，`D2 KSampler` 的 `positive` 和 `negative` 被輸入到 `arg_1` 和 `arg_2` 並通過 `%arg_1%` 和 `%arg_2%` 獲取，而其他參數則通過 `%node:{ID}.{Param}` 獲取。
+
+有關參數獲取方法的詳細信息，請參閱 <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>。
+
+```
+%arg_1%
+
+Negative prompt: %arg_2%
+Steps: %node:25.steps%, Sampler: %node:25.sampler_name% %node:25.scheduler%, CFG scale: %node:25.cfg%, Seed: %node:25.seed%, Size: %node:43.width%x%node:43.height%, Model: %node:26.ckpt_name%
+```
+輸出結果
+```
+masterpiece, 1girl, bikini, blue sky,
+
+Negative prompt: bad quality, worst quality, sepia,
+Steps: 20, Sampler: euler_ancestral simple, CFG scale: 5.000000000000001, Seed: 926243299419009, Size: 768x1024, Model: _SDXL_Illustrious\anime\HiyokoDarkness_vpred_v2_20250329.safetensors
+```
+
+---
+
+### D2 Send File Eagle
+
+<figure>
+<img src="../img/send_file_eagle.png?2">
+</figure>
+
+- 將 `file_path` 輸入的路徑文件註冊到 <a href="https://eagle.cool/" target="_blank">Eagle</a>
+- 為了將 `Video Combine` 的輸出文件註冊到Eagle而創建
+- 通過使用 `D2 File Template2` 輸入 `memo_text` 也可以保存視頻生成參數
+
+##### 關於 file_path
+
+以字符串或字符串數組的形式提供文件的完整路徑。
+
+例：字符串
+```
+D:\ComfyUI\output\foo.png
+```
+例：字符串數組
+```
+["D:\ComfyUI\output\foo.png","D:\ComfyUI\output\bar.png"]
+```
+
+##### 關於 Video Combine 輸出的 Filenames
+
+<a href="https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite" target="_blank">Video Combine</a> 輸出的 `Filenames` 是如下形式的數組：
+
+```
+[
+  true, 
+  [
+    "D:\\ComfyUI\\output\\AnimateDiff_00002.png",
+    "D:\\ComfyUI\\output\\AnimateDiff_00002.mp4"
+  ]
+]
+```
+
+在上圖中，使用了 <a href="https://github.com/godmt/ComfyUI-List-Utils" target="_blank">ComfyUI-List-Utils</a> 中的 `Exec` 節點來提取文件名部分。
+
+
 
 ### D2 Load Image
 

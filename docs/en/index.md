@@ -98,6 +98,10 @@ If you have installed any of the following custom nodes previously, please remov
   - Image preview with gallery functionality
 - <a href="node_image.md#D2-Save-Image">`D2 Save Image`</a>
   - Image saving with gallery functionality
+- <a href="node_image.md#D2-Save-Image-Eagle">`D2 Save Image Eagle`</a>
+  - `D2 Save Image` with Eagle registration functionality
+- <a href="node_image.md#D2-Send-File-Eagle">`D2 Send File Eagle`</a>
+  - Registers files at the specified path to Eagle
 - <a href="node_image.md#D2-Load-Image">`D2 Load Image`</a>
   - Load Image that can extract prompts from images
   - Compatible with images created in StableDiffusion webui A1111 and NovelAI
@@ -166,6 +170,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.08.07**
+
+- `D2_SaveImageEagle` / `D2_SendFileEagle`: Newly added
 
 **2025.08.06**
 

@@ -181,8 +181,7 @@ Output text
   <img src="../img/filename_template_2.png">
 </figure>
 
-- ファイル名を作るためのノード
-- 外部の要素を取り込むことが可能
+- 日付や他のノードのパラメーターを取り込んで文字列テンプレートを作るためのノード
 - `D2 Filename Template2` は複数行対応版です
 
 #### Input

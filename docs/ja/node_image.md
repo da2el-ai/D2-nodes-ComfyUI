@@ -55,6 +55,100 @@ Node
 
 ---
 
+
+### D2 Save Image Eagle
+
+<figure>
+<img src="../img/save_image_eagle.png?2">
+</figure>
+
+- `D2 Save Image` にEagle登録機能が付いたもの
+- <a href="https://eagle.cool/" target="_blank">Eagle公式サイト</a>
+
+#### `D2 Send Eagle` との違い
+
+- アニメーションWEBPに対応
+- 全画面ギャラリー機能
+- ファイル名のルールが標準に `Save Image` に準拠
+- タグの保存機能を除外
+- 生成パラメーターメモは自由に作れる
+  - `D2 Filename Template2` などで作る必要がある
+  - 動画やFluxなど様々な生成環境が増え、既存の生成パラメーター保存では対応できなくなったため
+
+#### Input
+
+- `eagle_folder`: Eagleの登録フォルダ。フォルダ名、フォルダIDどちらでも可能
+- `memo_text`: Eagleのメモとして登録するテキスト
+
+#### StableDiffusion A1111 webui のようなパラメーターをEagleメモに記録するには
+
+<figure>
+<img src="../img/save_image_eagle_2.png?2">
+</figure>
+
+`D2 Filename Template2` を使ってテンプレート化し、`D2 Save Image Eagle` の `memo_text` に入力します。
+
+上のサンプルでは `D2 KSampler` から `positive` `negative` を `arg_1` `arg_2` に入力して `%arg_1%` `%arg_2%` で取得、その他のパラメーターは `%node:{ID}.{Param}` で取得しています。
+
+パラメーター取得方法の詳細は <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a> をご覧下さい。
+
+```
+%arg_1%
+
+Negative prompt: %arg_2%
+Steps: %node:25.steps%, Sampler: %node:25.sampler_name% %node:25.scheduler%, CFG scale: %node:25.cfg%, Seed: %node:25.seed%, Size: %node:43.width%x%node:43.height%, Model: %node:26.ckpt_name%
+```
+出力結果
+```
+masterpiece, 1girl, bikini, blue sky,
+
+Negative prompt: bad quality, worst quality, sepia,
+Steps: 20, Sampler: euler_ancestral simple, CFG scale: 5.000000000000001, Seed: 926243299419009, Size: 768x1024, Model: _SDXL_Illustrious\anime\HiyokoDarkness_vpred_v2_20250329.safetensors
+```
+
+---
+
+### D2 Send File Eagle
+
+<figure>
+<img src="../img/send_file_eagle.png?2">
+</figure>
+
+- `file_path` で入力されたパスのファイルを<a href="https://eagle.cool/" target="_blank">Eagle</a>に登録する
+- `Video Combine` の出力ファイルをEagleに登録するために作りました
+- `D2 File Template2` を使って `memo_text` に入力すれば動画生成パラメーターの保存も可能
+
+##### file_path について
+
+ファイルのフルパスを文字列、または文字列の配列で与える。
+
+例：文字列
+```
+D:\ComfyUI\output\foo.png
+```
+例：文字列の配列
+```
+["D:\ComfyUI\output\foo.png","D:\ComfyUI\output\bar.png"]
+```
+
+##### Video Combine が出力する Filenames について
+
+<a href="https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite" target="_blank">Video Combine</a> が出力する `Filenames` は以下のような配列になっています。
+
+```
+[
+  true, 
+  [
+    "D:\\ComfyUI\\output\\AnimateDiff_00002.png",
+    "D:\\ComfyUI\\output\\AnimateDiff_00002.mp4"
+  ]
+]
+```
+
+上の画像では <a href="https://github.com/godmt/ComfyUI-List-Utils" target="_blank">ComfyUI-List-Utils</a> に含まれる `Exec` ノードによってファイル名の部分を抜き出しています。
+
+---
+
 ### D2 Load Image
 
 <figure>

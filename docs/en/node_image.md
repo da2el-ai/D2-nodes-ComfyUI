@@ -49,7 +49,100 @@
 #### Output
 
 - `filenames`: Array of full paths of saved image files
+
 ---
+
+### D2 Save Image Eagle
+
+<figure>
+<img src="../img/save_image_eagle.png?2">
+</figure>
+
+- `D2 Save Image` with Eagle registration functionality
+- <a href="https://eagle.cool/" target="_blank">Eagle Official Website</a>
+
+#### Differences from `D2 Send Eagle`
+
+- Supports animated WEBP
+- Full-screen gallery functionality
+- Filename rules conform to the standard `Save Image`
+- Tag saving feature excluded
+- Generation parameter memos can be freely created
+  - Need to be created using tools like `D2 Filename Template2`
+  - As various generation environments like videos and Flux have increased, existing generation parameter saving methods have become inadequate
+
+#### Input
+
+- `eagle_folder`: Eagle registration folder. Can use either folder name or folder ID
+- `memo_text`: Text to register as a memo in Eagle
+
+#### Recording A1111 webui-style parameters in Eagle memo
+
+<figure>
+<img src="../img/save_image_eagle_2.png?2">
+</figure>
+
+Use `D2 Filename Template2` to create a template and input it into the `memo_text` of `D2 Save Image Eagle`.
+
+In the sample above, `positive` and `negative` from `D2 KSampler` are input to `arg_1` and `arg_2` and retrieved with `%arg_1%` and `%arg_2%`, while other parameters are retrieved with `%node:{ID}.{Param}`.
+
+For details on parameter retrieval methods, see <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>.
+
+```
+%arg_1%
+
+Negative prompt: %arg_2%
+Steps: %node:25.steps%, Sampler: %node:25.sampler_name% %node:25.scheduler%, CFG scale: %node:25.cfg%, Seed: %node:25.seed%, Size: %node:43.width%x%node:43.height%, Model: %node:26.ckpt_name%
+```
+Output result
+```
+masterpiece, 1girl, bikini, blue sky,
+
+Negative prompt: bad quality, worst quality, sepia,
+Steps: 20, Sampler: euler_ancestral simple, CFG scale: 5.000000000000001, Seed: 926243299419009, Size: 768x1024, Model: _SDXL_Illustrious\anime\HiyokoDarkness_vpred_v2_20250329.safetensors
+```
+
+---
+
+### D2 Send File Eagle
+
+<figure>
+<img src="../img/send_file_eagle.png?2">
+</figure>
+
+- Registers files at the path input in `file_path` to <a href="https://eagle.cool/" target="_blank">Eagle</a>
+- Created to register output files from `Video Combine` to Eagle
+- Can also save video generation parameters by using `D2 File Template2` for `memo_text` input
+
+##### About file_path
+
+Provide the full path of the file as a string or an array of strings.
+
+Example: String
+```
+D:\ComfyUI\output\foo.png
+```
+Example: Array of strings
+```
+["D:\ComfyUI\output\foo.png","D:\ComfyUI\output\bar.png"]
+```
+
+##### About Filenames output by Video Combine
+
+The `Filenames` output by <a href="https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite" target="_blank">Video Combine</a> is an array like the following:
+
+```
+[
+  true, 
+  [
+    "D:\\ComfyUI\\output\\AnimateDiff_00002.png",
+    "D:\\ComfyUI\\output\\AnimateDiff_00002.mp4"
+  ]
+]
+```
+
+In the image above, the `Exec` node from <a href="https://github.com/godmt/ComfyUI-List-Utils" target="_blank">ComfyUI-List-Utils</a> is used to extract the filename part.
+
 
 ### D2 Load Image
 

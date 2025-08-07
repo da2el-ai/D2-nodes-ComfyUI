@@ -41,8 +41,9 @@ Drop images into ComfyUI to recreate workflows.
 
 <a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
 
-- Generate filenames using D2 Filename Template
-- D2 Send File Eagle is included in a separate custom node <a href="https://github.com/da2el-ai/ComfyUI-d2-send-eagle" target="_blank">ComfyUI-d2-send-eagle</a>
+- This example uses `D2 Save Image Eagle` for saving files
+- Generate filenames using `D2 Filename Template`
+- Generate Eagle memos using `D2 Filename Template2`
 
 
 ## :card_index_dividers: Batch Upscale Images in Folder

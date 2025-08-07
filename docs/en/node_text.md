@@ -144,8 +144,7 @@ Output text
   <img src="../img/filename_template_2.png">
 </figure>
 
-- A node for creating filenames
-- Can incorporate external elements
+- A node for creating string templates by incorporating date and parameters from other nodes
 - `D2 Filename Template2` is a version that supports multiple lines
 
 #### Input
