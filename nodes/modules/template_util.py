@@ -62,9 +62,13 @@ def replace_template(text: str, args={}, prompt={}) -> str:
     # 引数の置換
     for key, val in args.items():
         if val is not None:
+            val_str = str(val)
             # ckpt_name パターンの置換 (%arg_N:ckpt_name%)
-            text = re.sub(f'%{key}:ckpt_name%', re.escape(_replace_ckpt_name(str(val))), text)
+            ckpt_pattern = f'%{re.escape(key)}:ckpt_name%'
+            ckpt_replacement = _replace_ckpt_name(val_str)
+            text = re.sub(ckpt_pattern, lambda m: ckpt_replacement, text)
+            
             # 通常の置換 (%arg_N%)
-            text = re.sub(f'%{key}%', re.escape(str(val)), text)
-
+            normal_pattern = f'%{re.escape(key)}%'
+            text = re.sub(normal_pattern, lambda m: val_str, text)
     return text
