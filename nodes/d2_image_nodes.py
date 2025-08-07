@@ -30,7 +30,8 @@ from .modules import pnginfo_util
 from .modules import grid_image_util
 from .modules import image_util
 from .modules import mask_util
-
+from .modules.eagle_api import EagleAPI, send_to_eagle
+from .modules.util import AnyType
 
 
 
@@ -165,7 +166,97 @@ class D2_SaveImage:
                 "animated": (animated,)
             }
         }
-            
+
+
+"""
+
+D2 Save Image Eagle
+画像を保存してEagleに送信
+
+"""
+class D2_SaveImageEagle(D2_SaveImage):
+    def __init__(self):
+        self.eagle_api:EagleAPI = EagleAPI()
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
+        self.prefix_append = ""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE", ), 
+                "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."}),
+                "preview_only": ("BOOLEAN", {"default": False},),
+                "format": (["png", "webp", "jpeg", "animated_webp"],),
+                "lossless": ("BOOLEAN", {"default": True}),
+                "quality": ("INT", {"default": 80, "min": 0, "max": 100}),
+                "fps": ("FLOAT", {"default": 6.0, "min": 0.01, "max": 1000.0, "step": 0.01}),
+                "eagle_folder": ("STRING",{"default": ""}),
+                "memo_text": ("STRING",{"default": ""}),
+            },
+            "optional": {
+                "popup_image": ("D2_BUTTON", {}, )
+            },
+            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
+        }
+
+    RETURN_TYPES = ("LIST",)
+    RETURN_NAMES = ("filenames",)
+    FUNCTION = "save_images"
+    OUTPUT_NODE = True
+    CATEGORY = "D2/Image"
+
+    def save_images(self, images, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, eagle_folder = "", memo_text = "", popup_image="", prompt=None, extra_pnginfo=None):
+        # EagleフォルダIDを取得
+        folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
+
+        res = super().save_images(images, filename_prefix, preview_only, format, lossless, quality, fps, popup_image, prompt, extra_pnginfo)
+
+        for single_path in res["result"][0]:
+            send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)
+
+        return res
+
+"""
+
+D2 Send File Eagle
+指定されたパスのファイルを Eagleに送信
+
+"""
+class D2_SendFileEagle:
+    def __init__(self):
+        self.eagle_api:EagleAPI = EagleAPI()
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "file_path": (AnyType("*"),),
+                "eagle_folder": ("STRING",{"default": ""}),
+                "memo_text": ("STRING",{"multiline": True},),
+            },
+        }
+
+    RETURN_TYPES = ()
+    FUNCTION = "run"
+    OUTPUT_NODE = True
+    CATEGORY = "D2/Image"
+
+    def run(self, file_path, eagle_folder = "", memo_text = ""):
+        # EagleフォルダIDを取得
+        folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
+
+        if isinstance(file_path, str):
+            send_to_eagle(self.eagle_api, folder_id, file_path, memo_text)
+        elif isinstance(file_path, list):
+            for single_path in file_path:
+                send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)
+        else:
+            raise ValueError(f"Unsupported file_path type: {type(file_path)}")
+
+        return {}
+
 
 
 """
@@ -1226,6 +1317,8 @@ class D2_PasteByMask:
         return output_img
 
 NODE_CLASS_MAPPINGS = {
+    "D2 Send File Eagle": D2_SendFileEagle,
+    "D2 Save Image Eagle": D2_SaveImageEagle,
     "D2 Save Image": D2_SaveImage,
     "D2 Preview Image": D2_PreviewImage,
     "D2 Load Image": D2_LoadImage,
