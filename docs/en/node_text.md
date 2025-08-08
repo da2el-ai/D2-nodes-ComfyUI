@@ -159,6 +159,9 @@ Output text
       - `hh`: Hour
       - `mm`: Minute
       - `ss`: Second
+    - `%{node name}.{key}%`
+      - Retrieves values by specifying node name and item name
+      - Example: `%Empty Latent Image.width%`: Get width from the Empty Latent Image node
     - `%node:{id}.{key}%`
       - Retrieves values by specifying node ID and item name
       - Example: `%node:8.width%`: Get width from node ID 8
@@ -171,12 +174,9 @@ Output text
 - `arg_count`
   - Increase or decrease the number of input items
 
-#### Example
-```
-%date:yyyyMMdd-hhmmss%_%arg_1:ckpt_name%
-👇
-20241219-021926_obsessionIllustrious_v31
-```
+<figure>
+  <img src="../img/filename_template_2.png">
+</figure>
 
 
 

@@ -42,7 +42,7 @@ Workflow
 
 ## :card_index_dividers: 生成パラメーターをファイル名に入れる
 
-<a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
+<a href="../../workflow/filename_template_20250808.png"><img src="../../workflow/filename_template_20250808.png"></a>
 
 - この例ではファイルの保存に `D2 Save Image Eagle` を使用
 - `D2 Filename Template` を使ってファイル名を生成

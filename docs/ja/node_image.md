@@ -39,15 +39,18 @@ Node
 
 #### Input
 
-- `Popup Image`: ボタンをクリックすると全画面ギャラリーが表示される
-- `preview_only`: 
 - `images`: 保存する画像
-- `filename_prefix`: ファイルネーム書式
-- `preview_only`: true 時は画像を保存せず、プレビュー表示だけになる
+- `filename_prefix`: ファイルネーム書式。詳細は <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a> 参照
+- `preview_only`:
+  - `true`: 画像を保存せず、プレビュー表示だけになる
+  - `false`: 画像を保存する
 - `format`: 画像フォーマットを `png` / `jpeg` / `webp` / `animated_webp` から選択
-- `lossless`: `true`:可逆圧縮 / `false`:不可逆圧縮。`webp`、`animated_webp` の時に適用。
+- `lossless`: `webp`、`animated_webp` で適用
+  - `true`:可逆圧縮
+  - `false`:不可逆圧縮。
 - `quality`: 画像圧縮率。`jpeg` または `webp`、`animated_webp` で `losless:false` の時に適用
 - `fps`: `animated_webp` のフレームレート
+- `Popup Image`: ボタンをクリックすると全画面ギャラリーが表示される
 
 #### Output
 
@@ -83,12 +86,12 @@ Node
 #### StableDiffusion A1111 webui のようなパラメーターをEagleメモに記録するには
 
 <figure>
-<img src="../img/save_image_eagle_2.png?2">
+<img src="../img/save_image_eagle_3.png?2">
 </figure>
 
 `D2 Filename Template2` を使ってテンプレート化し、`D2 Save Image Eagle` の `memo_text` に入力します。
 
-上のサンプルでは `D2 KSampler` から `positive` `negative` を `arg_1` `arg_2` に入力して `%arg_1%` `%arg_2%` で取得、その他のパラメーターは `%node:{ID}.{Param}` で取得しています。
+上のサンプルでは `D2 KSampler` から `positive` `negative` を `arg_1` `arg_2` に入力して `%arg_1%` `%arg_2%` で取得、その他のパラメーターは `%{ノード名}.{Param}` で取得しています。
 
 パラメーター取得方法の詳細は <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a> をご覧下さい。
 
@@ -96,7 +99,7 @@ Node
 %arg_1%
 
 Negative prompt: %arg_2%
-Steps: %node:25.steps%, Sampler: %node:25.sampler_name% %node:25.scheduler%, CFG scale: %node:25.cfg%, Seed: %node:25.seed%, Size: %node:43.width%x%node:43.height%, Model: %node:26.ckpt_name%
+Steps: %D2 KSampler.steps%, Sampler: %D2 KSampler.sampler_name% %D2 KSampler.scheduler%, CFG scale: %D2 KSampler.cfg%, Seed: %D2 KSampler.seed%, Size: %Empty Latent Image.width%x%Empty Latent Image.height%, Model: %D2 Checkpoint Loader.ckpt_name%
 ```
 出力結果
 ```

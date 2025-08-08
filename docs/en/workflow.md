@@ -39,7 +39,7 @@ Drop images into ComfyUI to recreate workflows.
 
 ## :card_index_dividers: Include generation parameters in filename
 
-<a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
+<a href="../../workflow/filename_template_20250808.png"><img src="../../workflow/filename_template_20250808.png"></a>
 
 - This example uses `D2 Save Image Eagle` for saving files
 - Generate filenames using `D2 Filename Template`

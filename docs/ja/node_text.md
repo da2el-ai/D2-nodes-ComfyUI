@@ -196,6 +196,9 @@ Output text
       - `hh`: 時
       - `mm`: 分
       - `ss`: 秒
+    - `%{ノード名}.{key}%`
+      - ノード名と、項目名を指定して値を取得する
+      - 例：`%Empty Latent Image.width%`: Empty Latent Image のノードから width を取得
     - `%node:{id}.{key}%`
       - ノードIDと、項目名を指定して値を取得する
       - 例：`%node:8.width%`: ID 8 のノードから width を取得
@@ -206,12 +209,9 @@ Output text
 - `arg_count`
   - 入力項目の増減
 
-#### Example
-```
-%date:yyyyMMdd-hhmmss%_%arg_1:ckpt_name%
-👇
-20241219-021926_obsessionIllustrious_v31
-```
+<figure>
+  <img src="../img/filename_template_3.png">
+</figure>
 
 ---
 

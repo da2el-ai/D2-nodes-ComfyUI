@@ -35,7 +35,7 @@
 
 ## :card_index_dividers: 在檔案名中包含生成參數
 
-<a href="../../workflow/filename_template_20250806.png"><img src="../../workflow/filename_template_20250806.png"></a>
+<a href="../../workflow/filename_template_20250808.png"><img src="../../workflow/filename_template_20250808.png"></a>
 
 - 此範例使用 `D2 Save Image Eagle` 保存文件
 - 使用 `D2 Filename Template` 生成檔案名

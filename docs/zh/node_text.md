@@ -186,6 +186,9 @@ Output text
       - `hh`: 時
       - `mm`: 分
       - `ss`: 秒
+    - `%{節點名稱}.{key}%`
+      - 通過指定節點名稱和項目名稱來獲取值
+      - 示例：`%Empty Latent Image.width%`: 從Empty Latent Image節點獲取width值
     - `%node:{id}.{key}%`
       - 通過指定節點ID和項目名稱來獲取值
       - 示例：`%node:8.width%`: 從ID為8的節點獲取width值
@@ -198,13 +201,9 @@ Output text
 - `arg_count`
   - 增加或減少輸入項目的數量
 
-#### Example
-
-```
-%date:yyyyMMdd-hhmmss%_%arg_1:ckpt_name%
-👇
-20241219-021926_obsessionIllustrious_v31
-```
+<figure>
+  <img src="../img/filename_template_3.png">
+</figure>
 
 
 ---

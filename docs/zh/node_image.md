@@ -39,14 +39,18 @@
 
 #### Input
 
-- `Popup Image`: 點擊按鈕時顯示全螢幕圖庫
 - `images`: 要保存的圖像
-- `filename_prefix`: 檔案名格式
-- `preview_only`: 為 true 時僅顯示預覽，不保存圖像
+- `filename_prefix`: 檔案名格式。詳情請參閱 <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
+- `preview_only`:
+  - `true`: 僅顯示預覽，不保存圖像
+  - `false`: 保存圖像
 - `format`: 從 `png` / `jpeg` / `webp` / `animated_webp` 中選擇圖像格式
-- `lossless`: `true`: 無損壓縮 / `false`: 有損壓縮。適用於 `webp` 和 `animated_webp`
+- `lossless`: 適用於 `webp` 和 `animated_webp`
+  - `true`: 無損壓縮
+  - `false`: 有損壓縮
 - `quality`: 圖像壓縮率。適用於 `jpeg` 或 `webp`、`animated_webp` 且 `lossless:false` 時
 - `fps`: `animated_webp` 的幀率
+- `Popup Image`: 點擊按鈕時顯示全螢幕圖庫
 
 #### Output
 
@@ -81,12 +85,12 @@
 #### 在Eagle備忘錄中記錄A1111 webui風格的參數
 
 <figure>
-<img src="../img/save_image_eagle_2.png?2">
+<img src="../img/save_image_eagle_3.png?2">
 </figure>
 
 使用 `D2 Filename Template2` 創建模板，並將其輸入到 `D2 Save Image Eagle` 的 `memo_text` 中。
 
-在上面的示例中，`D2 KSampler` 的 `positive` 和 `negative` 被輸入到 `arg_1` 和 `arg_2` 並通過 `%arg_1%` 和 `%arg_2%` 獲取，而其他參數則通過 `%node:{ID}.{Param}` 獲取。
+在上面的示例中，`D2 KSampler` 的 `positive` 和 `negative` 被輸入到 `arg_1` 和 `arg_2` 並通過 `%arg_1%` 和 `%arg_2%` 獲取，而其他參數則通過 `%{Node name}.{Param}` 獲取。
 
 有關參數獲取方法的詳細信息，請參閱 <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>。
 
@@ -94,7 +98,7 @@
 %arg_1%
 
 Negative prompt: %arg_2%
-Steps: %node:25.steps%, Sampler: %node:25.sampler_name% %node:25.scheduler%, CFG scale: %node:25.cfg%, Seed: %node:25.seed%, Size: %node:43.width%x%node:43.height%, Model: %node:26.ckpt_name%
+Steps: %D2 KSampler.steps%, Sampler: %D2 KSampler.sampler_name% %D2 KSampler.scheduler%, CFG scale: %D2 KSampler.cfg%, Seed: %D2 KSampler.seed%, Size: %Empty Latent Image.width%x%Empty Latent Image.height%, Model: %D2 Checkpoint Loader.ckpt_name%
 ```
 輸出結果
 ```
