@@ -30,6 +30,7 @@ from .modules import pnginfo_util
 from .modules import grid_image_util
 from .modules import image_util
 from .modules import mask_util
+from .modules import template_util
 from .modules.eagle_api import EagleAPI, send_to_eagle
 from .modules.util import AnyType
 
@@ -50,10 +51,14 @@ class D2_SaveImage:
     
     @classmethod
     def INPUT_TYPES(s):
+        tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
+                  "Node param -- %{Node title}.{key}%\n" \
+                  "Node param -- %node:{id}.{key}%"
+        
         return {
             "required": {
                 "images": ("IMAGE", ), 
-                "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."}),
+                "filename_prefix": ("STRING", {"default": "%date:yyyyMMdd-hhmmss%", "tooltip": tooltip}),
                 "preview_only": ("BOOLEAN", {"default": False},),
                 "format": (["png", "webp", "jpeg", "animated_webp"],),
                 "lossless": ("BOOLEAN", {"default": True}),
@@ -86,6 +91,9 @@ class D2_SaveImage:
             self.type = "output"
             self.prefix_append = ""
             compress_level = 4
+
+        # プレフィックスのテンプレート処理
+        filename_prefix = template_util.replace_template(filename_prefix, {}, prompt)
 
         # ファイル名プレフィックスの設定
         filename_prefix += self.prefix_append
@@ -183,10 +191,14 @@ class D2_SaveImageEagle(D2_SaveImage):
 
     @classmethod
     def INPUT_TYPES(cls):
+        tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
+                  "Node param -- %{Node title}.{key}%\n" \
+                  "Node param -- %node:{id}.{key}%"
+
         return {
             "required": {
                 "images": ("IMAGE", ), 
-                "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."}),
+                "filename_prefix": ("STRING", {"default": "%date:yyyyMMdd-hhmmss%", "tooltip": tooltip}),
                 "preview_only": ("BOOLEAN", {"default": False},),
                 "format": (["png", "webp", "jpeg", "animated_webp"],),
                 "lossless": ("BOOLEAN", {"default": True}),
