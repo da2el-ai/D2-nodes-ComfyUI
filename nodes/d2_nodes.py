@@ -148,12 +148,16 @@ class D2_KSampler:
         )[0]
 
         latent_samples = latent['samples']
-        samp_images = vae.decode(latent_samples).cpu()
-        results_images = PreviewImage().save_images(samp_images, "d2", prompt, extra_pnginfo)['ui']['images']
+        images = vae.decode(latent_samples)
+
+        if len(images.shape) == 5: #Combine batches
+            images = images.reshape(-1, images.shape[-3], images.shape[-2], images.shape[-1])
+
+        results_images = PreviewImage().save_images(images, "d2", prompt, extra_pnginfo)['ui']['images']
 
         return {
             "ui": {"images": results_images},
-            "result": (samp_images, latent, lora_model, lora_clip, d2_pipe.positive, formatted_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
+            "result": (images, latent, lora_model, lora_clip, d2_pipe.positive, formatted_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
         }
     
     @classmethod
