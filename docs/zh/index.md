@@ -173,6 +173,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.08.09**
+
+- `D2_KSampler`: 新增對 Qwen-Image latent 的支援
+
 **2025.08.07**
 
 - `D2_SaveImageEagle` / `D2_SendFileEagle`: 新增功能

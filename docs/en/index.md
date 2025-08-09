@@ -171,6 +171,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.08.09**
+
+- `D2_KSampler`: Added support for Qwen-Image latent
+
 **2025.08.07**
 
 - `D2_SaveImageEagle` / `D2_SendFileEagle`: Newly added

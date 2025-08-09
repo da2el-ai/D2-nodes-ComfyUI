@@ -173,6 +173,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.08.09**
+
+- `D2_KSampler`: Qwen-Image の latent に対応
+
 **2025.08.07**
 
 - `D2_SaveImageEagle` / `D2_SendFileEagle`: 新規追加
