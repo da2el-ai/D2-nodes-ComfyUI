@@ -382,3 +382,55 @@ Lines that start with "//" or "#" are ignored.
 - A node that combines ModelMergeSDXL and CLIPMergeSimple
 - Allows comma-separated weight specifications for easier use with XYPlot
 - In this figure, `0.85,0.85,1,1,0.4,0.4,1,0.4,0.4,0.4,1,0.4,0.4,0.4,0,0.55,0.85,0.85,0.85,0.85,0.85,0.85,1,1,0.65` is specified
+
+---
+
+### D2 Any Delivery
+
+<figure>
+  <img src="../img/any-delivery.png">
+</figure>
+
+- A node that can pass multiple elements together
+- Connect `D2 Any Delivery` nodes to pass data as a package
+- You can dynamically add necessary inputs and outputs by writing them in `_label`
+- Created because <a href="https://github.com/Trung0246/ComfyUI-0246" target="_blank">ComfyUI-0246</a>'s `Highway` became unusable with ComfyUI updates
+  - It's probably better to use the original if it gets updated
+
+#### Input
+
+- `_package`
+  - Package received from other `D2 Any Delivery` nodes
+- `_label`
+  - Define inputs and outputs
+  - Specified like `>width; >height; <width`
+  - Items starting with `>` are added as inputs
+  - Items starting with `<` are added as outputs
+  - Multiple items can be specified separated by `;`
+- `_update`
+  - Update inputs and outputs according to the content of `_label`
+
+#### Output
+
+- `_package`
+  - Package to pass to other D2_AnyDelivery nodes
+  - All values received in inputs are stored
+- Items specified with `<` in `_label`
+  - Values extracted from `_package` are output
+
+#### _label Examples
+
+Add `width` `height` to inputs
+```
+>width; >height
+```
+
+Add `width` `height` to outputs
+```
+<width; <height
+```
+
+Add `prompt` `seed` to inputs, `width` `height` to outputs
+```
+>prompt; >seed; <width; <height
+```

@@ -67,10 +67,12 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node.md#D2-Refiner-Steps-Tester">`D2 Refiner Steps Tester`</a>
   - Node for checking steps
 
-### Merge Node
+### Other Node
 
 - <a href="node.md#D2-Model-and-CLIP-Merge-SDXL">`D2 Model and CLIP Merge SDXL`</a>
   - A node that combines ModelMergeSDXL and CLIPMergeSimple
+- <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
+  - Node for passing multiple elements together. Backward compatible with ComfyUI-0246's Highway
 
 ### Text
 
@@ -170,6 +172,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2025.08.10**
+
+- `D2 Any Delivery`: Added new node
 
 **2025.08.09**
 

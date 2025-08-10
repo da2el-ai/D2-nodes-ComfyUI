@@ -383,3 +383,55 @@ foo:0.5,bar
 - 將 ModelMergeSDXL 和 CLIPMergeSimple 結合的節點
 - 為了便於在 XYPlot 中使用，可以用逗號分隔指定各個權重
 - 在此圖中指定了 `0.85,0.85,1,1,0.4,0.4,1,0.4,0.4,0.4,1,0.4,0.4,0.4,0,0.55,0.85,0.85,0.85,0.85,0.85,0.85,1,1,0.65`
+
+---
+
+### D2 Any Delivery
+
+<figure>
+  <img src="../img/any-delivery.png">
+</figure>
+
+- 可以將多個元素一起傳遞的節點
+- 連接 `D2 Any Delivery` 節點，將數據作為包裝傳遞
+- 可以通過在 `_label` 中寫入來動態添加必要的輸入和輸出
+- 因為 ComfyUI 更新後 <a href="https://github.com/Trung0246/ComfyUI-0246" target="_blank">ComfyUI-0246</a> 的 `Highway` 變得不可用而創建
+  - 如果原版更新了，可能使用原版會更好
+
+#### Input
+
+- `_package`
+  - 從其他 `D2 Any Delivery` 節點接收的包裝
+- `_label`
+  - 定義輸入和輸出
+  - 像 `>width; >height; <width` 這樣指定
+  - 以 `>` 開頭的項目作為輸入添加
+  - 以 `<` 開頭的項目作為輸出添加
+  - 可以用 `;` 分隔指定多個項目
+- `_update`
+  - 根據 `_label` 的內容更新輸入和輸出
+
+#### Output
+
+- `_package`
+  - 傳遞給其他 D2_AnyDelivery 節點的包裝
+  - 存儲在輸入中接收的所有值
+- 在 `_label` 中用 `<` 指定的項目
+  - 輸出從 `_package` 中提取的值
+
+#### _label 範例
+
+添加 `width` `height` 到輸入
+```
+>width; >height
+```
+
+添加 `width` `height` 到輸出
+```
+<width; <height
+```
+
+添加 `prompt` `seed` 到輸入，`width` `height` 到輸出
+```
+>prompt; >seed; <width; <height
+```

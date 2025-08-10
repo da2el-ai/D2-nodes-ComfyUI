@@ -396,7 +396,7 @@ foo:0.5,bar
 ---
 
 
-## :tomato: Merge Node
+## :tomato: Other Node
 
 
 ### D2 Model and CLIP Merge SDXL
@@ -409,4 +409,55 @@ foo:0.5,bar
 - XYPlot で使いやすいように、各 weight をカンマ区切りで指定可能にした
 - この図では `0.85,0.85,1,1,0.4,0.4,1,0.4,0.4,0.4,1,0.4,0.4,0.4,0,0.55,0.85,0.85,0.85,0.85,0.85,0.85,1,1,0.65` を指定している
 
+---
 
+
+### D2 Any Delivery
+
+<figure>
+  <img src="../img/any-delivery.png">
+</figure>
+
+- 複数の要素をまとめて受け渡すことができるノード
+- `D2 Any Delivery` 同士を繋いで、データをパッケージとして受け渡しできる
+- 必要な入出力を `_label` に記入し、動的に追加することができる
+- ComfyUI のアップデートで <a href="https://github.com/Trung0246/ComfyUI-0246" target="_blank">ComfyUI-0246</a> の `Highway` が使えなくなってしまったので作りました
+  - 本家がアップデートしたらそっちを使うほうがいいと思います
+
+#### Input
+
+- `_package`
+  - 他の `D2 Any Delivery` から受け取るパッケージ
+- `_label`
+  - 入出力の定義を記入する
+  - `>width; >height; <width` のように指定する
+  - `>` で始まる項目は input として追加される
+  - `<` で始まる項目は output として追加される
+  - `;` で区切って複数指定可能
+- `_update`
+  - `_label` の内容に従って入出力を更新する
+
+#### Output
+
+- `_package`
+  - 他の D2_AnyDelivery へ渡すパッケージ
+  - input で受け取った値がすべて格納される
+- `_label` で `<` を付けて指定した項目
+  - `_package` から取り出された値が出力される
+
+#### _label 記入例
+
+入力に `width` `height` を追加
+```
+>width; >height
+```
+
+出力に `width` `height` を追加
+```
+<width; <height
+```
+
+入力に `prompt` `seed`、出力に `width` `height` を追加
+```
+>prompt; >seed; <width; <height
+```

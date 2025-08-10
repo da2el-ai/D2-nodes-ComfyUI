@@ -68,10 +68,12 @@
 - <a href="node.md#D2-Refiner-Steps-Tester">`D2 Refiner Steps Tester`</a>
   - 用於確認步數的節點
 
-### Merge Node
+### Other Node
 
 - <a href="node.md#D2-Model-and-CLIP-Merge-SDXL">`D2 Model and CLIP Merge SDXL`</a>
   - 將 ModelMergeSDXL 和 CLIPMergeSimple 結合的節點
+- <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
+  - 用於傳遞多個元素的節點。與 ComfyUI-0246 的 Highway 向下兼容
 
 
 ### 文字
@@ -172,6 +174,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2025.08.10**
+
+- `D2 Any Delivery`: 新增節點
 
 **2025.08.09**
 

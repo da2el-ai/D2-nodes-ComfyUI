@@ -68,10 +68,12 @@ D2 Nodes ComfyUI
 - <a href="node.md#D2-Refiner-Steps-Tester">`D2 Refiner Steps Tester`</a>
   - steps を確認するためのノード
 
-### Merge Node
+### Other Node
 
 - <a href="node.md#D2-Model-and-CLIP-Merge-SDXL">`D2 Model and CLIP Merge SDXL`</a>
   - ModelMergeSDXL と CLIPMergeSimple を合体させたノード
+- <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
+  - 複数の要素をまとめて運ぶためのノード。ComfyUI-0246 の Highway 下位互換
 
 
 ### Text
@@ -172,6 +174,10 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+**2025.08.10**
+
+- `D2 Any Delivery`: を追加
 
 **2025.08.09**
 
