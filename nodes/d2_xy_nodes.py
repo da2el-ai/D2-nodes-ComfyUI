@@ -84,7 +84,7 @@ class D2_XYPlot:
                 "y_title": ("STRING", {"default": ""}),
                 "y_list": ("STRING", {"multiline": True},),
                 "auto_queue": ("BOOLEAN", {"default": True},),
-                "start_index": ("INT", {"default": 0},),
+                "start_index": ("INT", {"default": 0, "max": 65535},),
             },
             "optional": {
                 "reset": ("D2_BUTTON", {"default":""}),
@@ -182,7 +182,8 @@ class D2_XYPlotEasy:
                 "y_type": (intput_types,),
                 "y_list": ("STRING", {"multiline": True},),
                 "auto_queue": ("BOOLEAN", {"default": True},),
-                "start_index": ("INT", {"default": 0},),
+                "start_index": ("INT", {"default": 0, "max": 65535},),
+
             },
             "optional": {
                 "reset": ("D2_BUTTON", {"default":""}),
