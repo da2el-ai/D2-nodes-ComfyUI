@@ -21,6 +21,13 @@ const findInputByName = (node, name) => {
 };
 
 /**
+ * 出力を名前から探す
+ */
+const findOutputByName = (node, name) => {
+    return node.outputs ? node.outputs.find((w) => w.name === name) : null;
+};
+
+/**
  * ウィジェットを名前から探す
  * "converted-widget" なら inputs から探す
  */
@@ -266,6 +273,7 @@ export {
     findWidgetByName,
     findWidgetOrInputsByName,
     findWidgetByType,
+    findOutputByName,
     findInputByName,
     getImageUrlFromApi,
     setCookie,

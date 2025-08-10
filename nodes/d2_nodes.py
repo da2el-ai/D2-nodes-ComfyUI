@@ -21,7 +21,7 @@ from server import PromptServer
 from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
 from .modules import util
-from .modules.util import D2_TD2Pipe, AnyType
+from .modules.util import D2_TD2Pipe, D2_TDelivery, AnyType
 from .modules import checkpoint_util
 from .modules.template_util import replace_template
 
@@ -568,6 +568,69 @@ class D2_Pipe:
 
 
 
+"""
+
+D2 Any Delivery
+
+"""
+class D2_PackageTuple(tuple):
+    def __new__(cls, types):
+        return super().__new__(cls, types)
+        
+    def __getitem__(self, index):
+        if index >= len(self):
+            return AnyType("")
+        item = super().__getitem__(index)
+        if isinstance(item, str):
+            return AnyType(item)
+        return item
+
+
+class D2_AnyDelivery:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "optional": {
+                "_package": ("D2_TDelivery",),
+                "_label": ("STRING",{"default": ""},),
+                "_update": ("D2_BUTTON", {})
+            },
+            "hidden": {"_prompt": "PROMPT"},
+        }
+
+    RETURN_TYPES = D2_PackageTuple(("D2_TDelivery", ))
+    RETURN_NAMES = D2_PackageTuple(("_package", ))
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, _package=None, _label="", _update=None, _prompt=None, **kwargs):
+        # _packageがNoneの場合は新しいインスタンスを作成
+        if _package is None:
+            _package = D2_TDelivery()
+        
+        # kwargsの値を_packageに統合
+        for key, value in kwargs.items():
+            _package.package[key] = value
+        
+        # _labelを解析して出力項目を特定
+        output_items = []
+        for item in _label.split(';'):
+            item = item.strip()
+            if item.startswith('<'):
+                output_items.append(item[1:])  # '<'を除去
+        
+        # 出力用の辞書を作成
+        result = {"_package": _package}
+        
+        # _packageから必要な出力項目を取り出す
+        for item in output_items:
+            if item in _package.package:
+                result[item] = _package.package[item]
+        
+        return tuple(result.values())
+
+
+
 NODE_CLASS_MAPPINGS = {
     # "D2 Preview Image": D2_PreviewImage,
     # "D2 Load Image": D2_LoadImage,
@@ -582,4 +645,5 @@ NODE_CLASS_MAPPINGS = {
     # "D2 Image Stack": D2_ImageStack,
     # "D2 Load Folder Images": D2_LoadFolderImages,
     "D2 Pipe": D2_Pipe,
+    "D2 Any Delivery": D2_AnyDelivery,
 }

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal, Optional
 import os
 from pathlib import Path
@@ -55,6 +55,10 @@ class D2_TGridPipe:
     x_annotation: D2_TAnnotation
     y_annotation: D2_TAnnotation
     status: D2_TXyStatus
+
+@dataclass
+class D2_TDelivery:
+    package: dict = field(default_factory=dict)
 
 
 
