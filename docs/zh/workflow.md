@@ -12,7 +12,8 @@
 
 # Workflow
 
-將圖像拖放到 ComfyUI 即可重現工作流程。
+> [!TIP]
+> **將圖像拖放到 ComfyUI 即可重現工作流程。**
 
 ## :card_index_dividers: 簡單的 txt2img
 
@@ -58,11 +59,14 @@
 
 - 使用 D2 XY Plot Easy 的簡單 XY Plot
 
-## :card_index_dividers: XY Plot: Lora
+## :card_index_dividers: XY Plot: Lora Test
 
-<a href="../../workflow/xy_easy_lora_20250806.png"><img src="../../workflow/xy_easy_lora_20250806.png"></a>
+<a href="../../workflow/xy_easy_lora_20250815.png"><img src="../../workflow/xy_easy_lora_20250815.png"></a>
 
 - Lora 的測試
+- XY Plot的替換詞設定為日文的「なし」（無）。使用日文是因為它不會被識別為提示詞。當然，您可以使用任何您喜歡的詞
+- Seed固定為 `11111` 和 `22222`
+- `D2 KSampler` 的參數會被 `D2 XYPlot Easy` 覆蓋
 
 ## :card_index_dividers: Checkpoint Test
 

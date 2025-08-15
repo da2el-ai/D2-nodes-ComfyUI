@@ -14,7 +14,8 @@
 Workflow
 </h1>
 
-画像を ComfyUI にドロップするとワークフローを再現できます。
+> [!TIP]
+> **画像を ComfyUI にドロップするとワークフローを再現できます。**
 
 
 ## :card_index_dividers: シンプルな txt2img
@@ -65,11 +66,15 @@ Workflow
 
 - D2 XY Plot Easy を使ったシンプルな XY Plot
 
-## :card_index_dividers: XY Plot: Lora
+## :card_index_dividers: XY Plot: Lora Test
 
-<a href="../../workflow/xy_easy_lora_20250806.png"><img src="../../workflow/xy_easy_lora_20250806.png"></a>
+<a href="../../workflow/xy_easy_lora_20250815.png"><img src="../../workflow/xy_easy_lora_20250815.png"></a>
 
 - Lora のテスト
+- XY Plotの置換用ワードは日本語の「なし」にしています。これはプロンプトと認識されないために日本語を使っています。もちろん好きなワードで問題ありません
+- Seed は `11111` `22222` で固定しています
+- `D2 KSampler` のパラメーターは `D2 XYPlot Easy` によって上書きされます
+
 
 
 ## :card_index_dividers: Checkpoint Test 

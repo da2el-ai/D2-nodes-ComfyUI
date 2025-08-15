@@ -12,7 +12,10 @@
 
 # Workflow
 
-Drop images into ComfyUI to recreate workflows.
+
+> [!TIP]
+> **Drop images into ComfyUI to recreate workflows.**
+
 
 
 ## :card_index_dividers: Simple txt2img
@@ -61,11 +64,14 @@ Drop images into ComfyUI to recreate workflows.
 
 - Simple XY Plot using D2 XY Plot Easy
 
-## :card_index_dividers: XY Plot: Lora
+## :card_index_dividers: XY Plot: Lora Test
 
-<a href="../../workflow/xy_easy_lora_20250806.png"><img src="../../workflow/xy_easy_lora_20250806.png"></a>
+<a href="../../workflow/xy_easy_lora_20250815.png"><img src="../../workflow/xy_easy_lora_20250815.png"></a>
 
 - Lora test
+- The replacement word for XY Plot is set to Japanese "なし" (none). Japanese is used because it won't be recognized as a prompt. Of course, you can use any word you prefer
+- Seeds are fixed at `11111` and `22222`
+- The parameters of `D2 KSampler` are overwritten by `D2 XYPlot Easy`
 
 
 
