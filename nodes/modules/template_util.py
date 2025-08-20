@@ -1,5 +1,17 @@
 import re
 from datetime import datetime
+from . import util
+
+"""
+プリセットの配列を取得
+"""
+def _get_template_preset(preset_name):
+    # 設定を読む
+    config_path = util.get_config_path("template_config.yaml")
+    config_sample_path = util.get_config_path("template_config.sample.yaml")
+    config_value = util.load_config(config_path, config_sample_path)
+    return config_value['preset'][preset_name]
+
 
 """
 日付フォーマットを変換
@@ -49,6 +61,72 @@ def _get_node_value_from_name(prompt: dict, name: str, key: str) -> str:
     # 一致するノードが見つからない場合は空文字列を返す
     return ""
 
+"""
+プリセットに従って変換
+"""
+def _replace_template_preset(preset_name, val) -> str:
+    """
+    プリセットに従って変換する関数
+    
+    Args:
+        preset_name (str): プリセット名
+        val: 置換する値（配列・辞書・オブジェクトのいずれか）
+        
+    Returns:
+        str: 置換後の文字列
+    """
+    # プリセットを取得
+    preset_template = _get_template_preset(preset_name)
+    
+    # プリセットが見つからない場合は空文字列を返す
+    if not preset_template:
+        return ""
+    
+    # プリセットのテンプレートを置換
+    result = preset_template
+    
+    # {arg.key} パターンの置換（オブジェクトの属性アクセス）
+    def replace_attr(match):
+        key = match.group(1)
+        try:
+            if hasattr(val, key):
+                return str(getattr(val, key, ""))
+            elif isinstance(val, dict) and key in val:
+                return str(val[key])
+            else:
+                return ""
+        except:
+            return ""
+    
+    result = re.sub(r'\{arg\.([^}]+)\}', replace_attr, result)
+    
+    # {arg[index]} パターンの置換（配列のインデックスアクセス）
+    def replace_index(match):
+        index = int(match.group(1))
+        try:
+            if isinstance(val, (list, tuple)) and 0 <= index < len(val):
+                return str(val[index])
+            else:
+                return ""
+        except:
+            return ""
+    
+    result = re.sub(r'\{arg\[(\d+)\]\}', replace_index, result)
+    
+    # {arg['key']} パターンの置換（辞書のキーアクセス）
+    def replace_key(match):
+        key = match.group(1)
+        try:
+            if isinstance(val, dict) and key in val:
+                return str(val[key])
+            else:
+                return ""
+        except:
+            return ""
+    
+    result = re.sub(r'\{arg\[\'([^\']+)\'\]\}', replace_key, result)
+    
+    return result
 
 """
 テンプレート文字列の置換を行う関数
@@ -88,6 +166,14 @@ def replace_template(text: str, args={}, prompt={}) -> str:
             ckpt_pattern = f"%{re.escape(key)}:ckpt_name%"
             ckpt_replacement = _replace_ckpt_name(val_str)
             text = re.sub(ckpt_pattern, lambda m: ckpt_replacement, text)
+
+            # preset パターンの置換 (%arg_N:preset.{preset_name}%)
+            def replace_preset(match):
+                preset_name = match.group(1)
+                return _replace_template_preset(preset_name, val)
+                
+            preset_pattern = f"%{re.escape(key)}:preset.([^%]+)%"
+            text = re.sub(preset_pattern, replace_preset, text)
 
             # 通常の置換 (%arg_N%)
             normal_pattern = f"%{re.escape(key)}%"

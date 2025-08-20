@@ -1,0 +1,7 @@
+preset:
+  a1111: |
+    {arg.positive}
+
+    Negative prompt: {arg.negative}
+    Steps:{arg.steps}, Sampler:{arg.sampler_name} {arg.scheduler}, CFG scale:{arg.cfg}, Seed:{arg.seed}, Size:{arg.width}x{arg.height}, Model:{arg.ckpt_name}
+
