@@ -175,6 +175,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.08.20**
+
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 配列、辞書、オブジェクトからの取得に対応
+
 **2025.08.10**
 
 - `D2 Any Delivery`: を追加

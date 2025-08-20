@@ -170,9 +170,10 @@ Output text
   <img src="../img/filename_template_2.png">
 </figure>
 
-- 用於創建文件名的節點
-- 可以引入外部元素
+- 用於通過整合日期和其他節點的參數來創建字串模板的節點
 - `D2 Filename Template2` 是支援多行的版本
+- 也可以從陣列、字典和物件中獲取值
+  - 為了從D2_Pipe獲取值而實現
 
 #### Input
 
@@ -196,13 +197,23 @@ Output text
       - 嵌入輸入的值
     - `%arg_{數字}:ckpt_name%`
       - 嵌入移除 `.safetensors` 後的檢查點名稱
-    - `%seed%`
-      - 嵌入種子值
+    - `%exec_{數字}[{index}]%`
+      - 從輸入到 `arg_{數字}` 的**陣列**中獲取 `{index}` 的值
+    - `%exec_{數字}['{key}']%`
+      - 從輸入到 `arg_{數字}` 的**字典**中獲取 `{key}` 的值
+    - `%exec_{數字}.{key}%`
+      - 從輸入到 `arg_{數字}` 的**物件**中獲取 `{key}` 的值
 - `arg_count`
   - 增加或減少輸入項目的數量
 
 <figure>
   <img src="../img/filename_template_3.png">
+  <figucaption>使用連接到`arg_N`的節點資訊、節點名稱等來獲取</figucaption>
+</figure>
+
+<figure>
+  <img src="../img/filename_template_4.png">
+  <figucaption>從匯總了生成參數的物件`d2_pipe`中獲取`steps`、`sampler_name`</figucaption>
 </figure>
 
 

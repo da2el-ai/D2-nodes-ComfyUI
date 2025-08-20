@@ -173,6 +173,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.08.20**
+
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: Supports retrieval from arrays, dictionaries, and objects
+
 **2025.08.10**
 
 - `D2 Any Delivery`: Added new node

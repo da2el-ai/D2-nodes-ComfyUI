@@ -146,6 +146,8 @@ Output text
 
 - A node for creating string templates by incorporating date and parameters from other nodes
 - `D2 Filename Template2` is a version that supports multiple lines
+- It is also possible to retrieve values from arrays, dictionaries, and objects
+  - This was implemented to get values from D2_Pipe
 
 #### Input
 
@@ -169,13 +171,23 @@ Output text
       - Embed input values
     - `%arg_{number}:ckpt_name%`
       - Embed checkpoint name with `.safetensors` removed
-    - `%seed%`
-      - Embed seed value
+    - `%exec_{number}[{index}]%`
+      - Retrieves the value at `{index}` from the **array** input to `arg_{number}`
+    - `%exec_{number}['{key}']%`
+      - Retrieves the value for `{key}` from the **dictionary** input to `arg_{number}`
+    - `%exec_{number}.{key}%`
+      - Retrieves the value for `{key}` from the **object** input to `arg_{number}`
 - `arg_count`
   - Increase or decrease the number of input items
 
 <figure>
-  <img src="../img/filename_template_2.png">
+  <img src="../img/filename_template_3.png">
+  <figucaption>Retrieving node information connected to `arg_N`, using the node name, etc.</figucaption>
+</figure>
+
+<figure>
+  <img src="../img/filename_template_4.png">
+  <figucaption>Retrieving `steps` and `sampler_name` from the `d2_pipe` object, which summarizes generation parameters.</figucaption>
 </figure>
 
 

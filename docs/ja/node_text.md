@@ -183,6 +183,8 @@ Output text
 
 - 日付や他のノードのパラメーターを取り込んで文字列テンプレートを作るためのノード
 - `D2 Filename Template2` は複数行対応版です
+- 配列、辞書、オブジェクトから値を取得することも可能
+  - D2_Pipeから値を取得したかったので実装しました
 
 #### Input
 
@@ -206,11 +208,23 @@ Output text
       - 入力した値を埋め込む
     - `%arg_{数字}:ckpt_name%`
       - チェックポイント名から `.safetensors` を除外したものを埋め込む
+    - `%exec_{数字}[{index}]%`
+      - `arg_{数字}` に入力された**配列**から `{index}` の値を取得
+    - `%exec_{数字}['{key}']%`
+      - `arg_{数字}` に入力された**辞書**から `{key}` の値を取得
+    - `%exec_{数字}.{key}%`
+      - `arg_{数字}` に入力された**オブジェクト**から `{key}` の値を取得
 - `arg_count`
   - 入力項目の増減
 
 <figure>
   <img src="../img/filename_template_3.png">
+  <figucaption>`arg_N`に接続したノード情報や、ノード名などを使って取得している</figucaption>
+</figure>
+
+<figure>
+  <img src="../img/filename_template_4.png">
+  <figucaption>生成パラメーターをまとめたオブジェクト `d2_pipe` から `steps`,`sampler_name` を取得している</figucaption>
 </figure>
 
 ---

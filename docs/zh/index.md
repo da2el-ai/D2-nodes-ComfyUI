@@ -175,6 +175,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.08.20**
+
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 支援從陣列、字典和物件中獲取
+
 **2025.08.10**
 
 - `D2 Any Delivery`: 新增節點
