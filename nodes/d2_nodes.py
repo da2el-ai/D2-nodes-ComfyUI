@@ -153,6 +153,10 @@ class D2_KSampler:
         if len(images.shape) == 5: #Combine batches
             images = images.reshape(-1, images.shape[-3], images.shape[-2], images.shape[-1])
 
+        # images から width, height を取得して d2_pipe に登録する
+        d2_pipe.width = images.shape[2]
+        d2_pipe.height = images.shape[1]
+
         results_images = PreviewImage().save_images(images, "d2", prompt, extra_pnginfo)['ui']['images']
 
         return {
