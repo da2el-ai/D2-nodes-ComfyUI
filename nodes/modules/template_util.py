@@ -64,10 +64,8 @@ Returns:
 """
 def replace_template(text: str, args={}, prompt={}) -> str:
 
-    # 現在の日時を取得
-    now = datetime.now()
-
     # date形式の置換 (%date:yyyyMMdd% 形式)
+    now = datetime.now()
     def replace_date(match):
         pattern = match.group(1)
         return _get_date_str(now, pattern)
@@ -82,7 +80,7 @@ def replace_template(text: str, args={}, prompt={}) -> str:
 
     text = re.sub(r"%node:(\d+)\.([^%]+)%", replace_node_from_id, text)
 
-    # 引数の置換
+    # 引数の置換（%arg_N%）
     for key, val in args.items():
         if val is not None:
             val_str = str(val)
@@ -94,6 +92,59 @@ def replace_template(text: str, args={}, prompt={}) -> str:
             # 通常の置換 (%arg_N%)
             normal_pattern = f"%{re.escape(key)}%"
             text = re.sub(normal_pattern, lambda m: val_str, text)
+
+    # 引数の実行（%exec_N[0]%、%exec_N.steps%、%exec_N['foo']%）
+    """
+    - args に登録されているアイテムに対し、pythonのListやDictの値取得を実行する
+    - text から `%exec_1[0]%`,`%exec_1['foo']%`,`%exec_1.bar%` などのパターンを抽出
+    - `exec_1` は `args['arg_1']` に該当する
+    - `args['arg_1'] = [100, 200, 300]` の時に `%exec_1[0]%` を検知したら `100` と置き換える
+    - `args['arg_2'] = `{'foo':'bar'}` の時に `%exec_2['foo']%` を検知したら `bar` と置き換える
+    """
+    # リストインデックスアクセス (%exec_N[0]% 形式)
+    def replace_exec_index(match):
+        arg_num = match.group(1)
+        index = int(match.group(2))
+        arg_key = f"arg_{arg_num}"
+        
+        if arg_key in args and args[arg_key] is not None:
+            try:
+                return str(args[arg_key][index])
+            except (IndexError, TypeError, KeyError):
+                return ""
+        return ""
+
+    text = re.sub(r"%exec_(\d+)\[(\d+)\]%", replace_exec_index, text)
+
+    # 辞書キーアクセス (%exec_N['foo']% 形式)
+    def replace_exec_key(match):
+        arg_num = match.group(1)
+        key = match.group(2)
+        arg_key = f"arg_{arg_num}"
+        
+        if arg_key in args and args[arg_key] is not None:
+            try:
+                return str(args[arg_key][key])
+            except (TypeError, KeyError):
+                return ""
+        return ""
+
+    text = re.sub(r"%exec_(\d+)\['([^']+)'\]%", replace_exec_key, text)
+
+    # 属性アクセス (%exec_N.attribute% 形式)
+    def replace_exec_attr(match):
+        arg_num = match.group(1)
+        attr = match.group(2)
+        arg_key = f"arg_{arg_num}"
+        
+        if arg_key in args and args[arg_key] is not None:
+            try:
+                return str(getattr(args[arg_key], attr, ""))
+            except (TypeError, AttributeError):
+                return ""
+        return ""
+
+    text = re.sub(r"%exec_(\d+)\.([a-zA-Z0-9_]+)%", replace_exec_attr, text)
 
     # ノードパターンの置換 (%ノード名.key% 形式)
     def replace_node_from_name(match):
