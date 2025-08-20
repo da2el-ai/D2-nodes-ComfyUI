@@ -175,7 +175,9 @@ If you have installed any of the following custom nodes previously, please remov
 
 **2025.08.20**
 
-- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: Supports retrieval from arrays, dictionaries, and objects
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: Support for retrieving values from arrays, dictionaries, and objects
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: Added preset feature
+- `D2_KSampler` / `D2_KSamplerAdvanced`: Register width / height to d2_pipe
 
 **2025.08.10**
 

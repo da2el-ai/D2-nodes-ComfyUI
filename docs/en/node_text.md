@@ -147,7 +147,8 @@ Output text
 - A node for creating string templates by incorporating date and parameters from other nodes
 - `D2 Filename Template2` is a version that supports multiple lines
 - It is also possible to retrieve values from arrays, dictionaries, and objects
-  - This was implemented to get values from D2_Pipe
+- Preset feature for commonly used formats like Stable Diffusion webui A1111-style metadata
+  - You can add presets by editing `custom_nodes/d2-nodes-comfyui/config/template_config.yaml`
 
 #### Input
 
@@ -171,6 +172,8 @@ Output text
       - Embed input values
     - `%arg_{number}:ckpt_name%`
       - Embed checkpoint name with `.safetensors` removed
+    - `%arg_{number}:preset.{preset_name}%`
+      - Presets can be added by editing `custom_nodes/d2-nodes-comfyui/config/template_config.yaml`
     - `%exec_{number}[{index}]%`
       - Retrieves the value at `{index}` from the **array** input to `arg_{number}`
     - `%exec_{number}['{key}']%`
@@ -190,7 +193,10 @@ Output text
   <figucaption>Retrieving `steps` and `sampler_name` from the `d2_pipe` object, which summarizes generation parameters.</figucaption>
 </figure>
 
-
+<figure>
+  <img src="../img/filename_template_5.png?3">
+  <figucaption>Using the preset `a1111` with the value input to `arg_1`. Using `D2 Pipe` to add the checkpoint name.</figucaption>
+</figure>
 
 ---
 

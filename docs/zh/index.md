@@ -177,7 +177,9 @@
 
 **2025.08.20**
 
-- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 支援從陣列、字典和物件中獲取
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 支援從陣列、字典和物件中獲取值
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 新增預設功能
+- `D2_KSampler` / `D2_KSamplerAdvanced`: 將 width / height 註冊到 d2_pipe
 
 **2025.08.10**
 

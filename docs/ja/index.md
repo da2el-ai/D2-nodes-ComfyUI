@@ -178,6 +178,8 @@ D2 Nodes ComfyUI
 **2025.08.20**
 
 - `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 配列、辞書、オブジェクトからの取得に対応
+- `D2_FilenameTemplate` / `D2_FilenameTemplate2`: プリセット機能を追加
+- `D2_KSampler` / `D2_KSamplerAdvanced`: d2_pipe に width / height を登録
 
 **2025.08.10**
 

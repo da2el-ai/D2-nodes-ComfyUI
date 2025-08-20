@@ -184,7 +184,9 @@ Output text
 - 日付や他のノードのパラメーターを取り込んで文字列テンプレートを作るためのノード
 - `D2 Filename Template2` は複数行対応版です
 - 配列、辞書、オブジェクトから値を取得することも可能
-  - D2_Pipeから値を取得したかったので実装しました
+- Stable Diffusion webui A1111風のメタデータ書式など、よく使う書式をプリセット登録が可能
+  - `custom_nodes/d2-nodes-comfyui/config/template_config.yaml` を編集することで追加可能
+
 
 #### Input
 
@@ -208,6 +210,8 @@ Output text
       - 入力した値を埋め込む
     - `%arg_{数字}:ckpt_name%`
       - チェックポイント名から `.safetensors` を除外したものを埋め込む
+    - `%arg_{数字}:preset.{プリセット名}%`
+      - プリセットは `custom_nodes/d2-nodes-comfyui/config/template_config.yaml` を編集することで追加可能
     - `%exec_{数字}[{index}]%`
       - `arg_{数字}` に入力された**配列**から `{index}` の値を取得
     - `%exec_{数字}['{key}']%`
@@ -225,6 +229,11 @@ Output text
 <figure>
   <img src="../img/filename_template_4.png">
   <figucaption>生成パラメーターをまとめたオブジェクト `d2_pipe` から `steps`,`sampler_name` を取得している</figucaption>
+</figure>
+
+<figure>
+  <img src="../img/filename_template_5.png?3">
+  <figucaption>`arg_1` に入力された値をプリセット `a1111` を使って出力している。チェックポイント名を追加するために `D2 Pipe` を使用</figucaption>
 </figure>
 
 ---

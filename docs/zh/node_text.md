@@ -173,7 +173,8 @@ Output text
 - 用於通過整合日期和其他節點的參數來創建字串模板的節點
 - `D2 Filename Template2` 是支援多行的版本
 - 也可以從陣列、字典和物件中獲取值
-  - 為了從D2_Pipe獲取值而實現
+- 常用格式的預設功能，如Stable Diffusion webui A1111風格的元數據
+  - 可以通過編輯 `custom_nodes/d2-nodes-comfyui/config/template_config.yaml` 添加預設
 
 #### Input
 
@@ -197,6 +198,8 @@ Output text
       - 嵌入輸入的值
     - `%arg_{數字}:ckpt_name%`
       - 嵌入移除 `.safetensors` 後的檢查點名稱
+    - `%arg_{數字}:preset.{預設名稱}%`
+      - 可以通過編輯 `custom_nodes/d2-nodes-comfyui/config/template_config.yaml` 添加預設
     - `%exec_{數字}[{index}]%`
       - 從輸入到 `arg_{數字}` 的**陣列**中獲取 `{index}` 的值
     - `%exec_{數字}['{key}']%`
@@ -216,6 +219,10 @@ Output text
   <figucaption>從匯總了生成參數的物件`d2_pipe`中獲取`steps`、`sampler_name`</figucaption>
 </figure>
 
+<figure>
+  <img src="../img/filename_template_5.png?3">
+  <figucaption>使用輸入到`arg_1`的值與預設`a1111`。使用`D2 Pipe`添加檢查點名稱</figucaption>
+</figure>
 
 ---
 
