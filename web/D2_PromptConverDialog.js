@@ -33,8 +33,8 @@ class D2_PromptConvert {
         const weight = parseFloat(weightStr);
 
         if (convertType === "new") {
-            // 新方式: 1.2::aaa::: という変換
-            return `${weight}::${text}:::`;
+            // 新方式: 1.2::aaa:: という変換
+            return `${weight}::${text}::`;
         } else {
             // 旧方式: (aaa:1.2) を {{{aaa}}} という変換
             const n = Math.round(Math.log(weight) / Math.log(D2_PromptConvert.RATE));
@@ -62,8 +62,8 @@ class D2_PromptConvert {
         let tempPrompt = srcPrompt.replace(/\n/g, lineBreakPlaceholder);
 
         if (convertType === "new") {
-            // 新方式: 1.2::aaa::: を (aaa:1.2) に変換
-            tempPrompt = tempPrompt.replace(/([0-9.]+)::([^:]+):::/g, (match) => {
+            // 新方式: 1.2::aaa:: を (aaa:1.2) に変換
+            tempPrompt = tempPrompt.replace(/([0-9.]+)::([^:]+)::/g, (match) => {
                 return D2_PromptConvert.$_convertToSd(match, convertType);
             });
         } else {
@@ -79,8 +79,8 @@ class D2_PromptConvert {
 
     static $_convertToSd (prompt, convertType = "old") {
         if (convertType === "new") {
-            // 新方式: 1.2::aaa::: を (aaa:1.2) に変換
-            const match = prompt.match(/([0-9.]+)::([^:]+):::/);
+            // 新方式: 1.2::aaa:: を (aaa:1.2) に変換
+            const match = prompt.match(/([0-9.]+)::([^:]+)::/);
             if (match) {
                 const weight = parseFloat(match[1]);
                 const text = match[2].trim();
