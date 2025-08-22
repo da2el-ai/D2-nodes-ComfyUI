@@ -63,7 +63,7 @@ class D2_PromptConvert {
 
         if (convertType === "new") {
             // 新方式: 1.2::aaa:: を (aaa:1.2) に変換
-            tempPrompt = tempPrompt.replace(/([0-9.]+)::([^:]+)::/g, (match) => {
+            tempPrompt = tempPrompt.replace(/([0-9.]+)::(.+?)::/g, (match) => {
                 return D2_PromptConvert.$_convertToSd(match, convertType);
             });
         } else {
@@ -80,7 +80,7 @@ class D2_PromptConvert {
     static $_convertToSd (prompt, convertType = "old") {
         if (convertType === "new") {
             // 新方式: 1.2::aaa:: を (aaa:1.2) に変換
-            const match = prompt.match(/([0-9.]+)::([^:]+)::/);
+            const match = prompt.match(/([0-9.]+)::(.+?)::/);
             if (match) {
                 const weight = parseFloat(match[1]);
                 const text = match[2].trim();
