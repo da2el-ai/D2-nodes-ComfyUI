@@ -173,6 +173,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.09.14**
+
+- `D2_SaveImage` / `D2_SaveImageEagle`: Added A1111-style generation parameters to metadata
+- `D2_LoadImage`: Added support for outputting prompts saved with "Save Image With Prompt" and "Save Image w/Metadata"
+
 **2025.08.20**
 
 - `D2_FilenameTemplate` / `D2_FilenameTemplate2`: Support for retrieving values from arrays, dictionaries, and objects

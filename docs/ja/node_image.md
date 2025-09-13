@@ -36,10 +36,13 @@ Node
 
 - `D2 Preview Image` と同じく、全画面ギャラリー機能を搭載した画像保存ノード
 - 画像フォーマットは PNG / JPEG / WEBP / アニメーションWEBP に対応
+- A1111方式の生成パラメーターをメタデータに保存する
+- 保存した画像を `D2 Load Image` から読み込むと positive, negative プロンプトを取り出し可能
 
 #### Input
 
 - `images`: 保存する画像
+- `d2_pipe`: `D2 KSampler` などから生成パラメーターを受け取る
 - `filename_prefix`: ファイルネーム書式。詳細は <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a> 参照
 - `preview_only`:
   - `true`: 画像を保存せず、プレビュー表示だけになる
@@ -170,14 +173,21 @@ D:\ComfyUI\output\foo.png
 
 #### Output
 
-- `IMAGE / MASK`
-    - 画像とマスク
-- `width / height`
-    - 画像サイズ
-- `positive` / `negative`
-    - プロンプト
+- `IMAGE / MASK`: 画像とマスク
+- `width / height`: 画像サイズ
+- `positive` / `negative`: プロンプト
+- `filename` / `filepath`: 保存したファイルの名前、パス
+- `pnginfo`: 画像のメタデータ
 
-※ワークフローの構成によってはプロンプトを取得できない場合もあります。例えば「KSampler」という文字が含まれたノード（例：Tiled KSampler）が無いと取得できません。
+#### プロンプトの出力について
+
+下記のノード、UIで保存した画像に対応しています。
+
+- `D2 Save Image`、`D2 Save Image Eagle`
+- <a href="https://github.com/easygoing0114/ComfyUI-easygoing-nodes?tab=readme-ov-file" target="_blank">Save Image With Prompt</a>
+- <a href="https://github.com/giriss/comfy-image-saver" target="_blank">Save Image w/Metadata</a>
+- Novel AI
+- A1111（Forge系含む）
 
 
 ---

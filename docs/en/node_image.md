@@ -34,10 +34,13 @@
 
 - An image saving node with full-screen gallery functionality, similar to `D2 Preview Image`
 - Supports PNG / JPEG / WEBP / animated WEBP image formats
+- Saves A1111-style generation parameters to metadata
+- When loaded with `D2 Load Image`, positive and negative prompts can be extracted from saved images
 
 #### Input
 
 - `images`: Images to save
+- `d2_pipe`: Receives generation parameters from `D2 KSampler` etc.
 - `filename_prefix`: Filename format. See <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a> for details
 - `preview_only`:
   - `true`: Only preview images without saving
@@ -166,14 +169,21 @@ In the image above, the `Exec` node from <a href="https://github.com/godmt/Comfy
 
 #### Output
 
-- `IMAGE / MASK`
-    - Image and mask
-- `width / height`
-    - Image size
-- `positive` / `negative`
-    - Prompts
+- `IMAGE / MASK`: Image and mask
+- `width / height`: Image size
+- `positive` / `negative`: Prompts
+- `filename` / `filepath`: Name and path of the saved file
+- `pnginfo`: Image metadata
 
-Note: Prompts may not be retrievable depending on workflow configuration. For example, they cannot be retrieved without a node containing the string "KSampler" (e.g., Tiled KSampler).
+#### About Prompt Output
+
+Compatible with images saved by the following nodes and UIs:
+
+- `D2 Save Image`, `D2 Save Image Eagle`
+- <a href="https://github.com/easygoing0114/ComfyUI-easygoing-nodes?tab=readme-ov-file" target="_blank">Save Image With Prompt</a>
+- <a href="https://github.com/giriss/comfy-image-saver" target="_blank">Save Image w/Metadata</a>
+- Novel AI
+- A1111 (including Forge variants)
 
 ---
 

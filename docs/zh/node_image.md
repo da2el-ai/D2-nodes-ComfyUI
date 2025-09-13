@@ -36,10 +36,13 @@
 
 - 與 `D2 Preview Image` 相同，搭載全螢幕圖庫功能的圖像保存節點
 - 支援 PNG / JPEG / WEBP / 動畫WEBP 圖像格式
+- 在元數據中保存 A1111 風格的生成參數
+- 使用 `D2 Load Image` 載入時可以提取保存圖像中的 positive、negative 提示詞
 
 #### Input
 
 - `images`: 要保存的圖像
+- `d2_pipe`: 從 `D2 KSampler` 等接收生成參數
 - `filename_prefix`: 檔案名格式。詳情請參閱 <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
 - `preview_only`:
   - `true`: 僅顯示預覽，不保存圖像
@@ -169,14 +172,21 @@ D:\ComfyUI\output\foo.png
 
 #### Output
 
-- `IMAGE / MASK`
-    - 圖像和遮罩
-- `width / height`
-    - 圖像尺寸
-- `positive` / `negative`
-    - 提示詞
+- `IMAGE / MASK`: 圖像和遮罩
+- `width / height`: 圖像尺寸
+- `positive` / `negative`: 提示詞
+- `filename` / `filepath`: 保存文件的名稱和路徑
+- `pnginfo`: 圖像元數據
 
-※根據工作流程配置，可能無法獲取提示詞。例如，如果沒有包含「KSampler」字樣的節點（如：Tiled KSampler），則無法獲取。
+#### 關於提示詞輸出
+
+支援以下節點和UI保存的圖像：
+
+- `D2 Save Image`、`D2 Save Image Eagle`
+- <a href="https://github.com/easygoing0114/ComfyUI-easygoing-nodes?tab=readme-ov-file" target="_blank">Save Image With Prompt</a>
+- <a href="https://github.com/giriss/comfy-image-saver" target="_blank">Save Image w/Metadata</a>
+- Novel AI
+- A1111（包括Forge系列）
 
 ---
 

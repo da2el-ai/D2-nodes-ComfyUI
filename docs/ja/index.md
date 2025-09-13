@@ -175,6 +175,11 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.09.14**
+
+- `D2_SaveImage` / `D2_SaveImageEagle`: A1111方式の生成パラメーターをメタデータに追加
+- `D2_LoadImage`: "Save Image With Prompt", "Save Image w/Metadata" で保存したプロンプトの出力に対応
+
 **2025.08.20**
 
 - `D2_FilenameTemplate` / `D2_FilenameTemplate2`: 配列、辞書、オブジェクトからの取得に対応
