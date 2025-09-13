@@ -24,15 +24,13 @@ from server import PromptServer
 # from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
 from .modules import util
-# from .modules.util import D2_TD2Pipe, AnyType
-# from .modules import checkpoint_util
 from .modules import pnginfo_util
 from .modules import grid_image_util
 from .modules import image_util
 from .modules import mask_util
 from .modules import template_util
 from .modules.eagle_api import EagleAPI, send_to_eagle
-from .modules.util import AnyType
+from .modules.util import AnyType, D2_TD2Pipe
 
 
 
@@ -66,6 +64,7 @@ class D2_SaveImage:
                 "fps": ("FLOAT", {"default": 6.0, "min": 0.01, "max": 1000.0, "step": 0.01}),
             },
             "optional": {
+                "d2_pipe": ("D2_TD2Pipe",),
                 "popup_image": ("D2_BUTTON", {}, )
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
@@ -77,7 +76,7 @@ class D2_SaveImage:
     OUTPUT_NODE = True
     CATEGORY = "D2/Image"
 
-    def save_images(self, images, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, popup_image="", prompt=None, extra_pnginfo=None):
+    def save_images(self, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, popup_image="", prompt=None, extra_pnginfo=None):
         # プレビューモードか保存モードかの設定
         if preview_only == True:
             # 保存せずプレビューのみ
@@ -150,6 +149,7 @@ class D2_SaveImage:
                     format, img, file_path, compress_level, lossless, quality,
                     prompt=prompt,
                     extra_pnginfo=extra_pnginfo,
+                    d2_pipe=d2_pipe
                 )
                 
                 # 結果リストに追加
@@ -208,6 +208,7 @@ class D2_SaveImageEagle(D2_SaveImage):
                 "memo_text": ("STRING",{"default": ""}),
             },
             "optional": {
+                "d2_pipe": ("D2_TD2Pipe",),
                 "popup_image": ("D2_BUTTON", {}, )
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
@@ -219,11 +220,11 @@ class D2_SaveImageEagle(D2_SaveImage):
     OUTPUT_NODE = True
     CATEGORY = "D2/Image"
 
-    def save_images(self, images, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, eagle_folder = "", memo_text = "", popup_image="", prompt=None, extra_pnginfo=None):
+    def save_images(self, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, eagle_folder = "", memo_text = "", popup_image="", prompt=None, extra_pnginfo=None):
         # EagleフォルダIDを取得
         folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
 
-        res = super().save_images(images, filename_prefix, preview_only, format, lossless, quality, fps, popup_image, prompt, extra_pnginfo)
+        res = super().save_images(images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps, popup_image, prompt, extra_pnginfo)
 
         for single_path in res["result"][0]:
             send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)
@@ -621,9 +622,9 @@ class D2_EmptyImageAlpha:
         r = torch.full([batch_size, height, width, 1], red / 255.0)
         g = torch.full([batch_size, height, width, 1], green / 255.0)
         b = torch.full([batch_size, height, width, 1], blue / 255.0)
-        print("r - ", red)
-        print("g - ", green)
-        print("b - ", blue)
+        # print("r - ", red)
+        # print("g - ", green)
+        # print("b - ", blue)
         # アルファチャンネル追加
         a = torch.full([batch_size, height, width, 1], alpha)
         # RGBAを結合

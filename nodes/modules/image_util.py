@@ -6,6 +6,12 @@ import os
 import json
 from comfy.cli_args import args
 from PIL.PngImagePlugin import PngInfo
+import piexif
+import piexif.helper
+from .util import D2_TD2Pipe
+
+
+
 
 def tensor2pil(image):
     """
@@ -177,7 +183,7 @@ def apply_mosaic_to_image(image, dot_size, color_mode, brightness, invert_color)
 
 # 画像保存関数
 
-def save_image(format, pil_image, file_path, compress_level=4, lossless=True, quality=80, prompt=None, extra_pnginfo=None):
+def save_image(format, pil_image, file_path, compress_level=4, lossless=True, quality=80, prompt=None, extra_pnginfo=None, d2_pipe=None):
     """
     PNG/JPEG/WEBP形式で画像を保存する
     
@@ -188,16 +194,21 @@ def save_image(format, pil_image, file_path, compress_level=4, lossless=True, qu
         lossless (bool, optional): 可逆圧縮を使用するかどうか / WEBP用
         quality (int, optional): 画質 (0-100)、lossless=Falseの場合に使用 / JPEG・WEBP用
     """
+    a1111_param = format_a1111_parameter(d2_pipe)
+
     if format == "png":
-        metadata = prepare_metadata_png(prompt, extra_pnginfo)
-        pil_image.save(file_path, pnginfo=metadata, compress_level=compress_level)
+        metadata = prepare_metadata_png(a1111_param, prompt, extra_pnginfo)
+        if metadata is not None:
+            pil_image.save(file_path, format="PNG", pnginfo=metadata, compress_level=compress_level)
+        else:
+            pil_image.save(file_path, format="PNG", compress_level=compress_level)
 
     elif format == "jpeg":
-        metadata = prepare_metadata_exif(prompt, extra_pnginfo, pil_image)
+        metadata = prepare_metadata_exif(a1111_param, prompt, extra_pnginfo, pil_image)
         pil_image.save(file_path, exif=metadata, quality=quality)
 
     elif format == "webp":
-        metadata = prepare_metadata_exif(prompt, extra_pnginfo, pil_image)
+        metadata = prepare_metadata_exif(a1111_param, prompt, extra_pnginfo, pil_image)
         pil_image.save(file_path, exif=metadata, lossless=lossless, quality=quality)
 
 
@@ -221,7 +232,7 @@ def save_image_animated_webp(pil_images, file_path, fps=6.0, lossless=True, qual
         raise ValueError("Cannot create animated WebP with only one image. Please provide multiple images for animation.")
 
     # メタデータの設定
-    metadata = prepare_metadata_exif(prompt, extra_pnginfo, pil_images[0])
+    metadata = prepare_metadata_exif("", prompt, extra_pnginfo, pil_images[0])
 
     # 最初の画像を保存し、残りの画像を追加
     pil_images[0].save(
@@ -237,7 +248,7 @@ def save_image_animated_webp(pil_images, file_path, fps=6.0, lossless=True, qual
     return file_path
 
 
-def prepare_metadata_png(prompt=None, extra_pnginfo=None):
+def prepare_metadata_png(a1111_param="", prompt=None, extra_pnginfo=None):
     """
     PNG形式のメタデータを準備する
     
@@ -252,17 +263,32 @@ def prepare_metadata_png(prompt=None, extra_pnginfo=None):
         return None
     
     metadata = PngInfo()
+
     if prompt is not None:
-        metadata.add(b"comf", "prompt".encode("latin-1", "strict") + b"\0" + json.dumps(prompt).encode("latin-1", "strict"), after_idat=True)
+        metadata.add_text("prompt", json.dumps(prompt))
+
+    if extra_pnginfo is not None:
+        for x in extra_pnginfo:
+            metadata.add_text(x, json.dumps(extra_pnginfo[x]))
+
+    if a1111_param is not None and a1111_param != "":
+        metadata.add_text("parameters", a1111_param)
+
+    # ComfyUIの標準形式でも追加
+    if prompt is not None:
+        metadata.add(b"comf", b"prompt\0" + json.dumps(prompt).encode("utf-8"), after_idat=True)
     
     if extra_pnginfo is not None:
         for x in extra_pnginfo:
-            metadata.add(b"comf", x.encode("latin-1", "strict") + b"\0" + json.dumps(extra_pnginfo[x]).encode("latin-1", "strict"), after_idat=True)
-    
+            metadata.add(b"comf", x.encode("utf-8") + b"\0" + json.dumps(extra_pnginfo[x]).encode("utf-8"), after_idat=True)
+
+    if a1111_param is not None and a1111_param != "":
+        metadata.add(b"comf", b"parameters\0" + a1111_param.encode("utf-8"), after_idat=True)
+
     return metadata
 
 
-def prepare_metadata_exif(prompt=None, extra_pnginfo=None, base_image=None):
+def prepare_metadata_exif(a1111_param="", prompt=None, extra_pnginfo=None, base_image=None):
     """
     EXIF形式のメタデータを準備する
     
@@ -276,19 +302,41 @@ def prepare_metadata_exif(prompt=None, extra_pnginfo=None, base_image=None):
     """
     if args.disable_metadata:
         return None
-    
+
+    # piexif の空Exif辞書を作る
+    exif_dict = {"0th": {}, "Exif": {}, "GPS": {}, "Interop": {}, "1st": {}, "thumbnail": None}
+
     if base_image is not None:
-        metadata = base_image.getexif()
-    else:
-        metadata = Image.Exif()
-    
+        try:
+            exif_dict = piexif.load(base_image.info.get("exif", b""))
+        except Exception:
+            pass  # exifが無い場合は空のまま
+
     if prompt is not None:
-        metadata[0x0110] = "prompt:{}".format(json.dumps(prompt))
+        exif_dict["0th"][piexif.ImageIFD.Model] = "prompt:{}".format(json.dumps(prompt))
+
     
     if extra_pnginfo is not None:
-        inital_exif = 0x010f
+        inital_exif = piexif.ImageIFD.Make
         for x in extra_pnginfo:
-            metadata[inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
+            exif_dict["0th"][inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
             inital_exif -= 1
-    
-    return metadata
+
+    exif_dict["Exif"][piexif.ExifIFD.UserComment] = piexif.helper.UserComment.dump(a1111_param, "unicode")
+
+    # dict → bytes に変換
+    return piexif.dump(exif_dict)
+
+
+def format_a1111_parameter(d2_pipe:D2_TD2Pipe):
+    """
+    A1111形式のパラメーターを作成
+    """
+    if d2_pipe is None:
+        return ""
+
+    template = "{positive}\n\nNegative prompt:{negative}\nSteps: {steps}, Sampler: {sampler_name} {scheduler}, CFG scale: {cfg}, Seed: {seed}, Size: {width}x{height}, Model: {ckpt_name}"
+    formatted = template.format(
+        **{k: (v if v is not None else "") for k, v in vars(d2_pipe).items()}
+    )    
+    return formatted
