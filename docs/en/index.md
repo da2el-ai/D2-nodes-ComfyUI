@@ -176,6 +176,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2025.09.14**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: Added A1111-style generation parameters to metadata
+- `D2_SaveImageEagle`: When d2_pipe is connected, A1111-style memo is automatically created
 - `D2_LoadImage`: Added support for outputting prompts saved with "Save Image With Prompt" and "Save Image w/Metadata"
 
 **2025.08.20**

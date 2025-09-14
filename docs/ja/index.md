@@ -178,6 +178,7 @@ D2 Nodes ComfyUI
 **2025.09.14**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: A1111方式の生成パラメーターをメタデータに追加
+- `D2_SaveImageEagle`: d2_pipe が接続されている時はA1111方式のメモを自動で作成するように変更
 - `D2_LoadImage`: "Save Image With Prompt", "Save Image w/Metadata" で保存したプロンプトの出力に対応
 
 **2025.08.20**

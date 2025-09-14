@@ -31,13 +31,21 @@ Node
 ### D2 Save Image
 
 <figure>
-<img src="../img/save_image_2.png?2">
+  <img src="../img/save_image_2.png?2">
+  <figcaption>▲filenames には保存した画像のパスが出力される</figcaption>
 </figure>
+
 
 - `D2 Preview Image` と同じく、全画面ギャラリー機能を搭載した画像保存ノード
 - 画像フォーマットは PNG / JPEG / WEBP / アニメーションWEBP に対応
-- A1111方式の生成パラメーターをメタデータに保存する
-- 保存した画像を `D2 Load Image` から読み込むと positive, negative プロンプトを取り出し可能
+- A1111方式の生成パラメーターをメタデータに保存する（PNG / JPEG / WEBP形式のみ）
+- 保存した画像を `D2 Load Image` から読み込むと positive, negative プロンプトを取り出し可能（PNG / JPEG / WEBP形式のみ）
+
+<figure>
+  <img src="../img/save_image_3.png?2">
+  <figcaption>▲d2_pipeから生成パラメーターを取得し、メタデータに保存</figcaption>
+</figure>
+
 
 #### Input
 
@@ -65,7 +73,7 @@ Node
 ### D2 Save Image Eagle
 
 <figure>
-<img src="../img/save_image_eagle.png?2">
+  <img src="../img/save_image_eagle.png?2">
 </figure>
 
 - `D2 Save Image` にEagle登録機能が付いたもの
@@ -77,9 +85,6 @@ Node
 - 全画面ギャラリー機能
 - ファイル名のルールが標準に `Save Image` に準拠
 - タグの保存機能を除外
-- 生成パラメーターメモは自由に作れる
-  - `D2 Filename Template2` などで作る必要がある
-  - 動画やFluxなど様々な生成環境が増え、既存の生成パラメーター保存では対応できなくなったため
 
 #### Input
 
@@ -88,8 +93,20 @@ Node
 
 #### StableDiffusion A1111 webui のようなパラメーターをEagleメモに記録するには
 
+##### 自動で作成
+
+`D2 Ksampler` から `d2_pipe` を接続するとEagle用メモに保存される。
+
 <figure>
-<img src="../img/save_image_eagle_3.png?2">
+  <img src="../img/save_image_eagle_4.png?2">
+</figure>
+
+##### 独自形式で作成
+
+動画など複雑な生成パラメーターをしたい時などは、独自のメモを記録することも可能。
+
+<figure>
+  <img src="../img/save_image_eagle_3.png?2">
 </figure>
 
 `D2 Filename Template2` を使ってテンプレート化し、`D2 Save Image Eagle` の `memo_text` に入力します。

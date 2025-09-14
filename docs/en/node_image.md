@@ -29,13 +29,19 @@
 ### D2 Save Image
 
 <figure>
-<img src="../img/save_image_2.png?2">
+  <img src="../img/save_image_2.png?2">
+  <figcaption>▲filenames outputs the paths of saved images</figcaption>
 </figure>
 
 - An image saving node with full-screen gallery functionality, similar to `D2 Preview Image`
 - Supports PNG / JPEG / WEBP / animated WEBP image formats
-- Saves A1111-style generation parameters to metadata
-- When loaded with `D2 Load Image`, positive and negative prompts can be extracted from saved images
+- Saves A1111-style generation parameters to metadata (PNG / JPEG / WEBP formats only)
+- When loaded with `D2 Load Image`, positive and negative prompts can be extracted from saved images (PNG / JPEG / WEBP formats only)
+
+<figure>
+  <img src="../img/save_image_3.png?2">
+  <figcaption>▲Retrieves generation parameters from d2_pipe and saves them to metadata</figcaption>
+</figure>
 
 #### Input
 
@@ -62,7 +68,7 @@
 ### D2 Save Image Eagle
 
 <figure>
-<img src="../img/save_image_eagle.png?2">
+  <img src="../img/save_image_eagle.png?2">
 </figure>
 
 - `D2 Save Image` with Eagle registration functionality
@@ -74,9 +80,29 @@
 - Full-screen gallery functionality
 - Filename rules conform to the standard `Save Image`
 - Tag saving feature excluded
-- Generation parameter memos can be freely created
-  - Need to be created using tools like `D2 Filename Template2`
-  - As various generation environments like videos and Flux have increased, existing generation parameter saving methods have become inadequate
+
+#### Input
+
+- `eagle_folder`: Eagle registration folder. Can use either folder name or folder ID
+- `memo_text`: Text to register as a memo in Eagle
+
+#### Recording A1111 webui-style parameters in Eagle memo
+
+##### Automatic creation
+
+When `d2_pipe` is connected from `D2 KSampler`, it is saved to the Eagle memo.
+
+<figure>
+  <img src="../img/save_image_eagle_4.png?2">
+</figure>
+
+##### Custom format creation
+
+For complex generation parameters like videos, you can also record custom memos.
+
+<figure>
+  <img src="../img/save_image_eagle_3.png?2">
+</figure>
 
 #### Input
 

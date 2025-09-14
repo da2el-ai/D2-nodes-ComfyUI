@@ -178,6 +178,7 @@
 **2025.09.14**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: 在元數據中添加 A1111 風格的生成參數
+- `D2_SaveImageEagle`: 當連接 d2_pipe 時自動創建 A1111 風格的備忘錄
 - `D2_LoadImage`: 新增支援輸出使用 "Save Image With Prompt" 和 "Save Image w/Metadata" 保存的提示詞
 
 **2025.08.20**

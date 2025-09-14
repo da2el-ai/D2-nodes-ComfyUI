@@ -31,13 +31,19 @@
 ### D2 Save Image
 
 <figure>
-<img src="../img/save_image_2.png?2">
+  <img src="../img/save_image_2.png?2">
+  <figcaption>▲filenames 輸出保存圖像的路徑</figcaption>
 </figure>
 
 - 與 `D2 Preview Image` 相同，搭載全螢幕圖庫功能的圖像保存節點
 - 支援 PNG / JPEG / WEBP / 動畫WEBP 圖像格式
-- 在元數據中保存 A1111 風格的生成參數
-- 使用 `D2 Load Image` 載入時可以提取保存圖像中的 positive、negative 提示詞
+- 在元數據中保存 A1111 風格的生成參數（僅 PNG / JPEG / WEBP 格式）
+- 使用 `D2 Load Image` 載入時可以提取保存圖像中的 positive、negative 提示詞（僅 PNG / JPEG / WEBP 格式）
+
+<figure>
+  <img src="../img/save_image_3.png?2">
+  <figcaption>▲從 d2_pipe 獲取生成參數並保存到元數據</figcaption>
+</figure>
 
 #### Input
 
@@ -64,7 +70,7 @@
 ### D2 Save Image Eagle
 
 <figure>
-<img src="../img/save_image_eagle.png?2">
+  <img src="../img/save_image_eagle.png?2">
 </figure>
 
 - 具有Eagle註冊功能的 `D2 Save Image`
@@ -76,9 +82,29 @@
 - 全螢幕圖庫功能
 - 檔案名規則符合標準 `Save Image`
 - 排除了標籤保存功能
-- 生成參數備忘錄可以自由創建
-  - 需要使用 `D2 Filename Template2` 等工具創建
-  - 隨著視頻和Flux等各種生成環境的增加，現有的生成參數保存方法已不足以應對
+
+#### Input
+
+- `eagle_folder`: Eagle註冊資料夾。可以使用資料夾名稱或資料夾ID
+- `memo_text`: 在Eagle中註冊為備忘錄的文本
+
+#### 在Eagle備忘錄中記錄A1111 webui風格的參數
+
+##### 自動創建
+
+當從 `D2 KSampler` 連接 `d2_pipe` 時，會自動保存到Eagle備忘錄。
+
+<figure>
+  <img src="../img/save_image_eagle_4.png?2">
+</figure>
+
+##### 自定義格式創建
+
+對於視頻等複雜的生成參數，也可以記錄自定義備忘錄。
+
+<figure>
+  <img src="../img/save_image_eagle_3.png?2">
+</figure>
 
 #### Input
 
