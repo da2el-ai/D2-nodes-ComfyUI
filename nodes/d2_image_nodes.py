@@ -139,6 +139,9 @@ class D2_SaveImage:
         
         # 静止画の場合（単一画像または複数画像を個別に保存）
         else:
+            # d2_pipe からA1111形式の生成パラメーターメモを作成
+            a1111_param = util.format_a1111_parameter(d2_pipe)
+
             for i, img in enumerate(pil_images):
                 # ファイル名の設定
                 file = f"{filename}_{counter:05}_.{format}"
@@ -149,7 +152,7 @@ class D2_SaveImage:
                     format, img, file_path, compress_level, lossless, quality,
                     prompt=prompt,
                     extra_pnginfo=extra_pnginfo,
-                    d2_pipe=d2_pipe
+                    a1111_param=a1111_param
                 )
                 
                 # 結果リストに追加
@@ -168,7 +171,7 @@ class D2_SaveImage:
         
         # 結果を返す
         return {
-            "result": (file_paths,),
+            "result": (file_paths, a1111_param,),
             "ui": {
                 "images": results,
                 "animated": (animated,)
@@ -225,6 +228,11 @@ class D2_SaveImageEagle(D2_SaveImage):
         folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
 
         res = super().save_images(images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps, popup_image, prompt, extra_pnginfo)
+
+        # A1111方式の生成メモ
+        a1111_param = res["result"][1]
+        if a1111_param != None and a1111_param != "":
+            memo_text = a1111_param + "\n\n" + memo_text
 
         for single_path in res["result"][0]:
             send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)

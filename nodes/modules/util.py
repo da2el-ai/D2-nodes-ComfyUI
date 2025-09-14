@@ -187,3 +187,17 @@ def delete_comment(text, type):
     # result_text = result_text.strip()
 
     return result_text
+
+
+"""
+d2_pipe からA1111形式の生成パラメーターメモを作成
+"""
+def format_a1111_parameter(d2_pipe:D2_TD2Pipe|None):
+    if d2_pipe is None:
+        return ""
+
+    template = "{positive}\n\nNegative prompt:{negative}\nSteps: {steps}, Sampler: {sampler_name} {scheduler}, CFG scale: {cfg}, Seed: {seed}, Size: {width}x{height}, Model: {ckpt_name}"
+    formatted = template.format(
+        **{k: (v if v is not None else "") for k, v in vars(d2_pipe).items()}
+    )    
+    return formatted

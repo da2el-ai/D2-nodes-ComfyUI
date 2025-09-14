@@ -183,7 +183,7 @@ def apply_mosaic_to_image(image, dot_size, color_mode, brightness, invert_color)
 
 # 画像保存関数
 
-def save_image(format, pil_image, file_path, compress_level=4, lossless=True, quality=80, prompt=None, extra_pnginfo=None, d2_pipe=None):
+def save_image(format, pil_image, file_path, compress_level=4, lossless=True, quality=80, prompt=None, extra_pnginfo=None, a1111_param=None):
     """
     PNG/JPEG/WEBP形式で画像を保存する
     
@@ -194,10 +194,10 @@ def save_image(format, pil_image, file_path, compress_level=4, lossless=True, qu
         lossless (bool, optional): 可逆圧縮を使用するかどうか / WEBP用
         quality (int, optional): 画質 (0-100)、lossless=Falseの場合に使用 / JPEG・WEBP用
     """
-    a1111_param = format_a1111_parameter(d2_pipe)
 
     if format == "png":
         metadata = prepare_metadata_png(a1111_param, prompt, extra_pnginfo)
+
         if metadata is not None:
             pil_image.save(file_path, format="PNG", pnginfo=metadata, compress_level=compress_level)
         else:
@@ -248,7 +248,7 @@ def save_image_animated_webp(pil_images, file_path, fps=6.0, lossless=True, qual
     return file_path
 
 
-def prepare_metadata_png(a1111_param="", prompt=None, extra_pnginfo=None):
+def prepare_metadata_png(a1111_param=None, prompt=None, extra_pnginfo=None):
     """
     PNG形式のメタデータを準備する
     
@@ -288,7 +288,7 @@ def prepare_metadata_png(a1111_param="", prompt=None, extra_pnginfo=None):
     return metadata
 
 
-def prepare_metadata_exif(a1111_param="", prompt=None, extra_pnginfo=None, base_image=None):
+def prepare_metadata_exif(a1111_param=None, prompt=None, extra_pnginfo=None, base_image=None):
     """
     EXIF形式のメタデータを準備する
     
@@ -322,21 +322,9 @@ def prepare_metadata_exif(a1111_param="", prompt=None, extra_pnginfo=None, base_
             exif_dict["0th"][inital_exif] = "{}:{}".format(x, json.dumps(extra_pnginfo[x]))
             inital_exif -= 1
 
-    exif_dict["Exif"][piexif.ExifIFD.UserComment] = piexif.helper.UserComment.dump(a1111_param, "unicode")
+    if a1111_param is not None and a1111_param != "":
+        exif_dict["Exif"][piexif.ExifIFD.UserComment] = piexif.helper.UserComment.dump(a1111_param, "unicode")
 
     # dict → bytes に変換
     return piexif.dump(exif_dict)
 
-
-def format_a1111_parameter(d2_pipe:D2_TD2Pipe):
-    """
-    A1111形式のパラメーターを作成
-    """
-    if d2_pipe is None:
-        return ""
-
-    template = "{positive}\n\nNegative prompt:{negative}\nSteps: {steps}, Sampler: {sampler_name} {scheduler}, CFG scale: {cfg}, Seed: {seed}, Size: {width}x{height}, Model: {ckpt_name}"
-    formatted = template.format(
-        **{k: (v if v is not None else "") for k, v in vars(d2_pipe).items()}
-    )    
-    return formatted
