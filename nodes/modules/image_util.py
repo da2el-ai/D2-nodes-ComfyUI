@@ -274,17 +274,6 @@ def prepare_metadata_png(a1111_param=None, prompt=None, extra_pnginfo=None):
     if a1111_param is not None and a1111_param != "":
         metadata.add_text("parameters", a1111_param)
 
-    # ComfyUIの標準形式でも追加
-    if prompt is not None:
-        metadata.add(b"comf", b"prompt\0" + json.dumps(prompt).encode("utf-8"), after_idat=True)
-    
-    if extra_pnginfo is not None:
-        for x in extra_pnginfo:
-            metadata.add(b"comf", x.encode("utf-8") + b"\0" + json.dumps(extra_pnginfo[x]).encode("utf-8"), after_idat=True)
-
-    if a1111_param is not None and a1111_param != "":
-        metadata.add(b"comf", b"parameters\0" + a1111_param.encode("utf-8"), after_idat=True)
-
     return metadata
 
 
