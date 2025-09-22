@@ -173,6 +173,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.09.22**
+
+- `D2_KSampler`: Modified to override positive and negative prompts in d2_pipe when prompts are specified in positive and negative parameters
+
 **2025.09.14**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: Added A1111-style generation parameters to metadata

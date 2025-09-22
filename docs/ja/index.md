@@ -175,6 +175,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.09.22**
+
+- `D2_KSampler`: positive, negative にプロンプトが指定された場合、d2_pipe 内の positive, negative を上書きするように変更
+
 **2025.09.14**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: A1111方式の生成パラメーターをメタデータに追加

@@ -91,6 +91,9 @@ class D2_KSampler:
 
         util.set_preview_method(preview_method)
 
+        print("positive", positive)
+        print("pipe", d2_pipe)
+
         # positive / negative 以外は pipe を優先する
         if d2_pipe == None:
             d2_pipe = D2_TD2Pipe(
@@ -104,10 +107,11 @@ class D2_KSampler:
                 denoise = denoise,
             )
         else:
-            if not d2_pipe.positive:
+            if positive:
                 d2_pipe.positive = positive
-            if not d2_pipe.negative:
+            if negative:
                 d2_pipe.negative = negative
+        print("pipe2", d2_pipe)
 
         # lora 適用を試みる
         lora_params, formatted_positive = D2_LoadLora.get_params_a1111(d2_pipe.positive)

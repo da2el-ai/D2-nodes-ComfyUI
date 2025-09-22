@@ -175,6 +175,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.09.22**
+
+- `D2_KSampler`: 修改為當在 positive、negative 參數中指定提示詞時，覆蓋 d2_pipe 內的 positive、negative 設定
+
 **2025.09.14**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: 在元數據中添加 A1111 風格的生成參數
