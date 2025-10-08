@@ -175,6 +175,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.10.09**
+
+- `D2_SaveImage` / `D2_SaveImageEagle`: 變更為 JPEG / WEBP 格式不儲存工作流程。因為當工作流程或提示變長時,會超過 Exif 容量限制而無法儲存。
+
 **2025.09.22**
 
 - `D2_KSampler`: 修改為當在 positive、negative 參數中指定提示詞時，覆蓋 d2_pipe 內的 positive、negative 設定

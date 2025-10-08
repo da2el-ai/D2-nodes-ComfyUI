@@ -204,11 +204,12 @@ def save_image(format, pil_image, file_path, compress_level=4, lossless=True, qu
             pil_image.save(file_path, format="PNG", compress_level=compress_level)
 
     elif format == "jpeg":
-        metadata = prepare_metadata_exif(a1111_param, prompt, extra_pnginfo, pil_image)
+        # metadata = prepare_metadata_exif(a1111_param, prompt, extra_pnginfo, pil_image)
+        metadata = prepare_metadata_exif(a1111_param, None, None, pil_image)
         pil_image.save(file_path, exif=metadata, quality=quality)
 
     elif format == "webp":
-        metadata = prepare_metadata_exif(a1111_param, prompt, extra_pnginfo, pil_image)
+        metadata = prepare_metadata_exif(a1111_param, None, None, pil_image)
         pil_image.save(file_path, exif=metadata, lossless=lossless, quality=quality)
 
 

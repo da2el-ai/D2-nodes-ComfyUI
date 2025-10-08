@@ -173,6 +173,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.10.09**
+
+- `D2_SaveImage` / `D2_SaveImageEagle`: Changed to not save workflows in JPEG/WEBP format. This is because when workflows or prompts become lengthy, they exceed the Exif capacity limit and cannot be saved.
+
 **2025.09.22**
 
 - `D2_KSampler`: Modified to override positive and negative prompts in d2_pipe when prompts are specified in positive and negative parameters
