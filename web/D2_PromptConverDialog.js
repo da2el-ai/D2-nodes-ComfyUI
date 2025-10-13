@@ -166,7 +166,7 @@ class D2_PromptConvertDialog {
         content.appendChild(sdToNaiBtn);
 
         // NAI > SD 変換ボタン
-        const naiToSdBtn = D2_PromptConvertDialog.createButton("NAI 👈 SD", () => {
+        const naiToSdBtn = D2_PromptConvertDialog.createButton("SD 👈 NAI", () => {
             const prompt = naiPrompt.value;
             const newPrompt = D2_PromptConvert.convertToSd(prompt, this.convertType);
             sdPrompt.value = newPrompt;
