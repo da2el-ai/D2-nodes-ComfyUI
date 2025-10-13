@@ -173,6 +173,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.10.13**
+
+- `Prompt Convert`: Close dialog when prompt is copied
+
 **2025.10.09**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: Changed to not save workflows in JPEG/WEBP format. This is because when workflows or prompts become lengthy, they exceed the Exif capacity limit and cannot be saved.

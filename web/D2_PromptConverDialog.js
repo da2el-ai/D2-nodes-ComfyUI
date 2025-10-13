@@ -158,7 +158,7 @@ class D2_PromptConvertDialog {
         content.appendChild(naiPrompt);
 
         // SD > NAI 変換ボタン
-        const sdToNaiBtn = D2_PromptConvertDialog.createButton("SD to NAI", () => {
+        const sdToNaiBtn = D2_PromptConvertDialog.createButton("SD 👉 NAI", () => {
             const prompt = sdPrompt.value;
             const newPrompt = D2_PromptConvert.convertToNai(prompt, this.convertType);
             naiPrompt.value = newPrompt;
@@ -166,7 +166,7 @@ class D2_PromptConvertDialog {
         content.appendChild(sdToNaiBtn);
 
         // NAI > SD 変換ボタン
-        const naiToSdBtn = D2_PromptConvertDialog.createButton("NAI to SD", () => {
+        const naiToSdBtn = D2_PromptConvertDialog.createButton("NAI 👈 SD", () => {
             const prompt = naiPrompt.value;
             const newPrompt = D2_PromptConvert.convertToSd(prompt, this.convertType);
             sdPrompt.value = newPrompt;
@@ -174,23 +174,25 @@ class D2_PromptConvertDialog {
         content.appendChild(naiToSdBtn);
 
         // SDクリップボード
-        const copySdBtn = D2_PromptConvertDialog.createButton("Send SD to Clipboard", () => {
+        const copySdBtn = D2_PromptConvertDialog.createButton("📋 Copy SD and ❌ close", () => {
             sdPrompt.select();
             document.execCommand("copy");
+            this.container.style.display = "none";
         });
         content.appendChild(copySdBtn);
 
         // NAIクリップボード
-        const copyNaiBtn = D2_PromptConvertDialog.createButton("Send NAI to Clipboard", () => {
+        const copyNaiBtn = D2_PromptConvertDialog.createButton("📋 Copy NAI and ❌ close", () => {
             naiPrompt.select();
             document.execCommand("copy");
+            this.container.style.display = "none";
         });
         content.appendChild(copyNaiBtn);
 
         // 閉じるボタン
         const closeBtn = document.createElement("button");
         closeBtn.classList.add("d2-prompt-convert__close-btn");
-        closeBtn.textContent = "CLOSE";
+        closeBtn.textContent = "❌ Close";
         closeBtn.addEventListener("click", () => {
             // container.close();
             this.container.style.display = "none";

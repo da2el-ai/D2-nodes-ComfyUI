@@ -175,6 +175,10 @@
 
 ## :blossom: 更新日誌
 
+**2025.10.13**
+
+- `Prompt Convert`: 複製提示詞後自動關閉對話框
+
 **2025.10.09**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: 變更為 JPEG / WEBP 格式不儲存工作流程。因為當工作流程或提示變長時,會超過 Exif 容量限制而無法儲存。

@@ -175,6 +175,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.10.13**
+
+- `Prompt Convert`: プロンプトをコピーしたらダイアログを閉じるように変更
+
 **2025.10.09**
 
 - `D2_SaveImage` / `D2_SaveImageEagle`: JPEG / WEBP形式はワークフローを保存しないように変更。ワークフローやフロンプトが長くなるとExif容量オーバーで保存できないため
