@@ -182,6 +182,8 @@ Output text
       - Retrieves the value for `{key}` from the **object** input to `arg_{number}`
 - `arg_count`
   - Increase or decrease the number of input items
+- `normalization`
+  - Filename sanitization option
 
 <figure>
   <img src="../img/filename_template_3.png">

@@ -175,6 +175,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2025.10.25**
+
+- `D2_FilenameTemplate`: ファイル名に使えない`:`を`_`に変換するオプションを追加
+
 **2025.10.13**
 
 - `Prompt Convert`: プロンプトをコピーしたらダイアログを閉じるように変更

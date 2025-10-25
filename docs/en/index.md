@@ -173,6 +173,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2025.10.25**
+
+- `D2_FilenameTemplate`: add filename sanitization option
+
 **2025.10.13**
 
 - `Prompt Convert`: Close dialog when prompt is copied

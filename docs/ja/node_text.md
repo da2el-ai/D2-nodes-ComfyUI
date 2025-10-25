@@ -220,6 +220,8 @@ Output text
       - `arg_{数字}` に入力された**オブジェクト**から `{key}` の値を取得
 - `arg_count`
   - 入力項目の増減
+- `normalization`
+  - ファイル名に使えない`:`を`_`に変換する
 
 <figure>
   <img src="../img/filename_template_3.png">

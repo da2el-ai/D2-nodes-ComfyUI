@@ -208,6 +208,9 @@ Output text
       - 從輸入到 `arg_{數字}` 的**物件**中獲取 `{key}` 的值
 - `arg_count`
   - 增加或減少輸入項目的數量
+- `normalization`
+  - 正規化檔案名稱中的無效字元
+
 
 <figure>
   <img src="../img/filename_template_3.png">
