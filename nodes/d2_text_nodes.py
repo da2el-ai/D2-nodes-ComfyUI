@@ -542,6 +542,7 @@ class D2_FilenameTemplate:
             "required": {
                 "format": ("STRING",{"tooltip": tooltip},),
                 "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+                "normalization": ("BOOLEAN", {"default":True}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
             "hidden": {"prompt": "PROMPT"},
@@ -552,7 +553,7 @@ class D2_FilenameTemplate:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, format, arg_count, seed, prompt, **kwargs):
+    def run(self, format, arg_count, normalization, seed, prompt, **kwargs):
 
         args = {}
 
@@ -562,7 +563,7 @@ class D2_FilenameTemplate:
             if arg is not None:
                 args[key] = arg
 
-        text = replace_template(format, args, prompt)
+        text = replace_template(format, args, prompt, normalization)
         return {
             "result": (text,),
         }
@@ -586,6 +587,7 @@ class D2_FilenameTemplate2(D2_FilenameTemplate):
             "required": {
                 "format": ("STRING",{"tooltip": tooltip, "multiline":True},),
                 "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
+                "normalization": ("BOOLEAN", {"default":True}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             },
             "hidden": {"prompt": "PROMPT"},

@@ -140,7 +140,7 @@ Args:
 Returns:
     str: 置換後の文字列
 """
-def replace_template(text: str, args={}, prompt={}) -> str:
+def replace_template(text: str, args={}, prompt={}, normalization=True) -> str:
 
     # date形式の置換 (%date:yyyyMMdd% 形式)
     now = datetime.now()
@@ -239,5 +239,9 @@ def replace_template(text: str, args={}, prompt={}) -> str:
         return _get_node_value_from_name(prompt, node_name, node_key)
 
     text = re.sub(r"%([^\.%]+)\.([^%]+)%", replace_node_from_name, text)
+
+    # ファイル名に使えるように文字列を正規化
+    if normalization:
+        text = re.sub(r":", "_", text)
 
     return text
