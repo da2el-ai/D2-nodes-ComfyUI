@@ -111,7 +111,7 @@ class D2_KSampler:
                 d2_pipe.positive = positive
             if negative:
                 d2_pipe.negative = negative
-        print("pipe2", d2_pipe)
+        # print("pipe2", d2_pipe)
 
         # lora 適用を試みる
         lora_params, formatted_positive = D2_LoadLora.get_params_a1111(d2_pipe.positive)
