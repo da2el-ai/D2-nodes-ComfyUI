@@ -242,6 +242,6 @@ def replace_template(text: str, args={}, prompt={}, normalization=True) -> str:
 
     # ファイル名に使えるように文字列を正規化
     if normalization:
-        text = re.sub(r":", "_", text)
+        text = re.sub(r'[<>:"/\\|?*]', '_', text)
 
     return text
