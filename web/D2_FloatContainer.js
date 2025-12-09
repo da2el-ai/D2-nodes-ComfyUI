@@ -68,7 +68,7 @@ class D2_FloatContainer {
         this.container.appendChild(frame);
 
         const dragHandle = document.createElement("span");
-        dragHandle.classList.add("drag-handle", "cursor-move", "mr-2", "d2-float-container__drag-handle");
+        dragHandle.classList.add("drag-handle", "cursor-grab", "w-3", "mr-2", "d2-float-container__drag-handle");
         frame.appendChild(dragHandle);
 
         this.body = document.createElement("div");
