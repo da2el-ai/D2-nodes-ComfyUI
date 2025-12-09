@@ -102,8 +102,6 @@ const addToNode = (type, items, node) => {
 }
 
 const changeInputVisibility = (node, labelValue) => {
-    console.log("////////////inputs", node.inputs);
-    console.log("////////////outputs", node.outputs);
     const inputItems = [];
     const outputItems = [];
 
@@ -117,8 +115,6 @@ const changeInputVisibility = (node, labelValue) => {
             outputItems.push(trimedItem.substring(1));
         }
     });
-    console.log("inputItems", inputItems);
-    console.log("outputItems", outputItems);
 
     // 不要なinput/outputを削除
     removeFromNode(node, "input", inputItems, node.inputs);
