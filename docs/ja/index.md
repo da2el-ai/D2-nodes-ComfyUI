@@ -175,6 +175,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2026.01.16**
+
+- `D2 XYPlot Easy Mini`: `D2 XYPlot Easy` ワークフローを読み込んで実行したときにエラーになる時があるのを修正
+
 **2025.10.25**
 
 - `D2_FilenameTemplate`: ファイル名に使えない`:`を`_`に変換するオプションを追加

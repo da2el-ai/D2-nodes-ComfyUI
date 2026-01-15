@@ -175,6 +175,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.01.16**
+
+- `D2 XYPlot Easy Mini`: 修復了載入並執行 `D2 XYPlot Easy` 工作流時有時會出現錯誤的問題
+
 **2025.10.25**
 
 - `D2_FilenameTemplate`: 新增檔案名稱無效字元正規化選項

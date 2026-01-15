@@ -227,8 +227,9 @@ class D2_XYPlotEasy:
              "y_other": "",
         }
 
-        # index = 0 の時に値を変換する
-        if index == 0:
+        # index = 0 の時、または x_annotation が存在しない時に値を変換する
+        # (ComfyUIはインスタンスを再生成することがあるため)
+        if index == 0 or not hasattr(self, 'x_annotation'):
             x_array = D2_XYPlot.change_type(x_type, x_list.strip().split('\n'))
             y_array = D2_XYPlot.change_type(y_type, y_list.strip().split('\n'))
             self.x_annotation = D2_TAnnotation(x_type, x_array)
