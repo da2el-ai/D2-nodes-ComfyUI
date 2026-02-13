@@ -173,6 +173,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.0２.13**
+
+- `D2 Prompt`: Changed to a toggle switch to allow disabling token count
+
 **2026.01.16**
 
 - `D2 XYPlot Easy Mini`: Fixed an issue where an error could occur when loading and running a `D2 XYPlot Easy` workflow

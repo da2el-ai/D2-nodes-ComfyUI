@@ -206,13 +206,13 @@ Output text
 ### D2 Prompt
 
 <figure>
-  <img src="../img/prompt.png?2">
+  <img src="../img/prompt_2.png?2">
 </figure>
 
 - You can select LoRA from the `CHOOSE` button and insert an A1111-style LoRA prompt
 - Delete comments in text
 - Targets lines starting with "#", lines starting with "//", and text between "/*" and "*/"
-- Displays token count at the bottom
+- Displays token count at the bottom (works when `token_count` is `true`)
 - Uses "ViT-L/14" CLIP for token count measurement. Please use `D2 Token Counter` if you want to use other CLIP models
 
 

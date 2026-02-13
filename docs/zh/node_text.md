@@ -233,13 +233,13 @@ Output text
 ### D2 Prompt
 
 <figure>
-  <img src="../img/prompt.png?2">
+  <img src="../img/prompt_2.png?2">
 </figure>
 
-- 您可以從 `CHOOSE` 按鈕選擇LoRA，並插入A1111方式的LoRA提示詞
+- 您可以從 `CHOOSE` 按鈕選擇LoRA,並插入A1111方式的LoRA提示詞
 - 刪除文字中的註解
 - 包括行首「#」、行首「//」以及「/*」至「*/」之間的內容
-- 在底部顯示令牌數量
+- 在底部顯示令牌數量（當 `token_count` 為 `true` 時生效）
 - 令牌計數使用"ViT-L/14" CLIP。如果想使用其他CLIP模型，請使用`D2 Token Counter`
 
 

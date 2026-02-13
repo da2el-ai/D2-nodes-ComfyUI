@@ -175,6 +175,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2026.0２.13**
+
+- `D2 Prompt`: トークン数のカウントを無効化できるようにトグルスイッチに変更
+
 **2026.01.16**
 
 - `D2 XYPlot Easy Mini`: `D2 XYPlot Easy` ワークフローを読み込んで実行したときにエラーになる時があるのを修正

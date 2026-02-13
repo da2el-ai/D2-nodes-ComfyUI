@@ -243,13 +243,13 @@ Output text
 ### D2 Prompt
 
 <figure>
-  <img src="../img/prompt.png?2">
+  <img src="../img/prompt_2.png?2">
 </figure>
 
 - `CHOOSE`ボタンからLoRAを選択し、A1111方式のLoRAプロンプトを挿入できる
 - テキスト内のコメントを削除する
 - 行頭「#」、行頭「//」、「/\*」〜「\*/」の間が対象
-- トークン数を下部に表示
+- トークン数を下部に表示（`token_count` が `true` の時に動作する）
 - トークン数の計測のCLIPは"ViT-L/14"を使用。他のCLIPを使いたい時は `D2 Token Counter` をご利用ください
 
 
