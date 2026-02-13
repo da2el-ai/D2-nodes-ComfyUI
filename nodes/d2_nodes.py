@@ -19,6 +19,7 @@ from comfy_execution.graph import ExecutionBlocker
 from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced, LoraLoader
 from server import PromptServer
 from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
+from nodes import UNETLoader
 
 from .modules import util
 from .modules.util import D2_TD2Pipe, D2_TDelivery, AnyType
@@ -316,6 +317,39 @@ class D2_CheckpointLoader:
         ckpt_name = os.path.basename(ckpt_name)
         return (model, clip, vae, ckpt_name, hash, ckpt_path, sampling,)
 
+
+
+"""
+
+D2_LoadDiffusionModel
+Checkpointのフルパスを取得できる Load Diffusion Model
+
+"""
+class D2_LoadDiffusionModel(UNETLoader):
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": { 
+                "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
+                "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
+            }
+        }
+
+    RETURN_TYPES = ("MODEL", "STRING", "STRING", "STRING",)
+    RETURN_NAMES = ("model", "ckpt_name", "ckpt_hash", "ckpt_fullpath", )
+    FUNCTION = "load_unet"
+
+    CATEGORY = "D2"
+
+    def load_unet(self, unet_name, weight_dtype):
+        ckpt_path = folder_paths.get_full_path("diffusion_models", unet_name)
+        hash = checkpoint_util.get_file_hash(ckpt_path)
+        ckpt_name = os.path.basename(unet_name)
+
+        out = super().load_unet(unet_name, weight_dtype)
+        model = out[0]
+
+        return (model, ckpt_name, hash, ckpt_path,)
 
 
 
@@ -640,18 +674,12 @@ class D2_AnyDelivery:
 
 
 NODE_CLASS_MAPPINGS = {
-    # "D2 Preview Image": D2_PreviewImage,
-    # "D2 Load Image": D2_LoadImage,
-    # "D2 Folder Image Queue": D2_FolderImageQueue,
     "D2 KSampler": D2_KSampler,
     "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
+    "D2 Load Diffusion Model": D2_LoadDiffusionModel,
     "D2 Controlnet Loader": D2_ControlnetLoader,
     "D2 Load Lora": D2_LoadLora,
-    # "D2 EmptyImage Alpha": D2_EmptyImageAlpha,
-    # "D2 Grid Image": D2_GridImage,
-    # "D2 Image Stack": D2_ImageStack,
-    # "D2 Load Folder Images": D2_LoadFolderImages,
     "D2 Pipe": D2_Pipe,
     "D2 Any Delivery": D2_AnyDelivery,
 }
