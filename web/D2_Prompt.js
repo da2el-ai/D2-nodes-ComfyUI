@@ -3,6 +3,15 @@ import { $el } from "../../../scripts/ui.js";
 import { findWidgetByName, sleep, getReadOnlyWidgetBase } from "./modules/utils.js";
 
 
+// カウンターの書き換え
+const setCounterLabel = (widget, value) => {
+    const newVal = "token_count: <%value%>".replace("<%value%>", value);
+    widget.label = newVal;
+    console.log("counterWidget", widget);
+    console.log("counterWidget", widget.value);
+};
+
+
 app.registerExtension({
     name: "Comfy.D2.D2_Prompt",
 
@@ -41,9 +50,7 @@ app.registerExtension({
             const promptWidget = findWidgetByName(this, "prompt");
             const commentTypeWidget = findWidgetByName(this, "comment_type");
             const commentTypeValue = commentTypeWidget.value;
-
-            const counterWidget = findWidgetByName(this, "counter");
-            counterWidget.textTemplate = "Token count: <%value%>";
+            const counterWidget = findWidgetByName(this, "token_count");
             
             // commentTypeWidget.value の再定義
             Object.defineProperty(commentTypeWidget, 'value', {
@@ -51,8 +58,11 @@ app.registerExtension({
                     return commentTypeValue;
                 },
                 async set(newVal) {
-                    const count = await getTokenCount(promptWidget.value, newVal);
-                    counterWidget.setValue(count);
+                    if(counterWidget.value === true){
+                        const count = await getTokenCount(promptWidget.value, newVal);
+                        // counterWidget.setValue(count);
+                        setCounterLabel(counterWidget, count);
+                    }
                 }
             });
   
@@ -60,8 +70,11 @@ app.registerExtension({
             if (promptWidget && counterWidget) {
                 // 初期カウント取得
                 setTimeout(async ()=>{
-                    const count = await getTokenCount(promptWidget.value, commentTypeWidget.value);
-                    counterWidget.setValue(count);
+                    if(counterWidget.value === true){
+                        const count = await getTokenCount(promptWidget.value, commentTypeWidget.value);
+                        // counterWidget.setValue(count);
+                        setCounterLabel(counterWidget, count);
+                    }
                 }, 1000);
         
                 // デバウンス処理用の変数
@@ -74,11 +87,14 @@ app.registerExtension({
                         // 既存のタイマーをクリア
                         clearTimeout(debounceTimer);
                         
-                        // 新しいタイマーを設定 (1秒後に実行)
-                        debounceTimer = setTimeout(async () => {
-                            const count = await getTokenCount(promptWidget.value, commentTypeWidget.value);
-                            counterWidget.setValue(count);
-                        }, 1000);
+                        if(counterWidget.value === true){
+                            // 新しいタイマーを設定 (1秒後に実行)
+                            debounceTimer = setTimeout(async () => {
+                                const count = await getTokenCount(promptWidget.value, commentTypeWidget.value);
+                                // counterWidget.setValue(count);
+                                setCounterLabel(counterWidget, count);
+                            }, 1000);
+                        }
                     });
                 }
             }

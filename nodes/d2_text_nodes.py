@@ -482,7 +482,7 @@ class D2_Prompt:
             # },
             # "optional": {
                 "insert_lora": (["CHOOSE"] + folder_paths.get_filename_list("loras"),),
-                "counter": ("D2_SIMPLE_TEXT", {})
+                "token_count": ("BOOLEAN", {"default":False}),
             }
         }
 
@@ -492,7 +492,7 @@ class D2_Prompt:
     CATEGORY = "D2"
 
     ######
-    def run(self, prompt, comment_type, insert_lora="", counter = ""):
+    def run(self, prompt, comment_type, insert_lora="", token_count = False):
         new_prompt = delete_comment(prompt, comment_type)
         return (new_prompt,)
 
