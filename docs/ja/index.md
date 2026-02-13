@@ -41,6 +41,8 @@ D2 Nodes ComfyUI
 
 - <a href="node.md#D2-Checkpoint-Loader">`D2 Checkpoint Loader`</a>
   - モデルファイルのフルパスを出力する Checkpoint Loader
+- <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
+  - モデルファイルのフルパスを出力する Load Diffusion Model
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - D2 KSampler に接続してシンプルなワークフローが作れる Controlnet Loader
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
@@ -178,6 +180,7 @@ D2 Nodes ComfyUI
 **2026.0２.13**
 
 - `D2 Prompt`: トークン数のカウントを無効化できるようにトグルスイッチに変更
+- `D2 Load Diffusion Model`: 新規追加
 
 **2026.01.16**
 

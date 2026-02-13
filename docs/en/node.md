@@ -109,6 +109,29 @@
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - Checkpoint name, hash, and full path.
 
+
+---
+
+
+### D2 Load Diffusion Model
+
+<img src="../img/load_diffusion_model.png">
+
+- A Load Diffusion Model that outputs the full path and filename of model files
+
+#### Input
+
+- `unet_name` / `weight_dtype`: Same as the standard `Load Diffusion Model`
+
+#### Output
+
+- `model`
+    - Same as the standard Load Diffusion Model.
+- `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
+    - Checkpoint name, hash, and full path.
+    - Although it's technically `unet_name`, it has been named `ckpt_name` to align with `D2 Checkpoint Loader`
+
+
 ---
 
 ### D2 Controlnet Loader

@@ -110,6 +110,29 @@
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - 檢查點名稱、雜湊值和完整路徑。
 
+
+---
+
+
+### D2 Load Diffusion Model
+
+<img src="../img/load_diffusion_model.png">
+
+- 輸出模型檔案完整路徑和檔案名稱的 Load Diffusion Model
+
+#### Input
+
+- `unet_name` / `weight_dtype`: 與標準的 `Load Diffusion Model` 相同
+
+#### Output
+
+- `model`
+    - 與標準的 Load Diffusion Model 相同。
+- `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
+    - 檢查點名稱、雜湊值和完整路徑。
+    - 雖然實際上是 `unet_name`，但為了與 `D2 Checkpoint Loader` 保持一致，命名為 `ckpt_name`
+
+
 ---
 
 ### D2 Controlnet Loader

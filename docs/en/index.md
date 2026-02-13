@@ -39,6 +39,8 @@ If you have installed any of the following custom nodes previously, please remov
 
 - <a href="node.md#D2-Checkpoint-Loader">`D2 Checkpoint Loader`</a>
   - Checkpoint Loader that outputs full model file paths
+- <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
+  - Load Diffusion Model that outputs full model file paths
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - Controlnet Loader that creates simple workflows when connected to D2 KSampler
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
@@ -176,6 +178,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2026.0２.13**
 
 - `D2 Prompt`: Changed to a toggle switch to allow disabling token count
+- `D2 Load Diffusion Model`: Added new node
 
 **2026.01.16**
 

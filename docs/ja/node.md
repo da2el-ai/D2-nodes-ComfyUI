@@ -121,6 +121,29 @@ Node
 ---
 
 
+
+### D2 Load Diffusion Model
+
+<img src="../img/load_diffusion_model.png">
+
+- モデルファイルのフルパスやファイル名を出力する Load Diffusion Model
+
+#### Input
+
+- `unet_name` / `weight_dtype`: 標準の `Load Diffusion Model` と同じです
+
+#### Output
+
+- `model`
+    - 標準の Load Diffusion Model と同じ。
+- `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
+    - Checkpoint 名、ハッシュ、フルパス。
+    - 正確には `unet_name` ですが、`D2 Checkpoint Loader` と揃えるために `ckpt_name` にしました
+
+
+---
+
+
 ### D2 Controlnet Loader
 
 <figure>

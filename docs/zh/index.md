@@ -40,6 +40,8 @@
 
 - <a href="node.md#D2-Checkpoint-Loader">`D2 Checkpoint Loader`</a>
   - 輸出模型文件完整路徑的 Checkpoint Loader
+- <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
+  - 輸出模型文件完整路徑的 Load Diffusion Model
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - 連接到 `D2 KSampler` 可建立簡單工作流程的 Controlnet Loader
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
@@ -178,6 +180,7 @@
 **2026.0２.13**
 
 - `D2 Prompt`: 更改為切換開關，可以停用令牌計數
+- `D2 Load Diffusion Model`: 新增節點
 
 **2026.01.16**
 
