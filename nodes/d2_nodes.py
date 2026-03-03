@@ -96,7 +96,8 @@ class D2_KSampler:
         print("pipe", d2_pipe)
 
         # positive / negative 以外は pipe を優先する
-        if d2_pipe == None:
+        # 入力 d2_pipe は直接変更せず、必要に応じてコピーを作成する
+        if d2_pipe is None:
             d2_pipe = D2_TD2Pipe(
                 positive = positive,
                 negative = negative,
@@ -108,6 +109,19 @@ class D2_KSampler:
                 denoise = denoise,
             )
         else:
+            d2_pipe = D2_TD2Pipe(
+                ckpt_name = d2_pipe.ckpt_name,
+                positive = d2_pipe.positive,
+                negative = d2_pipe.negative,
+                seed = d2_pipe.seed,
+                steps = d2_pipe.steps,
+                cfg = d2_pipe.cfg,
+                sampler_name = d2_pipe.sampler_name,
+                scheduler = d2_pipe.scheduler,
+                denoise = d2_pipe.denoise,
+                width = d2_pipe.width,
+                height = d2_pipe.height,
+            )
             if positive:
                 d2_pipe.positive = positive
             if negative:
