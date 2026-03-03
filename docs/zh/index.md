@@ -177,6 +177,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.03.03**
+
+- `D2 KSampler` / `D2 KSampler Advanced`: 修復了當 d2_pipe 內容為空時反映 KSampler 值的問題
+
 **2026.0２.13**
 
 - `D2 Prompt`: 更改為切換開關，可以停用令牌計數

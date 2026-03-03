@@ -175,6 +175,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.03.03**
+
+- `D2 KSampler` / `D2 KSampler Advanced`: Fixed to reflect KSampler values when d2_pipe contents are empty
+
 **2026.0２.13**
 
 - `D2 Prompt`: Changed to a toggle switch to allow disabling token count

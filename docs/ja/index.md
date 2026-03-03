@@ -177,6 +177,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2026.03.03**
+
+- `D2 KSampler` / `D2 KSampler Advanced`: d2_pipe の内容が空っぽだった時にKSamplerの値を反映するように修正
+
 **2026.0２.13**
 
 - `D2 Prompt`: トークン数のカウントを無効化できるようにトグルスイッチに変更
