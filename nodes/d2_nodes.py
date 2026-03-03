@@ -112,6 +112,19 @@ class D2_KSampler:
                 d2_pipe.positive = positive
             if negative:
                 d2_pipe.negative = negative
+            # その他のパラメータが空の場合、ksamplerの引数値を使用
+            if d2_pipe.seed is None:
+                d2_pipe.seed = seed
+            if d2_pipe.steps is None:
+                d2_pipe.steps = steps
+            if d2_pipe.cfg is None:
+                d2_pipe.cfg = cfg
+            if not d2_pipe.sampler_name:
+                d2_pipe.sampler_name = sampler_name
+            if not d2_pipe.scheduler:
+                d2_pipe.scheduler = scheduler
+            if d2_pipe.denoise is None:
+                d2_pipe.denoise = denoise
         # print("pipe2", d2_pipe)
 
         # lora 適用を試みる
