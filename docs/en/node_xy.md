@@ -234,7 +234,7 @@ Removed. Please use `D2 XY Model List` instead.
 
 #### input
 - `model_type`
-  - Select either `checkpoints` or `loras`
+  - `checkpoints`, `loras`, `diffusion_models`, `samplers`, `schedulers`, `upscaler`, `bbox_segm`, `controlnet`
 - `filter`
   - Enter text to filter
   - Regular expressions are supported

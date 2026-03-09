@@ -177,6 +177,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.03.09**
+
+- `D2_XY_ModelList`: 新增支援取得 "diffusion_models" 清單
+
 **2026.03.03**
 
 - `D2 KSampler` / `D2 KSampler Advanced`: 修復了當 d2_pipe 內容為空時反映 KSampler 值的問題

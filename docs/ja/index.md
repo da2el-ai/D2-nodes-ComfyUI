@@ -177,6 +177,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+**2026.03.09**
+
+- `D2_XY_ModelList`: "diffusion_models" のリスト取得に対応
+
 **2026.03.03**
 
 - `D2 KSampler` / `D2 KSampler Advanced`: d2_pipe の内容が空っぽだった時にKSamplerの値を反映するように修正

@@ -238,7 +238,7 @@
 
 #### input
 - `model_type`
-  - 選擇 `checkpoints` 或 `loras`
+  - `checkpoints`, `loras`, `diffusion_models`, `samplers`, `schedulers`, `upscaler`, `bbox_segm`, `controlnet`
 - `filter`
   - 輸入過濾文字
   - 支援正則表達式

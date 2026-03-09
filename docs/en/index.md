@@ -175,6 +175,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.03.09**
+
+- `D2_XY_ModelList`: Added support for retrieving the "diffusion_models" list
+
 **2026.03.03**
 
 - `D2 KSampler` / `D2 KSampler Advanced`: Fixed to reflect KSampler values when d2_pipe contents are empty

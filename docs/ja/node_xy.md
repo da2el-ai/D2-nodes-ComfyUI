@@ -249,7 +249,7 @@ Node
 
 #### input
 - `model_type`
-  - `checkpoints` または `lolas` を選択
+  - `checkpoints`, `loras`, `diffusion_models`, `samplers`, `schedulers`, `upscaler`, `bbox_segm`, `controlnet`
 - `filter`
   - 絞り込み文字列を入力
   - 正規表現が利用可能
