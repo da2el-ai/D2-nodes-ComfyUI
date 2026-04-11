@@ -112,6 +112,9 @@ class D2_SaveImage:
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
             pil_images.append(img)
         
+        # d2_pipe からA1111形式の生成パラメーターメモを作成
+        a1111_param = util.format_a1111_parameter(d2_pipe)
+
         # アニメーションwebpの場合
         if format == "animated_webp":
             # ファイル名の設定
@@ -139,9 +142,6 @@ class D2_SaveImage:
         
         # 静止画の場合（単一画像または複数画像を個別に保存）
         else:
-            # d2_pipe からA1111形式の生成パラメーターメモを作成
-            a1111_param = util.format_a1111_parameter(d2_pipe)
-
             for i, img in enumerate(pil_images):
                 # ファイル名の設定
                 file = f"{filename}_{counter:05}_.{format}"
