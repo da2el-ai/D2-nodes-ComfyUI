@@ -484,3 +484,31 @@ foo:0.5,bar
 ```
 >prompt; >seed; <width; <height
 ```
+
+
+### D2 Save Audio Eagle
+
+<figure>
+  <img src="../img/save_audio_eagle.png">
+</figure>
+
+- オーディオファイルをEagleに送信するノード
+- 従来のフォルダにも二重で保存されるのでドライブ残容量に注意
+
+#### Input
+
+- `audio`
+  - 保存する音声を入力
+- `filename_prefix`
+  - 保存ファイル名
+- `eagle_folder`
+  - Eagleの保存先フォルダ名
+- `format`
+  - FLAC / MP3 / Opus から選択
+- `mp3_quality`
+  - `format` が `mp3` の時に使用するビットレート
+- `opus_quality`
+  - `format` が `Opus` の時に使用するビットレート
+- `memo_text`
+  - Eagleのメモ欄に保存するテキスト
+

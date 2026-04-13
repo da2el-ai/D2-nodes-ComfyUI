@@ -76,6 +76,8 @@ D2 Nodes ComfyUI
   - ModelMergeSDXL と CLIPMergeSimple を合体させたノード
 - <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
   - 複数の要素をまとめて運ぶためのノード。ComfyUI-0246 の Highway 下位互換
+- <a href="node.md#D2-Save-Audio-Eagle">`D2 Save Audio Eagle`</a>
+  - 音声ファイルをEagleに保存
 
 
 ### Text
@@ -176,6 +178,11 @@ D2 Nodes ComfyUI
 
 
 ## :blossom: Changelog
+
+
+**2026.04.13**
+
+- `D2_SaveAudioEagle`: 新規追加
 
 **2026.03.09**
 

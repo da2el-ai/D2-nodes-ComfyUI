@@ -458,3 +458,30 @@ foo:0.5,bar
 ```
 >prompt; >seed; <width; <height
 ```
+
+
+### D2 Save Audio Eagle
+
+<figure>
+  <img src="../img/save_audio_eagle.png">
+</figure>
+
+- 將音頻文件發送到 Eagle 的節點
+- 文件也會同時保存到常規文件夾，請注意硬碟剩餘空間
+
+#### Input
+
+- `audio`
+  - 要保存的音頻
+- `filename_prefix`
+  - 保存文件名
+- `eagle_folder`
+  - Eagle 的保存目標文件夾名稱
+- `format`
+  - 從 FLAC / MP3 / Opus 中選擇
+- `mp3_quality`
+  - `format` 為 `mp3` 時使用的位元率
+- `opus_quality`
+  - `format` 為 `Opus` 時使用的位元率
+- `memo_text`
+  - 保存到 Eagle 備註欄的文字

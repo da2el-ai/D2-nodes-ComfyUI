@@ -76,6 +76,8 @@
   - 將 ModelMergeSDXL 和 CLIPMergeSimple 結合的節點
 - <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
   - 用於傳遞多個元素的節點。與 ComfyUI-0246 的 Highway 向下兼容
+- <a href="node.md#D2-Save-Audio-Eagle">`D2 Save Audio Eagle`</a>
+  - 將音頻文件保存到 Eagle
 
 
 ### 文字
@@ -176,6 +178,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.04.13**
+
+- `D2_SaveAudioEagle`: 新增
 
 **2026.03.09**
 

@@ -457,3 +457,30 @@ Add `prompt` `seed` to inputs, `width` `height` to outputs
 ```
 >prompt; >seed; <width; <height
 ```
+
+
+### D2 Save Audio Eagle
+
+<figure>
+  <img src="../img/save_audio_eagle.png">
+</figure>
+
+- A node that sends audio files to Eagle
+- Note that files are also saved to the regular folder, so be mindful of drive space
+
+#### Input
+
+- `audio`
+  - Audio to save
+- `filename_prefix`
+  - Filename for saving
+- `eagle_folder`
+  - Destination folder name in Eagle
+- `format`
+  - Choose from FLAC / MP3 / Opus
+- `mp3_quality`
+  - Bitrate used when `format` is `mp3`
+- `opus_quality`
+  - Bitrate used when `format` is `Opus`
+- `memo_text`
+  - Text to save in Eagle's memo field

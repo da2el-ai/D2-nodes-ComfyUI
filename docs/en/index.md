@@ -75,6 +75,8 @@ If you have installed any of the following custom nodes previously, please remov
   - A node that combines ModelMergeSDXL and CLIPMergeSimple
 - <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
   - Node for passing multiple elements together. Backward compatible with ComfyUI-0246's Highway
+- <a href="node.md#D2-Save-Audio-Eagle">`D2 Save Audio Eagle`</a>
+  - Save audio files to Eagle
 
 ### Text
 
@@ -174,6 +176,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.04.13**
+
+- `D2_SaveAudioEagle`: Added new node
 
 **2026.03.09**
 
