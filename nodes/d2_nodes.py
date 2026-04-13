@@ -92,9 +92,6 @@ class D2_KSampler:
 
         util.set_preview_method(preview_method)
 
-        print("positive", positive)
-        print("pipe", d2_pipe)
-
         # positive / negative 以外は pipe を優先する
         # 入力 d2_pipe は直接変更せず、必要に応じてコピーを作成する
         if d2_pipe is None:
