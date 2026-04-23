@@ -132,9 +132,20 @@ class D2_ShortcutKeyControl {
       const beforeText = text.substring(0, selStart);
       const afterText = text.substring(selEnd);
       const lastCommentStartPos = beforeText.lastIndexOf('/*');
+      const lastCommentEndPosBefore = beforeText.lastIndexOf('*/');
       const firstCommentEndPos = afterText.indexOf('*/');
-      
-      if (lastCommentStartPos !== -1 && firstCommentEndPos !== -1) {
+      const firstCommentStartPosAfter = afterText.indexOf('/*');
+
+      // カーソルが未閉じの /* ... */ の内部にあるか判定
+      // - beforeText: 最後の /* が最後の */ より後ろにある (まだ閉じていない)
+      // - afterText: 最初の */ が最初の /* より前にある (次の /* が始まる前に閉じる)
+      const isInsideComment =
+        lastCommentStartPos !== -1 &&
+        firstCommentEndPos !== -1 &&
+        lastCommentStartPos > lastCommentEndPosBefore &&
+        (firstCommentStartPosAfter === -1 || firstCommentEndPos < firstCommentStartPosAfter);
+
+      if (isInsideComment) {
         // /* */ が見つかった場合、コメント部分を削除して内容を保持
         const commentStartPos = lastCommentStartPos;
         const commentEndPos = selEnd + firstCommentEndPos + 2; // +2 for '*/'
