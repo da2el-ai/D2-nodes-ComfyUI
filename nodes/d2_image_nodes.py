@@ -91,6 +91,7 @@ class D2_SaveImage:
             self.prefix_append = ""
             compress_level = 4
 
+
         # プレフィックスのテンプレート処理
         filename_prefix = template_util.replace_template(filename_prefix, {}, prompt)
 
@@ -118,7 +119,7 @@ class D2_SaveImage:
         # アニメーションwebpの場合
         if format == "animated_webp":
             # ファイル名の設定
-            file = f"{filename}_{counter:05}_.webp"
+            file = f"{filename}_{counter:05}.webp"
             file_path = os.path.join(full_output_folder, file)
             
             # アニメーションwebpとして保存
@@ -144,7 +145,7 @@ class D2_SaveImage:
         else:
             for i, img in enumerate(pil_images):
                 # ファイル名の設定
-                file = f"{filename}_{counter:05}_.{format}"
+                file = f"{filename}_{counter:05}.{format}"
                 file_path = os.path.join(full_output_folder, file)
                 
                 # 各画像形式で保存
