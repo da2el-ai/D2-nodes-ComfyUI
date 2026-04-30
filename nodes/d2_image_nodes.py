@@ -929,12 +929,9 @@ class D2_CutByMask:
         width = images.shape[2]
         channels = images.shape[3]
         
-        # print(f"Debug - Image shape: {images.shape}, Mask shape: {mask.shape}")
-        
         # ユーティリティ関数を使用してマスクを調整
         mask = mask_util.adjust_mask_dimensions(mask)
         mask = mask_util.check_mask_image_compatibility(mask, height, width)
-        # print(f"Debug - After compatibility check: mask shape={mask.shape}")
         
         # マスクのある範囲を取得（非ゼロの部分）
         mask_np = mask.cpu().numpy()
@@ -967,14 +964,12 @@ class D2_CutByMask:
 
         elif len(non_zero_indices[0]) == 0:
             # マスクが空の場合、画像全体を矩形として扱う
-            print("Empty mask detected, treating the entire image as the rectangle.")
             mask = mask_util.create_rectangle_mask(height, width, 0, 0, width, height)
             rect = [0, 0, width, height]
             cut_type = "rectangle"
         else:
             # マスクから矩形領域を作成
             rect = mask_util.create_rectangle_from_mask(mask_np, width, height, padding, min_width, min_height)
-            print(f"Debug - Rect from Mask: x={rect[0]}, y={rect[1]}, width={rect[2]}, height={rect[3]}")
 
             # 中心座標を計算（矩形の検証に必要）
             y_min_nz, y_max_nz = non_zero_indices[0].min(), non_zero_indices[0].max()
@@ -986,8 +981,6 @@ class D2_CutByMask:
 
         # 矩形領域を取得 (この部分は共通化)
         x_min, y_min, rect_width, rect_height = rect
-        # print(f"Rectangle: x={rect[0]}, y={rect[1]}, w={rect[2]}, h={rect[3]}")
-        # print(f"Debug - Rect dimensions: x_min={x_min}, y_min={y_min}, rect_width={rect_width}, rect_height={rect_height}")
         
         # バッチ処理のための出力準備
         output_images = []
@@ -1005,7 +998,6 @@ class D2_CutByMask:
             img_crop = img[y_min:y_min+rect_height, x_min:x_min+rect_width].clone()
             
             # デバッグ情報を表示
-            # print(f"Debug - Crop dimensions: mask_crop={mask_crop.shape}, img_crop={img_crop.shape}")
             
             # 4. cut_type に基づいて処理
             if cut_type == "mask":
@@ -1017,7 +1009,6 @@ class D2_CutByMask:
                     # RGBをRGBAに変換
                     # 新しいRGBA画像を作成
                     rgba_img = torch.zeros((rect_height, rect_width, 4), dtype=img.dtype, device=img.device)
-                    # print(f"Debug - RGBA image size: {rgba_img.shape}, img_crop size: {img_crop.shape}")
                     rgba_img[:, :, :3] = img_crop  # RGB部分をコピー
                     rgba_img[:, :, 3] = 1.0  # 矩形領域は完全不透明に
                     img_crop = rgba_img
@@ -1046,8 +1037,13 @@ class D2_CutByMask:
         # 出力を適切な形式に変換
         output_tensor = torch.stack(output_images, dim=0)
         rect_tensor = torch.tensor(rect, dtype=torch.int32)
-        
-        return (output_tensor, output_mask if output_size == "mask_size" else mask, rect_tensor)
+
+        # ComfyUI 標準仕様の [1, H, W] に戻して返す
+        final_mask = output_mask if output_size == "mask_size" else mask
+        if final_mask.ndim == 2:
+            final_mask = final_mask.unsqueeze(0)
+
+        return (output_tensor, final_mask, rect_tensor)
 
 
 class D2_PasteByMask:
@@ -1127,22 +1123,15 @@ class D2_PasteByMask:
         paste_width = img_paste.shape[2]
         paste_channels = img_paste.shape[3]
         
-        # print(f"Debug - Base image: {img_base.shape}, Paste image: {img_paste.shape}")
-        # print(f"Debug - Base batch size: {batch_size_base}, Paste batch size: {batch_size_paste}")
-        # print(f"Debug - Using feather_type: {feather_type}")
-        
         # マスクの調整（必要な場合）
         if mask_opt is not None:
             mask_opt = mask_util.adjust_mask_dimensions(mask_opt)
-            # print(f"Debimage_util.ug - Mask shape after adjustment: {mask_opt.shape}")
         
         # rect_opt の検証（ない場合は初期値を設定）
         if rect_opt is None or len(rect_opt) != 4:
-            print("Rectangle not provided or invalid, using default values")
             rect_opt = torch.tensor([0, 0, paste_width, paste_height])
         
         x, y, rect_width, rect_height = rect_opt.tolist()
-        # print(f"Debug - Rectangle: x={x}, y={y}, width={rect_width}, height={rect_height}")
         
         # マルチモードに応じたバッチ処理の準備
         if multi_mode == "pair_only" and batch_size_base != batch_size_paste:

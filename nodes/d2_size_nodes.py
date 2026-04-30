@@ -126,6 +126,10 @@ class D2_ImageResize:
 
         # マスクのリサイズ
         if mask is not None:
+            # バッチ次元のないマスク [H, W] を [1, H, W] に正規化
+            if mask.ndim == 2:
+                mask = mask.unsqueeze(0)
+
             for m in mask:
                 # マスクをPIL Imageに変換
                 mask_pil = image_util.tensor2pil(m.unsqueeze(0))
@@ -150,12 +154,12 @@ class D2_ImageResize:
                     rotate = rotate,
                     resampling = resampling,
                 )
-                
+
                 # マスクをテンソルに戻す
                 mask_tensor = image_util.pil2tensor(resized_mask)
                 scaled_masks.append(mask_tensor.squeeze(0))
-            
-            scaled_masks = torch.cat(scaled_masks, dim=0)
+
+            scaled_masks = torch.stack(scaled_masks, dim=0)
         else:
             scaled_masks = None
 
