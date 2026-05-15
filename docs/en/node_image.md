@@ -211,6 +211,12 @@ Compatible with images saved by the following nodes and UIs:
 - Novel AI
 - A1111 (including Forge variants)
 
+> **Note: Prompts cannot be extracted when the mask editor is used**
+>
+> When you edit an image with the mask editor, ComfyUI writes out a new image file and internally swaps it in, so the original metadata is lost and prompts can no longer be extracted. Clearing the mask does not revert this swap.
+>
+> As a workaround, add a separate `D2 Load Image` dedicated to prompt extraction and avoid using the mask editor on that node.
+
 ---
 
 ### D2 Load Folder Images
