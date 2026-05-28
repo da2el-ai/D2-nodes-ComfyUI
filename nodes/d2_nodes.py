@@ -684,6 +684,91 @@ class D2_AnyDelivery:
 
 
 
+"""
+
+D2 Preset Selector
+複数パラメータのプリセットをテキストで定義し、プルダウンで1つ選ぶとまとめて出力する
+
+"""
+class D2_PresetSelector:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                # 選択肢は JS が options.values へ動的に流し込む（サーバー側は空のまま）
+                "preset": ([],),
+                "preset_text": ("STRING", {"multiline": True, "default": ""}),
+            },
+            "optional": {
+                "_update": ("D2_BUTTON", {}),
+            },
+        }
+
+    # 出力は preset_text の解析で決まる動的スロット。型検証で IndexError にならないよう AnyTypeTuple を使う
+    RETURN_TYPES = AnyTypeTuple(())
+    RETURN_NAMES = AnyTypeTuple(())
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    # preset は動的 COMBO のため、登録済みリスト（空）との照合をスキップする
+    @classmethod
+    def VALIDATE_INPUTS(cls, preset):
+        return True
+
+    """
+    型名に応じて値をキャストする。INT/FLOAT 変換失敗時は、どのプリセット・列かが分かるエラーを出す
+    """
+    @staticmethod
+    def _cast_value(type_name, raw, preset_title, col_name):
+        if type_name == "BOOLEAN":
+            return raw.strip().lower() in ("true", "1", "yes", "on")
+        try:
+            if type_name == "INT":
+                return int(raw)
+            if type_name == "FLOAT":
+                return float(raw)
+            return str(raw)
+        except (ValueError, TypeError):
+            raise ValueError(
+                f"D2 Preset Selector: プリセット '{preset_title}' の '{col_name}' 列の値 '{raw}' を {type_name} に変換できません"
+            )
+
+    def run(self, preset="", preset_text="", _update=None, **kwargs):
+        # 空行を除いた行を取得
+        lines = [line for line in preset_text.splitlines() if line.strip() != ""]
+
+        # 名前行・型行・プリセット行が揃っていなければ出力なし
+        if len(lines) < 3:
+            return ()
+
+        names = [n.strip() for n in lines[0].split(";")]
+        types = [t.strip() for t in lines[1].split(";")]
+        preset_rows = lines[2:]
+
+        # 選択中のプリセット行を探す（先頭セル＝タイトル）
+        target = None
+        for row in preset_rows:
+            cells = [c.strip() for c in row.split(";")]
+            if cells and cells[0] == preset:
+                target = cells
+                break
+
+        # 一致するプリセットがない（テキスト変更後など）→ 出力なし
+        if target is None:
+            return ()
+
+        values = target[1:]
+
+        result = []
+        for i, name in enumerate(names):
+            type_name = types[i] if i < len(types) else "STRING"
+            raw = values[i] if i < len(values) else ""
+            result.append(self._cast_value(type_name, raw, preset, name))
+
+        return tuple(result)
+
+
+
 NODE_CLASS_MAPPINGS = {
     "D2 KSampler": D2_KSampler,
     "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
@@ -693,4 +778,5 @@ NODE_CLASS_MAPPINGS = {
     "D2 Load Lora": D2_LoadLora,
     "D2 Pipe": D2_Pipe,
     "D2 Any Delivery": D2_AnyDelivery,
+    "D2 Preset Selector": D2_PresetSelector,
 }
