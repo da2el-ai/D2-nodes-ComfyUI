@@ -22,7 +22,7 @@ from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 from nodes import UNETLoader
 
 from .modules import util
-from .modules.util import D2_TD2Pipe, D2_TDelivery, AnyType
+from .modules.util import D2_TD2Pipe, D2_TDelivery, AnyType, AnyTypeTuple
 from .modules import checkpoint_util
 from .modules.template_util import replace_template
 
@@ -639,19 +639,6 @@ class D2_Pipe:
 D2 Any Delivery
 
 """
-class D2_PackageTuple(tuple):
-    def __new__(cls, types):
-        return super().__new__(cls, types)
-        
-    def __getitem__(self, index):
-        if index >= len(self):
-            return AnyType("")
-        item = super().__getitem__(index)
-        if isinstance(item, str):
-            return AnyType(item)
-        return item
-
-
 class D2_AnyDelivery:
     @classmethod
     def INPUT_TYPES(cls):
@@ -664,8 +651,8 @@ class D2_AnyDelivery:
             "hidden": {"_prompt": "PROMPT"},
         }
 
-    RETURN_TYPES = D2_PackageTuple(("D2_TDelivery", ))
-    RETURN_NAMES = D2_PackageTuple(("_package", ))
+    RETURN_TYPES = AnyTypeTuple(("D2_TDelivery", ))
+    RETURN_NAMES = AnyTypeTuple(("_package", ))
     FUNCTION = "run"
     CATEGORY = "D2"
 

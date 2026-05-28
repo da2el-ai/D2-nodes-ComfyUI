@@ -77,6 +77,23 @@ class AnyType(str):
     def __ne__(self, __value: object) -> bool:
         return False
 
+
+"""
+任意個数の出力に対応する RETURN_TYPES / RETURN_NAMES 用 tuple
+範囲外インデックスでは AnyType("") を返すので、出力スロットが宣言数を超えても IndexError にならない
+"""
+class AnyTypeTuple(tuple):
+    def __new__(cls, types):
+        return super().__new__(cls, types)
+
+    def __getitem__(self, index):
+        if index >= len(self):
+            return AnyType("")
+        item = super().__getitem__(index)
+        if isinstance(item, str):
+            return AnyType(item)
+        return item
+
 """
 リストを文字結合する
 """
