@@ -697,9 +697,10 @@ class D2_PresetSelector:
             "required": {
                 # 選択肢は JS が options.values へ動的に流し込む（サーバー側は空のまま）
                 "preset": ([],),
-                "preset_text": ("STRING", {"multiline": True, "default": ""}),
+                "preset_text": ("STRING", {"multiline": True, "default": "cfg;steps\nFLOAT;INT\nAnima;2;15\nIllustrious;5;20"}),
             },
             "optional": {
+                "preset_name": ("STRING", {"forceInput":True},),
                 "_update": ("D2_BUTTON", {}),
             },
         }
@@ -733,7 +734,7 @@ class D2_PresetSelector:
                 f"D2 Preset Selector: プリセット '{preset_title}' の '{col_name}' 列の値 '{raw}' を {type_name} に変換できません"
             )
 
-    def run(self, preset="", preset_text="", _update=None, **kwargs):
+    def run(self, preset="", preset_text="", preset_name=None, _update=None, **kwargs):
         # 空行を除いた行を取得
         lines = [line for line in preset_text.splitlines() if line.strip() != ""]
 
@@ -745,11 +746,15 @@ class D2_PresetSelector:
         types = [t.strip() for t in lines[1].split(";")]
         preset_rows = lines[2:]
 
+        # 外部からpreset_nameが指定されていたらそちらを優先する（空文字列は未指定扱い）
+        target_name = preset_name if preset_name else preset
+
         # 選択中のプリセット行を探す（先頭セル＝タイトル）
         target = None
         for row in preset_rows:
             cells = [c.strip() for c in row.split(";")]
-            if cells and cells[0] == preset:
+            # 先頭セル（タイトル）が空の行はマッチ対象にしない
+            if cells and cells[0] and cells[0] == target_name:
                 target = cells
                 break
 
@@ -763,7 +768,7 @@ class D2_PresetSelector:
         for i, name in enumerate(names):
             type_name = types[i] if i < len(types) else "STRING"
             raw = values[i] if i < len(values) else ""
-            result.append(self._cast_value(type_name, raw, preset, name))
+            result.append(self._cast_value(type_name, raw, target_name, name))
 
         return tuple(result)
 

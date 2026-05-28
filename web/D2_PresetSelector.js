@@ -32,6 +32,9 @@ const parsePresetText = (text) => {
         const cells = line.split(";").map((s) => s.trim());
         const title = cells[0];
         const values = cells.slice(1);
+        if (title.length <= 0) {
+            return { error: `プリセット名が指定されていません` };
+        }
         if (values.length !== names.length) {
             return { error: `プリセット '${title}' の値の数(${values.length})が出力数(${names.length})と一致しません` };
         }

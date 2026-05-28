@@ -2,3 +2,5 @@
 config/sizeselector_config.yaml
 .clinerules
 config/template_config.yaml
+.claude/
+CLAUDE.md
