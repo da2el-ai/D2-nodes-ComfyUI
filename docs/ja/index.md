@@ -185,6 +185,7 @@ D2 Nodes ComfyUI
 **2026.05.29**
 
 - `D2_PresetSelector`: 新規追加
+- `D2_PresetSelector`: `preset_name` 入力を追加（外部からプリセットを切り替え可能に）。`preset_text` に初期サンプルを追加
 
 **2026.04.13**
 

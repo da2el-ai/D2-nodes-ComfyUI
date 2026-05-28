@@ -476,8 +476,12 @@ Add `prompt` `seed` to inputs, `width` `height` to outputs
 - `preset`
   - Dropdown. The currently selected preset
   - The titles from line 3 onward of `preset_text` become the choices
+- `preset_name`
+  - Input that receives a preset name as a string from outside (forceInput)
+  - When connected and not an empty string, it takes priority over `preset` (the dropdown selection)
 - `preset_text`
   - Preset definition text (format described below)
+  - A sample is filled in by default, so you can try it as is
 - `_update`
   - Updates the output slots and the dropdown according to `preset_text`
 
@@ -497,7 +501,7 @@ Illustrious;20;5.0
 
 - Line 1: output names (separated by `;`)
 - Line 2: output types (`INT` / `FLOAT` / `STRING` / `BOOLEAN`)
-- Line 3 onward: `title;value1;value2…` (one line per preset)
+- Line 3 onward: `title;value1;value2…` (one line per preset). The title (first cell) is required; leaving it empty causes an error
 
 In the example above, selecting `Anima` outputs `steps`=15 and `cfg`=1.5.
 

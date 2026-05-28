@@ -182,6 +182,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2026.05.29**
 
 - `D2_PresetSelector`: Added new node
+- `D2_PresetSelector`: Added a `preset_name` input (lets you switch presets from outside) and a sample default for `preset_text`
 
 **2026.04.13**
 

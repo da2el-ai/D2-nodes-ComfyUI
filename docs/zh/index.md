@@ -184,6 +184,7 @@
 **2026.05.29**
 
 - `D2_PresetSelector`: 新增
+- `D2_PresetSelector`：新增 `preset_name` 輸入（可從外部切換預設），並為 `preset_text` 加入範例預設值
 
 **2026.04.13**
 
