@@ -485,6 +485,56 @@ foo:0.5,bar
 >prompt; >seed; <width; <height
 ```
 
+---
+
+
+### D2 Preset Selector
+
+<figure>
+  <img src="../img/preset_selector.png">
+</figure>
+
+- 複数パラメータのプリセットをテキストで定義し、プルダウンで1つ選ぶとまとめて出力するノード
+- Checkpoint ごとの推奨 `steps` / `cfg` などをセットで切り替える用途を想定
+- `preset_text` に書式を記入して `_update` を押すと、出力スロットとプルダウンが再構築される
+
+#### Input
+
+- `preset`
+  - プルダウン。選択中のプリセット
+  - `preset_text` の3行目以降のタイトルが選択肢になる
+- `preset_text`
+  - プリセット定義テキスト（書式は後述）
+- `_update`
+  - `preset_text` の内容に従って出力スロットとプルダウンを更新する
+
+#### Output
+
+- `preset_text` の1行目で定義した名前ごとに出力スロットが作られる
+- 選択中のプリセットの値が、2行目で指定した型に変換されて出力される
+
+#### preset_text の書式
+
+```
+steps;cfg
+INT;FLOAT
+Anima;15;1.5
+Illustrious;20;5.0
+```
+
+- 1行目：出力名（`;` 区切り）
+- 2行目：出力の型（`INT` / `FLOAT` / `STRING` / `BOOLEAN`）
+- 3行目以降：`タイトル;値1;値2…`（プリセット1つにつき1行）
+
+上の例で `Anima` を選ぶと `steps`=15、`cfg`=1.5 が出力される。
+
+#### 制約
+
+- `STRING` の値に区切り文字 `;` は使えない
+- `preset` プルダウンへの Primitive ノード接続は非対応（ComfyUI の仕様により選択肢が表示されない）。リロード・ワークフロー読込・サブグラフ入力は正常に動作する
+
+---
+
 
 ### D2 Save Audio Eagle
 

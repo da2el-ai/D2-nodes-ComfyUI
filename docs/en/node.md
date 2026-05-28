@@ -458,6 +458,56 @@ Add `prompt` `seed` to inputs, `width` `height` to outputs
 >prompt; >seed; <width; <height
 ```
 
+---
+
+
+### D2 Preset Selector
+
+<figure>
+  <img src="../img/preset_selector.png">
+</figure>
+
+- A node that defines presets of multiple parameters as text and outputs a whole set by picking one from a dropdown
+- Intended for switching sets of recommended `steps` / `cfg` etc. per Checkpoint
+- Enter the format into `preset_text` and press `_update` to rebuild the output slots and the dropdown
+
+#### Input
+
+- `preset`
+  - Dropdown. The currently selected preset
+  - The titles from line 3 onward of `preset_text` become the choices
+- `preset_text`
+  - Preset definition text (format described below)
+- `_update`
+  - Updates the output slots and the dropdown according to `preset_text`
+
+#### Output
+
+- An output slot is created for each name defined on line 1 of `preset_text`
+- The values of the selected preset are converted to the types specified on line 2 and output
+
+#### preset_text Format
+
+```
+steps;cfg
+INT;FLOAT
+Anima;15;1.5
+Illustrious;20;5.0
+```
+
+- Line 1: output names (separated by `;`)
+- Line 2: output types (`INT` / `FLOAT` / `STRING` / `BOOLEAN`)
+- Line 3 onward: `title;value1;value2…` (one line per preset)
+
+In the example above, selecting `Anima` outputs `steps`=15 and `cfg`=1.5.
+
+#### Constraints
+
+- The separator `;` cannot be used inside `STRING` values
+- Connecting a Primitive node to the `preset` dropdown is not supported (due to a ComfyUI limitation, the choices are not shown). Reloading, loading a workflow, and subgraph inputs all work normally
+
+---
+
 
 ### D2 Save Audio Eagle
 

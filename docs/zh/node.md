@@ -459,6 +459,56 @@ foo:0.5,bar
 >prompt; >seed; <width; <height
 ```
 
+---
+
+
+### D2 Preset Selector
+
+<figure>
+  <img src="../img/preset_selector.png">
+</figure>
+
+- 以文字定義多個參數的預設組合，從下拉選單選擇一個即可整組輸出的節點
+- 適用於依各 Checkpoint 切換建議的 `steps` / `cfg` 等成組設定
+- 在 `preset_text` 填入格式後按下 `_update`，即可重建輸出插槽與下拉選單
+
+#### Input
+
+- `preset`
+  - 下拉選單。目前選擇的預設
+  - `preset_text` 第 3 行以後的標題會成為選項
+- `preset_text`
+  - 預設定義文字（格式如下）
+- `_update`
+  - 依 `preset_text` 的內容更新輸出插槽與下拉選單
+
+#### Output
+
+- 會依 `preset_text` 第 1 行定義的名稱各自建立輸出插槽
+- 所選預設的值會依第 2 行指定的型別轉換後輸出
+
+#### preset_text 格式
+
+```
+steps;cfg
+INT;FLOAT
+Anima;15;1.5
+Illustrious;20;5.0
+```
+
+- 第 1 行：輸出名稱（以 `;` 分隔）
+- 第 2 行：輸出型別（`INT` / `FLOAT` / `STRING` / `BOOLEAN`）
+- 第 3 行以後：`標題;值1;值2…`（每個預設一行）
+
+在上述範例中，選擇 `Anima` 會輸出 `steps`=15、`cfg`=1.5。
+
+#### 限制
+
+- `STRING` 的值中不能使用分隔符號 `;`
+- 不支援將 Primitive 節點連接到 `preset` 下拉選單（因 ComfyUI 的限制，選項不會顯示）。重新載入、載入工作流程、子圖（subgraph）輸入皆可正常運作
+
+---
+
 
 ### D2 Save Audio Eagle
 

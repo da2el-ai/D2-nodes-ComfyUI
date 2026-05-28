@@ -76,6 +76,8 @@ D2 Nodes ComfyUI
   - ModelMergeSDXL と CLIPMergeSimple を合体させたノード
 - <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
   - 複数の要素をまとめて運ぶためのノード。ComfyUI-0246 の Highway 下位互換
+- <a href="node.md#D2-Preset-Selector">`D2 Preset Selector`</a>
+  - 複数パラメータのプリセットをテキストで定義し、プルダウンでまとめて出力
 - <a href="node.md#D2-Save-Audio-Eagle">`D2 Save Audio Eagle`</a>
   - 音声ファイルをEagleに保存
 
@@ -179,6 +181,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.05.29**
+
+- `D2_PresetSelector`: 新規追加
 
 **2026.04.13**
 

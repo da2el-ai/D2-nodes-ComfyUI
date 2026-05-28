@@ -75,6 +75,8 @@ If you have installed any of the following custom nodes previously, please remov
   - A node that combines ModelMergeSDXL and CLIPMergeSimple
 - <a href="node.md#D2-Any-Delivery">`D2 Any Delivery`</a>
   - Node for passing multiple elements together. Backward compatible with ComfyUI-0246's Highway
+- <a href="node.md#D2-Preset-Selector">`D2 Preset Selector`</a>
+  - Define presets of multiple parameters as text and output a whole set from a dropdown
 - <a href="node.md#D2-Save-Audio-Eagle">`D2 Save Audio Eagle`</a>
   - Save audio files to Eagle
 
@@ -176,6 +178,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.05.29**
+
+- `D2_PresetSelector`: Added new node
 
 **2026.04.13**
 
