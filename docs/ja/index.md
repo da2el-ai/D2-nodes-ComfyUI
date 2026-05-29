@@ -44,7 +44,7 @@ D2 Nodes ComfyUI
 - <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
   - モデルファイルのフルパスを出力する Load Diffusion Model
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
-  - D2 KSampler に接続してシンプルなワークフローが作れる Controlnet Loader
+  - D2 KSampler に接続してシンプルなワークフローが作れる Controlnet Loader。Anima-LLLite にも対応
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - テキストで指定するLoraローダー
 
@@ -186,6 +186,7 @@ D2 Nodes ComfyUI
 
 - `D2_PresetSelector`: 新規追加
 - `D2_PresetSelector`: `preset_name` 入力を追加（外部からプリセットを切り替え可能に）。`preset_text` に初期サンプルを追加
+- `D2_ControlnetLoader` / `D2_KSampler`: kohya-ss の Anima-LLLite に対応。`controlnet_type` 入力を追加（要 [ComfyUI-Anima-LLLite](https://github.com/kohya-ss/ComfyUI-Anima-LLLite)）
 
 **2026.04.13**
 

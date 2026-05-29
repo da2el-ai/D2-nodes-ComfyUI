@@ -33,13 +33,22 @@ from .modules.template_util import replace_template
 Controlnet object wrapper
 """
 class D2_Cnet:
-    def __init__(self, controlnet_name, image, strength, start_percent, end_percent):
-        self.controlnet_path = folder_paths.get_full_path_or_raise("controlnet", controlnet_name)
-        self.controlnet = comfy.controlnet.load_controlnet(self.controlnet_path)
+    def __init__(self, controlnet_type, controlnet_name, image, strength, start_percent, end_percent):
+        self.controlnet_type = controlnet_type
+        self.controlnet_name = controlnet_name
         self.image = image
         self.strength = strength
         self.start_percent = start_percent
         self.end_percent = end_percent
+
+        # Anima(LLLite)は標準 ControlNet 形式ではないため、ここでは読み込まない。
+        # 重みの読み込みは AnimaLLLiteApply 側が controlnet_name から行う。
+        if controlnet_type == "Anima":
+            self.controlnet_path = None
+            self.controlnet = None
+        else:
+            self.controlnet_path = folder_paths.get_full_path_or_raise("controlnet", controlnet_name)
+            self.controlnet = comfy.controlnet.load_controlnet(self.controlnet_path)
 
 
 
@@ -158,12 +167,14 @@ class D2_KSampler:
         # control net
         if isinstance(cnet_stack, list):
             for d2_cnet in cnet_stack:
-                controlnet_conditioning = ControlNetApplyAdvanced().apply_controlnet(
-                    positive_encoded, negative_encoded, 
-                    d2_cnet.controlnet, d2_cnet.image, d2_cnet.strength,
-                    d2_cnet.start_percent, d2_cnet.end_percent
-                )
-                positive_encoded, negative_encoded = controlnet_conditioning[0], controlnet_conditioning[1]
+                # ControlNetが Animaの場合
+                # Anima は MODEL をラップするため、実際にサンプリングする lora_model に適用する
+                if(d2_cnet.controlnet_type == "Anima"):
+                    lora_model = self.__class__._apply_controlnet_anima(d2_cnet, lora_model)
+                else:
+                    positive_encoded, negative_encoded = self.__class__._apply_controlnet_stablediffusion(
+                        d2_cnet, positive_encoded, negative_encoded
+                    )
 
         disable_noise = add_noise == "disable"
         force_full_denoise = return_with_leftover_noise != "enable"
@@ -192,7 +203,61 @@ class D2_KSampler:
             "ui": {"images": results_images},
             "result": (images, latent, lora_model, lora_clip, d2_pipe.positive, formatted_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
         }
-    
+
+
+    @classmethod
+    def _apply_controlnet_stablediffusion(cls, d2_cnet, positive_encoded, negative_encoded):
+        """
+        StableDiffusion の Controlnet の適用
+        """
+        # ControlNetが StableDiffusionの場合
+        controlnet_conditioning = ControlNetApplyAdvanced().apply_controlnet(
+            positive_encoded, negative_encoded, 
+            d2_cnet.controlnet, d2_cnet.image, d2_cnet.strength,
+            d2_cnet.start_percent, d2_cnet.end_percent
+        )
+        positive_encoded, negative_encoded = controlnet_conditioning[0], controlnet_conditioning[1]
+
+        return positive_encoded, negative_encoded
+
+
+    @classmethod
+    def _apply_controlnet_anima(cls, d2_cnet, model):
+        """
+        Anima の Controlnet(LLLite) の適用
+        https://github.com/kohya-ss/ComfyUI-Anima-LLLite が必要
+
+        AnimaLLLiteApply は MODEL を model_function_wrapper でラップして返すノードなので、
+        StableDiffusion 系のように conditioning を加工するのではなく MODEL 自体を差し替える。
+        外部クラスの読み込みは _create_conditioning と同様に sys.path 経由で行うが、
+        Anima 側のモジュール名 `nodes` は ComfyUI 本体の `nodes` と衝突するため、
+        importlib でパッケージ（ComfyUI-Anima-LLLite）として読み込む。
+        """
+        try:
+            import importlib
+            custom_nodes_path = str(util.COMFYUI_PATH / "custom_nodes")
+            if custom_nodes_path not in sys.path:
+                sys.path.append(custom_nodes_path)
+            anima_module = importlib.import_module("ComfyUI-Anima-LLLite")
+            AnimaLLLiteApply = anima_module.NODE_CLASS_MAPPINGS["AnimaLLLiteApply"]
+
+            # apply はインスタンスメソッドで戻り値は (MODEL,) のタプル
+            model = AnimaLLLiteApply().apply(
+                model,
+                d2_cnet.controlnet_name,
+                d2_cnet.image,
+                d2_cnet.strength,
+                d2_cnet.start_percent,
+                d2_cnet.end_percent,
+            )[0]
+
+        except (ImportError, AttributeError, ValueError, KeyError) as e:
+            print(f"[D2 KSampler] Error: {e} //////////////" )
+            print("ComfyUI-Anima-LLLite を読み込めませんでした。\nComfyUI-Anima-LLLite をインストールする必要があります。\nhttps://github.com/kohya-ss/ComfyUI-Anima-LLLite")
+
+        return model
+
+
     @classmethod
     def _create_conditioning(cls, clip, prompt, token_normalization="none", weight_interpretation="comfy", affect_pooled='disable'):
         """
@@ -388,6 +453,7 @@ class D2_ControlnetLoader:
     def INPUT_TYPES(cls):
         return {
             "required": { 
+                "controlnet_type": (["StableDiffusion", "Anima"],),
                 "controlnet_name": (folder_paths.get_filename_list("controlnet"),),
                 "image": ("IMAGE",),
                 "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.001}),
@@ -404,9 +470,9 @@ class D2_ControlnetLoader:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, controlnet_name, image, strength, start_percent, end_percent, cnet_stack=None ):
+    def run(self, controlnet_type, controlnet_name, image, strength, start_percent, end_percent, cnet_stack=None ):
         d2_cnet = D2_Cnet(
-            controlnet_name, image, strength, start_percent, end_percent
+            controlnet_type, controlnet_name, image, strength, start_percent, end_percent
         )
 
         if isinstance(cnet_stack, list):

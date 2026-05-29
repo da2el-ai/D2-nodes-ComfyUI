@@ -137,13 +137,18 @@
 ### D2 Controlnet Loader
 
 <figure>
-<img src="../img/controlnet.png">
+<img src="../img/controlnet_2.png">
 </figure>
 
 - Controlnet Loader that creates simple workflows when connected to `D2 KSampler`
+- `controlnet_type` switches between `StableDiffusion` (standard Controlnet) and `Anima` (kohya-ss's Anima-LLLite)
+  - To use `Anima`, you need to install [ComfyUI-Anima-LLLite](https://github.com/kohya-ss/ComfyUI-Anima-LLLite) beforehand
 
 #### Input
 
+- `controlnet_type`
+  - `StableDiffusion`: Standard Controlnet
+  - `Anima`: kohya-ss's Anima-LLLite (requires [ComfyUI-Anima-LLLite](https://github.com/kohya-ss/ComfyUI-Anima-LLLite))
 - `cnet_stack`
   - For connecting to `D2 Controlnet Loader`
 

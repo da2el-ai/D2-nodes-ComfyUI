@@ -42,7 +42,7 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
   - Load Diffusion Model that outputs full model file paths
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
-  - Controlnet Loader that creates simple workflows when connected to D2 KSampler
+  - Controlnet Loader that creates simple workflows when connected to D2 KSampler. Also supports Anima-LLLite
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - Lora loader that can be specified with text
 
@@ -183,6 +183,7 @@ If you have installed any of the following custom nodes previously, please remov
 
 - `D2_PresetSelector`: Added new node
 - `D2_PresetSelector`: Added a `preset_name` input (lets you switch presets from outside) and a sample default for `preset_text`
+- `D2_ControlnetLoader` / `D2_KSampler`: Added support for kohya-ss's Anima-LLLite. Added a `controlnet_type` input (requires [ComfyUI-Anima-LLLite](https://github.com/kohya-ss/ComfyUI-Anima-LLLite))
 
 **2026.04.13**
 

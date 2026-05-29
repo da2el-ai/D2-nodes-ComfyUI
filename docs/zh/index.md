@@ -43,7 +43,7 @@
 - <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
   - 輸出模型文件完整路徑的 Load Diffusion Model
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
-  - 連接到 `D2 KSampler` 可建立簡單工作流程的 Controlnet Loader
+  - 連接到 `D2 KSampler` 可建立簡單工作流程的 Controlnet Loader。同時支援 Anima-LLLite
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - 可通過文本指定的 Lora 加載器
 
@@ -185,6 +185,7 @@
 
 - `D2_PresetSelector`: 新增
 - `D2_PresetSelector`：新增 `preset_name` 輸入（可從外部切換預設），並為 `preset_text` 加入範例預設值
+- `D2_ControlnetLoader` / `D2_KSampler`：支援 kohya-ss 的 Anima-LLLite。新增 `controlnet_type` 輸入（需要 [ComfyUI-Anima-LLLite](https://github.com/kohya-ss/ComfyUI-Anima-LLLite)）
 
 **2026.04.13**
 
