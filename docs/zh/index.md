@@ -181,6 +181,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.06.03**
+
+- `D2_ControlnetLoader` / `D2_KSampler`：支援 MASK 輸入
+
 **2026.05.29**
 
 - `D2_PresetSelector`: 新增

@@ -182,6 +182,10 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.06.03**
+
+- `D2_ControlnetLoader` / `D2_KSampler`: MASK入力に対応
+
 **2026.05.29**
 
 - `D2_PresetSelector`: 新規追加

@@ -179,6 +179,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.06.03**
+
+- `D2_ControlnetLoader` / `D2_KSampler`: Added support for MASK input
+
 **2026.05.29**
 
 - `D2_PresetSelector`: Added new node
