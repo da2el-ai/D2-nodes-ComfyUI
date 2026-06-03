@@ -16,7 +16,9 @@ from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
 
 from comfy_execution.graph_utils import GraphBuilder
 from comfy_execution.graph import ExecutionBlocker
-from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced, LoraLoader
+# from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, ControlNetApplyAdvanced, LoraLoader
+from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage, LoraLoader
+from comfy_extras.nodes_controlnet import ControlNetInpaintingAliMamaApply
 from server import PromptServer
 from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 from nodes import UNETLoader
@@ -33,10 +35,12 @@ from .modules.template_util import replace_template
 Controlnet object wrapper
 """
 class D2_Cnet:
-    def __init__(self, controlnet_type, controlnet_name, image, strength, start_percent, end_percent):
+    def __init__(self, controlnet_type, controlnet_name, image, strength, start_percent, end_percent, mask=None, vae=None):
         self.controlnet_type = controlnet_type
         self.controlnet_name = controlnet_name
         self.image = image
+        self.mask = mask
+        self.vae = vae
         self.strength = strength
         self.start_percent = start_percent
         self.end_percent = end_percent
@@ -211,10 +215,17 @@ class D2_KSampler:
         StableDiffusion の Controlnet の適用
         """
         # ControlNetが StableDiffusionの場合
-        controlnet_conditioning = ControlNetApplyAdvanced().apply_controlnet(
-            positive_encoded, negative_encoded, 
-            d2_cnet.controlnet, d2_cnet.image, d2_cnet.strength,
-            d2_cnet.start_percent, d2_cnet.end_percent
+        # controlnet_conditioning = ControlNetApplyAdvanced().apply_controlnet(
+        controlnet_conditioning = ControlNetInpaintingAliMamaApply().execute(
+            positive = positive_encoded,
+            negative = negative_encoded, 
+            control_net = d2_cnet.controlnet,
+            vae = d2_cnet.vae,
+            image = d2_cnet.image,
+            mask = d2_cnet.mask,
+            strength = d2_cnet.strength,
+            start_percent = d2_cnet.start_percent,
+            end_percent = d2_cnet.end_percent
         )
         positive_encoded, negative_encoded = controlnet_conditioning[0], controlnet_conditioning[1]
 
@@ -243,12 +254,13 @@ class D2_KSampler:
 
             # apply はインスタンスメソッドで戻り値は (MODEL,) のタプル
             model = AnimaLLLiteApply().apply(
-                model,
-                d2_cnet.controlnet_name,
-                d2_cnet.image,
-                d2_cnet.strength,
-                d2_cnet.start_percent,
-                d2_cnet.end_percent,
+                model = model,
+                lllite_name = d2_cnet.controlnet_name,
+                image = d2_cnet.image,
+                strength = d2_cnet.strength,
+                start_percent = d2_cnet.start_percent,
+                end_percent = d2_cnet.end_percent,
+                mask = d2_cnet.mask,
             )[0]
 
         except (ImportError, AttributeError, ValueError, KeyError) as e:
@@ -461,6 +473,8 @@ class D2_ControlnetLoader:
                 "end_percent": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.001})
             },
             "optional": {
+                "mask": ("MASK",),
+                "vae": ("VAE",),
                 "cnet_stack": ("D2_CNET_STACK",),
             },
         }
@@ -470,9 +484,9 @@ class D2_ControlnetLoader:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, controlnet_type, controlnet_name, image, strength, start_percent, end_percent, cnet_stack=None ):
+    def run(self, controlnet_type, controlnet_name, image, strength, start_percent, end_percent, mask=None, vae=None, cnet_stack=None ):
         d2_cnet = D2_Cnet(
-            controlnet_type, controlnet_name, image, strength, start_percent, end_percent
+            controlnet_type, controlnet_name, image, strength, start_percent, end_percent, mask, vae
         )
 
         if isinstance(cnet_stack, list):
@@ -487,7 +501,7 @@ class D2_ControlnetLoader:
 """
 
 D2 Load Lora
-Loraの指定をテキストで行うノード
+    Loraの指定をテキストで行うノード
 
 """
 class D2_LoadLora:
