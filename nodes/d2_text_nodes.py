@@ -594,6 +594,64 @@ class D2_FilenameTemplate2(D2_FilenameTemplate):
         }
 
 
+"""
+
+D2 Prompt Sanitizer
+
+"""
+class D2_PromptSanitizer:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"forceInput": True}),
+                "underscore_to_space": ("BOOLEAN", {"default": True}),
+                "space_after_comma": ("BOOLEAN", {"default": True}),
+                "protect_lora": ("BOOLEAN", {"default": True}),
+                "protect_score": ("BOOLEAN", {"default": True}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("prompt",)
+    FUNCTION = "run"
+    CATEGORY = "D2"
+
+    def run(self, prompt, underscore_to_space=True, space_after_comma=True, protect_lora=True, protect_score=True):
+        # 保護対象（LoRA等の <...> と Pony 品質タグ score_9 / score_8_up 等）を
+        # プレースホルダへ退避し、整形対象から除外する
+        protected = []
+
+        def _stash(match):
+            protected.append(match.group(0))
+            return f"\x00{len(protected) - 1}\x00"
+
+        text = prompt
+
+        # <...> を退避（LoRA ファイル名のアンダースコアを保護）
+        if protect_lora:
+            text = re.sub(r"<[^>]*>", _stash, text)
+        # score_数字_語 を退避
+        if protect_score:
+            text = re.sub(r"score_\d+(?:_[a-zA-Z0-9]+)*", _stash, text)
+
+        # アンダースコアを半角スペースへ変換
+        if underscore_to_space:
+            text = text.replace("_", " ")
+
+        # カンマ前後の空白（スペース・タブ）を整理し ", " に統一（改行は保持）
+        if space_after_comma:
+            text = re.sub(r"[ \t]*,[ \t]*", ", ", text)
+
+        # 退避した保護対象を復元
+        if protected:
+            text = re.sub(r"\x00(\d+)\x00", lambda m: protected[int(m.group(1))], text)
+
+        return (text,)
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Regex Replace": D2_RegexReplace,
@@ -603,4 +661,5 @@ NODE_CLASS_MAPPINGS = {
     "D2 Filename Template": D2_FilenameTemplate,
     "D2 Filename Template2": D2_FilenameTemplate2,
     "D2 Prompt": D2_Prompt,
+    "D2 Prompt Sanitizer": D2_PromptSanitizer,
 }
