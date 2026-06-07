@@ -99,6 +99,8 @@ D2 Nodes ComfyUI
   - プロンプトのトークンを数える
 - <a href="node_text.md#D2-Prompt">`D2 Prompt`</a>
   - テキストのコメントを削除やトークン数の表示があるテキストノード
+- <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
+  - プロンプト文字列を整形する（`_` を空白に変換、カンマ後に空白を挿入）
 
 ### Image
 
@@ -181,6 +183,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.06.08**
+
+- `D2_PromptSanitizer`: 新規追加
 
 **2026.06.03**
 
@@ -275,107 +281,182 @@ D2 Nodes ComfyUI
 
 - `D2_PromptConvert`: NovelAI4の新しいウェイト方式に対応
 
-**2025.05.02**
+<details>
+<summary><strong>2025.05.02</strong></summary>
 
 - `D2_ProgressPreview`: 新規追加。
 - `D2_XYUploadImage`: 新規追加。
 
+</details>
 
-**2025.04.30**
+
+<details>
+<summary><strong>2025.04.30</strong></summary>
 
 - `D2_FolderImageQueue` `D2_FolderImages` `D2_LoadFolderImages`: ソート機能を追加
 
-**2025.04.28**
+</details>
+
+
+<details>
+<summary><strong>2025.04.28</strong></summary>
 
 - `D2_FolderImageQueue`: 開始番号を `1` から `0` に変更
 
-**2025.04.24**
+</details>
+
+
+<details>
+<summary><strong>2025.04.24</strong></summary>
 
 - `D2_FilenameTemplate2`: 新規追加。`D2_FilenameTemplate` の複数行対応版
 - `D2 EmptyImage Alpha` 色の指定を red green blue に変更。色見本も追加
 
-**2025.04.22**
+</details>
+
+
+<details>
+<summary><strong>2025.04.22</strong></summary>
 
 - `D2_CutByMask`: 最大サイズの正方形でカットするモード `square_thumb` を追加
 - `D2_XYFolderImages` / `D2_LoadFolderImages`: 毎回画像リストを更新するように変更。画像枚数の表示を追加
 - `D2_LoadImage`: A1111で作成したPNG画像のプロンプトが出力されない不具合を修正
 
-**2025.04.18**
+</details>
+
+
+<details>
+<summary><strong>2025.04.18</strong></summary>
 
 - `D2_KSamplerAdvanced`: プロンプトのウェイトを調整するパラメーター `weight_interpretation` `token_normalization` を追加
-  - 利用するには [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/) が必要です。 
+  - 利用するには [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/) が必要です。
 
-**2025.04.16**
+</details>
+
+
+<details>
+<summary><strong>2025.04.16</strong></summary>
 
 - `D2_Prompt`: LoRA挿入ボタンを追加
 - `D2_KSampler` / `D2_KSamplerAdvanced`: A1111方式のLoRA読み込みプロンプトに対応。KSampler内部でLoRA読み込みをする
 - `D2_LoadLora`: outputの `prompt` はA1111方式のLoRA読み込みプロンプトを消さずに出力するように変更。従来のものは `formatted_prompt` に名称変更
 
-**2025.04.14**
+</details>
+
+
+<details>
+<summary><strong>2025.04.14</strong></summary>
 
 - `D2 Cut By Mask`: 新規追加
 - `D2 Paste By Mask`: 新規追加
 - `D2 XY Model List`: アップスケーラーモデルに対応
 - `D2 KSampler Advanced`: 出力に d2_pipe を追加
 
-**2025.04.09**
+</details>
+
+
+<details>
+<summary><strong>2025.04.09</strong></summary>
 
 - `D2_LoadImage`: ファイル名とファイルパスの出力を追加
 - `D2_FilenameTemplate`: `format`にツールチップを追加（マウスホバーで表示）
 
+</details>
 
-**2025.04.06**
+
+<details>
+<summary><strong>2025.04.06</strong></summary>
 
 - `D2 Image Mask Stack`: 新規追加
 - `D2 Mosaic Filter`: 新規追加
 
-**2025.04.02**
+</details>
+
+
+<details>
+<summary><strong>2025.04.02</strong></summary>
 
 - `D2 Prompt`: 新規追加
 - `D2 Delete Comment`: `D2 Prompt`に統合
 
-**2025.03.31**
+</details>
+
+
+<details>
+<summary><strong>2025.03.31</strong></summary>
 
 - `D2 Token Counter`: 新規追加
 
-**2025.03.25**
+</details>
+
+
+<details>
+<summary><strong>2025.03.25</strong></summary>
 
 - コメントアウトのショートカットキー（ctrl + /）を追加
 - `D2 XYPlot Easy Mini`: `D2 XYPlot Easy` の出力スロット制限バージョンを追加
 
-**2025.03.23**
+</details>
+
+
+<details>
+<summary><strong>2025.03.23</strong></summary>
 
 - `D2 Delete Comment`: 新規追加
 - `D2 Load Lora`: A1111フォーマットを利用可能にするオプションを追加
 - `D2 Model List`: A1111フォーマットで取得するオプションを追加
 
-**2025.02.27**
+</details>
+
+
+<details>
+<summary><strong>2025.02.27</strong></summary>
 
 - `D2 Load Lora`: 新規追加
 - `D2 Multi Output`: x_list/ylist 出力を追加
 
-**2025.02.23**
+</details>
+
+
+<details>
+<summary><strong>2025.02.23</strong></summary>
 
 - `D2 Model and CLIP Merge SDXL`: checkpointのマージノードを追加
 
-**2025.01.20**
+</details>
+
+
+<details>
+<summary><strong>2025.01.20</strong></summary>
 
 - `D2 XY Seed2`: 新規追加
 - `D2 XY Plot / D2 XY Plot Easy`: XYプロットの開始位置を指定可能にした
 - `D2 XY Plot / D2 XY Plot Easy`: XYプロットの予想残り時間の表示を追加
 - `D2 Regex Replace`: 置換文字列に空白を指定可能にした
 
-**2024.12.28**
+</details>
+
+
+<details>
+<summary><strong>2024.12.28</strong></summary>
 
 - `D2 Pipe`: 新規追加
 - `D2_KSampler / D2_XYPlotEasy`: xy_pipe の名前を d2_pipe に変更
 
-**2024.12.18**
+</details>
+
+
+<details>
+<summary><strong>2024.12.18</strong></summary>
 
 - `D2 Filename Template`: 新規追加
 - `D2 Grid Image`: グリッド画像出力のトリガーを画像枚数で指定できるようにした
 
-**2024.12.16**
+</details>
+
+
+<details>
+<summary><strong>2024.12.16</strong></summary>
 
 - `D2 XY String To Plot`: 新規追加
 - `D2 XY Grid Image`: ラベルの改行に対応
@@ -383,35 +464,63 @@ D2 Nodes ComfyUI
 - `D2 XY Prompt SR`: 改行を含むテキストに対応
 - `D2 XY Plot Easy`: seed で `-1` を指定した時に `x/y_annotation` にランダム値を登録するように変更
 
-**2024.12.14**
+</details>
+
+
+<details>
+<summary><strong>2024.12.14</strong></summary>
 
 - `D2 KSampler`: `D2 XY Plot Easy` と接続するための `xy_pipe` を追加
 - `D2 XY Grid Image`: `D2 XY Plot`、`D2 XY Plot Easy` と接続するための `grid_pip` を追加
 - `D2 XY Plot Easy`: を新規追加
 - `D2 XY Model List`: ファイル名、日付ソートを追加。Sampler、Schedulerのリスト取得に対応。
 
-**2024.12.05**
+</details>
+
+
+<details>
+<summary><strong>2024.12.05</strong></summary>
 
 - `D2 KSampler` / `D2 KSampler` に Conditioning 出力を追加
 
-**2024.11.27**
+</details>
+
+
+<details>
+<summary><strong>2024.11.27</strong></summary>
 
 - `D2 Preview Image` を新規追加
 
-**2024.11.23**
+</details>
+
+
+<details>
+<summary><strong>2024.11.23</strong></summary>
 
 - `D2 Model List` を新規追加
 
-**2024.11.21**
+</details>
+
+
+<details>
+<summary><strong>2024.11.21</strong></summary>
 
 - `D2 Checkpoint Loader`: Vpred（v_prediction）に関する設定を追加
 - `D2 Image Resize`: Latentを出力できるように変更した
 
-**2024.11.20**
+</details>
+
+
+<details>
+<summary><strong>2024.11.20</strong></summary>
 
 - `D2 Image Resize`: アップスケールモデル（SwinIR_4xなど）を使えるようにした
 
-**2024.11.18**
+</details>
+
+
+<details>
+<summary><strong>2024.11.18</strong></summary>
 
 - 一気にたくさん追加しました
 - `D2 Controlnet Loader`、`D2 Get Image Size`、`D2 Grid Image`、`D2 Image Stack`、`D2 List To String`、`D2 Load Folder Images`
@@ -419,20 +528,35 @@ D2 Nodes ComfyUI
 - `D2 XY Annotation`、`D2 XY Checkpoint List`、`D2 XY Folder Images`、`D2 Grid Image`、`D2 XY List To Plot`、`D2 XY Lora List`、`D2 XY Plot`、`D2 XY Prompt SR`、`D2 XY Prompt SR2`、`D2 XY Seed`
 - 既存のノードも変更してるので詳細はコミット履歴を参照してください
 
-**2024.11.02**
+</details>
+
+
+<details>
+<summary><strong>2024.11.02</strong></summary>
 
 - `D2 Regex Switcher`: 入力テキストの確認用テキストエリアの表示・非表示切り替えを追加
 
-**2024.10.28**
+</details>
+
+
+<details>
+<summary><strong>2024.10.28</strong></summary>
 
 - `Prompt convert`: NovelAI と StableDiffusion のプロンプトを相互変換するダイアログを追加
 - `D2 Folder Image Queue`: 画像生成枚数が同じにならない不具合を修正
 
-**2024.10.26**
+</details>
+
+
+<details>
+<summary><strong>2024.10.26</strong></summary>
 
 - `D2 EmptyImage Alpha` を新規追加
 - `D2 Image Resize` を新規追加
 - `D2 Resize Calculator` を新規追加
+
+</details>
+
 
 <details>
 <summary><strong>2024.10.24</strong></summary>

@@ -99,6 +99,8 @@
   - 計算提示詞的標記數量
 - <a href="node_text.md#D2-Prompt">`D2 Prompt`</a>
   - 具有刪除註解功能和顯示令牌數量的文字節點
+- <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
+  - 整理提示詞字串（將 `_` 轉換為空格、逗號後插入空格）
 
 
 
@@ -180,6 +182,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.06.08**
+
+- `D2_PromptSanitizer`：新增
 
 **2026.06.03**
 
@@ -274,105 +280,182 @@
 
 - `D2_PromptConvert`: 支援NovelAI4的新權重方式
 
-**2025.05.02**
+<details>
+<summary><strong>2025.05.02</strong></summary>
 
 - `D2_ProgressPreview`: 新增功能。
 - `D2_XYUploadImage`: 新增加。
 
-**2025.04.30**
+</details>
+
+
+<details>
+<summary><strong>2025.04.30</strong></summary>
 
 - `D2_FolderImageQueue` `D2_FolderImages` `D2_LoadFolderImages`: 添加排序功能
 
-**2025.04.28**
+</details>
+
+
+<details>
+<summary><strong>2025.04.28</strong></summary>
 
 - `D2_FolderImageQueue`: 將起始編號從 `1` 更改為 `0`
 
-**2025.04.24**
+</details>
+
+
+<details>
+<summary><strong>2025.04.24</strong></summary>
 
 - `D2_FilenameTemplate2`：新增功能。支援多行的 `D2_FilenameTemplate` 版本
 - `D2 EmptyImage Alpha` 顏色指定改為 red green blue。同時新增顏色樣本
 
-**2025.04.22**
+</details>
+
+
+<details>
+<summary><strong>2025.04.22</strong></summary>
 
 - `D2_CutByMask`: 新增了 `square_thumb` 模式，可使用最大尺寸的正方形進行裁剪
 - `D2_XYFolderImages` / `D2_LoadFolderImages`: 修改為每次更新圖像列表。新增顯示圖像數量
 - `D2_LoadImage`: 修復了在A1111中創建的PNG圖像提示無法輸出的錯誤
 
-**2025.04.18**
+</details>
+
+
+<details>
+<summary><strong>2025.04.18</strong></summary>
 
 - `D2_KSamplerAdvanced`: 添加了參數 `weight_interpretation` 和 `token_normalization` 用於調整提示詞權重
   - 使用需要安裝 [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/)。
 
-**2025.04.16**
+</details>
+
+
+<details>
+<summary><strong>2025.04.16</strong></summary>
 
 - `D2_Prompt`：添加LoRA插入按鈕
 - `D2_KSampler` / `D2_KSamplerAdvanced`：支援A1111方式的LoRA載入提示詞。在KSampler內部進行LoRA載入
 - `D2_LoadLora`：輸出的 `prompt` 更改為不刪除A1111方式的LoRA載入提示詞。傳統的輸出已重新命名為 `formatted_prompt`
 
-**2025.04.14**
+</details>
+
+
+<details>
+<summary><strong>2025.04.14</strong></summary>
 
 - `D2 Cut By Mask`: 新增功能
 - `D2 Paste By Mask`: 新增功能
 - `D2 XY Model List`: 支援升頻模型
 - `D2 KSampler Advanced`: 輸出增加 d2_pipe
 
-**2025.04.09**
+</details>
+
+
+<details>
+<summary><strong>2025.04.09</strong></summary>
 
 - `D2_LoadImage`: 新增檔案名稱和檔案路徑的輸出
 - `D2_FilenameTemplate`: 為`format`新增工具提示（滑鼠懸停時顯示）
 
-**2025.04.06**
+</details>
+
+
+<details>
+<summary><strong>2025.04.06</strong></summary>
 
 - `D2 Image Mask Stack`: 新增功能
 - `D2 Mosaic Filter`: 新增功能
 
-**2025.04.02**
+</details>
+
+
+<details>
+<summary><strong>2025.04.02</strong></summary>
 
 - `D2 Prompt`：新增功能
 - `D2 Delete Comment`：整合至`D2 Prompt`
 
-**2025.03.31**
+</details>
+
+
+<details>
+<summary><strong>2025.03.31</strong></summary>
 
 - `D2 Token Counter`: 新增功能
 
-**2025.03.25**
+</details>
+
+
+<details>
+<summary><strong>2025.03.25</strong></summary>
 
 - 新增註釋快捷鍵（ctrl + /）
 - `D2 XYPlot Easy Mini`: 新增了 `D2 XYPlot Easy` 的輸出插槽受限版本
 
-**2025.03.23**
+</details>
+
+
+<details>
+<summary><strong>2025.03.23</strong></summary>
 
 - `D2 Delete Comment`: 新增功能
 - `D2 Load Lora`: 新增使用A1111格式的選項
 - `D2 Model List`: 新增以A1111格式獲取列表的選項
 
-**2025.02.27**
+</details>
+
+
+<details>
+<summary><strong>2025.02.27</strong></summary>
 
 - `D2 Load Lora`: 新增
 - `D2 Multi Output`: 新增 x_list/ylist 輸出
 
-**2025.02.23**
+</details>
+
+
+<details>
+<summary><strong>2025.02.23</strong></summary>
 
 - `D2 Model and CLIP Merge SDXL`: 新增 checkpoint 合併節點
 
-**2025.01.20**
+</details>
+
+
+<details>
+<summary><strong>2025.01.20</strong></summary>
 
 - `D2 XY Seed2`: 新增節點
 - `D2 XY Plot / D2 XY Plot Easy`: 新增可指定XY繪圖起始位置的功能
 - `D2 XY Plot / D2 XY Plot Easy`: 新增XY繪圖預估剩餘時間顯示
 - `D2 Regex Replace`: 新增可在替換字串中使用空白的功能
 
-**2024.12.28**
+</details>
+
+
+<details>
+<summary><strong>2024.12.28</strong></summary>
 
 - `D2 Pipe`: 新增節點
 - `D2_KSampler / D2_XYPlotEasy`：將 xy_pipe 名稱更改為 d2_pipe
 
-**2024.12.18**
+</details>
+
+
+<details>
+<summary><strong>2024.12.18</strong></summary>
 
 - `D2 Filename Template`: 新增節點
 - `D2 Grid Image`: 新增了可以通過圖片數量來指定網格圖像輸出觸發的功能
 
-**2024.12.16**
+</details>
+
+
+<details>
+<summary><strong>2024.12.16</strong></summary>
 
 - `D2 XY String To Plot`: 新增節點
 - `D2 XY Grid Image`: 支援標籤中的換行符
@@ -380,36 +463,63 @@
 - `D2 XY Prompt SR`: 支援包含換行符的文本
 - `D2 XY Plot Easy`: 修改為在指定 seed 為 `-1` 時，在 `x/y_annotation` 中記錄隨機值
 
-**2024.12.14**
+</details>
+
+
+<details>
+<summary><strong>2024.12.14</strong></summary>
 
 - `D2 KSampler`：新增 `xy_pipe` 以連接 `D2 XY Plot Easy`
 - `D2 Grid Image`：新增 `grid_pipe` 以連接 `D2 XY Plot` 和 `D2 XY Plot Easy`
 - `D2 XY Plot Easy`：新增功能
 - `D2 XY Model List`：新增檔案名稱和日期排序功能。新增支援 Sampler 和 Scheduler 列表獲取
 
-**2024.12.05**
+</details>
+
+
+<details>
+<summary><strong>2024.12.05</strong></summary>
 
 - 為 `D2 KSampler` / `D2 KSampler` 新增了 Conditioning 輸出
-  
-**2024.11.27**
+
+</details>
+
+
+<details>
+<summary><strong>2024.11.27</strong></summary>
 
 - 新增 `D2 Preview Image`
 
-**2024.11.23**
+</details>
+
+
+<details>
+<summary><strong>2024.11.23</strong></summary>
 
 - 新增 `D2 Model List`
 
-**2024.11.21**
+</details>
+
+
+<details>
+<summary><strong>2024.11.21</strong></summary>
 
 - `D2 Checkpoint Loader`: 新增 Vpred（v_prediction）相關設定
 - `D2 Image Resize`: 修改為可輸出 Latent
 
+</details>
 
-**2024.11.20**
+
+<details>
+<summary><strong>2024.11.20</strong></summary>
 
 - `D2 Image Resize`: 追加放大模型支援（如 SwinIR_4x）
 
-**2024.11.18**
+</details>
+
+
+<details>
+<summary><strong>2024.11.18</strong></summary>
 
 - 一次添加了許多功能
 - 新增 `D2 Controlnet Loader`、`D2 Get Image Size`、`D2 Grid Image`、`D2 Image Stack`、`D2 List To String`、`D2 Load Folder Images`
@@ -417,20 +527,34 @@
 - 新增 `D2 XY Annotation`、`D2 XY Checkpoint List`、`D2 XY Folder Images`、`D2 Grid Image`、`D2 XY List To Plot`、`D2 XY Lora List`、`D2 XY Plot`、`D2 XY Prompt SR`、`D2 XY Prompt SR2`、`D2 XY Seed`
 - 現有節點也有修改，詳情請參考提交歷史記錄
 
-**2024.11.02**
+</details>
+
+
+<details>
+<summary><strong>2024.11.02</strong></summary>
 
 - `D2 Regex Switcher`: 新增輸入文字確認用文字區域的顯示/隱藏切換
 
-**2024.10.28**
+</details>
+
+
+<details>
+<summary><strong>2024.10.28</strong></summary>
 
 - 新增 `Prompt convert`: 用於 `NovelAI` 和 `StableDiffusion` 提示詞互相轉換的對話框
 - `D2 Folder Image Queue`: 修復圖像生成數量不一致的問題
 
-**2024.10.26**
+</details>
+
+
+<details>
+<summary><strong>2024.10.26</strong></summary>
 
 - 新增 `D2 EmptyImage Alpha`
 - 新增 `D2 Image Resize`
 - 新增 `D2 Resize Calculator`
+
+</details>
 
 
 <details>

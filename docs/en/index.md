@@ -97,6 +97,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Counts tokens in prompts
 - <a href="node_text.md#D2-Prompt">`D2 Prompt`</a>
   - Text node with comment deletion function and token count display
+- <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
+  - Cleans up prompt strings (convert `_` to space, add a space after commas)
 
 
 
@@ -178,6 +180,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.06.08**
+
+- `D2_PromptSanitizer`: Newly added
 
 **2026.06.03**
 
@@ -272,106 +278,182 @@ If you have installed any of the following custom nodes previously, please remov
 
 - `D2_PromptConvert`: Support new weight format for NovelAI4
 
-**2025.05.02**
+<details>
+<summary><strong>2025.05.02</strong></summary>
 
 - `D2_ProgressPreview`: Newly added.
 - `D2_XYUploadImage`: Newly added.
 
-**2025.04.30**
+</details>
+
+
+<details>
+<summary><strong>2025.04.30</strong></summary>
 
 - `D2_FolderImageQueue` `D2_FolderImages` `D2_LoadFolderImages`: Added sorting functionality
 
-**2025.04.28**
+</details>
+
+
+<details>
+<summary><strong>2025.04.28</strong></summary>
 
 - `D2_FolderImageQueue`: Changed start number from `1` to `0`
 
-**2025.04.24**
+</details>
+
+
+<details>
+<summary><strong>2025.04.24</strong></summary>
 
 - `D2_FilenameTemplate2`: Newly added. Multiple line support version of `D2_FilenameTemplate`
 - `D2 EmptyImage Alpha` color specification changed to red green blue. Color samples also added
 
-**2025.04.22**
+</details>
+
+
+<details>
+<summary><strong>2025.04.22</strong></summary>
 
 - `D2_CutByMask`: Added `square_thumb` mode to cut with maximum-sized square
 - `D2_XYFolderImages` / `D2_LoadFolderImages`: Changed to update the image list every time. Added display of image count
 - `D2_LoadImage`: Fixed a bug where prompts from PNG images created in A1111 were not being output
 
-**2025.04.18**
+</details>
+
+
+<details>
+<summary><strong>2025.04.18</strong></summary>
 
 - `D2_KSamplerAdvanced`: Added parameters `weight_interpretation` and `token_normalization` to adjust prompt weights
   - Requires [Advanced CLIP Text Encode](https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb/) to use.
 
-**2025.04.16**
+</details>
+
+
+<details>
+<summary><strong>2025.04.16</strong></summary>
 
 - `D2_Prompt`: Add LoRA insertion button
 - `D2_KSampler` / `D2_KSamplerAdvanced`: Support A1111-style LoRA loading prompts. Load LoRA inside KSampler
 - `D2_LoadLora`: Changed the output `prompt` to output A1111-style LoRA loading prompts without removing them. The conventional output has been renamed to `formatted_prompt`
 
-**2025.04.14**
+</details>
+
+
+<details>
+<summary><strong>2025.04.14</strong></summary>
 
 - `D2 Cut By Mask`: Newly added
 - `D2 Paste By Mask`: Newly added
 - `D2 XY Model List`: Added support for upscaler models
 - `D2 KSampler Advanced`: Added d2_pipe to outputs
 
-**2025.04.09**
+</details>
+
+
+<details>
+<summary><strong>2025.04.09</strong></summary>
 
 - `D2_LoadImage`: Added output of filename and file path
 - `D2_FilenameTemplate`: Added tooltip to `format` (displayed on mouse hover)
 
-**2025.04.06**
+</details>
+
+
+<details>
+<summary><strong>2025.04.06</strong></summary>
 
 - `D2 Image Mask Stack`: Newly added
 - `D2 Mosaic Filter`: Newly added
 
-**2025.04.02**
+</details>
+
+
+<details>
+<summary><strong>2025.04.02</strong></summary>
 
 - `D2 Prompt`: Newly added
 - `D2 Delete Comment`: Integrated into `D2 Prompt`
 
-**2025.03.31**
+</details>
+
+
+<details>
+<summary><strong>2025.03.31</strong></summary>
 
 - `D2 Token Counter`: Newly added
 
-**2025.03.25**
+</details>
+
+
+<details>
+<summary><strong>2025.03.25</strong></summary>
 
 - Added comment shortcut key (ctrl + /)
 - `D2 XYPlot Easy Mini`: Added a version of `D2 XYPlot Easy` with limited output slots
 
-**2025.03.23**
+</details>
+
+
+<details>
+<summary><strong>2025.03.23</strong></summary>
 
 - `D2 Delete Comment`: Newly added
 - `D2 Load Lora`: Added option to enable the use of A1111 format
 - `D2 Model List`: Added option to retrieve in A1111 format
 
+</details>
 
-**2025.02.27**
+
+<details>
+<summary><strong>2025.02.27</strong></summary>
 
 - `D2 Load Lora`: Newly added
 - `D2 Multi Output`: Added x_list/ylist output
 
-**2025.02.23**
+</details>
+
+
+<details>
+<summary><strong>2025.02.23</strong></summary>
 
 - `D2 Model and CLIP Merge SDXL`: Added checkpoint merge nodes
 
-**2025.01.20**
+</details>
+
+
+<details>
+<summary><strong>2025.01.20</strong></summary>
 
 - `D2 XY Seed2`: Added new node
 - `D2 XY Plot / D2 XY Plot Easy`: Added ability to specify XY plot starting position
 - `D2 XY Plot / D2 XY Plot Easy`: Added estimated time remaining display for XY plots
 - `D2 Regex Replace`: Added support for using whitespace in replacement strings
 
-**2024.12.28**
+</details>
+
+
+<details>
+<summary><strong>2024.12.28</strong></summary>
 
 - `D2 Pipe`: Added new node
 - `D2_KSampler / D2_XYPlotEasy`: Changed xy_pipe name to d2_pipe
 
-**2024.12.18**
+</details>
+
+
+<details>
+<summary><strong>2024.12.18</strong></summary>
 
 - `D2 Filename Template`: Added new node
 - `D2 Grid Image`: Added the ability to specify the grid image output trigger by the number of images
 
-**2024.12.16**
+</details>
+
+
+<details>
+<summary><strong>2024.12.16</strong></summary>
 
 - `D2 XY String To Plot`: Added new node
 - `D2 XY Grid Image`: Added support for line breaks in labels
@@ -379,35 +461,63 @@ If you have installed any of the following custom nodes previously, please remov
 - `D2 XY Prompt SR`: Added support for text containing line breaks
 - `D2 XY Plot Easy`: Modified to record random values in `x/y_annotation` when `-1` is specified for seed
 
-**2024.12.14**
+</details>
+
+
+<details>
+<summary><strong>2024.12.14</strong></summary>
 
 - `D2 KSampler`: Added `xy_pipe` for connection with `D2 XY Plot Easy`
 - `D2 Grid Image`: Added `grid_pipe` for connection with `D2 XY Plot` and `D2 XY Plot Easy`
 - `D2 XY Plot Easy`: Newly added
 - `D2 XY Model List`: Added filename and date sorting. Added support for retrieving Sampler and Scheduler lists
 
-**2024.12.05**
+</details>
+
+
+<details>
+<summary><strong>2024.12.05</strong></summary>
 
 - Added Conditioning output to `D2 KSampler` / `D2 KSampler`
 
-**2024.11.27**
+</details>
+
+
+<details>
+<summary><strong>2024.11.27</strong></summary>
 
 - Added new `D2 Preview Image`
 
-**2024.11.23**
+</details>
+
+
+<details>
+<summary><strong>2024.11.23</strong></summary>
 
 - Added new `D2 Model List`
 
-**2024.11.21**
+</details>
+
+
+<details>
+<summary><strong>2024.11.21</strong></summary>
 
 - `D2 Checkpoint Loader`: Added settings for Vpred (v_prediction)
 - `D2 Image Resize`: Modified to enable Latent output
 
-**2024.11.20**
+</details>
+
+
+<details>
+<summary><strong>2024.11.20</strong></summary>
 
 - `D2 Image Resize`: Added support for upscale models (like SwinIR_4x)
 
-**2024.11.18**
+</details>
+
+
+<details>
+<summary><strong>2024.11.18</strong></summary>
 
 - Added many nodes at once
 - Added `D2 Controlnet Loader`, `D2 Get Image Size`, `D2 Grid Image`, `D2 Image Stack`, `D2 List To String`, `D2 Load Folder Images`
@@ -415,20 +525,34 @@ If you have installed any of the following custom nodes previously, please remov
 - Added `D2 XY Annotation`, `D2 XY Checkpoint List`, `D2 XY Folder Images`, `D2 Grid Image`, `D2 XY List To Plot`, `D2 XY Lora List`, `D2 XY Plot`, `D2 XY Prompt SR`, `D2 XY Prompt SR2`, `D2 XY Seed`
 - Existing nodes have also been modified, see commit history for details
 
-**2024.11.02**
+</details>
+
+
+<details>
+<summary><strong>2024.11.02</strong></summary>
 
 - `D2 Regex Switcher`: Added toggle for input text confirmation textarea
 
-**2024.10.28**
+</details>
+
+
+<details>
+<summary><strong>2024.10.28</strong></summary>
 
 - Added `Prompt convert`: Dialog for converting prompts between NovelAI and StableDiffusion
 - `D2 Folder Image Queue`: Fixed issue where image generation count was inconsistent
 
-**2024.10.26**
+</details>
+
+
+<details>
+<summary><strong>2024.10.26</strong></summary>
 
 - Added new `D2 EmptyImage Alpha`
 - Added new `D2 Image Resize`
 - Added new `D2 Resize Calculator`
+
+</details>
 
 
 <details>

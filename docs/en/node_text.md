@@ -224,6 +224,26 @@ Output text
 
 ---
 
+### D2 Prompt Sanitizer
+
+<figure>
+  <img src="../img/prompt_sanitizer.png">
+</figure>
+
+- A node that cleans up prompt strings
+- Converts `_` (underscore) to a space (`long_hair` → `long hair`)
+- Ensures a single space after each `,` (comma) and tidies up surrounding whitespace (`a ,  b` → `a, b`)
+- Each transformation can be toggled on / off individually
+
+#### Input
+
+- `underscore_to_space`: Convert `_` to a space
+- `space_after_comma`: Tidy the whitespace around commas and normalize it to `, ` (line breaks are preserved)
+- `protect_lora`: Protect LoRA notation enclosed in `<...>` from conversion (keeps the underscores in `<lora:my_lora:1>`)
+- `protect_score`: Protect Pony quality tags such as `score_9` / `score_8_up` from conversion
+
+---
+
 ### D2 Token Counter
 
 <figure>

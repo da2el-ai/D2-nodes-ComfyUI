@@ -262,6 +262,26 @@ Output text
 
 ---
 
+### D2 Prompt Sanitizer
+
+<figure>
+  <img src="../img/prompt_sanitizer.png">
+</figure>
+
+- プロンプト文字列を整形するノード
+- `_`（アンダースコア）を半角スペースに変換する（`long_hair` → `long hair`）
+- `,`（カンマ）の後に必ず半角スペースを1つ入れ、前後の余分な空白を整理する（`a ,  b` → `a, b`）
+- 各処理は個別に ON / OFF できる
+
+#### Input
+
+- `underscore_to_space`：`_` を半角スペースに変換する
+- `space_after_comma`：カンマ前後の空白を整理し `, ` に統一する（改行は保持）
+- `protect_lora`：`<...>` で囲まれた LoRA 表記などを変換対象から保護する（`<lora:my_lora:1>` のアンダースコアを残す）
+- `protect_score`：Pony 系の品質タグ `score_9` / `score_8_up` などを変換対象から保護する
+
+---
+
 ### D2 Token Counter
 
 <figure>
