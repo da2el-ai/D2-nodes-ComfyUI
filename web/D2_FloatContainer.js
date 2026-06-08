@@ -4,6 +4,11 @@
 
 import { setCookie, getCookie, loadCssFile } from "./modules/utils.js";
 
+const CSS_CLASS_BUTTON_BASE =
+    'inline-flex items-center justify-center cursor-pointer touch-manipulation appearance-none border-none text-sm font-inter transition-colors h-8 rounded-lg px-4 font-light';
+const CSS_CLSSS_BUTTON_PRIMARY = 'text-base-foreground bg-primary-background hover:bg-primary-background-hover';
+const CSS_CLSSS_BUTTON_SECONDARY = 'text-secondary-foreground bg-secondary-background hover:bg-secondary-background-hover';
+
 
 class D2_FloatContainer {
     static CSS_FILEPATH = "/D2/assets/css/D2_FloatContainer.css?2";
@@ -167,4 +172,4 @@ class D2_FloatContainer {
     }
 }
 
-export { D2_FloatContainer }
+export { D2_FloatContainer, CSS_CLASS_BUTTON_BASE, CSS_CLSSS_BUTTON_PRIMARY, CSS_CLSSS_BUTTON_SECONDARY }

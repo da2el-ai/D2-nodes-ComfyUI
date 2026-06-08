@@ -1,5 +1,5 @@
 import { app } from "../../scripts/app.js";
-import { D2_FloatContainer } from "./D2_FloatContainer.js";
+import { D2_FloatContainer, CSS_CLASS_BUTTON_BASE, CSS_CLSSS_BUTTON_PRIMARY, CSS_CLSSS_BUTTON_SECONDARY } from "./D2_FloatContainer.js";
 
 
 const D2_QUEUE_DEFAULT_COUNT = "1,10";
@@ -44,7 +44,7 @@ class D2_QueueButton {
 
     counts.forEach((count) => {
       const button = document.createElement("button");
-      button.classList.add("p-button");
+      button.classList.add("p-button", ...CSS_CLASS_BUTTON_BASE.split(" "), ...CSS_CLSSS_BUTTON_PRIMARY.split(" "));
       button.textContent = count;
       this.floatContainer.addContent(button);
 
