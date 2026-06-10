@@ -607,6 +607,7 @@ class D2_PromptSanitizer:
                 "prompt": ("STRING", {"forceInput": True}),
                 "underscore_to_space": ("BOOLEAN", {"default": True}),
                 "space_after_comma": ("BOOLEAN", {"default": True}),
+                "remove_extra_comma": ("BOOLEAN", {"default": True}),
                 "protect_lora": ("BOOLEAN", {"default": True}),
                 "protect_score": ("BOOLEAN", {"default": True}),
             }
@@ -617,7 +618,7 @@ class D2_PromptSanitizer:
     FUNCTION = "run"
     CATEGORY = "D2"
 
-    def run(self, prompt, underscore_to_space=True, space_after_comma=True, protect_lora=True, protect_score=True):
+    def run(self, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True):
         # 保護対象（LoRA等の <...> と Pony 品質タグ score_9 / score_8_up 等）を
         # プレースホルダへ退避し、整形対象から除外する
         protected = []
@@ -638,6 +639,12 @@ class D2_PromptSanitizer:
         # アンダースコアを半角スペースへ変換
         if underscore_to_space:
             text = text.replace("_", " ")
+
+        # 連続するカンマ（間が空白・タブのみ。例: ",," ", ,"）を1つにまとめる（改行はまたがない）
+        if remove_extra_comma:
+            text = re.sub(r",(?:[ \t]*,)+", ",", text)
+            # 行頭のカンマを削除（各行頭・文字列先頭。改行は保持）
+            text = re.sub(r"(?m)^[ \t]*,[ \t]*", "", text)
 
         # カンマ前後の空白（スペース・タブ）を整理し ", " に統一（改行は保持）
         if space_after_comma:
