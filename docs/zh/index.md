@@ -183,6 +183,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.06.10**
+
+- `D2_PromptSanitizer`：新增 `remove_extra_comma`，用於整理多餘的逗號
+
 **2026.06.08**
 
 - `D2_PromptSanitizer`：新增

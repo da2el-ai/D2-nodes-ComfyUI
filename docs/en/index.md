@@ -181,6 +181,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.06.10**
+
+- `D2_PromptSanitizer`: Added `remove_extra_comma` to clean up redundant commas
+
 **2026.06.08**
 
 - `D2_PromptSanitizer`: Newly added

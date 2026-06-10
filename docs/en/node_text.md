@@ -233,12 +233,14 @@ Output text
 - A node that cleans up prompt strings
 - Converts `_` (underscore) to a space (`long_hair` → `long hair`)
 - Ensures a single space after each `,` (comma) and tidies up surrounding whitespace (`a ,  b` → `a, b`)
+- Collapses redundant consecutive commas and removes commas at the start of a line (`a,, ,b` → `a, b`)
 - Each transformation can be toggled on / off individually
 
 #### Input
 
 - `underscore_to_space`: Convert `_` to a space
 - `space_after_comma`: Tidy the whitespace around commas and normalize it to `, ` (line breaks are preserved)
+- `remove_extra_comma`: Collapse redundant consecutive commas (`,,` / `, ,`) into one and remove commas at the start of a line (line breaks are preserved)
 - `protect_lora`: Protect LoRA notation enclosed in `<...>` from conversion (keeps the underscores in `<lora:my_lora:1>`)
 - `protect_score`: Protect Pony quality tags such as `score_9` / `score_8_up` from conversion
 

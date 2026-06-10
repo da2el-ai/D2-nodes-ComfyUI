@@ -184,6 +184,10 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.06.10**
+
+- `D2_PromptSanitizer`: 余分なカンマを整理する `remove_extra_comma` を追加
+
 **2026.06.08**
 
 - `D2_PromptSanitizer`: 新規追加

@@ -260,12 +260,14 @@ Output text
 - 整理提示詞字串的節點
 - 將 `_`（底線）轉換為半形空格（`long_hair` → `long hair`）
 - 在每個 `,`（逗號）之後確保有一個半形空格，並整理前後多餘的空白（`a ,  b` → `a, b`）
+- 合併多餘的連續逗號，並刪除行首的逗號（`a,, ,b` → `a, b`）
 - 各項處理皆可獨立切換開關
 
 #### Input
 
 - `underscore_to_space`：將 `_` 轉換為半形空格
 - `space_after_comma`：整理逗號前後的空白並統一為 `, `（保留換行）
+- `remove_extra_comma`：將多餘的連續逗號（`,,` / `, ,`）合併為一個，並刪除行首的逗號（保留換行）
 - `protect_lora`：保護以 `<...>` 包圍的 LoRA 表記不被轉換（保留 `<lora:my_lora:1>` 中的底線）
 - `protect_score`：保護 Pony 系的品質標籤 `score_9` / `score_8_up` 等不被轉換
 
