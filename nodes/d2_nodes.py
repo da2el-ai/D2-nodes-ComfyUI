@@ -812,30 +812,35 @@ D2 Preset Selector
 複数パラメータのプリセットをテキストで定義し、プルダウンで1つ選ぶとまとめて出力する
 
 """
-class D2_PresetSelector:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # 選択肢は JS が options.values へ動的に流し込む（サーバー側は空のまま）
-                "preset": ([],),
-                "preset_text": ("STRING", {"multiline": True, "default": "cfg;steps\nFLOAT;INT\nAnima;2;15\nIllustrious;5;20"}),
-            },
-            "optional": {
-                "preset_name": ("STRING", {"forceInput":True},),
-                "_update": ("D2_BUTTON", {}),
-            },
-        }
+class D2_PresetSelector(io.ComfyNode):
+    # 出力は preset_text の解析で決まる動的スロット（JS が addOutput で増やす）。
+    # 可変出力対応は D2_AnyDelivery と同方式: _RETURN_TYPES/_RETURN_NAMES を AnyTypeTuple、
+    # _OUTPUT_IS_LIST を AnyFalseList にして事前設定する（GET_SCHEMA の上書きを回避）。
+    _RETURN_TYPES = AnyTypeTuple(())
+    _RETURN_NAMES = AnyTypeTuple(())
+    _OUTPUT_IS_LIST = AnyFalseList()
+    _OUTPUT_TOOLTIPS = ()
 
-    # 出力は preset_text の解析で決まる動的スロット。型検証で IndexError にならないよう AnyTypeTuple を使う
-    RETURN_TYPES = AnyTypeTuple(())
-    RETURN_NAMES = AnyTypeTuple(())
-    FUNCTION = "run"
-    CATEGORY = "D2"
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Preset Selector",
+            display_name="D2 Preset Selector",
+            category="D2",
+            inputs=[
+                # 選択肢は JS が options.values へ動的に流し込む（サーバー側は空のまま）
+                io.Combo.Input("preset", options=[]),
+                io.String.Input("preset_text", multiline=True, default="cfg;steps\nFLOAT;INT\nAnima;2;15\nIllustrious;5;20"),
+                io.String.Input("preset_name", force_input=True, optional=True),
+                io.Custom("D2_BUTTON").Input("_update", optional=True),
+            ],
+            outputs=[],
+        )
 
     # preset は動的 COMBO のため、登録済みリスト（空）との照合をスキップする
+    # （validate_inputs の引数に preset を含めると ComfyUI がその input の既定照合をスキップする）
     @classmethod
-    def VALIDATE_INPUTS(cls, preset):
+    def validate_inputs(cls, preset):
         return True
 
     """
@@ -856,13 +861,14 @@ class D2_PresetSelector:
                 f"D2 Preset Selector: プリセット '{preset_title}' の '{col_name}' 列の値 '{raw}' を {type_name} に変換できません"
             )
 
-    def run(self, preset="", preset_text="", preset_name=None, _update=None, **kwargs):
+    @classmethod
+    def execute(cls, preset="", preset_text="", preset_name=None, _update=None, **kwargs) -> io.NodeOutput:
         # 空行を除いた行を取得
         lines = [line for line in preset_text.splitlines() if line.strip() != ""]
 
         # 名前行・型行・プリセット行が揃っていなければ出力なし
         if len(lines) < 3:
-            return ()
+            return io.NodeOutput()
 
         names = [n.strip() for n in lines[0].split(";")]
         types = [t.strip() for t in lines[1].split(";")]
@@ -882,7 +888,7 @@ class D2_PresetSelector:
 
         # 一致するプリセットがない（テキスト変更後など）→ 出力なし
         if target is None:
-            return ()
+            return io.NodeOutput()
 
         values = target[1:]
 
@@ -890,9 +896,9 @@ class D2_PresetSelector:
         for i, name in enumerate(names):
             type_name = types[i] if i < len(types) else "STRING"
             raw = values[i] if i < len(values) else ""
-            result.append(self._cast_value(type_name, raw, target_name, name))
+            result.append(cls._cast_value(type_name, raw, target_name, name))
 
-        return tuple(result)
+        return io.NodeOutput(*result)
 
 
 

@@ -59,6 +59,7 @@ from .nodes.d2_nodes import (
     D2_LoadLora,
     D2_Pipe,
     D2_AnyDelivery,
+    D2_PresetSelector,
 )
 from .nodes.d2_size_nodes import (
     D2_ResizeCalculator,
@@ -90,6 +91,8 @@ class D2Extension(ComfyExtension):
             # B. 重要度が高いもの（Pipe / Delivery）
             D2_Pipe,
             D2_AnyDelivery,
+            # B. 重要度が高いもの（Preset Selector）
+            D2_PresetSelector,
         ]
 
 
