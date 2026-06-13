@@ -57,6 +57,8 @@ from .nodes.d2_nodes import (
     D2_LoadDiffusionModel,
     D2_ControlnetLoader,
     D2_LoadLora,
+    D2_Pipe,
+    D2_AnyDelivery,
 )
 from .nodes.d2_size_nodes import (
     D2_ResizeCalculator,
@@ -85,6 +87,9 @@ class D2Extension(ComfyExtension):
             D2_ImageResize,
             D2_SizeSelector,
             D2_GetImageSize,
+            # B. 重要度が高いもの（Pipe / Delivery）
+            D2_Pipe,
+            D2_AnyDelivery,
         ]
 
 

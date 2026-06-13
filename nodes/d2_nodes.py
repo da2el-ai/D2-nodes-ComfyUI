@@ -25,7 +25,7 @@ from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 from nodes import UNETLoader
 
 from .modules import util
-from .modules.util import D2_TD2Pipe, D2_TDelivery, AnyType, AnyTypeTuple
+from .modules.util import D2_TD2Pipe, D2_TDelivery, AnyType, AnyTypeTuple, AnyFalseList
 from .modules import checkpoint_util
 from .modules.template_util import replace_template
 
@@ -652,32 +652,45 @@ class D2_LoadLora(io.ComfyNode):
 D2 D2 Pipe
 
 """
-class D2_Pipe:
+class D2_Pipe(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "optional": {
-                "d2_pipe": ("D2_TD2Pipe",),
-                "ckpt_name": ("STRING", {"forceInput":True},),
-                "positive": ("STRING", {"forceInput":True},),
-                "negative": ("STRING", {"forceInput":True},),
-                "seed": ("INT", {"forceInput":True},),
-                "steps": ("INT", {"forceInput":True},),
-                "cfg": ("FLOAT", {"forceInput":True},),
-                "sampler_name": ("STRING", {"forceInput":True},),
-                "scheduler": ("STRING", {"forceInput":True},),
-                "denoise": ("FLOAT", {"forceInput":True},),
-                "width": ("INT", {"forceInput":True},),
-                "height": ("INT", {"forceInput":True},),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Pipe",
+            display_name="D2 Pipe",
+            category="D2",
+            inputs=[
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
+                io.String.Input("ckpt_name", force_input=True, optional=True),
+                io.String.Input("positive", force_input=True, optional=True),
+                io.String.Input("negative", force_input=True, optional=True),
+                io.Int.Input("seed", force_input=True, optional=True),
+                io.Int.Input("steps", force_input=True, optional=True),
+                io.Float.Input("cfg", force_input=True, optional=True),
+                io.String.Input("sampler_name", force_input=True, optional=True),
+                io.String.Input("scheduler", force_input=True, optional=True),
+                io.Float.Input("denoise", force_input=True, optional=True),
+                io.Int.Input("width", force_input=True, optional=True),
+                io.Int.Input("height", force_input=True, optional=True),
+            ],
+            outputs=[
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
+                io.String.Output(display_name="ckpt_name"),
+                io.String.Output(display_name="positive"),
+                io.String.Output(display_name="negative"),
+                io.Int.Output(display_name="seed"),
+                io.Int.Output(display_name="steps"),
+                io.Float.Output(display_name="cfg"),
+                io.String.Output(display_name="sampler_name"),
+                io.String.Output(display_name="scheduler"),
+                io.Float.Output(display_name="denoise"),
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+            ],
+        )
 
-    RETURN_TYPES = ("D2_TD2Pipe", "STRING", "STRING", "STRING", "INT", "INT", "FLOAT", "STRING", "STRING", "FLOAT", "INT", "INT", )
-    RETURN_NAMES = ("d2_pipe", "ckpt_name", "positive", "negative", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", "width", "height", )
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, d2_pipe:Optional[D2_TD2Pipe]=None, ckpt_name = None, positive = None, negative = None, seed = None, steps = None, cfg = None, sampler_name = None, scheduler = None, denoise = None, width = None, height = None):
+    @classmethod
+    def execute(cls, d2_pipe=None, ckpt_name = None, positive = None, negative = None, seed = None, steps = None, cfg = None, sampler_name = None, scheduler = None, denoise = None, width = None, height = None) -> io.NodeOutput:
 
         # d2_pipeがNoneの場合、デフォルト値で新しいインスタンスを作成
         if d2_pipe is None:
@@ -722,7 +735,7 @@ class D2_Pipe:
         if height != None:
             d2_pipe.height = height
 
-        return (d2_pipe, d2_pipe.ckpt_name, d2_pipe.positive, d2_pipe.negative, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, d2_pipe.denoise, d2_pipe.width, d2_pipe.height,)
+        return io.NodeOutput(d2_pipe, d2_pipe.ckpt_name, d2_pipe.positive, d2_pipe.negative, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, d2_pipe.denoise, d2_pipe.width, d2_pipe.height)
 
 
 
@@ -731,24 +744,41 @@ class D2_Pipe:
 D2 Any Delivery
 
 """
-class D2_AnyDelivery:
+class D2_AnyDelivery(io.ComfyNode):
+    # 可変出力ノード。JS が addOutput(name, "*") で出力を動的に増やすため、
+    # ComfyUI の出力型検証（RETURN_TYPES[slot]）が宣言数を超えても落ちないよう、
+    # _RETURN_TYPES / _RETURN_NAMES を AnyTypeTuple にする（範囲外は AnyType("") を返す）。
+    # V3 では GET_SCHEMA が `_RETURN_TYPES is None` のときだけ schema.outputs から
+    # 構築するので、ここでクラス属性として事前設定すると上書きされない。
+    # その際 _OUTPUT_IS_LIST / _OUTPUT_TOOLTIPS も同じ if ブロックで構築されるため併せて設定する。
+    # _OUTPUT_IS_LIST は固定長 tuple だと merge_result_data の zip で動的出力が切り捨てられるため、
+    # 常に False を返す AnyFalseList を使う（詳細は util.AnyFalseList）。
+    _RETURN_TYPES = AnyTypeTuple(("D2_TDelivery", ))
+    _RETURN_NAMES = AnyTypeTuple(("_package", ))
+    _OUTPUT_IS_LIST = AnyFalseList()
+    _OUTPUT_TOOLTIPS = (None, )
+
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "optional": {
-                "_package": ("D2_TDelivery",),
-                "_label": ("STRING",{"default": ""},),
-                "_update": ("D2_BUTTON", {})
-            },
-            "hidden": {"_prompt": "PROMPT"},
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Any Delivery",
+            display_name="D2 Any Delivery",
+            category="D2",
+            inputs=[
+                io.Custom("D2_TDelivery").Input("_package", optional=True),
+                io.String.Input("_label", default="", optional=True),
+                io.Custom("D2_BUTTON").Input("_update", optional=True),
+            ],
+            outputs=[
+                io.Custom("D2_TDelivery").Output(display_name="_package"),
+            ],
+            hidden=[io.Hidden.prompt],
+            # JS が addInput(name, "*") で増やす動的入力を **kwargs で受けるため
+            accept_all_inputs=True,
+        )
 
-    RETURN_TYPES = AnyTypeTuple(("D2_TDelivery", ))
-    RETURN_NAMES = AnyTypeTuple(("_package", ))
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, _package=None, _label="", _update=None, _prompt=None, **kwargs):
+    @classmethod
+    def execute(cls, _package=None, _label="", _update=None, **kwargs) -> io.NodeOutput:
         # _packageがNoneの場合は新しいインスタンスを作成
         if _package is None:
             _package = D2_TDelivery()
@@ -771,8 +801,8 @@ class D2_AnyDelivery:
         for item in output_items:
             if item in _package.package:
                 result[item] = _package.package[item]
-        
-        return tuple(result.values())
+
+        return io.NodeOutput(*result.values())
 
 
 

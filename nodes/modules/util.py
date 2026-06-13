@@ -94,6 +94,27 @@ class AnyTypeTuple(tuple):
             return AnyType(item)
         return item
 
+
+"""
+可変出力ノードの OUTPUT_IS_LIST 用。常に False を無限に供給するイテラブル。
+
+V3 ノードでは OUTPUT_IS_LIST が classproperty として常に存在し、execution.py の
+merge_result_data が `zip(range(len(results[0])), obj.OUTPUT_IS_LIST)` で出力を組み立てる。
+固定長の tuple を渡すと zip が短い方で止まり、宣言数を超える動的出力（JS の addOutput）が
+切り捨てられて None になる。__iter__ で False を無限に返せば zip は結果数ぶんだけ回り、
+全出力が非リスト扱いで通る。
+（V3 のフロントエンド向け output_is_list は schema.outputs から別途作られるため、この
+イテラブルが object_info の JSON 化に使われることはない。consumer は merge のみ。）
+"""
+class AnyFalseList:
+    def __iter__(self):
+        while True:
+            yield False
+
+    def __getitem__(self, index):
+        return False
+
+
 """
 リストを文字結合する
 """
