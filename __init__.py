@@ -58,6 +58,12 @@ from .nodes.d2_nodes import (
     D2_ControlnetLoader,
     D2_LoadLora,
 )
+from .nodes.d2_size_nodes import (
+    D2_ResizeCalculator,
+    D2_ImageResize,
+    D2_SizeSelector,
+    D2_GetImageSize,
+)
 
 
 class D2Extension(ComfyExtension):
@@ -74,6 +80,11 @@ class D2Extension(ComfyExtension):
             D2_LoadDiffusionModel,
             D2_ControlnetLoader,
             D2_LoadLora,
+            # B. 重要度が高いもの（Size 系）
+            D2_ResizeCalculator,
+            D2_ImageResize,
+            D2_SizeSelector,
+            D2_GetImageSize,
         ]
 
 
