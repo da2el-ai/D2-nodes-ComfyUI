@@ -13,7 +13,7 @@ from transformers import CLIPTokenizer
 from datetime import datetime
 
 import folder_paths
-from comfy_api.latest import ComfyExtension, io
+from comfy_api.latest import io
 # import comfy.sd
 # import comfy.samplers
 # from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
@@ -269,32 +269,30 @@ D2 MultiOutput
 数値、文字列、SEEDのリストを出力するノード
 
 """
-class D2_MultiOutput:
+class D2_MultiOutput(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Multi Output",
+            display_name="D2 Multi Output",
+            category="D2",
+            inputs=[
                 # 入力タイプ
-                "type": (["FLOAT","INT","STRING","SEED",],),
+                io.Combo.Input("type", options=["FLOAT", "INT", "STRING", "SEED"]),
                 # プロンプト
-                "parameter": (
-                    "STRING",{"multiline": True},
-                ),
-            },
-            "optional": {
-                "create_seed": ("D2_BUTTON", {})
-            }
-        }
+                io.String.Input("parameter", multiline=True),
+                # seed 生成ボタン（JS の D2_BUTTON ウィジェット。値は使わない）
+                io.Custom("D2_BUTTON").Input("create_seed", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="LIST"),
+                io.String.Output(display_name="x / y_list"),
+            ],
+        )
 
-    RETURN_TYPES = ("LIST", "STRING",)
-    RETURN_NAMES = ("LIST", "x / y_list",)
-    FUNCTION = "output_list"
-    CATEGORY = "D2"
-
-    ######
-    # def output_list(self, type, parameter, seed):
-    def output_list(self, type, parameter, reset = ""):
+    @classmethod
+    def execute(cls, type, parameter, create_seed=None) -> io.NodeOutput:
 
         # 入力文字列を改行で分割
         param_options = parameter.strip().split('\n')
@@ -311,7 +309,7 @@ class D2_MultiOutput:
             else:
                 output_list.append(option)
 
-        return (output_list, parameter,)
+        return io.NodeOutput(output_list, parameter)
 
 
 
@@ -504,26 +502,26 @@ class D2_Prompt:
 D2 List To String
 
 """
-class D2_ListToString:
+class D2_ListToString(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "LIST": ("LIST",),
-                "separator": (util.SEPARATOR,),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 List To String",
+            display_name="D2 List To String",
+            category="D2",
+            inputs=[
+                io.Custom("LIST").Input("LIST"),
+                io.Combo.Input("separator", options=util.SEPARATOR),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, LIST, separator):
+    @classmethod
+    def execute(cls, LIST, separator) -> io.NodeOutput:
         output = util.list_to_text(LIST, separator)
-        return {
-            "result": (output,),
-        }
+        return io.NodeOutput(output)
 
 
 """
@@ -531,30 +529,35 @@ class D2_ListToString:
 D2 Filename Template
 
 """
-class D2_FilenameTemplate:
+class D2_FilenameTemplate(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %node:{id}.{key}%\n" \
                   "arg_1-3 -- %arg_1%\n" \
                   "Delete .safetensors -- %arg_1:ckpt_name"
 
-        return {
-            "required": {
-                "format": ("STRING",{"tooltip": tooltip},),
-                "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-                "normalization": ("BOOLEAN", {"default":True}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-            },
-            "hidden": {"prompt": "PROMPT"},
-        }
+        return io.Schema(
+            node_id="D2 Filename Template",
+            display_name="D2 Filename Template",
+            category="D2",
+            inputs=[
+                io.String.Input("format", tooltip=tooltip),
+                io.Int.Input("arg_count", default=3, min=1, max=50, step=1),
+                io.Boolean.Input("normalization", default=True),
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+            hidden=[io.Hidden.prompt],
+            # arg_1..arg_N は JS が動的に追加する未宣言入力。V1 の **kwargs と同様に
+            # 受け取るため accept_all_inputs を有効化する。
+            accept_all_inputs=True,
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, format, arg_count, normalization, seed, prompt, **kwargs):
+    @classmethod
+    def execute(cls, format, arg_count, normalization, seed, **kwargs) -> io.NodeOutput:
 
         args = {}
 
@@ -564,10 +567,8 @@ class D2_FilenameTemplate:
             if arg is not None:
                 args[key] = arg
 
-        text = replace_template(format, args, prompt, normalization)
-        return {
-            "result": (text,),
-        }
+        text = replace_template(format, args, cls.hidden.prompt, normalization)
+        return io.NodeOutput(text)
 
 
 
@@ -578,21 +579,28 @@ D2 Filename Template2
 """
 class D2_FilenameTemplate2(D2_FilenameTemplate):
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %node:{id}.{key}%\n" \
                   "arg_1-3 -- %arg_1%\n" \
                   "Delete .safetensors -- %arg_1:ckpt_name"
 
-        return {
-            "required": {
-                "format": ("STRING",{"tooltip": tooltip, "multiline":True},),
-                "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-                "normalization": ("BOOLEAN", {"default":True}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-            },
-            "hidden": {"prompt": "PROMPT"},
-        }
+        return io.Schema(
+            node_id="D2 Filename Template2",
+            display_name="D2 Filename Template2",
+            category="D2",
+            inputs=[
+                io.String.Input("format", tooltip=tooltip, multiline=True),
+                io.Int.Input("arg_count", default=3, min=1, max=50, step=1),
+                io.Boolean.Input("normalization", default=True),
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+            hidden=[io.Hidden.prompt],
+            accept_all_inputs=True,
+        )
 
 
 """

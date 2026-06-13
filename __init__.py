@@ -45,7 +45,13 @@ from .nodes.modules import util
 # -----------------------------------------------------------------------------
 
 # --- V3 化済みノードの import ------------------------------------------------
-from .nodes.d2_text_nodes import D2_PromptSanitizer
+from .nodes.d2_text_nodes import (
+    D2_PromptSanitizer,
+    D2_MultiOutput,
+    D2_ListToString,
+    D2_FilenameTemplate,
+    D2_FilenameTemplate2,
+)
 
 
 class D2Extension(ComfyExtension):
@@ -53,10 +59,10 @@ class D2Extension(ComfyExtension):
         return [
             # A. 他モジュール依存がなく環境変化の影響を受けないもの
             D2_PromptSanitizer,
-            # D2_MultiOutput,
-            # D2_ListToString,
-            # D2_FilenameTemplate,
-            # D2_FilenameTemplate2,
+            D2_MultiOutput,
+            D2_ListToString,
+            D2_FilenameTemplate,
+            D2_FilenameTemplate2,
         ]
 
 
