@@ -31,6 +31,7 @@ from .modules import mask_util
 from .modules import template_util
 from .modules.eagle_api import EagleAPI, send_to_eagle
 from .modules.util import AnyType, D2_TD2Pipe
+from comfy_api.latest import io
 
 
 
@@ -41,54 +42,51 @@ D2 Save Image
 複数フォーマット対応（png / jpeg / webp / アニメーションwebp）
 
 """
-class D2_SaveImage:
-    def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
-        self.type = "output"
-        self.prefix_append = ""
-    
+class D2_SaveImage(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(s):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %{Node title}.{key}%\n" \
                   "Node param -- %node:{id}.{key}%"
-        
-        return {
-            "required": {
-                "images": ("IMAGE", ), 
-                "filename_prefix": ("STRING", {"default": "%date:yyyyMMdd-hhmmss%", "tooltip": tooltip}),
-                "preview_only": ("BOOLEAN", {"default": False},),
-                "format": (["png", "webp", "jpeg", "animated_webp"],),
-                "lossless": ("BOOLEAN", {"default": True}),
-                "quality": ("INT", {"default": 80, "min": 0, "max": 100}),
-                "fps": ("FLOAT", {"default": 6.0, "min": 0.01, "max": 1000.0, "step": 0.01}),
-            },
-            "optional": {
-                "d2_pipe": ("D2_TD2Pipe",),
-                "popup_image": ("D2_BUTTON", {}, )
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
-        }
 
-    RETURN_TYPES = ("LIST",)
-    RETURN_NAMES = ("filenames",)
-    FUNCTION = "save_images"
-    OUTPUT_NODE = True
-    CATEGORY = "D2/Image"
+        return io.Schema(
+            node_id="D2 Save Image",
+            display_name="D2 Save Image",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.String.Input("filename_prefix", default="%date:yyyyMMdd-hhmmss%", tooltip=tooltip),
+                io.Boolean.Input("preview_only", default=False),
+                io.Combo.Input("format", options=["png", "webp", "jpeg", "animated_webp"]),
+                io.Boolean.Input("lossless", default=True),
+                io.Int.Input("quality", default=80, min=0, max=100),
+                io.Float.Input("fps", default=6.0, min=0.01, max=1000.0, step=0.01),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
+                io.Custom("D2_BUTTON").Input("popup_image", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="filenames"),
+            ],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
+            is_output_node=True,
+        )
 
-    def save_images(self, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, popup_image="", prompt=None, extra_pnginfo=None):
+    # 保存処理の本体。サブクラス（D2_SaveImageEagle）からも再利用するため classmethod ヘルパーに分離。
+    # 戻り値は (file_paths, a1111_param, ui_dict)。prompt/extra_pnginfo は hidden を呼び出し側から渡す。
+    @classmethod
+    def _save_images(cls, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, prompt=None, extra_pnginfo=None):
         # プレビューモードか保存モードかの設定
         if preview_only == True:
             # 保存せずプレビューのみ
-            self.output_dir = folder_paths.get_temp_directory()
-            self.type = "temp"
-            self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+            output_dir = folder_paths.get_temp_directory()
+            node_type = "temp"
+            prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
             compress_level = 1
         else:
             # 保存
-            self.output_dir = folder_paths.get_output_directory()
-            self.type = "output"
-            self.prefix_append = ""
+            output_dir = folder_paths.get_output_directory()
+            node_type = "output"
+            prefix_append = ""
             compress_level = 4
 
 
@@ -96,23 +94,23 @@ class D2_SaveImage:
         filename_prefix = template_util.replace_template(filename_prefix, {}, prompt)
 
         # ファイル名プレフィックスの設定
-        filename_prefix += self.prefix_append
-        
+        filename_prefix += prefix_append
+
         # 保存先フォルダとファイル名の取得
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
-        
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, output_dir, images[0].shape[1], images[0].shape[0])
+
         # 結果を格納するリスト
         results = []
         # 保存したファイルのフルパスを格納するリスト
         file_paths = []
-        
+
         # 画像をPIL形式に変換
         pil_images = []
         for image in images:
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
             pil_images.append(img)
-        
+
         # d2_pipe からA1111形式の生成パラメーターメモを作成
         a1111_param = util.format_a1111_parameter(d2_pipe)
 
@@ -121,33 +119,33 @@ class D2_SaveImage:
             # ファイル名の設定
             file = f"{filename}_{counter:05}_.webp"
             file_path = os.path.join(full_output_folder, file)
-            
+
             # アニメーションwebpとして保存
             file_path = image_util.save_image_animated_webp(
                 pil_images, file_path, fps, lossless, quality,
                 prompt=prompt,
                 extra_pnginfo=extra_pnginfo,
             )
-            
+
             # 結果リストに追加
             results.append({
                 "filename": file,
                 "subfolder": subfolder,
-                "type": self.type
+                "type": node_type
             })
-            
+
             # ファイルパスリストに追加
             file_paths.append(file_path)
             # アニメーションフラグを設定
             animated = True
-        
+
         # 静止画の場合（単一画像または複数画像を個別に保存）
         else:
             for i, img in enumerate(pil_images):
                 # ファイル名の設定
                 file = f"{filename}_{counter:05}_.{format}"
                 file_path = os.path.join(full_output_folder, file)
-                
+
                 # 各画像形式で保存
                 image_util.save_image(
                     format, img, file_path, compress_level, lossless, quality,
@@ -155,29 +153,34 @@ class D2_SaveImage:
                     extra_pnginfo=extra_pnginfo,
                     a1111_param=a1111_param
                 )
-                
+
                 # 結果リストに追加
                 results.append({
                     "filename": file,
                     "subfolder": subfolder,
-                    "type": self.type
+                    "type": node_type
                 })
-                
+
                 # ファイルパスリストに追加
                 file_paths.append(file_path)
                 counter += 1
-            
+
             # アニメーションフラグを設定
             animated = False
-        
-        # 結果を返す
-        return {
-            "result": (file_paths, a1111_param,),
-            "ui": {
-                "images": results,
-                "animated": (animated,)
-            }
+
+        # (ファイルパス, A1111メモ, UI辞書) を返す
+        return file_paths, a1111_param, {
+            "images": results,
+            "animated": (animated,)
         }
+
+    @classmethod
+    def execute(cls, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, popup_image=None) -> io.NodeOutput:
+        file_paths, a1111_param, ui = cls._save_images(
+            images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps,
+            prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
+        )
+        return io.NodeOutput(file_paths, ui=ui)
 
 
 """
@@ -187,58 +190,56 @@ D2 Save Image Eagle
 
 """
 class D2_SaveImageEagle(D2_SaveImage):
-    def __init__(self):
-        self.eagle_api:EagleAPI = EagleAPI()
-        self.output_dir = folder_paths.get_output_directory()
-        self.type = "output"
-        self.prefix_append = ""
-
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %{Node title}.{key}%\n" \
                   "Node param -- %node:{id}.{key}%"
 
-        return {
-            "required": {
-                "images": ("IMAGE", ), 
-                "filename_prefix": ("STRING", {"default": "%date:yyyyMMdd-hhmmss%", "tooltip": tooltip}),
-                "preview_only": ("BOOLEAN", {"default": False},),
-                "format": (["png", "webp", "jpeg", "animated_webp"],),
-                "lossless": ("BOOLEAN", {"default": True}),
-                "quality": ("INT", {"default": 80, "min": 0, "max": 100}),
-                "fps": ("FLOAT", {"default": 6.0, "min": 0.01, "max": 1000.0, "step": 0.01}),
-                "eagle_folder": ("STRING",{"default": ""}),
-                "memo_text": ("STRING",{"default": ""}),
-            },
-            "optional": {
-                "d2_pipe": ("D2_TD2Pipe",),
-                "popup_image": ("D2_BUTTON", {}, )
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
-        }
+        return io.Schema(
+            node_id="D2 Save Image Eagle",
+            display_name="D2 Save Image Eagle",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.String.Input("filename_prefix", default="%date:yyyyMMdd-hhmmss%", tooltip=tooltip),
+                io.Boolean.Input("preview_only", default=False),
+                io.Combo.Input("format", options=["png", "webp", "jpeg", "animated_webp"]),
+                io.Boolean.Input("lossless", default=True),
+                io.Int.Input("quality", default=80, min=0, max=100),
+                io.Float.Input("fps", default=6.0, min=0.01, max=1000.0, step=0.01),
+                io.String.Input("eagle_folder", default=""),
+                io.String.Input("memo_text", default=""),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
+                io.Custom("D2_BUTTON").Input("popup_image", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="filenames"),
+            ],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
+            is_output_node=True,
+        )
 
-    RETURN_TYPES = ("LIST",)
-    RETURN_NAMES = ("filenames",)
-    FUNCTION = "save_images"
-    OUTPUT_NODE = True
-    CATEGORY = "D2/Image"
-
-    def save_images(self, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, eagle_folder = "", memo_text = "", popup_image="", prompt=None, extra_pnginfo=None):
+    @classmethod
+    def execute(cls, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, eagle_folder="", memo_text="", popup_image=None) -> io.NodeOutput:
+        eagle_api = EagleAPI()
         # EagleフォルダIDを取得
-        folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
+        folder_id = eagle_api.find_or_create_folder(eagle_folder)
 
-        res = super().save_images(images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps, popup_image, prompt, extra_pnginfo)
+        # 親の保存処理を再利用（file_paths と a1111_param を取得）
+        file_paths, a1111_param, ui = cls._save_images(
+            images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps,
+            prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
+        )
 
         # A1111方式の生成メモ
-        a1111_param = res["result"][1]
         if a1111_param != None and a1111_param != "":
             memo_text = a1111_param + "\n\n" + memo_text
 
-        for single_path in res["result"][0]:
-            send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)
+        for single_path in file_paths:
+            send_to_eagle(eagle_api, folder_id, single_path, memo_text)
 
-        return res
+        return io.NodeOutput(file_paths, ui=ui)
 
 """
 
@@ -246,38 +247,37 @@ D2 Send File Eagle
 指定されたパスのファイルを Eagleに送信
 
 """
-class D2_SendFileEagle:
-    def __init__(self):
-        self.eagle_api:EagleAPI = EagleAPI()
+class D2_SendFileEagle(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Send File Eagle",
+            display_name="D2 Send File Eagle",
+            category="D2/Image",
+            inputs=[
+                io.AnyType.Input("file_path"),
+                io.String.Input("eagle_folder", default=""),
+                io.String.Input("memo_text", multiline=True),
+            ],
+            outputs=[],
+            is_output_node=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "file_path": (AnyType("*"),),
-                "eagle_folder": ("STRING",{"default": ""}),
-                "memo_text": ("STRING",{"multiline": True},),
-            },
-        }
-
-    RETURN_TYPES = ()
-    FUNCTION = "run"
-    OUTPUT_NODE = True
-    CATEGORY = "D2/Image"
-
-    def run(self, file_path, eagle_folder = "", memo_text = ""):
+    def execute(cls, file_path, eagle_folder="", memo_text="") -> io.NodeOutput:
+        eagle_api = EagleAPI()
         # EagleフォルダIDを取得
-        folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
+        folder_id = eagle_api.find_or_create_folder(eagle_folder)
 
         if isinstance(file_path, str):
-            send_to_eagle(self.eagle_api, folder_id, file_path, memo_text)
+            send_to_eagle(eagle_api, folder_id, file_path, memo_text)
         elif isinstance(file_path, list):
             for single_path in file_path:
-                send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)
+                send_to_eagle(eagle_api, folder_id, single_path, memo_text)
         else:
             raise ValueError(f"Unsupported file_path type: {type(file_path)}")
 
-        return {}
+        return io.NodeOutput()
 
 
 
@@ -287,27 +287,32 @@ D2 Prewview Image
 画像クリックでポップアップする Preview Image
 
 """
-class D2_PreviewImage(SaveImage):
-    def __init__(self):
-        self.output_dir = folder_paths.get_temp_directory()
-        self.type = "temp"
-        self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
-        self.compress_level = 1
+class D2_PreviewImage(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Preview Image",
+            display_name="D2 Preview Image",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Custom("D2_BUTTON").Input("popup_image", optional=True),
+            ],
+            outputs=[],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
+            is_output_node=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {"images": ("IMAGE", ), },
-            "optional": {
-                "popup_image": ("D2_BUTTON", {}, )
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
-        }
-
-    CATEGORY = "D2/Image"
-
-    def save_images(self, images, popup_image="", filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
-        return super().save_images(images)
+    def execute(cls, images, popup_image=None) -> io.NodeOutput:
+        # V3 では V1 クラス SaveImage を継承できないため、インスタンスに temp 設定をして呼ぶ（挙動は同一）
+        saver = SaveImage()
+        saver.output_dir = folder_paths.get_temp_directory()
+        saver.type = "temp"
+        saver.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+        saver.compress_level = 1
+        res = saver.save_images(images)
+        return io.NodeOutput(ui=res["ui"])
 
 
 
@@ -317,36 +322,54 @@ D2 Load Image
 プロンプト出力できる Load Image
 
 """
-class D2_LoadImage(LoadImage):
+class D2_LoadImage(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(s):
+    def define_schema(cls) -> io.Schema:
         input_dir = folder_paths.get_input_directory()
         files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
-        return {
-            "required":{
-                "image": (sorted(files), {"image_upload": True})
-            },
-            "optional": {
-                "image_path": ("STRING", {"forceInput": True}),
-                "editor": ("D2_BUTTON", {})
-            }
-        }
+        return io.Schema(
+            node_id="D2 Load Image",
+            display_name="D2 Load Image",
+            category="D2/Image",
+            inputs=[
+                io.Combo.Input("image", options=sorted(files), upload=io.UploadType.image),
+                io.String.Input("image_path", force_input=True, optional=True),
+                io.Custom("D2_BUTTON").Input("editor", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+                io.Mask.Output(display_name="MASK"),
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                io.String.Output(display_name="positive"),
+                io.String.Output(display_name="negative"),
+                io.String.Output(display_name="filename"),
+                io.String.Output(display_name="filepath"),
+                io.String.Output(display_name="pnginfo"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING", "STRING", "STRING", "STRING", "STRING" )
-    RETURN_NAMES = ("IMAGE", "MASK", "width", "height", "positive", "negative", "filename", "filepath", "pnginfo" )
-    FUNCTION = "load_image"
-    CATEGORY = "D2/Image"
+    # V3 では V1 クラス LoadImage を継承できないため、継承で得ていた IS_CHANGED / VALIDATE_INPUTS を再定義する。
+    # 既定照合スキップのため引数に image を含める（image は input_dir のファイル combo）。
+    @classmethod
+    def fingerprint_inputs(cls, image, image_path=None, editor=None):
+        return LoadImage.IS_CHANGED(image)
 
-    def load_image(self, image, image_path=None):
+    @classmethod
+    def validate_inputs(cls, image):
+        return LoadImage.VALIDATE_INPUTS(image)
+
+    @classmethod
+    def execute(cls, image, image_path=None, editor=None) -> io.NodeOutput:
         if image_path != None:
             image = image_path.strip()
-            
-        # オリジナルのLoadImage処理
-        output_images, output_masks = super().load_image(image)
+
+        # オリジナルのLoadImage処理（V1 クラスをインスタンス経由で呼ぶ）
+        output_images, output_masks = LoadImage().load_image(image)
 
         image_path = folder_paths.get_annotated_filepath(image)
-        
+
         with Image.open(image_path) as img:
             width = img.size[0]
             height = img.size[1]
@@ -354,8 +377,8 @@ class D2_LoadImage(LoadImage):
             pnginfo = pnginfo_util.get_pnginfo(img)
 
         filename = os.path.basename(image_path)
-        
-        return (output_images, output_masks, width, height, prompt["positive"], prompt["negative"], filename, image_path, pnginfo)
+
+        return io.NodeOutput(output_images, output_masks, width, height, prompt["positive"], prompt["negative"], filename, image_path, pnginfo)
 
 
 """

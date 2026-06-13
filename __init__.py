@@ -67,6 +67,13 @@ from .nodes.d2_size_nodes import (
     D2_SizeSelector,
     D2_GetImageSize,
 )
+from .nodes.d2_image_nodes import (
+    D2_SaveImage,
+    D2_SaveImageEagle,
+    D2_SendFileEagle,
+    D2_PreviewImage,
+    D2_LoadImage,
+)
 
 
 class D2Extension(ComfyExtension):
@@ -93,6 +100,12 @@ class D2Extension(ComfyExtension):
             D2_AnyDelivery,
             # B. 重要度が高いもの（Preset Selector）
             D2_PresetSelector,
+            # B. 重要度が高いもの（Image 保存・読込）
+            D2_SaveImage,
+            D2_SaveImageEagle,
+            D2_SendFileEagle,
+            D2_PreviewImage,
+            D2_LoadImage,
         ]
 
 
