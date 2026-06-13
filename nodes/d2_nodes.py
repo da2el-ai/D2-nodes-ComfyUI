@@ -12,6 +12,7 @@ from transformers import CLIPTokenizer
 import folder_paths
 import comfy.sd
 import comfy.samplers
+from comfy_api.latest import io
 from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
 
 from comfy_execution.graph_utils import GraphBuilder
@@ -361,40 +362,41 @@ D2_CheckpointLoader
 Checkpointのフルパスを取得できる Checkpoint Loader
 
 """
-class D2_CheckpointLoader:
+class D2_CheckpointLoader(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),
-                "auto_vpred": ("BOOLEAN", {"default": True}),
-                "sampling": (["normal", "eps", "v_prediction", "lcm", "x0"],),
-                "zsnr": ("BOOLEAN", {"default": False}),
-                "multiplier": ("FLOAT", {"default": 0.6, "min": 0.0, "max": 1.0, "step": 0.01}),
-            },
-            "hidden": {
-                "unique_id": "UNIQUE_ID", "extra_pnginfo": "EXTRA_PNGINFO", "prompt": "PROMPT"}
-            }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Checkpoint Loader",
+            display_name="D2 Checkpoint Loader",
+            category="D2",
+            inputs=[
+                io.Combo.Input("ckpt_name", options=folder_paths.get_filename_list("checkpoints")),
+                io.Boolean.Input("auto_vpred", default=True),
+                io.Combo.Input("sampling", options=["normal", "eps", "v_prediction", "lcm", "x0"]),
+                io.Boolean.Input("zsnr", default=False),
+                io.Float.Input("multiplier", default=0.6, min=0.0, max=1.0, step=0.01),
+            ],
+            outputs=[
+                io.Model.Output(display_name="model"),
+                io.Clip.Output(display_name="clip"),
+                io.Vae.Output(display_name="vae"),
+                io.String.Output(display_name="ckpt_name"),
+                io.String.Output(display_name="ckpt_hash"),
+                io.String.Output(display_name="ckpt_fullpath"),
+                io.String.Output(display_name="sampling"),
+            ],
+            hidden=[io.Hidden.unique_id, io.Hidden.extra_pnginfo, io.Hidden.prompt],
+        )
 
-    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING", "STRING", "STRING", "STRING",)
-    RETURN_NAMES = ("model", "clip", "vae", "ckpt_name", "ckpt_hash", "ckpt_fullpath", "sampling", )
-    FUNCTION = "load_checkpoint"
-
-    CATEGORY = "D2"
-
-    def load_checkpoint(
-            self, 
-            ckpt_name, 
-            auto_vpred = True, 
-            sampling = "normal", 
-            zsnr = False, 
-            multiplier = 0.6, 
-            output_vae = True, 
-            output_clip = True, 
-            unique_id = None, 
-            extra_pnginfo = None, 
-            prompt = None
-        ):
+    @classmethod
+    def execute(
+            cls,
+            ckpt_name,
+            auto_vpred = True,
+            sampling = "normal",
+            zsnr = False,
+            multiplier = 0.6,
+        ) -> io.NodeOutput:
         ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
         out = comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         model = out[0]
@@ -416,7 +418,7 @@ class D2_CheckpointLoader:
 
         hash = checkpoint_util.get_file_hash(ckpt_path)
         ckpt_name = os.path.basename(ckpt_name)
-        return (model, clip, vae, ckpt_name, hash, ckpt_path, sampling,)
+        return io.NodeOutput(model, clip, vae, ckpt_name, hash, ckpt_path, sampling)
 
 
 
@@ -426,31 +428,36 @@ D2_LoadDiffusionModel
 Checkpointのフルパスを取得できる Load Diffusion Model
 
 """
-class D2_LoadDiffusionModel(UNETLoader):
+class D2_LoadDiffusionModel(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": { 
-                "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
-                "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Load Diffusion Model",
+            display_name="D2 Load Diffusion Model",
+            category="D2",
+            inputs=[
+                io.Combo.Input("unet_name", options=folder_paths.get_filename_list("diffusion_models")),
+                io.Combo.Input("weight_dtype", options=["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"]),
+            ],
+            outputs=[
+                io.Model.Output(display_name="model"),
+                io.String.Output(display_name="ckpt_name"),
+                io.String.Output(display_name="ckpt_hash"),
+                io.String.Output(display_name="ckpt_fullpath"),
+            ],
+        )
 
-    RETURN_TYPES = ("MODEL", "STRING", "STRING", "STRING",)
-    RETURN_NAMES = ("model", "ckpt_name", "ckpt_hash", "ckpt_fullpath", )
-    FUNCTION = "load_unet"
-
-    CATEGORY = "D2"
-
-    def load_unet(self, unet_name, weight_dtype):
+    @classmethod
+    def execute(cls, unet_name, weight_dtype) -> io.NodeOutput:
         ckpt_path = folder_paths.get_full_path("diffusion_models", unet_name)
         hash = checkpoint_util.get_file_hash(ckpt_path)
         ckpt_name = os.path.basename(unet_name)
 
-        out = super().load_unet(unet_name, weight_dtype)
+        # V3 では V1 クラス UNETLoader を継承できないため、インスタンス経由で呼ぶ（挙動は同一）
+        out = UNETLoader().load_unet(unet_name, weight_dtype)
         model = out[0]
 
-        return (model, ckpt_name, hash, ckpt_path,)
+        return io.NodeOutput(model, ckpt_name, hash, ckpt_path)
 
 
 
@@ -460,31 +467,31 @@ D2 Controlnet Loader
 D2 Ksampler専用のcontrolnetローダー
 
 """
-class D2_ControlnetLoader:
+class D2_ControlnetLoader(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": { 
-                "controlnet_type": (["StableDiffusion", "Anima"],),
-                "controlnet_name": (folder_paths.get_filename_list("controlnet"),),
-                "image": ("IMAGE",),
-                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.001}),
-                "start_percent": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.001}),
-                "end_percent": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.001})
-            },
-            "optional": {
-                "mask": ("MASK",),
-                "vae": ("VAE",),
-                "cnet_stack": ("D2_CNET_STACK",),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Controlnet Loader",
+            display_name="D2 Controlnet Loader",
+            category="D2",
+            inputs=[
+                io.Combo.Input("controlnet_type", options=["StableDiffusion", "Anima"]),
+                io.Combo.Input("controlnet_name", options=folder_paths.get_filename_list("controlnet")),
+                io.Image.Input("image"),
+                io.Float.Input("strength", default=1.0, min=0.0, max=10.0, step=0.001),
+                io.Float.Input("start_percent", default=0.0, min=0.0, max=1.0, step=0.001),
+                io.Float.Input("end_percent", default=1.0, min=0.0, max=1.0, step=0.001),
+                io.Mask.Input("mask", optional=True),
+                io.Vae.Input("vae", optional=True),
+                io.Custom("D2_CNET_STACK").Input("cnet_stack", optional=True),
+            ],
+            outputs=[
+                io.Custom("D2_CNET_STACK").Output(display_name="cnet_stack"),
+            ],
+        )
 
-    RETURN_TYPES = ("D2_CNET_STACK",)
-    RETURN_NAMES = ("cnet_stack",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, controlnet_type, controlnet_name, image, strength, start_percent, end_percent, mask=None, vae=None, cnet_stack=None ):
+    @classmethod
+    def execute(cls, controlnet_type, controlnet_name, image, strength, start_percent, end_percent, mask=None, vae=None, cnet_stack=None) -> io.NodeOutput:
         d2_cnet = D2_Cnet(
             controlnet_type, controlnet_name, image, strength, start_percent, end_percent, mask, vae
         )
@@ -493,8 +500,8 @@ class D2_ControlnetLoader:
             cnet_stack.append(d2_cnet)
         else:
             cnet_stack = [d2_cnet]
-        
-        return (cnet_stack,)
+
+        return io.NodeOutput(cnet_stack)
 
 
 
@@ -504,36 +511,41 @@ D2 Load Lora
     Loraの指定をテキストで行うノード
 
 """
-class D2_LoadLora:
+class D2_LoadLora(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "model": ("MODEL",),
-                "clip": ("CLIP",),
-                "prompt": ("STRING", {"multiline": True}),
-                "mode": (["a1111", "simple"],),
-                "insert_lora": (["CHOOSE"] + folder_paths.get_filename_list("loras"),)
-            },
-        }
-
-    RETURN_TYPES = ("MODEL", "CLIP", "STRING", "STRING",)
-    RETURN_NAMES = ("MODEL", "CLIP", "prompt", "formatted_prompt",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Load Lora",
+            display_name="D2 Load Lora",
+            category="D2",
+            inputs=[
+                io.Model.Input("model"),
+                io.Clip.Input("clip"),
+                io.String.Input("prompt", multiline=True),
+                io.Combo.Input("mode", options=["a1111", "simple"]),
+                io.Combo.Input("insert_lora", options=["CHOOSE"] + folder_paths.get_filename_list("loras")),
+            ],
+            outputs=[
+                io.Model.Output(display_name="MODEL"),
+                io.Clip.Output(display_name="CLIP"),
+                io.String.Output(display_name="prompt"),
+                io.String.Output(display_name="formatted_prompt"),
+            ],
+        )
 
     ######
-    def run(self, model, clip, prompt, mode, insert_lora):
+    @classmethod
+    def execute(cls, model, clip, prompt, mode, insert_lora) -> io.NodeOutput:
         if mode == "simple":
-            processed_params = self.__class__.get_params_simple(prompt)
+            processed_params = cls.get_params_simple(prompt)
             formatted_prompt = ""
         else:
-            processed_params, formatted_prompt = self.__class__.get_params_a1111(prompt)
+            processed_params, formatted_prompt = cls.get_params_a1111(prompt)
 
-        model, clip = self.__class__.apply_lora(model, clip, processed_params)
+        model, clip = cls.apply_lora(model, clip, processed_params)
 
-        return (model, clip, prompt, formatted_prompt,)
+        return io.NodeOutput(model, clip, prompt, formatted_prompt)
 
     ######
     @classmethod
