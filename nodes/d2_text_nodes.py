@@ -13,6 +13,7 @@ from transformers import CLIPTokenizer
 from datetime import datetime
 
 import folder_paths
+from comfy_api.latest import ComfyExtension, io
 # import comfy.sd
 # import comfy.samplers
 # from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
@@ -599,26 +600,28 @@ class D2_FilenameTemplate2(D2_FilenameTemplate):
 D2 Prompt Sanitizer
 
 """
-class D2_PromptSanitizer:
+class D2_PromptSanitizer(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "prompt": ("STRING", {"forceInput": True}),
-                "underscore_to_space": ("BOOLEAN", {"default": True}),
-                "space_after_comma": ("BOOLEAN", {"default": True}),
-                "remove_extra_comma": ("BOOLEAN", {"default": True}),
-                "protect_lora": ("BOOLEAN", {"default": True}),
-                "protect_score": ("BOOLEAN", {"default": True}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Prompt Sanitizer",
+            display_name="D2 Prompt Sanitizer",
+            category="D2",
+            inputs=[
+                io.String.Input("prompt", force_input=True),
+                io.Boolean.Input("underscore_to_space", default=True),
+                io.Boolean.Input("space_after_comma", default=True),
+                io.Boolean.Input("remove_extra_comma", default=True),
+                io.Boolean.Input("protect_lora", default=True),
+                io.Boolean.Input("protect_score", default=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="prompt"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("prompt",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True):
+    @classmethod
+    def execute(cls, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True) -> io.NodeOutput:
         # 保護対象（LoRA等の <...> と Pony 品質タグ score_9 / score_8_up 等）を
         # プレースホルダへ退避し、整形対象から除外する
         protected = []
@@ -654,7 +657,7 @@ class D2_PromptSanitizer:
         if protected:
             text = re.sub(r"\x00(\d+)\x00", lambda m: protected[int(m.group(1))], text)
 
-        return (text,)
+        return io.NodeOutput(text)
 
 
 
