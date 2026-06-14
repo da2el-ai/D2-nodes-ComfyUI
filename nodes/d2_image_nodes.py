@@ -903,7 +903,7 @@ class D2_MosaicFilter(io.ComfyNode):
 
 
 
-class D2_CutByMask:
+class D2_CutByMask(io.ComfyNode):
     """
     マスクから画像を切り出すノード
     class名: D2_CutByMask
@@ -932,28 +932,30 @@ class D2_CutByMask:
     """
     
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "images": ("IMAGE",),
-                "mask": ("MASK",),
-                "cut_type": (["mask", "rectangle", "square_thumb"],),
-                "output_size": (["mask_size", "image_size"],),
-            },
-            "optional": {
-                "padding": ("INT", {"default": 0, "min": 0, "max": 1000}),
-                "min_width": ("INT", {"default": 0, "min": 0, "max": 10000}),
-                "min_height": ("INT", {"default": 0, "min": 0, "max": 10000}),
-                "output_alpha": ("BOOLEAN", {"default":True})
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Cut By Mask",
+            display_name="D2 Cut By Mask",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Mask.Input("mask"),
+                io.Combo.Input("cut_type", options=["mask", "rectangle", "square_thumb"]),
+                io.Combo.Input("output_size", options=["mask_size", "image_size"]),
+                io.Int.Input("padding", default=0, min=0, max=1000, optional=True),
+                io.Int.Input("min_width", default=0, min=0, max=10000, optional=True),
+                io.Int.Input("min_height", default=0, min=0, max=10000, optional=True),
+                io.Boolean.Input("output_alpha", default=True, optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+                io.Mask.Output(display_name="mask"),
+                io.Int.Output(display_name="rect"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "MASK", "INT",)
-    RETURN_NAMES = ("image", "mask", "rect",)
-    FUNCTION = "cut_by_mask"
-    CATEGORY = "D2/Image"
-
-    def cut_by_mask(self, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0, output_alpha=True):
+    @classmethod
+    def execute(cls, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0, output_alpha=True) -> io.NodeOutput:
         # ComfyUIでの画像形状: [batch, height, width, channels]
         # マスク形状: [batch, height, width] または [height, width]
         
@@ -1077,10 +1079,10 @@ class D2_CutByMask:
         if final_mask.ndim == 2:
             final_mask = final_mask.unsqueeze(0)
 
-        return (output_tensor, final_mask, rect_tensor)
+        return io.NodeOutput(output_tensor, final_mask, rect_tensor)
 
 
-class D2_PasteByMask:
+class D2_PasteByMask(io.ComfyNode):
     """
     マスクと領域を指定して画像を結合するノード
 
@@ -1107,28 +1109,30 @@ class D2_PasteByMask:
     """
     
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "img_base": ("IMAGE",),
-                "img_paste": ("IMAGE",),
-                "paste_mode": (["mask", "rect_full", "rect_position", "rect_pos_mask"],),
-                "multi_mode": (["pair_last", "pair_only", "cross"],),
-            },
-            "optional": {
-                "mask_opt": ("MASK", {"default": None, "forceInput": True}),
-                "rect_opt": ("INT", {"default": None, "forceInput": True}),
-                "feather": ("INT", {"default": 0, "min": 0, "max": 100}),
-                "feather_type": (["simple", "distance"], {"default": "simple"}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Paste By Mask",
+            display_name="D2 Paste By Mask",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("img_base"),
+                io.Image.Input("img_paste"),
+                io.Combo.Input("paste_mode", options=["mask", "rect_full", "rect_position", "rect_pos_mask"]),
+                io.Combo.Input("multi_mode", options=["pair_last", "pair_only", "cross"]),
+                # MASK はソケット専用型のため V1 の forceInput/default は no-op（落とす）
+                io.Mask.Input("mask_opt", optional=True),
+                # INT は widget 型なので forceInput でソケット入力に強制する（rect は CutByMask の出力）
+                io.Int.Input("rect_opt", force_input=True, optional=True),
+                io.Int.Input("feather", default=0, min=0, max=100, optional=True),
+                io.Combo.Input("feather_type", options=["simple", "distance"], default="simple", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("image",)
-    FUNCTION = "paste_by_mask"
-    CATEGORY = "D2/Image"
-
-    def paste_by_mask(self, img_base, img_paste, paste_mode, multi_mode, mask_opt=None, rect_opt=None, feather=0, feather_type="simple"):
+    @classmethod
+    def execute(cls, img_base, img_paste, paste_mode, multi_mode, mask_opt=None, rect_opt=None, feather=0, feather_type="simple") -> io.NodeOutput:
         """
         マスクと領域を指定して画像を結合する
 
@@ -1192,19 +1196,20 @@ class D2_PasteByMask:
             img_paste_single = img_paste[paste_idx]  # [height, width, channels]
             
             # 処理モードに応じた画像合成を行う
-            result_img = self._process_image_pair(
-                img_base_single, img_paste_single, 
-                paste_mode, mask_opt, rect_opt, 
+            result_img = cls._process_image_pair(
+                img_base_single, img_paste_single,
+                paste_mode, mask_opt, rect_opt,
                 feather, feather_type, base_height, base_width
             )
-            
+
             output_images.append(result_img)
-        
+
         # 出力を適切な形式に変換
         output_tensor = torch.stack(output_images, dim=0)
-        return (output_tensor,)
-    
-    def _process_image_pair(self, img_base, img_paste, paste_mode, mask_opt, rect_opt, feather, feather_type, base_height, base_width):
+        return io.NodeOutput(output_tensor)
+
+    @classmethod
+    def _process_image_pair(cls, img_base, img_paste, paste_mode, mask_opt, rect_opt, feather, feather_type, base_height, base_width):
         """
         1ペアの画像処理を行う
         
@@ -1233,23 +1238,23 @@ class D2_PasteByMask:
         
         # paste_modeに応じた処理
         if paste_mode == "mask":
-            output_img = self._process_mode_mask(
-                img_base_rgba, img_paste_rgba, mask_opt, 
+            output_img = cls._process_mode_mask(
+                img_base_rgba, img_paste_rgba, mask_opt,
                 base_height, base_width, feather, feather_type
             )
         elif paste_mode == "rect_full":
-            output_img = self._process_mode_rect_full(
+            output_img = cls._process_mode_rect_full(
                 img_base_rgba, img_paste_rgba, x, y, rect_width, rect_height,
                 base_height, base_width, feather, feather_type
             )
         elif paste_mode == "rect_position":
-            output_img = self._process_mode_rect_position(
-                img_base_rgba, img_paste_rgba, x, y, 
+            output_img = cls._process_mode_rect_position(
+                img_base_rgba, img_paste_rgba, x, y,
                 base_height, base_width, feather, feather_type
             )
         elif paste_mode == "rect_pos_mask":
-            output_img = self._process_mode_rect_pos_mask(
-                img_base_rgba, img_paste_rgba, mask_opt, x, y, 
+            output_img = cls._process_mode_rect_pos_mask(
+                img_base_rgba, img_paste_rgba, mask_opt, x, y,
                 base_height, base_width, feather, feather_type
             )
         else:
@@ -1257,7 +1262,8 @@ class D2_PasteByMask:
         return output_img
 
 
-    def _process_mode_mask(self, img_base_rgba, img_paste_rgba, mask_opt, base_height, base_width, feather, feather_type):
+    @classmethod
+    def _process_mode_mask(cls, img_base_rgba, img_paste_rgba, mask_opt, base_height, base_width, feather, feather_type):
         """マスクモード - マスクでマスキングして x=0, y=0 の位置に貼りつける"""
         if mask_opt is None:
             raise ValueError("Mask is required for 'mask' paste mode")
@@ -1278,7 +1284,8 @@ class D2_PasteByMask:
         
         return output_img
     
-    def _process_mode_rect_full(self, img_base_rgba, img_paste_rgba, x, y, rect_width, rect_height,
+    @classmethod
+    def _process_mode_rect_full(cls, img_base_rgba, img_paste_rgba, x, y, rect_width, rect_height,
                               base_height, base_width, feather, feather_type):
         """短形フルモード - 貼り付けエリアのマスクを作り x=0, y=0 に貼りつける"""
         # img_paste の寸法を取得
@@ -1308,7 +1315,8 @@ class D2_PasteByMask:
         
         return output_img
 
-    def _process_mode_rect_position(self, img_base_rgba, img_paste_rgba, x, y,
+    @classmethod
+    def _process_mode_rect_position(cls, img_base_rgba, img_paste_rgba, x, y,
                                   base_height, base_width, feather, feather_type):
         """
         矩形位置モード - img_paste を rect_opt の位置に貼りつける
@@ -1337,7 +1345,8 @@ class D2_PasteByMask:
 
         return output_img
 
-    def _process_mode_rect_pos_mask(self, img_base_rgba, img_paste_rgba, mask_opt, x, y,
+    @classmethod
+    def _process_mode_rect_pos_mask(cls, img_base_rgba, img_paste_rgba, mask_opt, x, y,
                                    base_height, base_width, feather, feather_type):
         """
         矩形位置マスクモード - img_paste を mask_opt でマスキングして rect_opt の位置に貼りつける

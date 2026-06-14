@@ -81,6 +81,8 @@ from .nodes.d2_image_nodes import (
     D2_FolderImageQueue,
     D2_ImageStack,
     D2_ImageMaskStack,
+    D2_CutByMask,
+    D2_PasteByMask,
 )
 
 
@@ -125,6 +127,9 @@ class D2Extension(ComfyExtension):
             D2_FolderImageQueue,
             D2_ImageStack,
             D2_ImageMaskStack,
+            # C. 環境依存（複雑なマスク処理）
+            D2_CutByMask,
+            D2_PasteByMask,
         ]
 
 
