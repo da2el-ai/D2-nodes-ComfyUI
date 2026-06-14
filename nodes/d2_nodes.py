@@ -65,44 +65,64 @@ D2 KSampler
 positive / negative 入力に文字列が使える KSampler
 
 """
-class D2_KSampler:
+class D2_KSampler(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "model": ("MODEL",),
-                "clip": ("CLIP",),
-                "vae": ("VAE",),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
-                "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0, "step": 0.01}),
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, ),
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, ),
-                "latent_image": ("LATENT",),
-                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-                "preview_method": (["auto", "latent2rgb", "taesd", "vae_decoded_only", "none"],),
-                "positive": ("STRING", {"default": "","multiline": True}),
-                "negative": ("STRING", {"default": "", "multiline": True}),
-            },
-            "optional": {
-                "cnet_stack": ("D2_CNET_STACK",),
-                "d2_pipe": ("D2_TD2Pipe",),
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 KSampler",
+            display_name="D2 KSampler",
+            category="D2",
+            is_output_node=True,
+            inputs=[
+                io.Model.Input("model"),
+                io.Clip.Input("clip"),
+                io.Vae.Input("vae"),
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+                io.Int.Input("steps", default=20, min=1, max=10000),
+                io.Float.Input("cfg", default=7.0, min=0.0, max=100.0, step=0.01),
+                io.Combo.Input("sampler_name", options=comfy.samplers.KSampler.SAMPLERS),
+                io.Combo.Input("scheduler", options=comfy.samplers.KSampler.SCHEDULERS),
+                io.Latent.Input("latent_image"),
+                io.Float.Input("denoise", default=1.0, min=0.0, max=1.0, step=0.01),
+                io.Combo.Input("preview_method", options=["auto", "latent2rgb", "taesd", "vae_decoded_only", "none"]),
+                io.String.Input("positive", default="", multiline=True),
+                io.String.Input("negative", default="", multiline=True),
+                io.Custom("D2_CNET_STACK").Input("cnet_stack", optional=True),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+                io.Latent.Output(display_name="LATENT"),
+                io.Model.Output(display_name="MODEL"),
+                io.Clip.Output(display_name="CLIP"),
+                io.String.Output(display_name="positive"),
+                io.String.Output(display_name="formatted_positive"),
+                io.String.Output(display_name="negative"),
+                io.Conditioning.Output(display_name="positive_cond"),
+                io.Conditioning.Output(display_name="negative_cond"),
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
+            ],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo, io.Hidden.unique_id],
+        )
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "MODEL", "CLIP", "STRING", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formatted_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
-    OUTPUT_NODE = True
-    FUNCTION = "run"
-    CATEGORY = "D2"
+    @classmethod
+    def execute(cls, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
+            preview_method, positive, negative, cnet_stack=None, d2_pipe=None) -> io.NodeOutput:
+        return cls._execute_core(
+            model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
+            preview_method, positive, negative,
+            cnet_stack=cnet_stack, d2_pipe=d2_pipe,
+            prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
+        )
 
-
-    def run(self, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise, 
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, 
-            d2_pipe:Optional[D2_TD2Pipe]=None, prompt=None, extra_pnginfo=None, my_unique_id=None,
-            add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular", 
-            token_normalization="none", weight_interpretation="comfy"):
+    # KSampler / KSamplerAdvanced の共通本体。
+    # サブクラス（Advanced）から呼ばれるため hidden は cls.hidden を読まず引数で受け取る。
+    @classmethod
+    def _execute_core(cls, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None,
+            d2_pipe:Optional[D2_TD2Pipe]=None, prompt=None, extra_pnginfo=None,
+            add_noise=None, start_at_step=None, end_at_step=None, return_with_leftover_noise=None, sampler_type="regular",
+            token_normalization="none", weight_interpretation="comfy") -> io.NodeOutput:
 
         util.set_preview_method(preview_method)
 
@@ -161,12 +181,12 @@ class D2_KSampler:
         if positive_cond != None:
             positive_encoded = positive_cond
         else:
-            positive_encoded = self.__class__._create_conditioning(lora_clip, formatted_positive, token_normalization, weight_interpretation)
-        
+            positive_encoded = cls._create_conditioning(lora_clip, formatted_positive, token_normalization, weight_interpretation)
+
         if negative_cond != None:
             negative_encoded = negative_cond
         else:
-            negative_encoded = self.__class__._create_conditioning(lora_clip, d2_pipe.negative, token_normalization, weight_interpretation)
+            negative_encoded = cls._create_conditioning(lora_clip, d2_pipe.negative, token_normalization, weight_interpretation)
 
 
         # control net
@@ -175,9 +195,9 @@ class D2_KSampler:
                 # ControlNetが Animaの場合
                 # Anima は MODEL をラップするため、実際にサンプリングする lora_model に適用する
                 if(d2_cnet.controlnet_type == "Anima"):
-                    lora_model = self.__class__._apply_controlnet_anima(d2_cnet, lora_model)
+                    lora_model = cls._apply_controlnet_anima(d2_cnet, lora_model)
                 else:
-                    positive_encoded, negative_encoded = self.__class__._apply_controlnet_stablediffusion(
+                    positive_encoded, negative_encoded = cls._apply_controlnet_stablediffusion(
                         d2_cnet, positive_encoded, negative_encoded
                     )
 
@@ -204,10 +224,10 @@ class D2_KSampler:
 
         results_images = PreviewImage().save_images(images, "d2", prompt, extra_pnginfo)['ui']['images']
 
-        return {
-            "ui": {"images": results_images},
-            "result": (images, latent, lora_model, lora_clip, d2_pipe.positive, formatted_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe, )
-        }
+        return io.NodeOutput(
+            images, latent, lora_model, lora_clip, d2_pipe.positive, formatted_positive, d2_pipe.negative, positive_encoded, negative_encoded, d2_pipe,
+            ui={"images": results_images},
+        )
 
 
     @classmethod
@@ -303,53 +323,62 @@ positive / negative 入力に文字列が使える KSampler Advanced
 """
 class D2_KSamplerAdvanced(D2_KSampler):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "model": ("MODEL",),
-                "clip": ("CLIP",),
-                "vae": ("VAE",),
-                "add_noise": (["enable", "disable"],),
-                "noise_seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
-                "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0, "step": 0.01}),
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, ),
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, ),
-                "latent_image": ("LATENT",),
-                "start_at_step": ("INT", {"default": 0, "min": 0, "max": 10000}),
-                "end_at_step": ("INT", {"default": 10000, "min": 0, "max": 10000}),
-                "return_with_leftover_noise": (["disable", "enable"],),
-                "token_normalization": (["none", "mean", "length", "length+mean"],),
-                "weight_interpretation": (["comfy", "A1111", "compel", "comfy++" ,"down_weight"],),
-                "preview_method": (["auto", "latent2rgb", "taesd", "vae_decoded_only", "none"],),
-                "positive": ("STRING", {"default": "","multiline": True}),
-                "negative": ("STRING", {"default": "", "multiline": True}),
-            },
-            "optional": {
-                "positive_cond": ("CONDITIONING",),
-                "negative_cond": ("CONDITIONING",),
-                "cnet_stack": ("D2_CNET_STACK",),
-                "d2_pipe": ("D2_TD2Pipe",),
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "my_unique_id": "UNIQUE_ID",},
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 KSampler(Advanced)",
+            display_name="D2 KSampler(Advanced)",
+            category="D2",
+            is_output_node=True,
+            inputs=[
+                io.Model.Input("model"),
+                io.Clip.Input("clip"),
+                io.Vae.Input("vae"),
+                io.Combo.Input("add_noise", options=["enable", "disable"]),
+                io.Int.Input("noise_seed", default=0, min=0, max=0xffffffffffffffff),
+                io.Int.Input("steps", default=20, min=1, max=10000),
+                io.Float.Input("cfg", default=7.0, min=0.0, max=100.0, step=0.01),
+                io.Combo.Input("sampler_name", options=comfy.samplers.KSampler.SAMPLERS),
+                io.Combo.Input("scheduler", options=comfy.samplers.KSampler.SCHEDULERS),
+                io.Latent.Input("latent_image"),
+                io.Int.Input("start_at_step", default=0, min=0, max=10000),
+                io.Int.Input("end_at_step", default=10000, min=0, max=10000),
+                io.Combo.Input("return_with_leftover_noise", options=["disable", "enable"]),
+                io.Combo.Input("token_normalization", options=["none", "mean", "length", "length+mean"]),
+                io.Combo.Input("weight_interpretation", options=["comfy", "A1111", "compel", "comfy++", "down_weight"]),
+                io.Combo.Input("preview_method", options=["auto", "latent2rgb", "taesd", "vae_decoded_only", "none"]),
+                io.String.Input("positive", default="", multiline=True),
+                io.String.Input("negative", default="", multiline=True),
+                io.Conditioning.Input("positive_cond", optional=True),
+                io.Conditioning.Input("negative_cond", optional=True),
+                io.Custom("D2_CNET_STACK").Input("cnet_stack", optional=True),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+                io.Latent.Output(display_name="LATENT"),
+                io.Model.Output(display_name="MODEL"),
+                io.Clip.Output(display_name="CLIP"),
+                io.String.Output(display_name="positive"),
+                io.String.Output(display_name="formatted_positive"),
+                io.String.Output(display_name="negative"),
+                io.Conditioning.Output(display_name="positive_cond"),
+                io.Conditioning.Output(display_name="negative_cond"),
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
+            ],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo, io.Hidden.unique_id],
+        )
 
-    RETURN_TYPES = ("IMAGE", "LATENT", "MODEL", "CLIP", "STRING", "STRING", "STRING", "CONDITIONING", "CONDITIONING", "D2_TD2Pipe", )
-    RETURN_NAMES = ("IMAGE", "LATENT", "MODEL", "CLIP", "positive", "formatted_positive", "negative", "positive_cond", "negative_cond", "d2_pipe", )
+    @classmethod
+    def execute(cls, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image,
+            start_at_step, end_at_step, return_with_leftover_noise, token_normalization, weight_interpretation,
+            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, d2_pipe=None) -> io.NodeOutput:
 
-    OUTPUT_NODE = True
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 
-            start_at_step, end_at_step, return_with_leftover_noise,
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, d2_pipe=None, 
-            token_normalization="none", weight_interpretation="comfy",
-            prompt=None, extra_pnginfo=None, my_unique_id=None, denoise=1.0):
-
-        return super().run(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
-            preview_method, positive, negative, positive_cond, negative_cond, cnet_stack, d2_pipe, prompt, extra_pnginfo, my_unique_id,
-            add_noise, start_at_step, end_at_step, return_with_leftover_noise, 
+        return cls._execute_core(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 1.0,
+            preview_method, positive, negative,
+            positive_cond=positive_cond, negative_cond=negative_cond, cnet_stack=cnet_stack, d2_pipe=d2_pipe,
+            prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
+            add_noise=add_noise, start_at_step=start_at_step, end_at_step=end_at_step,
+            return_with_leftover_noise=return_with_leftover_noise,
             token_normalization=token_normalization, weight_interpretation=weight_interpretation,
             sampler_type="advanced")
 

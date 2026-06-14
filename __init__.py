@@ -53,6 +53,8 @@ from .nodes.d2_text_nodes import (
     D2_FilenameTemplate2,
 )
 from .nodes.d2_nodes import (
+    D2_KSampler,
+    D2_KSamplerAdvanced,
     D2_CheckpointLoader,
     D2_LoadDiffusionModel,
     D2_ControlnetLoader,
@@ -85,6 +87,9 @@ class D2Extension(ComfyExtension):
             D2_ListToString,
             D2_FilenameTemplate,
             D2_FilenameTemplate2,
+            # B. 重要度が高いもの（KSampler 系）
+            D2_KSampler,
+            D2_KSamplerAdvanced,
             # B. 重要度が高いもの（Loader 系）
             D2_CheckpointLoader,
             D2_LoadDiffusionModel,
