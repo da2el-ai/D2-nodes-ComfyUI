@@ -78,6 +78,9 @@ from .nodes.d2_image_nodes import (
     D2_EmptyImageAlpha,
     D2_LoadFolderImages,
     D2_MosaicFilter,
+    D2_FolderImageQueue,
+    D2_ImageStack,
+    D2_ImageMaskStack,
 )
 
 
@@ -118,6 +121,10 @@ class D2Extension(ComfyExtension):
             D2_EmptyImageAlpha,
             D2_LoadFolderImages,
             D2_MosaicFilter,
+            # C. 環境依存（JS 連動: 動的入力・キュー）
+            D2_FolderImageQueue,
+            D2_ImageStack,
+            D2_ImageMaskStack,
         ]
 
 

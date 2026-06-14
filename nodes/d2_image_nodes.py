@@ -433,23 +433,25 @@ class D2_LoadFolderImages(io.ComfyNode):
 D2 Image Stack
 
 """
-class D2_ImageStack:
+class D2_ImageStack(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Image Stack",
+            display_name="D2 Image Stack",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("image_count", default=3, min=1, max=50, step=1),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+            ],
+            # JS が image_1..image_N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
-
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
-    FUNCTION = "stack_image"
-    CATEGORY = "D2/Image"
-
-    def stack_image(self, image_count, **kwargs):
+    def execute(cls, image_count, **kwargs) -> io.NodeOutput:
 
         image_list = []
         
@@ -473,9 +475,9 @@ class D2_ImageStack:
                             image_list[i] = image_util.convert_to_rgba_or_rgb(image_list[i], "rgb")
             
             image_batch = torch.cat(image_list, dim=0)
-            return (image_batch,)
+            return io.NodeOutput(image_batch)
 
-        return (None,)
+        return io.NodeOutput(None)
 
 
 
@@ -484,22 +486,26 @@ class D2_ImageStack:
 D2 Image and Mask Stack
 
 """
-class D2_ImageMaskStack:
+class D2_ImageMaskStack(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Image Mask Stack",
+            display_name="D2 Image Mask Stack",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("image_count", default=3, min=1, max=50, step=1),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+                io.Mask.Output(display_name="MASK"),
+            ],
+            # JS が image_1/mask_1..N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
-
-    
-    RETURN_TYPES = ("IMAGE", "MASK",)
-    FUNCTION = "stack_image_mask"
-    CATEGORY = "D2/Image"
-
-    def stack_image_mask(self, image_count, **kwargs):
+    def execute(cls, image_count, **kwargs) -> io.NodeOutput:
 
         image_list = []
         mask_list = []
@@ -529,9 +535,9 @@ class D2_ImageMaskStack:
             image_batch = torch.cat(image_list, dim=0)
             mask_batch = torch.cat(mask_list, dim=0)
 
-            return (image_batch, mask_batch,)
+            return io.NodeOutput(image_batch, mask_batch)
 
-        return (None, None,)
+        return io.NodeOutput(None, None)
 
 
 
@@ -541,56 +547,63 @@ D2 Folder Image Queue
 フォルダ内画像の枚数分キューを送る
 
 """
-class D2_FolderImageQueue:
+class D2_FolderImageQueue(io.ComfyNode):
+    # V1 は self.files / self.is_finished をインスタンスに保持し、ComfyUI が obj を
+    # CacheKeySetID（ノードID）でキャッシュ・実行間で再利用することでキューを進めていた。
+    # V3 の execute は classmethod でインスタンス状態を持てないため、unique_id を
+    # キーにしたクラス辞書で同等の永続状態を持つ（ノードごとに独立、プロセス内で永続）。
+    # 特に sort_by="Random" のとき、キュー進行中に files を読み直すと並びが変わってしまうので
+    # files をキャッシュして同一バッチ内の順序を固定する意味がある。
+    # （is_finished は V1 でも書き込むだけで誰も読まない vestigial 状態。互換のため残す）
+    _queue_state = {}
 
-    def __init__(self):
-        self.is_finished = False
-        self.files = []
-    
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required":{
-                "folder": ("STRING", {"default": ""}),
-                "extension": ("STRING", {"default": "*.*"}),
-                "start_at": ("INT", {"default": 0, "min": 0}),
-                "auto_queue": ("BOOLEAN", {"default": True},),
-                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {}),
-                "queue_seed": ("D2_SEED", {}),
-                "progress_bar": ("D2_PROGRESS_BAR", {}),
-                "refresh_btn": ("D2_BUTTON", {})
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Folder Image Queue",
+            display_name="D2 Folder Image Queue",
+            category="D2/Image",
+            inputs=[
+                io.String.Input("folder", default=""),
+                io.String.Input("extension", default="*.*"),
+                io.Int.Input("start_at", default=0, min=0),
+                io.Boolean.Input("auto_queue", default=True),
+                io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SEED").Input("queue_seed", optional=True),
+                io.Custom("D2_PROGRESS_BAR").Input("progress_bar", optional=True),
+                io.Custom("D2_BUTTON").Input("refresh_btn", optional=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="image_path"),
+                io.Int.Output(display_name="image_count"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
 
-    RETURN_TYPES = ("STRING", "INT",)
-    RETURN_NAMES = ("image_path", "image_count",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
+    @classmethod
+    def execute(cls, folder="", extension="*.*", start_at=0, auto_queue=True, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, progress_bar=None, refresh_btn=None) -> io.NodeOutput:
+        state = cls._queue_state.setdefault(cls.hidden.unique_id, {"files": [], "is_finished": False})
 
-    ######
-    def run(self, folder = "", extension="*.*", start_at=1, auto_queue=True, sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, progress_bar=0, refresh_btn=""):
-        if(len(self.files) <= 0):
-            self.files = util.get_files(folder, extension, sort_by, order_by)
-            self.is_finished = False
+        if len(state["files"]) <= 0:
+            state["files"] = util.get_files(folder, extension, sort_by, order_by)
+            state["is_finished"] = False
 
-        image_path = self.files[start_at]
-        image_count = len(self.files)
+        image_path = state["files"][start_at]
+        image_count = len(state["files"])
 
-        if(len(self.files) <= start_at + 1):
-            self.is_finished = True
-            self.files = []
+        if len(state["files"]) <= start_at + 1:
+            state["is_finished"] = True
+            state["files"] = []
 
-        return {
-            "result": (image_path, image_count,),
-            "ui": {
+        return io.NodeOutput(
+            image_path, image_count,
+            ui={
                 "image_count": (image_count,),
                 "start_at": (start_at,),
-            }
-        }
+            },
+        )
 
 
 
