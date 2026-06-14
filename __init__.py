@@ -51,6 +51,10 @@ from .nodes.d2_text_nodes import (
     D2_ListToString,
     D2_FilenameTemplate,
     D2_FilenameTemplate2,
+    D2_RegexSwitcher,
+    D2_RegexReplace,
+    D2_TokenCounter,
+    D2_Prompt,
 )
 from .nodes.d2_nodes import (
     D2_KSampler,
@@ -112,6 +116,11 @@ class D2Extension(ComfyExtension):
             D2_ListToString,
             D2_FilenameTemplate,
             D2_FilenameTemplate2,
+            # D. Text 系残り
+            D2_RegexSwitcher,
+            D2_RegexReplace,
+            D2_TokenCounter,
+            D2_Prompt,
             # B. 重要度が高いもの（KSampler 系）
             D2_KSampler,
             D2_KSamplerAdvanced,
