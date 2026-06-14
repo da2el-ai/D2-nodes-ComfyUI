@@ -89,6 +89,11 @@ from .nodes.d2_xy_nodes import (
     D2_XYFolderImages,
     D2_XYUploadImage,
 )
+from .nodes.d2_refiner_nodes import (
+    D2_RefinerSteps,
+    D2_RefinerStepsA1111,
+    D2_RefinerStepsTester,
+)
 from .nodes.d2_image_nodes import (
     D2_SaveImage,
     D2_SaveImageEagle,
@@ -121,6 +126,10 @@ class D2Extension(ComfyExtension):
             D2_RegexReplace,
             D2_TokenCounter,
             D2_Prompt,
+            # D. Refiner 系
+            D2_RefinerSteps,
+            D2_RefinerStepsA1111,
+            D2_RefinerStepsTester,
             # B. 重要度が高いもの（KSampler 系）
             D2_KSampler,
             D2_KSamplerAdvanced,
