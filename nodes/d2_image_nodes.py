@@ -675,65 +675,56 @@ class D2_EmptyImageAlpha(io.ComfyNode):
 D2 Grid Image
 
 """
-class D2_GridImage:
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "images": ("IMAGE",),
-                "max_columns": ("INT", {"default": 3},),
-                "grid_gap": ("INT", {"default": 0},),
-                "swap_dimensions": ("BOOLEAN", {"default": False},),
-                "trigger_count": ("INT", {"default": 1, "min": 1, "step": 1}),
-            },
-            "optional": {
-                "title_text": ("STRING", {},),
-                "font_size": ("INT", {"default":24},),
-                "count": ("D2_SIMPLE_TEXT", {}),
-                "reset": ("D2_BUTTON", {}),
-            },
-            "hidden": {
-                "unique_id": "UNIQUE_ID",
-            },
-        }
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
+class D2_GridImage(io.ComfyNode):
 
     TITLE_HEIGHT = 64
 
-    def run(self, images, max_columns, grid_gap, swap_dimensions, trigger_count, title_text="", font_size=24, count=0, reset=None, unique_id=0):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Grid Image",
+            display_name="D2 Grid Image",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Int.Input("max_columns", default=3),
+                io.Int.Input("grid_gap", default=0),
+                io.Boolean.Input("swap_dimensions", default=False),
+                io.Int.Input("trigger_count", default=1, min=1, step=1),
+                io.String.Input("title_text", optional=True),
+                io.Int.Input("font_size", default=24, optional=True),
+                io.Custom("D2_SIMPLE_TEXT").Input("count", optional=True),
+                io.Custom("D2_BUTTON").Input("reset", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
+
+    @classmethod
+    def execute(cls, images, max_columns, grid_gap, swap_dimensions, trigger_count, title_text="", font_size=24, count=None, reset=None) -> io.NodeOutput:
+        unique_id = cls.hidden.unique_id
         # 画像をスタックして個数を取得
         image_count = D2_GridImage_ImageStocker.add_image(unique_id, images)
 
         if image_count >= trigger_count:
             # グリッド画像作成
-            grid_image = self.__class__.create_grid_image(
+            grid_image = cls.create_grid_image(
                 max_columns = max_columns,
-                image_batch = D2_GridImage_ImageStocker.get_images(unique_id), 
-                grid_gap = grid_gap, 
+                image_batch = D2_GridImage_ImageStocker.get_images(unique_id),
+                grid_gap = grid_gap,
                 swap_dimensions = swap_dimensions
             )
 
             # タイトル結合
-            finish_image = self.__class__.create_grid_title_image(grid_image, title_text, font_size)
+            finish_image = cls.create_grid_title_image(grid_image, title_text, font_size)
             finish_image = image_util.pil2tensor(finish_image)
             D2_GridImage_ImageStocker.reset_images(unique_id)
 
-            return {
-                "result": (finish_image,),
-                "ui": {"image_count": (image_count,),}
-            }
+            return io.NodeOutput(finish_image, ui={"image_count": (image_count,)})
         else:
-            return {
-                "result": (ExecutionBlocker(None),),
-                "ui": {
-                    "image_count": (image_count,),
-                }
-            }
+            return io.NodeOutput(ExecutionBlocker(None), ui={"image_count": (image_count,)})
 
     """
     グリッド＋タイトル画像作成

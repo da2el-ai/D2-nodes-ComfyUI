@@ -81,6 +81,7 @@ from .nodes.d2_xy_nodes import (
     D2_XYSeed,
     D2_XYSeed2,
     D2_XYAnnotation,
+    D2_XYGridImage,
 )
 from .nodes.d2_image_nodes import (
     D2_SaveImage,
@@ -96,6 +97,7 @@ from .nodes.d2_image_nodes import (
     D2_ImageMaskStack,
     D2_CutByMask,
     D2_PasteByMask,
+    D2_GridImage,
 )
 
 
@@ -143,6 +145,8 @@ class D2Extension(ComfyExtension):
             # C. 環境依存（複雑なマスク処理）
             D2_CutByMask,
             D2_PasteByMask,
+            # C. グリッド画像（状態保持・ExecutionBlocker）
+            D2_GridImage,
             # C. XY Plot コア
             D2_XYPlot,
             D2_XYPlotEasy,
@@ -156,6 +160,7 @@ class D2Extension(ComfyExtension):
             D2_XYSeed,
             D2_XYSeed2,
             D2_XYAnnotation,
+            D2_XYGridImage,
         ]
 
 

@@ -373,6 +373,17 @@ D2 XY Plot Easy Mini
 
 """
 class D2_XYPlotEasyMini(D2_XYPlotEasy):
+    # 親 D2_XYPlotEasy と出力数が違う（17→7）。V3 の RETURN_TYPES などは
+    # GET_SCHEMA が `cls._RETURN_TYPES is None` のときだけ schema.outputs から構築する
+    # クラス属性キャッシュ。親の GET_SCHEMA が先に走ると親の値（17出力）がキャッシュされ、
+    # サブクラスは継承でその非 None 値を見て再計算をスキップしてしまう
+    # （結果 y_other 等のスロット/型が親基準になり型検証で誤判定する）。
+    # ここで None にリセットして Mini 自身の schema から再構築させる。
+    _RETURN_TYPES = None
+    _RETURN_NAMES = None
+    _OUTPUT_IS_LIST = None
+    _OUTPUT_TOOLTIPS = None
+
     @classmethod
     def define_schema(cls) -> io.Schema:
         return io.Schema(
@@ -404,39 +415,46 @@ class D2_XYPlotEasyMini(D2_XYPlotEasy):
 D2 XY Grid Image
 
 """
-class D2_XYGridImage:
+class D2_XYGridImage(io.ComfyNode):
+    # V1 はインスタンス属性 self.image_batch / self.finished に画像を蓄積し、
+    # ComfyUI の obj キャッシュ（CacheKeySetID）で実行間に状態を保っていた。
+    # V3 の execute は classmethod で状態を持てないため、unique_id をキーにした
+    # クラス辞書で per-node に保持する（V1 に hidden が無かったので unique_id を追加）。
+    _grid_state = {}
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "images": ("IMAGE",),
-                "font_size": ("INT", {"default": 24},),
-                "grid_gap": ("INT", {"default": 0},),
-                "swap_dimensions": ("BOOLEAN", {"default": False},),
-                "grid_only": ("BOOLEAN", {"default": True},),
-                "draw_x_label": ("BOOLEAN", {"default": True},),
-                "draw_y_label": ("BOOLEAN", {"default": True},),
-            },
-            "optional": {
-                "x_annotation": ("D2_TAnnotation", {}),
-                "y_annotation": ("D2_TAnnotation", {}),
-                "status": ("STRING", {"forceInput": True, "default": ""},),
-                "grid_pipe": ("D2_TGridPipe", {"forceInput": True}),
-            },
-        }
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Grid Image",
+            display_name="D2 XY Grid Image",
+            category="D2/XY Plot",
+            inputs=[
+                io.Image.Input("images"),
+                io.Int.Input("font_size", default=24),
+                io.Int.Input("grid_gap", default=0),
+                io.Boolean.Input("swap_dimensions", default=False),
+                io.Boolean.Input("grid_only", default=True),
+                io.Boolean.Input("draw_x_label", default=True),
+                io.Boolean.Input("draw_y_label", default=True),
+                io.Custom("D2_TAnnotation").Input("x_annotation", optional=True),
+                io.Custom("D2_TAnnotation").Input("y_annotation", optional=True),
+                # status は STRING(widget型)なので forceInput を維持。grid_pipe は
+                # カスタムソケット型のため forceInput は no-op で落とす。
+                io.String.Input("status", force_input=True, optional=True),
+                io.Custom("D2_TGridPipe").Input("grid_pipe", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
 
-    image_batch = None
-    finished = True
+    @classmethod
+    def execute(cls, images, font_size, grid_gap, swap_dimensions, grid_only, draw_x_label, draw_y_label,
+            x_annotation=None, y_annotation=None, status=None, grid_pipe=None) -> io.NodeOutput:
 
-    def run(self, images, font_size, grid_gap, swap_dimensions, grid_only, draw_x_label, draw_y_label,
-            x_annotation:Optional[D2_TAnnotation]=None, y_annotation:Optional[D2_TAnnotation]=None, status=None, grid_pipe:Optional[D2_TGridPipe]=None):
-        
+        state = cls._grid_state.setdefault(cls.hidden.unique_id, {"image_batch": None, "finished": True})
+
         if grid_pipe != None:
             x_annotation = grid_pipe.x_annotation if grid_pipe.x_annotation else x_annotation
             y_annotation = grid_pipe.y_annotation if grid_pipe.y_annotation else y_annotation
@@ -444,43 +462,37 @@ class D2_XYGridImage:
 
         # 最初の画像だったら初期化する
         if status == "INIT":
-            self.finished = False
-            self.image_batch = None
+            state["finished"] = False
+            state["image_batch"] = None
 
         # 画像をスタックしていく
-        if self.image_batch is None:
-            self.image_batch = images
+        if state["image_batch"] is None:
+            state["image_batch"] = images
         else:
-            self.image_batch = torch.cat((self.image_batch, images), dim=0)
+            state["image_batch"] = torch.cat((state["image_batch"], images), dim=0)
 
         # 最後の画像まで送られたらグリッド画像生成して完了状態にする
         # 未完了なら今回送られてきた画像を送るか、または処理を止める
         if status == "FINISH":
-            grid_image = self.__class__.create_grid_image(
-                image_batch = self.image_batch, 
-                x_annotation = x_annotation, 
-                y_annotation = y_annotation, 
+            grid_image = cls.create_grid_image(
+                image_batch = state["image_batch"],
+                x_annotation = x_annotation,
+                y_annotation = y_annotation,
                 draw_x_label = draw_x_label,
                 draw_y_label = draw_y_label,
-                font_size = font_size, 
-                grid_gap = grid_gap, 
+                font_size = font_size,
+                grid_gap = grid_gap,
                 swap_dimensions = swap_dimensions
             )
             grid_image = image_util.pil2tensor(grid_image)
-            self.finished = True
-            self.image_batch = None
+            state["finished"] = True
+            state["image_batch"] = None
 
-            return {
-                "result": (grid_image,),
-            }
+            return io.NodeOutput(grid_image)
         elif grid_only:
-            return {
-                "result": (ExecutionBlocker(None),),
-            }
+            return io.NodeOutput(ExecutionBlocker(None))
         else:
-            return {
-                "result": (images,),
-            }
+            return io.NodeOutput(images)
 
     """
     グリッド画像作成
