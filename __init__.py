@@ -73,6 +73,14 @@ from .nodes.d2_xy_nodes import (
     D2_XYPlot,
     D2_XYPlotEasy,
     D2_XYPlotEasyMini,
+    D2_XYModelList,
+    D2_XYPromptSR,
+    D2_XYPromptSR2,
+    D2_XYListToPlot,
+    D2_XYStringToPlot,
+    D2_XYSeed,
+    D2_XYSeed2,
+    D2_XYAnnotation,
 )
 from .nodes.d2_image_nodes import (
     D2_SaveImage,
@@ -139,6 +147,15 @@ class D2Extension(ComfyExtension):
             D2_XYPlot,
             D2_XYPlotEasy,
             D2_XYPlotEasyMini,
+            # C. XY Plot テキスト系
+            D2_XYModelList,
+            D2_XYPromptSR,
+            D2_XYPromptSR2,
+            D2_XYListToPlot,
+            D2_XYStringToPlot,
+            D2_XYSeed,
+            D2_XYSeed2,
+            D2_XYAnnotation,
         ]
 
 

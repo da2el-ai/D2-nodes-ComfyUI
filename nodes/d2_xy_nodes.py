@@ -38,26 +38,27 @@ from .modules import network_util
 D2 XY Annotation
 
 """
-class D2_XYAnnotation:
+class D2_XYAnnotation(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # "type": (["STRING","INT","FLOAT",],),
-                "title": ("STRING", {"default": ""}),
-                "list": ("STRING", {"multiline": True},),
-            },
-        }
-    
-    RETURN_TYPES = ("D2_TAnnotation",)
-    RETURN_NAMES = ("x / y_annotation",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Annotation",
+            display_name="D2 XY Annotation",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("title", default=""),
+                io.String.Input("list", multiline=True),
+            ],
+            outputs=[
+                io.Custom("D2_TAnnotation").Output(display_name="x / y_annotation"),
+            ],
+        )
 
-    def run(self, title, list):
-        annotation = self.__class__.get_annotation(title, list)
-        return (annotation,)
+    @classmethod
+    def execute(cls, title, list) -> io.NodeOutput:
+        annotation = cls.get_annotation(title, list)
+        return io.NodeOutput(annotation)
 
     @classmethod
     def get_annotation(cls, title:str, list:str) -> D2_TAnnotation:
@@ -561,31 +562,32 @@ class D2_XYGridImage:
 D2 XY Model List
 
 """
-class D2_XYModelList:
+class D2_XYModelList(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "model_type": (["checkpoints", "loras", "diffusion_models", "samplers", "schedulers", "upscaler", "bbox_segm", "controlnet"],),
-                "filter": ("STRING", {"default":""}),
-                "mode": (["simple", "a1111"],),
-                "sort_by": (["Name", "Date"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "get_list": ("D2_BUTTON", {}),
-                "model_list": ("STRING", {"multiline": True}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Model List",
+            display_name="D2 XY Model List",
+            category="D2/XY Plot",
+            inputs=[
+                io.Combo.Input("model_type", options=["checkpoints", "loras", "diffusion_models", "samplers", "schedulers", "upscaler", "bbox_segm", "controlnet"]),
+                io.String.Input("filter", default=""),
+                io.Combo.Input("mode", options=["simple", "a1111"]),
+                io.Combo.Input("sort_by", options=["Name", "Date"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_BUTTON").Input("get_list", optional=True),
+                io.String.Input("model_list", multiline=True, optional=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("x / y_list", "LIST")
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    def run(self, model_type, filter="", mode="simple", sort_by="Name", order_by="A-Z", get_list="", model_list=""):
+    @classmethod
+    def execute(cls, model_type, filter="", mode="simple", sort_by="Name", order_by="A-Z", get_list=None, model_list="") -> io.NodeOutput:
         list_list = model_list.split("\n")
-        return (model_list, list_list,)
+        return io.NodeOutput(model_list, list_list)
 
 
 
@@ -662,27 +664,27 @@ D2 XYPromptSR
 D2 XY Plot 用に作った文字列置換
 
 """
-class D2_XYPromptSR:
+class D2_XYPromptSR(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # プロンプト
-                "prompt": ("STRING", {"multiline":True, "default":""},),
-                # 検索ワード
-                "search": ("STRING", {"default":""}),
-                # 置換文字列
-                "replace": ("STRING", {"multiline":True, "default":""}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Prompt SR",
+            display_name="D2 XY Prompt SR",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("prompt", multiline=True, default=""),
+                io.String.Input("search", default=""),
+                io.String.Input("replace", multiline=True, default=""),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("x / y_list", "LIST")
-    FUNCTION = "replace_text"
-    CATEGORY = "D2/XY Plot"
-
-    def replace_text(self, prompt, search, replace):
+    @classmethod
+    def execute(cls, prompt, search, replace) -> io.NodeOutput:
         # 置換文字列を改行で分割
         replace_items = replace.strip().split('\n')
 
@@ -696,7 +698,7 @@ class D2_XYPromptSR:
 
         output_xy = "\n".join([prompt.replace('\n','') for prompt in output_list])
 
-        return (output_xy, output_list,)
+        return io.NodeOutput(output_xy, output_list)
 
 
 
@@ -706,29 +708,28 @@ D2 XYPromptSR2
 D2 XY Plot 用に作った文字列置換
 
 """
-class D2_XYPromptSR2:
+class D2_XYPromptSR2(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # 検索ワード
-                "search": ("STRING", {}),
-                # プロンプト
-                "prompt": ("STRING", {"multiline":True}),
-                # 置換文字列
-                "x_y": ("STRING", {"forceInput":True},),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Prompt SR2",
+            display_name="D2 XY Prompt SR2",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("search"),
+                io.String.Input("prompt", multiline=True),
+                io.String.Input("x_y", force_input=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
-    FUNCTION = "replace_text"
-    CATEGORY = "D2/XY Plot"
-
-    def replace_text(self, prompt, search, x_y):
+    @classmethod
+    def execute(cls, search, prompt, x_y) -> io.NodeOutput:
         new_prompt = prompt.replace(search, x_y)
-        return (new_prompt,)
+        return io.NodeOutput(new_prompt)
 
 
 """
@@ -737,38 +738,36 @@ D2 XY Seed
 SEEDのリストを出力するノード
 
 """
-class D2_XYSeed:
+class D2_XYSeed(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # プロンプト
-                "seeds": ("STRING",{"multiline": True, "default":"-1\n-1"},),
-                # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Seed",
+            display_name="D2 XY Seed",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("seeds", multiline=True, default="-1\n-1"),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+                # V1 の OUTPUT_IS_LIST=(False, False, True) を踏襲。BATCH はリスト出力
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST", AnyType("*"))
-    RETURN_NAMES = ("x / y_list", "LIST", "BATCH")
-    OUTPUT_IS_LIST = (False, False, True)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    ######
-    def run(self, seeds):
+    @classmethod
+    def execute(cls, seeds) -> io.NodeOutput:
 
         # 入力文字列を改行で分割
         seed_list = seeds.strip().split('\n')
-
-        # 出力リスト
-        output_list = []
 
         # seed値を生成
         output_list = [util.create_seed(seed) for seed in seed_list]
         output_xy = "\n".join(str(x) for x in output_list)
 
-        return (output_xy, output_list, output_list,)
+        return io.NodeOutput(output_xy, output_list, output_list)
 
 
 """
@@ -777,32 +776,35 @@ D2 XY Seed 2
 指定個数のSEEDのリストを出力するノード
 
 """
-class D2_XYSeed2:
+class D2_XYSeed2(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "initial_number": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
-                "count": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
-                "mode": (["fixed", "increment", "decrement", "randomize"], {"default": "randomize"}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Seed2",
+            display_name="D2 XY Seed2",
+            category="D2/XY Plot",
+            inputs=[
+                io.Int.Input("initial_number", default=-1, min=-1, max=0xffffffffffffffff),
+                io.Int.Input("count", default=1, min=0, max=0xffffffffffffffff),
+                io.Combo.Input("mode", options=["fixed", "increment", "decrement", "randomize"], default="randomize"),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+                # V1 の OUTPUT_IS_LIST=(False, False, True) を踏襲。BATCH はリスト出力
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST", AnyType("*"))
-    RETURN_NAMES = ("x / y_list", "LIST", "BATCH")
-    OUTPUT_IS_LIST = (False, False, True)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    ######
     """
     seed値を生成する
     initial_number: 元の数値
     count: 生成個数
     mode: モード（fixed / increment / decrement / randomize）
     """
-    def run(self, initial_number, count, mode):
+    @classmethod
+    def execute(cls, initial_number, count, mode) -> io.NodeOutput:
         # 出力リスト
         output_list = []
         # 初期番号生成
@@ -821,7 +823,7 @@ class D2_XYSeed2:
 
         output_xy = "\n".join(str(x) for x in output_list)
 
-        return (output_xy, output_list, output_list,)
+        return io.NodeOutput(output_xy, output_list, output_list)
 
 
 
@@ -830,25 +832,25 @@ class D2_XYSeed2:
 D2 XY List To XYPlot
 
 """
-class D2_XYListToPlot:
+class D2_XYListToPlot(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "LIST": ("LIST",),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY List To Plot",
+            display_name="D2 XY List To Plot",
+            category="D2/XY Plot",
+            inputs=[
+                io.Custom("LIST").Input("LIST"),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("x / y_list",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    def run(self, LIST):
+    @classmethod
+    def execute(cls, LIST) -> io.NodeOutput:
         output = util.list_to_text(LIST, util.LINE_BREAK)
-        return {
-            "result": (output,),
-        }
+        return io.NodeOutput(output)
 
 
 """
@@ -856,25 +858,29 @@ class D2_XYListToPlot:
 D2 XY String To XYPlot
 
 """
-class D2_XYStringToPlot:
+class D2_XYStringToPlot(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "string_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY String To Plot",
+            display_name="D2 XY String To Plot",
+            category="D2/XY Plot",
+            inputs=[
+                io.Int.Input("string_count", default=3, min=1, max=50, step=1),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+            ],
+            # JS が string_1..N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("x / y_list",)
-    FUNCTION = "string_to_plot"
-    CATEGORY = "D2/XY Plot"
-
-    def string_to_plot(self, string_count, **kwargs):
+    @classmethod
+    def execute(cls, string_count, **kwargs) -> io.NodeOutput:
 
         string_list = []
-        
+
         for i in range(1, string_count + 1):
             string = kwargs.get(f"string_{i}")
             if string is not None:
@@ -885,9 +891,9 @@ class D2_XYStringToPlot:
             cleaned = [s.replace('\n', '') for s in string_list]
             result = '\n'.join(cleaned)
 
-            return (result,)
+            return io.NodeOutput(result)
 
-        return (None,)
+        return io.NodeOutput(None)
 
 
 """
