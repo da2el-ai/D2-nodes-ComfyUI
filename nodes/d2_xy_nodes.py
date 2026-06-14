@@ -914,39 +914,38 @@ D2 XY Folder Images
 フォルダ内画像を渡す
 
 """
-class D2_XYFolderImages:
+class D2_XYFolderImages(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required":{
-                "folder": ("STRING", {"default": ""}),
-                "extension": ("STRING", {"default": "*.*"}),
-                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {}),
-                "queue_seed": ("D2_SEED", {}),
-                "refresh_btn": ("D2_BUTTON", {})
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Folder Images",
+            display_name="D2 XY Folder Images",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("folder", default=""),
+                io.String.Input("extension", default="*.*"),
+                io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SEED").Input("queue_seed", optional=True),
+                io.Custom("D2_BUTTON").Input("refresh_btn", optional=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+                io.Int.Output(display_name="image_count"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST", "INT",)
-    RETURN_NAMES = ("x / y_list", "LIST", "image_count",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    ######
-    def run(self, folder, extension, sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, refresh_btn=""):
+    @classmethod
+    def execute(cls, folder, extension, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
         files = util.get_files(folder, extension, sort_by, order_by)
         output = util.list_to_text(files, util.LINE_BREAK)
 
-        return {
-            "result": (output, files, len(files),),
-            "ui": {
-                "image_count": (len(files),),
-            }
-        }
+        return io.NodeOutput(
+            output, files, len(files),
+            ui={"image_count": (len(files),)},
+        )
 
 
 
@@ -955,34 +954,34 @@ class D2_XYFolderImages:
 D2 Upload Image
 
 """
-class D2_XYUploadImage():
+class D2_XYUploadImage(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "image_list": ("STRING", {"multiline":True, "default":""}), 
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {"default":0}),
-                "status": ("D2_SIMPLE_TEXT", {"default":""}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Upload Image",
+            display_name="D2 XY Upload Image",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("image_list", multiline=True, default=""),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SIMPLE_TEXT").Input("status", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="LIST"),
+                io.String.Output(display_name="x / y_list"),
+                io.Int.Output(display_name="image_count"),
+            ],
+        )
 
-    RETURN_TYPES = ("LIST", "STRING", "INT",)
-    RETURN_NAMES = ("LIST", "x / y_list", "image_count",)
-    FUNCTION = "send_image_path"
-    CATEGORY = "D2/XY Plot"
-
-    def send_image_path(self, image_list, image_count=0, status=""):
+    @classmethod
+    def execute(cls, image_list, image_count=0, status="") -> io.NodeOutput:
         # 入力文字列を改行で分割
         image_batch = image_list.strip().split('\n')
 
-        return {
-            "result": (image_batch, image_list, image_count,),
-            "ui": {
-                "image_count": (len(image_batch),),
-            }
-        }
+        return io.NodeOutput(
+            image_batch, image_list, image_count,
+            ui={"image_count": (len(image_batch),)},
+        )
 
 
 

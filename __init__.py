@@ -82,6 +82,8 @@ from .nodes.d2_xy_nodes import (
     D2_XYSeed2,
     D2_XYAnnotation,
     D2_XYGridImage,
+    D2_XYFolderImages,
+    D2_XYUploadImage,
 )
 from .nodes.d2_image_nodes import (
     D2_SaveImage,
@@ -161,6 +163,8 @@ class D2Extension(ComfyExtension):
             D2_XYSeed2,
             D2_XYAnnotation,
             D2_XYGridImage,
+            D2_XYFolderImages,
+            D2_XYUploadImage,
         ]
 
 
