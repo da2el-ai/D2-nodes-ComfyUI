@@ -387,30 +387,30 @@ D2 Load Folder Images
 フォルダ内画像読み込んで渡す
 
 """
-class D2_LoadFolderImages():
+class D2_LoadFolderImages(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required":{
-                "folder": ("STRING", {"default": ""}),
-                "extension": ("STRING", {"default": "*.*"}),
-                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {}),
-                "queue_seed": ("D2_SEED", {}),
-                "refresh_btn": ("D2_BUTTON", {})
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Load Folder Images",
+            display_name="D2 Load Folder Images",
+            category="D2/Image",
+            inputs=[
+                io.String.Input("folder", default=""),
+                io.String.Input("extension", default="*.*"),
+                io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SEED").Input("queue_seed", optional=True),
+                io.Custom("D2_BUTTON").Input("refresh_btn", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+                io.Int.Output(display_name="image_count"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "INT",)
-    RETURN_NAMES = ("images", "image_count",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
-
-    ######
-    def run(self, folder = "", extension="*.*", sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, refresh_btn=""):
+    @classmethod
+    def execute(cls, folder="", extension="*.*", sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
         files = util.get_files(folder, extension, sort_by, order_by)
         load_image = LoadImage()
         image_list = []
@@ -422,12 +422,10 @@ class D2_LoadFolderImages():
 
         image_batch = torch.cat(image_list, dim=0)
 
-        return {
-            "result": (image_batch, len(files),),
-            "ui": {
-                "image_count": (len(files),),
-            }
-        }
+        return io.NodeOutput(
+            image_batch, len(files),
+            ui={"image_count": (len(files),)},
+        )
 
 
 """
@@ -626,41 +624,37 @@ D2 EmptyImage Alpha
 αチャンネル（透明度）付き画像作成
 
 """
-class D2_EmptyImageAlpha:
-    def __init__(self, device="cpu"):
-        self.device = device
+class D2_EmptyImageAlpha(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 EmptyImage Alpha",
+            display_name="D2 EmptyImage Alpha",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("width", default=512, min=1, max=util.MAX_RESOLUTION, step=1),
+                io.Int.Input("height", default=512, min=1, max=util.MAX_RESOLUTION, step=1),
+                io.Int.Input("batch_size", default=1, min=1, max=4096),
+                io.Int.Input("red", default=0, min=0, max=255, step=1),
+                io.Int.Input("green", default=0, min=0, max=255, step=1),
+                io.Int.Input("blue", default=0, min=0, max=255, step=1),
+                io.Float.Input("alpha", default=1.0, min=0, max=1.0, step=0.001),
+                io.Custom("D2_COLOR_CANVAS").Input("sample", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+            ],
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": { 
-                "width": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
-                "height": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
-                "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
-                "red": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
-                "green": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
-                "blue": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
-                "alpha": ("FLOAT", {"default": 1.0, "min": 0, "max": 1.0, "step": 0.001, "display": "alpha"}),
-            },
-            "optional": {
-                "sample": ("D2_COLOR_CANVAS", {}),
-            }
-        }
-    RETURN_TYPES = ("IMAGE",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
-
-    def run(self, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0, sample=""):
+    def execute(cls, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0, sample=None) -> io.NodeOutput:
         r = torch.full([batch_size, height, width, 1], red / 255.0)
         g = torch.full([batch_size, height, width, 1], green / 255.0)
         b = torch.full([batch_size, height, width, 1], blue / 255.0)
-        # print("r - ", red)
-        # print("g - ", green)
-        # print("b - ", blue)
         # アルファチャンネル追加
         a = torch.full([batch_size, height, width, 1], alpha)
         # RGBAを結合
-        return (torch.cat((r, g, b, a), dim=-1), )
+        return io.NodeOutput(torch.cat((r, g, b, a), dim=-1))
 
 
 """
@@ -834,24 +828,28 @@ D2 Mosaic Filter
 モザイクをかける
 
 """
-class D2_MosaicFilter:
+class D2_MosaicFilter(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": { 
-                "images": ("IMAGE",),
-                "dot_size": ("INT", {"default": 20, "min":1, "max":512},),
-                "color_mode": (["average", "original"],),
-                "opacity": ("FLOAT", {"default": 1, "min":0, "max":1},),
-                "brightness": ("INT", {"default": 0, "min":-100, "max":100},),
-                "invert_color": ("BOOLEAN", {"default": False},),
-            }
-        }
-    RETURN_TYPES = ("IMAGE",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Mosaic Filter",
+            display_name="D2 Mosaic Filter",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Int.Input("dot_size", default=20, min=1, max=512),
+                io.Combo.Input("color_mode", options=["average", "original"]),
+                io.Float.Input("opacity", default=1, min=0, max=1),
+                io.Int.Input("brightness", default=0, min=-100, max=100),
+                io.Boolean.Input("invert_color", default=False),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+            ],
+        )
 
-    def run(self, images, dot_size, color_mode, opacity, brightness, invert_color):
+    @classmethod
+    def execute(cls, images, dot_size, color_mode, opacity, brightness, invert_color) -> io.NodeOutput:
         """
         images の画像を全てモザイク処理する
         dot_size: ドットの大きさ
@@ -885,9 +883,9 @@ class D2_MosaicFilter:
             
             # 処理した画像を結果リストに追加
             result_images.append(mosaic_image)
-        
+
         # すべての画像を結合して返す
-        return (torch.stack(result_images),)
+        return io.NodeOutput(torch.stack(result_images))
 
 
 

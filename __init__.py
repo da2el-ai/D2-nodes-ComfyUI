@@ -75,6 +75,9 @@ from .nodes.d2_image_nodes import (
     D2_SendFileEagle,
     D2_PreviewImage,
     D2_LoadImage,
+    D2_EmptyImageAlpha,
+    D2_LoadFolderImages,
+    D2_MosaicFilter,
 )
 
 
@@ -111,6 +114,10 @@ class D2Extension(ComfyExtension):
             D2_SendFileEagle,
             D2_PreviewImage,
             D2_LoadImage,
+            # C. 環境依存（影響の小さいもの）
+            D2_EmptyImageAlpha,
+            D2_LoadFolderImages,
+            D2_MosaicFilter,
         ]
 
 
