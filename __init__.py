@@ -69,6 +69,11 @@ from .nodes.d2_size_nodes import (
     D2_SizeSelector,
     D2_GetImageSize,
 )
+from .nodes.d2_xy_nodes import (
+    D2_XYPlot,
+    D2_XYPlotEasy,
+    D2_XYPlotEasyMini,
+)
 from .nodes.d2_image_nodes import (
     D2_SaveImage,
     D2_SaveImageEagle,
@@ -130,6 +135,10 @@ class D2Extension(ComfyExtension):
             # C. 環境依存（複雑なマスク処理）
             D2_CutByMask,
             D2_PasteByMask,
+            # C. XY Plot コア
+            D2_XYPlot,
+            D2_XYPlotEasy,
+            D2_XYPlotEasyMini,
         ]
 
 
