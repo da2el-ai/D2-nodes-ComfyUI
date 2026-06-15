@@ -13,6 +13,7 @@ from transformers import CLIPTokenizer
 from datetime import datetime
 
 import folder_paths
+from comfy_api.latest import io
 # import comfy.sd
 # import comfy.samplers
 # from comfy_extras.nodes_model_advanced import RescaleCFG, ModelSamplingDiscrete
@@ -38,38 +39,7 @@ D2 RegexSwitcher
 正規表現で検索して文字列を結合・出力するノード
 
 """
-class D2_RegexSwitcher:
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # 検索対象テキスト
-                "text": (
-                    "STRING", {"forceInput": True, "multiline": True, "default": ""},
-                ),
-                # 正規表現、出力テキストのペア
-                "regex_and_output": (
-                    "STRING", {"multiline": True, "default": "pony\n--\nscore_9,\n--\n--\nhighres, high quality,"},
-                ),
-                "pre_delim": (["Comma", "Line break", "None"],),
-                "suf_delim": (["Comma", "Line break", "None"],),
-                "show_text": (["False", "True"],),
-                # 入力確認用
-                "text_check": ("STRING", {"multiline": True},),
-            },
-            "optional": {
-                # 先頭に結合するテキスト
-                "prefix": ("STRING", {"forceInput": True, "multiline": True, "default":"",},),
-                # 最後に結合するテキスト
-                "suffix": ("STRING", {"forceInput": True, "multiline": True, "default":"",},),
-            },
-        }
-
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "INT",)
-    RETURN_NAMES = ("combined_text", "prefix", "suffix", "index",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
+class D2_RegexSwitcher(io.ComfyNode):
 
     DELIMITER = {
         "Comma": ",",
@@ -77,7 +47,32 @@ class D2_RegexSwitcher:
         "None": "",
     }
 
-    def run(self, text, regex_and_output, pre_delim, suf_delim, show_text="True", prefix="", suffix="", text_check=""):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Regex Switcher",
+            display_name="D2 Regex Switcher",
+            category="D2",
+            inputs=[
+                io.String.Input("text", force_input=True, multiline=True, default=""),
+                io.String.Input("regex_and_output", multiline=True, default="pony\n--\nscore_9,\n--\n--\nhighres, high quality,"),
+                io.Combo.Input("pre_delim", options=["Comma", "Line break", "None"]),
+                io.Combo.Input("suf_delim", options=["Comma", "Line break", "None"]),
+                io.Combo.Input("show_text", options=["False", "True"]),
+                io.String.Input("text_check", multiline=True),
+                io.String.Input("prefix", force_input=True, multiline=True, default="", optional=True),
+                io.String.Input("suffix", force_input=True, multiline=True, default="", optional=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="combined_text"),
+                io.String.Output(display_name="prefix"),
+                io.String.Output(display_name="suffix"),
+                io.Int.Output(display_name="index"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, text, regex_and_output, pre_delim, suf_delim, show_text="True", text_check="", prefix="", suffix="") -> io.NodeOutput:
         """
         正規表現に基づいてテキストをマッチングし、結果を結合して返す関数。
 
@@ -90,6 +85,12 @@ class D2_RegexSwitcher:
         Returns:
             dict: UI用のテキストと結果のタプルを含む辞書
         """
+        # optional 未接続時は V1 同様 空文字列として扱う（出力が None にならないように）
+        if prefix is None:
+            prefix = ""
+        if suffix is None:
+            suffix = ""
+
         regex_output_list, default_output = D2_RegexSwitcher.get_regex_list(regex_and_output)
         match_text, match_index = D2_RegexSwitcher.get_mach_text(regex_output_list, default_output, text)
 
@@ -97,18 +98,18 @@ class D2_RegexSwitcher:
         parts = []
         if prefix:
             parts.append(prefix)
-            parts.append(self.DELIMITER[pre_delim])
+            parts.append(cls.DELIMITER[pre_delim])
         parts.append(match_text)
         if suffix:
-            parts.append(self.DELIMITER[suf_delim])
+            parts.append(cls.DELIMITER[suf_delim])
             parts.append(suffix)
 
         combined_text = "".join(parts)
 
-        return {
-            "ui": {"text": (text,)},
-            "result": (combined_text, prefix, suffix, match_index)
-        }
+        return io.NodeOutput(
+            combined_text, prefix, suffix, match_index,
+            ui={"text": (text,)},
+        )
 
     """
     該当文字列と該当indexを取得
@@ -157,30 +158,28 @@ D2 RegexReplace
 正規表現で文字列置換
 
 """
-class D2_RegexReplace:
+class D2_RegexReplace(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "text": (
-                    "STRING", {"forceInput": True, "multiline": True, "default": ""},
-                ),
-                "mode": (["Tag", "Advanced",],),
-                "regex_replace": (
-                    "STRING", {"multiline": True, "default": ""},
-                ),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Regex Replace",
+            display_name="D2 Regex Replace",
+            category="D2",
+            inputs=[
+                io.String.Input("text", force_input=True, multiline=True, default=""),
+                io.Combo.Input("mode", options=["Tag", "Advanced"]),
+                io.String.Input("regex_replace", multiline=True, default=""),
+            ],
+            outputs=[
+                io.String.Output(display_name="text"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, text, mode="Tag", regex_replace=""):
+    @classmethod
+    def execute(cls, text, mode="Tag", regex_replace="") -> io.NodeOutput:
         if not text or not regex_replace:
-            return { "result": (text,) }
+            return io.NodeOutput(text)
 
         replace_pairs = D2_RegexReplace._parse_regex_replace(regex_replace)
 
@@ -189,7 +188,7 @@ class D2_RegexReplace:
         else:
             result_text = D2_RegexReplace._repalace_advanced(text, replace_pairs)
 
-        return {"result": (result_text,)}
+        return io.NodeOutput(result_text)
 
 
     @classmethod
@@ -268,32 +267,30 @@ D2 MultiOutput
 数値、文字列、SEEDのリストを出力するノード
 
 """
-class D2_MultiOutput:
+class D2_MultiOutput(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Multi Output",
+            display_name="D2 Multi Output",
+            category="D2",
+            inputs=[
                 # 入力タイプ
-                "type": (["FLOAT","INT","STRING","SEED",],),
+                io.Combo.Input("type", options=["FLOAT", "INT", "STRING", "SEED"]),
                 # プロンプト
-                "parameter": (
-                    "STRING",{"multiline": True},
-                ),
-            },
-            "optional": {
-                "create_seed": ("D2_BUTTON", {})
-            }
-        }
+                io.String.Input("parameter", multiline=True),
+                # seed 生成ボタン（JS の D2_BUTTON ウィジェット。値は使わない）
+                io.Custom("D2_BUTTON").Input("create_seed", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="LIST"),
+                io.String.Output(display_name="x / y_list"),
+            ],
+        )
 
-    RETURN_TYPES = ("LIST", "STRING",)
-    RETURN_NAMES = ("LIST", "x / y_list",)
-    FUNCTION = "output_list"
-    CATEGORY = "D2"
-
-    ######
-    # def output_list(self, type, parameter, seed):
-    def output_list(self, type, parameter, reset = ""):
+    @classmethod
+    def execute(cls, type, parameter, create_seed=None) -> io.NodeOutput:
 
         # 入力文字列を改行で分割
         param_options = parameter.strip().split('\n')
@@ -310,7 +307,7 @@ class D2_MultiOutput:
             else:
                 output_list.append(option)
 
-        return (output_list, parameter,)
+        return io.NodeOutput(output_list, parameter)
 
 
 
@@ -414,30 +411,32 @@ D2 TokenCounter
 プロンプトのトークンを数える
 
 """
-class D2_TokenCounter:
-
-    def __init__(self):
-        self.token_counter = TokenCounter()
+class D2_TokenCounter(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "text": ("STRING", {"multiline": True}),
-                "clip_name": (["ViT-L/14", "ViT-B/32", "ViT-B/16"], {"default": "ViT-L/14"}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Token Counter",
+            display_name="D2 Token Counter",
+            category="D2",
+            inputs=[
+                io.String.Input("text", multiline=True),
+                io.Combo.Input("clip_name", options=["ViT-L/14", "ViT-B/32", "ViT-B/16"], default="ViT-L/14"),
+            ],
+            outputs=[
+                io.Int.Output(display_name="token_count"),
+                io.String.Output(display_name="tokenized_result"),
+            ],
+        )
 
-    RETURN_TYPES = ("INT", "STRING")
-    RETURN_NAMES = ("token_count", "tokenized_result")
-    FUNCTION = "count_tokens"
-    CATEGORY = "D2"
-
-    def count_tokens(self, text, clip_name):
+    @classmethod
+    def execute(cls, text, clip_name) -> io.NodeOutput:
         """
         テキストをトークン化して、トークン数とトークン化された結果を返す
         """
-        return self.token_counter.count_tokens(text, clip_name)
+        # V3 はステートレスなので TokenCounter は execute 内で生成する（V1 の self.token_counter 相当）
+        token_count, tokenized_result = TokenCounter().count_tokens(text, clip_name)
+        return io.NodeOutput(token_count, tokenized_result)
 
 
 """
@@ -471,30 +470,29 @@ D2 Prompt
 トークン計算機能とコメント削除機能がついたテキスト入力
 
 """
-class D2_Prompt:
+class D2_Prompt(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "prompt": ("STRING",{"multiline": True},),
-                "comment_type": (["# + // + /**/","# only","// only","/* */ only","None"],),
-            # },
-            # "optional": {
-                "insert_lora": (["CHOOSE"] + folder_paths.get_filename_list("loras"),),
-                "token_count": ("BOOLEAN", {"default":False}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Prompt",
+            display_name="D2 Prompt",
+            category="D2",
+            inputs=[
+                io.String.Input("prompt", multiline=True),
+                io.Combo.Input("comment_type", options=["# + // + /**/", "# only", "// only", "/* */ only", "None"]),
+                io.Combo.Input("insert_lora", options=["CHOOSE"] + folder_paths.get_filename_list("loras")),
+                io.Boolean.Input("token_count", default=False),
+            ],
+            outputs=[
+                io.String.Output(display_name="text"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    ######
-    def run(self, prompt, comment_type, insert_lora="", token_count = False):
+    @classmethod
+    def execute(cls, prompt, comment_type, insert_lora="", token_count=False) -> io.NodeOutput:
         new_prompt = delete_comment(prompt, comment_type)
-        return (new_prompt,)
+        return io.NodeOutput(new_prompt)
 
 
 
@@ -503,26 +501,26 @@ class D2_Prompt:
 D2 List To String
 
 """
-class D2_ListToString:
+class D2_ListToString(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "LIST": ("LIST",),
-                "separator": (util.SEPARATOR,),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 List To String",
+            display_name="D2 List To String",
+            category="D2",
+            inputs=[
+                io.Custom("LIST").Input("LIST"),
+                io.Combo.Input("separator", options=util.SEPARATOR),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, LIST, separator):
+    @classmethod
+    def execute(cls, LIST, separator) -> io.NodeOutput:
         output = util.list_to_text(LIST, separator)
-        return {
-            "result": (output,),
-        }
+        return io.NodeOutput(output)
 
 
 """
@@ -530,30 +528,35 @@ class D2_ListToString:
 D2 Filename Template
 
 """
-class D2_FilenameTemplate:
+class D2_FilenameTemplate(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %node:{id}.{key}%\n" \
                   "arg_1-3 -- %arg_1%\n" \
                   "Delete .safetensors -- %arg_1:ckpt_name"
 
-        return {
-            "required": {
-                "format": ("STRING",{"tooltip": tooltip},),
-                "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-                "normalization": ("BOOLEAN", {"default":True}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-            },
-            "hidden": {"prompt": "PROMPT"},
-        }
+        return io.Schema(
+            node_id="D2 Filename Template",
+            display_name="D2 Filename Template",
+            category="D2",
+            inputs=[
+                io.String.Input("format", tooltip=tooltip),
+                io.Int.Input("arg_count", default=3, min=1, max=50, step=1),
+                io.Boolean.Input("normalization", default=True),
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+            hidden=[io.Hidden.prompt],
+            # arg_1..arg_N は JS が動的に追加する未宣言入力。V1 の **kwargs と同様に
+            # 受け取るため accept_all_inputs を有効化する。
+            accept_all_inputs=True,
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, format, arg_count, normalization, seed, prompt, **kwargs):
+    @classmethod
+    def execute(cls, format, arg_count, normalization, seed, **kwargs) -> io.NodeOutput:
 
         args = {}
 
@@ -563,10 +566,8 @@ class D2_FilenameTemplate:
             if arg is not None:
                 args[key] = arg
 
-        text = replace_template(format, args, prompt, normalization)
-        return {
-            "result": (text,),
-        }
+        text = replace_template(format, args, cls.hidden.prompt, normalization)
+        return io.NodeOutput(text)
 
 
 
@@ -577,21 +578,28 @@ D2 Filename Template2
 """
 class D2_FilenameTemplate2(D2_FilenameTemplate):
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %node:{id}.{key}%\n" \
                   "arg_1-3 -- %arg_1%\n" \
                   "Delete .safetensors -- %arg_1:ckpt_name"
 
-        return {
-            "required": {
-                "format": ("STRING",{"tooltip": tooltip, "multiline":True},),
-                "arg_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-                "normalization": ("BOOLEAN", {"default":True}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-            },
-            "hidden": {"prompt": "PROMPT"},
-        }
+        return io.Schema(
+            node_id="D2 Filename Template2",
+            display_name="D2 Filename Template2",
+            category="D2",
+            inputs=[
+                io.String.Input("format", tooltip=tooltip, multiline=True),
+                io.Int.Input("arg_count", default=3, min=1, max=50, step=1),
+                io.Boolean.Input("normalization", default=True),
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+            hidden=[io.Hidden.prompt],
+            accept_all_inputs=True,
+        )
 
 
 """
@@ -599,26 +607,28 @@ class D2_FilenameTemplate2(D2_FilenameTemplate):
 D2 Prompt Sanitizer
 
 """
-class D2_PromptSanitizer:
+class D2_PromptSanitizer(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "prompt": ("STRING", {"forceInput": True}),
-                "underscore_to_space": ("BOOLEAN", {"default": True}),
-                "space_after_comma": ("BOOLEAN", {"default": True}),
-                "remove_extra_comma": ("BOOLEAN", {"default": True}),
-                "protect_lora": ("BOOLEAN", {"default": True}),
-                "protect_score": ("BOOLEAN", {"default": True}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Prompt Sanitizer",
+            display_name="D2 Prompt Sanitizer",
+            category="D2",
+            inputs=[
+                io.String.Input("prompt", force_input=True),
+                io.Boolean.Input("underscore_to_space", default=True),
+                io.Boolean.Input("space_after_comma", default=True),
+                io.Boolean.Input("remove_extra_comma", default=True),
+                io.Boolean.Input("protect_lora", default=True),
+                io.Boolean.Input("protect_score", default=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="prompt"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("prompt",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True):
+    @classmethod
+    def execute(cls, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True) -> io.NodeOutput:
         # 保護対象（LoRA等の <...> と Pony 品質タグ score_9 / score_8_up 等）を
         # プレースホルダへ退避し、整形対象から除外する
         protected = []
@@ -654,7 +664,7 @@ class D2_PromptSanitizer:
         if protected:
             text = re.sub(r"\x00(\d+)\x00", lambda m: protected[int(m.group(1))], text)
 
-        return (text,)
+        return io.NodeOutput(text)
 
 
 

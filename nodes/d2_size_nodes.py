@@ -1,6 +1,7 @@
 import torch
 
 import folder_paths
+from comfy_api.latest import io
 # import comfy.utils
 # import comfy_extras.nodes_upscale_model
 
@@ -15,29 +16,33 @@ D2 Rescale Calculator
 サイズのリスケール計算機
 
 """
-class D2_ResizeCalculator:
+class D2_ResizeCalculator(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
-                "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
-                "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
-                "round_method": (["Floor", "Round", "Ceil", "None"],{"default":"Round"}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Resize Calculator",
+            display_name="D2 Resize Calculator",
+            category="D2",
+            inputs=[
+                io.Int.Input("width", default=1024, min=64, max=8192),
+                io.Int.Input("height", default=1024, min=64, max=8192),
+                io.Float.Input("rescale_factor", default=2.0, min=0.1, max=16, step=0.001),
+                io.Combo.Input("round_method", options=["Floor", "Round", "Ceil", "None"], default="Round"),
+            ],
+            outputs=[
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                io.Float.Output(display_name="rescale_factor"),
+            ],
+        )
 
-    RETURN_TYPES = ("INT", "INT", "FLOAT",)
-    RETURN_NAMES = ("width", "height", "rescale_factor",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, width, height, rescale_factor, round_method):
+    @classmethod
+    def execute(cls, width, height, rescale_factor, round_method) -> io.NodeOutput:
 
         width, height = size_util.rescale_calc(width, height, rescale_factor, round_method)
 
-        return(width, height, rescale_factor,)
+        return io.NodeOutput(width, height, rescale_factor)
 
 
 """
@@ -48,51 +53,56 @@ WAS_Node_Suite の関数を流用
 https://github.com/WASasquatch/was-node-suite-comfyui
 
 """
-class D2_ImageResize:
+class D2_ImageResize(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image": ("IMAGE",),
-                "mode": (["rescale", "resize"],),
-                "rescale_factor": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 16, "step":0.001}),
-                "preset": (size_util.SIZE_LIST,),
-                "resize_width": ("INT", {"default": 1024, "min": 1, "max": 48000, "step": 1}),
-                "resize_height": ("INT", {"default": 1536, "min": 1, "max": 48000, "step": 1}),
-                "rotate": (["None", "90 deg", "180 deg", "270 deg"],),
-                "round_method": (["Floor", "Round", "Ceil", "None"],{"default":"Round"}),
-                "upscale_model": (["None"] + folder_paths.get_filename_list("upscale_models"), ),
-                "resampling": (["lanczos", "nearest", "bilinear", "bicubic"],),
-                "use_tiled_vae": ("BOOLEAN", {"default":False}),
-            },
-            "optional": {
-                "mask": ("MASK",),
-                "vae": ("VAE",),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Image Resize",
+            display_name="D2 Image Resize",
+            category="D2",
+            inputs=[
+                io.Image.Input("image"),
+                io.Combo.Input("mode", options=["rescale", "resize"]),
+                io.Float.Input("rescale_factor", default=2.0, min=0.1, max=16, step=0.001),
+                io.Combo.Input("preset", options=size_util.SIZE_LIST),
+                io.Int.Input("resize_width", default=1024, min=1, max=48000, step=1),
+                io.Int.Input("resize_height", default=1536, min=1, max=48000, step=1),
+                io.Combo.Input("rotate", options=["None", "90 deg", "180 deg", "270 deg"]),
+                io.Combo.Input("round_method", options=["Floor", "Round", "Ceil", "None"], default="Round"),
+                io.Combo.Input("upscale_model", options=["None"] + folder_paths.get_filename_list("upscale_models")),
+                io.Combo.Input("resampling", options=["lanczos", "nearest", "bilinear", "bicubic"]),
+                io.Boolean.Input("use_tiled_vae", default=False),
+                io.Mask.Input("mask", optional=True),
+                io.Vae.Input("vae", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                io.Float.Output(display_name="rescale_factor"),
+                io.Latent.Output(display_name="latent"),
+                io.Mask.Output(display_name="mask"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "INT", "INT", "FLOAT", "LATENT", "MASK")
-    RETURN_NAMES = ("image", "width", "height", "rescale_factor", "latent", "mask")
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(
-            self, 
-            image, 
-            mode = "rescale", 
-            rescale_factor = 2, 
-            preset = "custom", 
-            resize_width = 1024, 
-            resize_height = 1024, 
-            rotate = "None", 
-            round_method:size_util.D2_TResizeMethod = "Floor", 
-            upscale_model = 'None', 
+    @classmethod
+    def execute(
+            cls,
+            image,
+            mode = "rescale",
+            rescale_factor = 2,
+            preset = "custom",
+            resize_width = 1024,
+            resize_height = 1024,
+            rotate = "None",
+            round_method = "Floor",
+            upscale_model = 'None',
             resampling = "lanczos",
             use_tiled_vae = False,
-            mask = None, 
+            mask = None,
             vae = None,
-        ):
+        ) -> io.NodeOutput:
 
         scaled_images = []
         scaled_masks = []
@@ -172,7 +182,7 @@ class D2_ImageResize:
                 l = vae.encode(scaled_images[:,:,:,:3])
             latent = {"samples":l}
 
-        return (scaled_images, resized_width, resized_height, rescale_factor, latent, scaled_masks)
+        return io.NodeOutput(scaled_images, resized_width, resized_height, rescale_factor, latent, scaled_masks)
 
 
 
@@ -183,32 +193,37 @@ D2 SizeSelector
 指定サイズの latent も取得できる
 
 """
-class D2_SizeSelector:
+class D2_SizeSelector(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "preset": (size_util.SIZE_LIST,),
-                "width": ("INT", {"default": 1024, "min": 64, "max": 8192}),
-                "height": ("INT", {"default": 1024, "min": 64, "max": 8192}),
-                "swap_dimensions": ("BOOLEAN", {"default":False}),
-                "upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
-                "prescale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 16.0, "step":0.001}),
-                "round_method": (["Floor", "Round", "Ceil", "None"],{"default":"Round"}),
-                "batch_size": ("INT", {"default": 1, "min": 1, "max": 64})
-            },
-            "optional": {
-                "images": ("IMAGE",),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Size Selector",
+            display_name="D2 Size Selector",
+            category="D2",
+            inputs=[
+                io.Combo.Input("preset", options=size_util.SIZE_LIST),
+                io.Int.Input("width", default=1024, min=64, max=8192),
+                io.Int.Input("height", default=1024, min=64, max=8192),
+                io.Boolean.Input("swap_dimensions", default=False),
+                io.Float.Input("upscale_factor", default=1.0, min=0.1, max=16.0, step=0.001),
+                io.Float.Input("prescale_factor", default=1.0, min=0.1, max=16.0, step=0.001),
+                io.Combo.Input("round_method", options=["Floor", "Round", "Ceil", "None"], default="Round"),
+                io.Int.Input("batch_size", default=1, min=1, max=64),
+                io.Image.Input("images", optional=True),
+            ],
+            outputs=[
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                io.Float.Output(display_name="upscale_factor"),
+                io.Float.Output(display_name="prescale_factor"),
+                io.Int.Output(display_name="batch_size"),
+                io.Latent.Output(display_name="empty_latent"),
+            ],
+        )
 
-    RETURN_TYPES = ("INT", "INT", "FLOAT", "FLOAT", "INT", "LATENT",)
-    RETURN_NAMES = ("width", "height", "upscale_factor", "prescale_factor", "batch_size", "empty_latent",)
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, preset, width, height, swap_dimensions, upscale_factor, prescale_factor, round_method, batch_size, images=None):
+    @classmethod
+    def execute(cls, preset, width, height, swap_dimensions, upscale_factor, prescale_factor, round_method, batch_size, images=None) -> io.NodeOutput:
 
         if(images != None):
             width = images.shape[2]
@@ -225,7 +240,7 @@ class D2_SizeSelector:
 
         latent = torch.zeros([batch_size, 4, height // 8, width // 8])
 
-        return(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent}, )
+        return io.NodeOutput(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent})
 
 
 
@@ -235,37 +250,34 @@ D2 Get Image Size
 画像サイズ表示
 
 """
-class D2_GetImageSize:
+class D2_GetImageSize(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Get Image Size",
+            display_name="D2 Get Image Size",
+            category="D2",
+            inputs=[
+                io.Image.Input("images"),
+                io.String.Input("display", multiline=True, default="", optional=True),
+            ],
+            outputs=[
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+            ],
+            is_output_node=True,
+        )
 
-        return {
-            "required": {
-                "images": ("IMAGE",),
-            },
-            "optional": {
-                "display": ("STRING", {"multiline":True, "default":""},),
-            }
-        }
-
-    RETURN_TYPES = ("INT", "INT",)
-    RETURN_NAMES = ("width", "height",)
-    OUTPUT_NODE = True
-    FUNCTION = "run"
-    CATEGORY = "D2"
-
-    def run(self, images, display):
+    @classmethod
+    def execute(cls, images, display="") -> io.NodeOutput:
         width = images.shape[2]
         height = images.shape[1]
 
-        return {
-            "result": (width, height, ),
-            "ui": {
-                "width": (width,), 
-                "height": (height,),
-            },
-        }
+        return io.NodeOutput(width, height, ui={
+            "width": (width,),
+            "height": (height,),
+        })
 
 
 

@@ -31,6 +31,7 @@ from .modules import mask_util
 from .modules import template_util
 from .modules.eagle_api import EagleAPI, send_to_eagle
 from .modules.util import AnyType, D2_TD2Pipe
+from comfy_api.latest import io
 
 
 
@@ -41,54 +42,51 @@ D2 Save Image
 複数フォーマット対応（png / jpeg / webp / アニメーションwebp）
 
 """
-class D2_SaveImage:
-    def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
-        self.type = "output"
-        self.prefix_append = ""
-    
+class D2_SaveImage(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(s):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %{Node title}.{key}%\n" \
                   "Node param -- %node:{id}.{key}%"
-        
-        return {
-            "required": {
-                "images": ("IMAGE", ), 
-                "filename_prefix": ("STRING", {"default": "%date:yyyyMMdd-hhmmss%", "tooltip": tooltip}),
-                "preview_only": ("BOOLEAN", {"default": False},),
-                "format": (["png", "webp", "jpeg", "animated_webp"],),
-                "lossless": ("BOOLEAN", {"default": True}),
-                "quality": ("INT", {"default": 80, "min": 0, "max": 100}),
-                "fps": ("FLOAT", {"default": 6.0, "min": 0.01, "max": 1000.0, "step": 0.01}),
-            },
-            "optional": {
-                "d2_pipe": ("D2_TD2Pipe",),
-                "popup_image": ("D2_BUTTON", {}, )
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
-        }
 
-    RETURN_TYPES = ("LIST",)
-    RETURN_NAMES = ("filenames",)
-    FUNCTION = "save_images"
-    OUTPUT_NODE = True
-    CATEGORY = "D2/Image"
+        return io.Schema(
+            node_id="D2 Save Image",
+            display_name="D2 Save Image",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.String.Input("filename_prefix", default="%date:yyyyMMdd-hhmmss%", tooltip=tooltip),
+                io.Boolean.Input("preview_only", default=False),
+                io.Combo.Input("format", options=["png", "webp", "jpeg", "animated_webp"]),
+                io.Boolean.Input("lossless", default=True),
+                io.Int.Input("quality", default=80, min=0, max=100),
+                io.Float.Input("fps", default=6.0, min=0.01, max=1000.0, step=0.01),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
+                io.Custom("D2_BUTTON").Input("popup_image", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="filenames"),
+            ],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
+            is_output_node=True,
+        )
 
-    def save_images(self, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, popup_image="", prompt=None, extra_pnginfo=None):
+    # 保存処理の本体。サブクラス（D2_SaveImageEagle）からも再利用するため classmethod ヘルパーに分離。
+    # 戻り値は (file_paths, a1111_param, ui_dict)。prompt/extra_pnginfo は hidden を呼び出し側から渡す。
+    @classmethod
+    def _save_images(cls, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, prompt=None, extra_pnginfo=None):
         # プレビューモードか保存モードかの設定
         if preview_only == True:
             # 保存せずプレビューのみ
-            self.output_dir = folder_paths.get_temp_directory()
-            self.type = "temp"
-            self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+            output_dir = folder_paths.get_temp_directory()
+            node_type = "temp"
+            prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
             compress_level = 1
         else:
             # 保存
-            self.output_dir = folder_paths.get_output_directory()
-            self.type = "output"
-            self.prefix_append = ""
+            output_dir = folder_paths.get_output_directory()
+            node_type = "output"
+            prefix_append = ""
             compress_level = 4
 
 
@@ -96,23 +94,23 @@ class D2_SaveImage:
         filename_prefix = template_util.replace_template(filename_prefix, {}, prompt)
 
         # ファイル名プレフィックスの設定
-        filename_prefix += self.prefix_append
-        
+        filename_prefix += prefix_append
+
         # 保存先フォルダとファイル名の取得
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
-        
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, output_dir, images[0].shape[1], images[0].shape[0])
+
         # 結果を格納するリスト
         results = []
         # 保存したファイルのフルパスを格納するリスト
         file_paths = []
-        
+
         # 画像をPIL形式に変換
         pil_images = []
         for image in images:
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
             pil_images.append(img)
-        
+
         # d2_pipe からA1111形式の生成パラメーターメモを作成
         a1111_param = util.format_a1111_parameter(d2_pipe)
 
@@ -121,33 +119,33 @@ class D2_SaveImage:
             # ファイル名の設定
             file = f"{filename}_{counter:05}_.webp"
             file_path = os.path.join(full_output_folder, file)
-            
+
             # アニメーションwebpとして保存
             file_path = image_util.save_image_animated_webp(
                 pil_images, file_path, fps, lossless, quality,
                 prompt=prompt,
                 extra_pnginfo=extra_pnginfo,
             )
-            
+
             # 結果リストに追加
             results.append({
                 "filename": file,
                 "subfolder": subfolder,
-                "type": self.type
+                "type": node_type
             })
-            
+
             # ファイルパスリストに追加
             file_paths.append(file_path)
             # アニメーションフラグを設定
             animated = True
-        
+
         # 静止画の場合（単一画像または複数画像を個別に保存）
         else:
             for i, img in enumerate(pil_images):
                 # ファイル名の設定
                 file = f"{filename}_{counter:05}_.{format}"
                 file_path = os.path.join(full_output_folder, file)
-                
+
                 # 各画像形式で保存
                 image_util.save_image(
                     format, img, file_path, compress_level, lossless, quality,
@@ -155,29 +153,34 @@ class D2_SaveImage:
                     extra_pnginfo=extra_pnginfo,
                     a1111_param=a1111_param
                 )
-                
+
                 # 結果リストに追加
                 results.append({
                     "filename": file,
                     "subfolder": subfolder,
-                    "type": self.type
+                    "type": node_type
                 })
-                
+
                 # ファイルパスリストに追加
                 file_paths.append(file_path)
                 counter += 1
-            
+
             # アニメーションフラグを設定
             animated = False
-        
-        # 結果を返す
-        return {
-            "result": (file_paths, a1111_param,),
-            "ui": {
-                "images": results,
-                "animated": (animated,)
-            }
+
+        # (ファイルパス, A1111メモ, UI辞書) を返す
+        return file_paths, a1111_param, {
+            "images": results,
+            "animated": (animated,)
         }
+
+    @classmethod
+    def execute(cls, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, popup_image=None) -> io.NodeOutput:
+        file_paths, a1111_param, ui = cls._save_images(
+            images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps,
+            prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
+        )
+        return io.NodeOutput(file_paths, ui=ui)
 
 
 """
@@ -187,58 +190,56 @@ D2 Save Image Eagle
 
 """
 class D2_SaveImageEagle(D2_SaveImage):
-    def __init__(self):
-        self.eagle_api:EagleAPI = EagleAPI()
-        self.output_dir = folder_paths.get_output_directory()
-        self.type = "output"
-        self.prefix_append = ""
-
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls) -> io.Schema:
         tooltip = "Datetime -- %date:{yyyy/MM/dd/hh/mm/ss}%\n" \
                   "Node param -- %{Node title}.{key}%\n" \
                   "Node param -- %node:{id}.{key}%"
 
-        return {
-            "required": {
-                "images": ("IMAGE", ), 
-                "filename_prefix": ("STRING", {"default": "%date:yyyyMMdd-hhmmss%", "tooltip": tooltip}),
-                "preview_only": ("BOOLEAN", {"default": False},),
-                "format": (["png", "webp", "jpeg", "animated_webp"],),
-                "lossless": ("BOOLEAN", {"default": True}),
-                "quality": ("INT", {"default": 80, "min": 0, "max": 100}),
-                "fps": ("FLOAT", {"default": 6.0, "min": 0.01, "max": 1000.0, "step": 0.01}),
-                "eagle_folder": ("STRING",{"default": ""}),
-                "memo_text": ("STRING",{"default": ""}),
-            },
-            "optional": {
-                "d2_pipe": ("D2_TD2Pipe",),
-                "popup_image": ("D2_BUTTON", {}, )
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
-        }
+        return io.Schema(
+            node_id="D2 Save Image Eagle",
+            display_name="D2 Save Image Eagle",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.String.Input("filename_prefix", default="%date:yyyyMMdd-hhmmss%", tooltip=tooltip),
+                io.Boolean.Input("preview_only", default=False),
+                io.Combo.Input("format", options=["png", "webp", "jpeg", "animated_webp"]),
+                io.Boolean.Input("lossless", default=True),
+                io.Int.Input("quality", default=80, min=0, max=100),
+                io.Float.Input("fps", default=6.0, min=0.01, max=1000.0, step=0.01),
+                io.String.Input("eagle_folder", default=""),
+                io.String.Input("memo_text", default=""),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
+                io.Custom("D2_BUTTON").Input("popup_image", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="filenames"),
+            ],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
+            is_output_node=True,
+        )
 
-    RETURN_TYPES = ("LIST",)
-    RETURN_NAMES = ("filenames",)
-    FUNCTION = "save_images"
-    OUTPUT_NODE = True
-    CATEGORY = "D2/Image"
-
-    def save_images(self, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, eagle_folder = "", memo_text = "", popup_image="", prompt=None, extra_pnginfo=None):
+    @classmethod
+    def execute(cls, images, d2_pipe=None, filename_prefix="ComfyUI", preview_only=False, format="png", lossless=True, quality=80, fps=6.0, eagle_folder="", memo_text="", popup_image=None) -> io.NodeOutput:
+        eagle_api = EagleAPI()
         # EagleフォルダIDを取得
-        folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
+        folder_id = eagle_api.find_or_create_folder(eagle_folder)
 
-        res = super().save_images(images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps, popup_image, prompt, extra_pnginfo)
+        # 親の保存処理を再利用（file_paths と a1111_param を取得）
+        file_paths, a1111_param, ui = cls._save_images(
+            images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps,
+            prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
+        )
 
         # A1111方式の生成メモ
-        a1111_param = res["result"][1]
         if a1111_param != None and a1111_param != "":
             memo_text = a1111_param + "\n\n" + memo_text
 
-        for single_path in res["result"][0]:
-            send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)
+        for single_path in file_paths:
+            send_to_eagle(eagle_api, folder_id, single_path, memo_text)
 
-        return res
+        return io.NodeOutput(file_paths, ui=ui)
 
 """
 
@@ -246,38 +247,37 @@ D2 Send File Eagle
 指定されたパスのファイルを Eagleに送信
 
 """
-class D2_SendFileEagle:
-    def __init__(self):
-        self.eagle_api:EagleAPI = EagleAPI()
+class D2_SendFileEagle(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Send File Eagle",
+            display_name="D2 Send File Eagle",
+            category="D2/Image",
+            inputs=[
+                io.AnyType.Input("file_path"),
+                io.String.Input("eagle_folder", default=""),
+                io.String.Input("memo_text", multiline=True),
+            ],
+            outputs=[],
+            is_output_node=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "file_path": (AnyType("*"),),
-                "eagle_folder": ("STRING",{"default": ""}),
-                "memo_text": ("STRING",{"multiline": True},),
-            },
-        }
-
-    RETURN_TYPES = ()
-    FUNCTION = "run"
-    OUTPUT_NODE = True
-    CATEGORY = "D2/Image"
-
-    def run(self, file_path, eagle_folder = "", memo_text = ""):
+    def execute(cls, file_path, eagle_folder="", memo_text="") -> io.NodeOutput:
+        eagle_api = EagleAPI()
         # EagleフォルダIDを取得
-        folder_id = self.eagle_api.find_or_create_folder(eagle_folder)
+        folder_id = eagle_api.find_or_create_folder(eagle_folder)
 
         if isinstance(file_path, str):
-            send_to_eagle(self.eagle_api, folder_id, file_path, memo_text)
+            send_to_eagle(eagle_api, folder_id, file_path, memo_text)
         elif isinstance(file_path, list):
             for single_path in file_path:
-                send_to_eagle(self.eagle_api, folder_id, single_path, memo_text)
+                send_to_eagle(eagle_api, folder_id, single_path, memo_text)
         else:
             raise ValueError(f"Unsupported file_path type: {type(file_path)}")
 
-        return {}
+        return io.NodeOutput()
 
 
 
@@ -287,27 +287,32 @@ D2 Prewview Image
 画像クリックでポップアップする Preview Image
 
 """
-class D2_PreviewImage(SaveImage):
-    def __init__(self):
-        self.output_dir = folder_paths.get_temp_directory()
-        self.type = "temp"
-        self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
-        self.compress_level = 1
+class D2_PreviewImage(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Preview Image",
+            display_name="D2 Preview Image",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Custom("D2_BUTTON").Input("popup_image", optional=True),
+            ],
+            outputs=[],
+            hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
+            is_output_node=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {"images": ("IMAGE", ), },
-            "optional": {
-                "popup_image": ("D2_BUTTON", {}, )
-            },
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
-        }
-
-    CATEGORY = "D2/Image"
-
-    def save_images(self, images, popup_image="", filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
-        return super().save_images(images)
+    def execute(cls, images, popup_image=None) -> io.NodeOutput:
+        # V3 では V1 クラス SaveImage を継承できないため、インスタンスに temp 設定をして呼ぶ（挙動は同一）
+        saver = SaveImage()
+        saver.output_dir = folder_paths.get_temp_directory()
+        saver.type = "temp"
+        saver.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+        saver.compress_level = 1
+        res = saver.save_images(images)
+        return io.NodeOutput(ui=res["ui"])
 
 
 
@@ -317,36 +322,54 @@ D2 Load Image
 プロンプト出力できる Load Image
 
 """
-class D2_LoadImage(LoadImage):
+class D2_LoadImage(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(s):
+    def define_schema(cls) -> io.Schema:
         input_dir = folder_paths.get_input_directory()
         files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
-        return {
-            "required":{
-                "image": (sorted(files), {"image_upload": True})
-            },
-            "optional": {
-                "image_path": ("STRING", {"forceInput": True}),
-                "editor": ("D2_BUTTON", {})
-            }
-        }
+        return io.Schema(
+            node_id="D2 Load Image",
+            display_name="D2 Load Image",
+            category="D2/Image",
+            inputs=[
+                io.Combo.Input("image", options=sorted(files), upload=io.UploadType.image),
+                io.String.Input("image_path", force_input=True, optional=True),
+                io.Custom("D2_BUTTON").Input("editor", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+                io.Mask.Output(display_name="MASK"),
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                io.String.Output(display_name="positive"),
+                io.String.Output(display_name="negative"),
+                io.String.Output(display_name="filename"),
+                io.String.Output(display_name="filepath"),
+                io.String.Output(display_name="pnginfo"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING", "STRING", "STRING", "STRING", "STRING" )
-    RETURN_NAMES = ("IMAGE", "MASK", "width", "height", "positive", "negative", "filename", "filepath", "pnginfo" )
-    FUNCTION = "load_image"
-    CATEGORY = "D2/Image"
+    # V3 では V1 クラス LoadImage を継承できないため、継承で得ていた IS_CHANGED / VALIDATE_INPUTS を再定義する。
+    # 既定照合スキップのため引数に image を含める（image は input_dir のファイル combo）。
+    @classmethod
+    def fingerprint_inputs(cls, image, image_path=None, editor=None):
+        return LoadImage.IS_CHANGED(image)
 
-    def load_image(self, image, image_path=None):
+    @classmethod
+    def validate_inputs(cls, image):
+        return LoadImage.VALIDATE_INPUTS(image)
+
+    @classmethod
+    def execute(cls, image, image_path=None, editor=None) -> io.NodeOutput:
         if image_path != None:
             image = image_path.strip()
-            
-        # オリジナルのLoadImage処理
-        output_images, output_masks = super().load_image(image)
+
+        # オリジナルのLoadImage処理（V1 クラスをインスタンス経由で呼ぶ）
+        output_images, output_masks = LoadImage().load_image(image)
 
         image_path = folder_paths.get_annotated_filepath(image)
-        
+
         with Image.open(image_path) as img:
             width = img.size[0]
             height = img.size[1]
@@ -354,8 +377,8 @@ class D2_LoadImage(LoadImage):
             pnginfo = pnginfo_util.get_pnginfo(img)
 
         filename = os.path.basename(image_path)
-        
-        return (output_images, output_masks, width, height, prompt["positive"], prompt["negative"], filename, image_path, pnginfo)
+
+        return io.NodeOutput(output_images, output_masks, width, height, prompt["positive"], prompt["negative"], filename, image_path, pnginfo)
 
 
 """
@@ -364,30 +387,30 @@ D2 Load Folder Images
 フォルダ内画像読み込んで渡す
 
 """
-class D2_LoadFolderImages():
+class D2_LoadFolderImages(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required":{
-                "folder": ("STRING", {"default": ""}),
-                "extension": ("STRING", {"default": "*.*"}),
-                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {}),
-                "queue_seed": ("D2_SEED", {}),
-                "refresh_btn": ("D2_BUTTON", {})
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Load Folder Images",
+            display_name="D2 Load Folder Images",
+            category="D2/Image",
+            inputs=[
+                io.String.Input("folder", default=""),
+                io.String.Input("extension", default="*.*"),
+                io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SEED").Input("queue_seed", optional=True),
+                io.Custom("D2_BUTTON").Input("refresh_btn", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+                io.Int.Output(display_name="image_count"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "INT",)
-    RETURN_NAMES = ("images", "image_count",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
-
-    ######
-    def run(self, folder = "", extension="*.*", sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, refresh_btn=""):
+    @classmethod
+    def execute(cls, folder="", extension="*.*", sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
         files = util.get_files(folder, extension, sort_by, order_by)
         load_image = LoadImage()
         image_list = []
@@ -399,12 +422,10 @@ class D2_LoadFolderImages():
 
         image_batch = torch.cat(image_list, dim=0)
 
-        return {
-            "result": (image_batch, len(files),),
-            "ui": {
-                "image_count": (len(files),),
-            }
-        }
+        return io.NodeOutput(
+            image_batch, len(files),
+            ui={"image_count": (len(files),)},
+        )
 
 
 """
@@ -412,23 +433,25 @@ class D2_LoadFolderImages():
 D2 Image Stack
 
 """
-class D2_ImageStack:
+class D2_ImageStack(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Image Stack",
+            display_name="D2 Image Stack",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("image_count", default=3, min=1, max=50, step=1),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+            ],
+            # JS が image_1..image_N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
-
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
-    FUNCTION = "stack_image"
-    CATEGORY = "D2/Image"
-
-    def stack_image(self, image_count, **kwargs):
+    def execute(cls, image_count, **kwargs) -> io.NodeOutput:
 
         image_list = []
         
@@ -452,9 +475,9 @@ class D2_ImageStack:
                             image_list[i] = image_util.convert_to_rgba_or_rgb(image_list[i], "rgb")
             
             image_batch = torch.cat(image_list, dim=0)
-            return (image_batch,)
+            return io.NodeOutput(image_batch)
 
-        return (None,)
+        return io.NodeOutput(None)
 
 
 
@@ -463,22 +486,26 @@ class D2_ImageStack:
 D2 Image and Mask Stack
 
 """
-class D2_ImageMaskStack:
+class D2_ImageMaskStack(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Image Mask Stack",
+            display_name="D2 Image Mask Stack",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("image_count", default=3, min=1, max=50, step=1),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+                io.Mask.Output(display_name="MASK"),
+            ],
+            # JS が image_1/mask_1..N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
-
-    
-    RETURN_TYPES = ("IMAGE", "MASK",)
-    FUNCTION = "stack_image_mask"
-    CATEGORY = "D2/Image"
-
-    def stack_image_mask(self, image_count, **kwargs):
+    def execute(cls, image_count, **kwargs) -> io.NodeOutput:
 
         image_list = []
         mask_list = []
@@ -508,9 +535,9 @@ class D2_ImageMaskStack:
             image_batch = torch.cat(image_list, dim=0)
             mask_batch = torch.cat(mask_list, dim=0)
 
-            return (image_batch, mask_batch,)
+            return io.NodeOutput(image_batch, mask_batch)
 
-        return (None, None,)
+        return io.NodeOutput(None, None)
 
 
 
@@ -520,56 +547,63 @@ D2 Folder Image Queue
 フォルダ内画像の枚数分キューを送る
 
 """
-class D2_FolderImageQueue:
+class D2_FolderImageQueue(io.ComfyNode):
+    # V1 は self.files / self.is_finished をインスタンスに保持し、ComfyUI が obj を
+    # CacheKeySetID（ノードID）でキャッシュ・実行間で再利用することでキューを進めていた。
+    # V3 の execute は classmethod でインスタンス状態を持てないため、unique_id を
+    # キーにしたクラス辞書で同等の永続状態を持つ（ノードごとに独立、プロセス内で永続）。
+    # 特に sort_by="Random" のとき、キュー進行中に files を読み直すと並びが変わってしまうので
+    # files をキャッシュして同一バッチ内の順序を固定する意味がある。
+    # （is_finished は V1 でも書き込むだけで誰も読まない vestigial 状態。互換のため残す）
+    _queue_state = {}
 
-    def __init__(self):
-        self.is_finished = False
-        self.files = []
-    
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required":{
-                "folder": ("STRING", {"default": ""}),
-                "extension": ("STRING", {"default": "*.*"}),
-                "start_at": ("INT", {"default": 0, "min": 0}),
-                "auto_queue": ("BOOLEAN", {"default": True},),
-                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {}),
-                "queue_seed": ("D2_SEED", {}),
-                "progress_bar": ("D2_PROGRESS_BAR", {}),
-                "refresh_btn": ("D2_BUTTON", {})
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Folder Image Queue",
+            display_name="D2 Folder Image Queue",
+            category="D2/Image",
+            inputs=[
+                io.String.Input("folder", default=""),
+                io.String.Input("extension", default="*.*"),
+                io.Int.Input("start_at", default=0, min=0),
+                io.Boolean.Input("auto_queue", default=True),
+                io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SEED").Input("queue_seed", optional=True),
+                io.Custom("D2_PROGRESS_BAR").Input("progress_bar", optional=True),
+                io.Custom("D2_BUTTON").Input("refresh_btn", optional=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="image_path"),
+                io.Int.Output(display_name="image_count"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
 
-    RETURN_TYPES = ("STRING", "INT",)
-    RETURN_NAMES = ("image_path", "image_count",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
+    @classmethod
+    def execute(cls, folder="", extension="*.*", start_at=0, auto_queue=True, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, progress_bar=None, refresh_btn=None) -> io.NodeOutput:
+        state = cls._queue_state.setdefault(cls.hidden.unique_id, {"files": [], "is_finished": False})
 
-    ######
-    def run(self, folder = "", extension="*.*", start_at=1, auto_queue=True, sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, progress_bar=0, refresh_btn=""):
-        if(len(self.files) <= 0):
-            self.files = util.get_files(folder, extension, sort_by, order_by)
-            self.is_finished = False
+        if len(state["files"]) <= 0:
+            state["files"] = util.get_files(folder, extension, sort_by, order_by)
+            state["is_finished"] = False
 
-        image_path = self.files[start_at]
-        image_count = len(self.files)
+        image_path = state["files"][start_at]
+        image_count = len(state["files"])
 
-        if(len(self.files) <= start_at + 1):
-            self.is_finished = True
-            self.files = []
+        if len(state["files"]) <= start_at + 1:
+            state["is_finished"] = True
+            state["files"] = []
 
-        return {
-            "result": (image_path, image_count,),
-            "ui": {
+        return io.NodeOutput(
+            image_path, image_count,
+            ui={
                 "image_count": (image_count,),
                 "start_at": (start_at,),
-            }
-        }
+            },
+        )
 
 
 
@@ -603,41 +637,37 @@ D2 EmptyImage Alpha
 αチャンネル（透明度）付き画像作成
 
 """
-class D2_EmptyImageAlpha:
-    def __init__(self, device="cpu"):
-        self.device = device
+class D2_EmptyImageAlpha(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 EmptyImage Alpha",
+            display_name="D2 EmptyImage Alpha",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("width", default=512, min=1, max=util.MAX_RESOLUTION, step=1),
+                io.Int.Input("height", default=512, min=1, max=util.MAX_RESOLUTION, step=1),
+                io.Int.Input("batch_size", default=1, min=1, max=4096),
+                io.Int.Input("red", default=0, min=0, max=255, step=1),
+                io.Int.Input("green", default=0, min=0, max=255, step=1),
+                io.Int.Input("blue", default=0, min=0, max=255, step=1),
+                io.Float.Input("alpha", default=1.0, min=0, max=1.0, step=0.001),
+                io.Custom("D2_COLOR_CANVAS").Input("sample", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+            ],
+        )
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": { 
-                "width": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
-                "height": ("INT", {"default": 512, "min": 1, "max": util.MAX_RESOLUTION, "step": 1}),
-                "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
-                "red": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
-                "green": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
-                "blue": ("INT", {"default": 0, "min": 0, "max": 255, "step": 1}),
-                "alpha": ("FLOAT", {"default": 1.0, "min": 0, "max": 1.0, "step": 0.001, "display": "alpha"}),
-            },
-            "optional": {
-                "sample": ("D2_COLOR_CANVAS", {}),
-            }
-        }
-    RETURN_TYPES = ("IMAGE",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
-
-    def run(self, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0, sample=""):
+    def execute(cls, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0, sample=None) -> io.NodeOutput:
         r = torch.full([batch_size, height, width, 1], red / 255.0)
         g = torch.full([batch_size, height, width, 1], green / 255.0)
         b = torch.full([batch_size, height, width, 1], blue / 255.0)
-        # print("r - ", red)
-        # print("g - ", green)
-        # print("b - ", blue)
         # アルファチャンネル追加
         a = torch.full([batch_size, height, width, 1], alpha)
         # RGBAを結合
-        return (torch.cat((r, g, b, a), dim=-1), )
+        return io.NodeOutput(torch.cat((r, g, b, a), dim=-1))
 
 
 """
@@ -645,65 +675,56 @@ class D2_EmptyImageAlpha:
 D2 Grid Image
 
 """
-class D2_GridImage:
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "images": ("IMAGE",),
-                "max_columns": ("INT", {"default": 3},),
-                "grid_gap": ("INT", {"default": 0},),
-                "swap_dimensions": ("BOOLEAN", {"default": False},),
-                "trigger_count": ("INT", {"default": 1, "min": 1, "step": 1}),
-            },
-            "optional": {
-                "title_text": ("STRING", {},),
-                "font_size": ("INT", {"default":24},),
-                "count": ("D2_SIMPLE_TEXT", {}),
-                "reset": ("D2_BUTTON", {}),
-            },
-            "hidden": {
-                "unique_id": "UNIQUE_ID",
-            },
-        }
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
+class D2_GridImage(io.ComfyNode):
 
     TITLE_HEIGHT = 64
 
-    def run(self, images, max_columns, grid_gap, swap_dimensions, trigger_count, title_text="", font_size=24, count=0, reset=None, unique_id=0):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Grid Image",
+            display_name="D2 Grid Image",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Int.Input("max_columns", default=3),
+                io.Int.Input("grid_gap", default=0),
+                io.Boolean.Input("swap_dimensions", default=False),
+                io.Int.Input("trigger_count", default=1, min=1, step=1),
+                io.String.Input("title_text", optional=True),
+                io.Int.Input("font_size", default=24, optional=True),
+                io.Custom("D2_SIMPLE_TEXT").Input("count", optional=True),
+                io.Custom("D2_BUTTON").Input("reset", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
+
+    @classmethod
+    def execute(cls, images, max_columns, grid_gap, swap_dimensions, trigger_count, title_text="", font_size=24, count=None, reset=None) -> io.NodeOutput:
+        unique_id = cls.hidden.unique_id
         # 画像をスタックして個数を取得
         image_count = D2_GridImage_ImageStocker.add_image(unique_id, images)
 
         if image_count >= trigger_count:
             # グリッド画像作成
-            grid_image = self.__class__.create_grid_image(
+            grid_image = cls.create_grid_image(
                 max_columns = max_columns,
-                image_batch = D2_GridImage_ImageStocker.get_images(unique_id), 
-                grid_gap = grid_gap, 
+                image_batch = D2_GridImage_ImageStocker.get_images(unique_id),
+                grid_gap = grid_gap,
                 swap_dimensions = swap_dimensions
             )
 
             # タイトル結合
-            finish_image = self.__class__.create_grid_title_image(grid_image, title_text, font_size)
+            finish_image = cls.create_grid_title_image(grid_image, title_text, font_size)
             finish_image = image_util.pil2tensor(finish_image)
             D2_GridImage_ImageStocker.reset_images(unique_id)
 
-            return {
-                "result": (finish_image,),
-                "ui": {"image_count": (image_count,),}
-            }
+            return io.NodeOutput(finish_image, ui={"image_count": (image_count,)})
         else:
-            return {
-                "result": (ExecutionBlocker(None),),
-                "ui": {
-                    "image_count": (image_count,),
-                }
-            }
+            return io.NodeOutput(ExecutionBlocker(None), ui={"image_count": (image_count,)})
 
     """
     グリッド＋タイトル画像作成
@@ -811,24 +832,28 @@ D2 Mosaic Filter
 モザイクをかける
 
 """
-class D2_MosaicFilter:
+class D2_MosaicFilter(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": { 
-                "images": ("IMAGE",),
-                "dot_size": ("INT", {"default": 20, "min":1, "max":512},),
-                "color_mode": (["average", "original"],),
-                "opacity": ("FLOAT", {"default": 1, "min":0, "max":1},),
-                "brightness": ("INT", {"default": 0, "min":-100, "max":100},),
-                "invert_color": ("BOOLEAN", {"default": False},),
-            }
-        }
-    RETURN_TYPES = ("IMAGE",)
-    FUNCTION = "run"
-    CATEGORY = "D2/Image"
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Mosaic Filter",
+            display_name="D2 Mosaic Filter",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Int.Input("dot_size", default=20, min=1, max=512),
+                io.Combo.Input("color_mode", options=["average", "original"]),
+                io.Float.Input("opacity", default=1, min=0, max=1),
+                io.Int.Input("brightness", default=0, min=-100, max=100),
+                io.Boolean.Input("invert_color", default=False),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+            ],
+        )
 
-    def run(self, images, dot_size, color_mode, opacity, brightness, invert_color):
+    @classmethod
+    def execute(cls, images, dot_size, color_mode, opacity, brightness, invert_color) -> io.NodeOutput:
         """
         images の画像を全てモザイク処理する
         dot_size: ドットの大きさ
@@ -862,14 +887,14 @@ class D2_MosaicFilter:
             
             # 処理した画像を結果リストに追加
             result_images.append(mosaic_image)
-        
+
         # すべての画像を結合して返す
-        return (torch.stack(result_images),)
+        return io.NodeOutput(torch.stack(result_images))
 
 
 
 
-class D2_CutByMask:
+class D2_CutByMask(io.ComfyNode):
     """
     マスクから画像を切り出すノード
     class名: D2_CutByMask
@@ -898,28 +923,30 @@ class D2_CutByMask:
     """
     
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "images": ("IMAGE",),
-                "mask": ("MASK",),
-                "cut_type": (["mask", "rectangle", "square_thumb"],),
-                "output_size": (["mask_size", "image_size"],),
-            },
-            "optional": {
-                "padding": ("INT", {"default": 0, "min": 0, "max": 1000}),
-                "min_width": ("INT", {"default": 0, "min": 0, "max": 10000}),
-                "min_height": ("INT", {"default": 0, "min": 0, "max": 10000}),
-                "output_alpha": ("BOOLEAN", {"default":True})
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Cut By Mask",
+            display_name="D2 Cut By Mask",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("images"),
+                io.Mask.Input("mask"),
+                io.Combo.Input("cut_type", options=["mask", "rectangle", "square_thumb"]),
+                io.Combo.Input("output_size", options=["mask_size", "image_size"]),
+                io.Int.Input("padding", default=0, min=0, max=1000, optional=True),
+                io.Int.Input("min_width", default=0, min=0, max=10000, optional=True),
+                io.Int.Input("min_height", default=0, min=0, max=10000, optional=True),
+                io.Boolean.Input("output_alpha", default=True, optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+                io.Mask.Output(display_name="mask"),
+                io.Int.Output(display_name="rect"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "MASK", "INT",)
-    RETURN_NAMES = ("image", "mask", "rect",)
-    FUNCTION = "cut_by_mask"
-    CATEGORY = "D2/Image"
-
-    def cut_by_mask(self, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0, output_alpha=True):
+    @classmethod
+    def execute(cls, images, mask, cut_type, output_size, padding=0, min_width=0, min_height=0, output_alpha=True) -> io.NodeOutput:
         # ComfyUIでの画像形状: [batch, height, width, channels]
         # マスク形状: [batch, height, width] または [height, width]
         
@@ -1043,10 +1070,10 @@ class D2_CutByMask:
         if final_mask.ndim == 2:
             final_mask = final_mask.unsqueeze(0)
 
-        return (output_tensor, final_mask, rect_tensor)
+        return io.NodeOutput(output_tensor, final_mask, rect_tensor)
 
 
-class D2_PasteByMask:
+class D2_PasteByMask(io.ComfyNode):
     """
     マスクと領域を指定して画像を結合するノード
 
@@ -1073,28 +1100,30 @@ class D2_PasteByMask:
     """
     
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "img_base": ("IMAGE",),
-                "img_paste": ("IMAGE",),
-                "paste_mode": (["mask", "rect_full", "rect_position", "rect_pos_mask"],),
-                "multi_mode": (["pair_last", "pair_only", "cross"],),
-            },
-            "optional": {
-                "mask_opt": ("MASK", {"default": None, "forceInput": True}),
-                "rect_opt": ("INT", {"default": None, "forceInput": True}),
-                "feather": ("INT", {"default": 0, "min": 0, "max": 100}),
-                "feather_type": (["simple", "distance"], {"default": "simple"}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Paste By Mask",
+            display_name="D2 Paste By Mask",
+            category="D2/Image",
+            inputs=[
+                io.Image.Input("img_base"),
+                io.Image.Input("img_paste"),
+                io.Combo.Input("paste_mode", options=["mask", "rect_full", "rect_position", "rect_pos_mask"]),
+                io.Combo.Input("multi_mode", options=["pair_last", "pair_only", "cross"]),
+                # MASK はソケット専用型のため V1 の forceInput/default は no-op（落とす）
+                io.Mask.Input("mask_opt", optional=True),
+                # INT は widget 型なので forceInput でソケット入力に強制する（rect は CutByMask の出力）
+                io.Int.Input("rect_opt", force_input=True, optional=True),
+                io.Int.Input("feather", default=0, min=0, max=100, optional=True),
+                io.Combo.Input("feather_type", options=["simple", "distance"], default="simple", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("image",)
-    FUNCTION = "paste_by_mask"
-    CATEGORY = "D2/Image"
-
-    def paste_by_mask(self, img_base, img_paste, paste_mode, multi_mode, mask_opt=None, rect_opt=None, feather=0, feather_type="simple"):
+    @classmethod
+    def execute(cls, img_base, img_paste, paste_mode, multi_mode, mask_opt=None, rect_opt=None, feather=0, feather_type="simple") -> io.NodeOutput:
         """
         マスクと領域を指定して画像を結合する
 
@@ -1158,19 +1187,20 @@ class D2_PasteByMask:
             img_paste_single = img_paste[paste_idx]  # [height, width, channels]
             
             # 処理モードに応じた画像合成を行う
-            result_img = self._process_image_pair(
-                img_base_single, img_paste_single, 
-                paste_mode, mask_opt, rect_opt, 
+            result_img = cls._process_image_pair(
+                img_base_single, img_paste_single,
+                paste_mode, mask_opt, rect_opt,
                 feather, feather_type, base_height, base_width
             )
-            
+
             output_images.append(result_img)
-        
+
         # 出力を適切な形式に変換
         output_tensor = torch.stack(output_images, dim=0)
-        return (output_tensor,)
-    
-    def _process_image_pair(self, img_base, img_paste, paste_mode, mask_opt, rect_opt, feather, feather_type, base_height, base_width):
+        return io.NodeOutput(output_tensor)
+
+    @classmethod
+    def _process_image_pair(cls, img_base, img_paste, paste_mode, mask_opt, rect_opt, feather, feather_type, base_height, base_width):
         """
         1ペアの画像処理を行う
         
@@ -1199,23 +1229,23 @@ class D2_PasteByMask:
         
         # paste_modeに応じた処理
         if paste_mode == "mask":
-            output_img = self._process_mode_mask(
-                img_base_rgba, img_paste_rgba, mask_opt, 
+            output_img = cls._process_mode_mask(
+                img_base_rgba, img_paste_rgba, mask_opt,
                 base_height, base_width, feather, feather_type
             )
         elif paste_mode == "rect_full":
-            output_img = self._process_mode_rect_full(
+            output_img = cls._process_mode_rect_full(
                 img_base_rgba, img_paste_rgba, x, y, rect_width, rect_height,
                 base_height, base_width, feather, feather_type
             )
         elif paste_mode == "rect_position":
-            output_img = self._process_mode_rect_position(
-                img_base_rgba, img_paste_rgba, x, y, 
+            output_img = cls._process_mode_rect_position(
+                img_base_rgba, img_paste_rgba, x, y,
                 base_height, base_width, feather, feather_type
             )
         elif paste_mode == "rect_pos_mask":
-            output_img = self._process_mode_rect_pos_mask(
-                img_base_rgba, img_paste_rgba, mask_opt, x, y, 
+            output_img = cls._process_mode_rect_pos_mask(
+                img_base_rgba, img_paste_rgba, mask_opt, x, y,
                 base_height, base_width, feather, feather_type
             )
         else:
@@ -1223,7 +1253,8 @@ class D2_PasteByMask:
         return output_img
 
 
-    def _process_mode_mask(self, img_base_rgba, img_paste_rgba, mask_opt, base_height, base_width, feather, feather_type):
+    @classmethod
+    def _process_mode_mask(cls, img_base_rgba, img_paste_rgba, mask_opt, base_height, base_width, feather, feather_type):
         """マスクモード - マスクでマスキングして x=0, y=0 の位置に貼りつける"""
         if mask_opt is None:
             raise ValueError("Mask is required for 'mask' paste mode")
@@ -1244,7 +1275,8 @@ class D2_PasteByMask:
         
         return output_img
     
-    def _process_mode_rect_full(self, img_base_rgba, img_paste_rgba, x, y, rect_width, rect_height,
+    @classmethod
+    def _process_mode_rect_full(cls, img_base_rgba, img_paste_rgba, x, y, rect_width, rect_height,
                               base_height, base_width, feather, feather_type):
         """短形フルモード - 貼り付けエリアのマスクを作り x=0, y=0 に貼りつける"""
         # img_paste の寸法を取得
@@ -1274,7 +1306,8 @@ class D2_PasteByMask:
         
         return output_img
 
-    def _process_mode_rect_position(self, img_base_rgba, img_paste_rgba, x, y,
+    @classmethod
+    def _process_mode_rect_position(cls, img_base_rgba, img_paste_rgba, x, y,
                                   base_height, base_width, feather, feather_type):
         """
         矩形位置モード - img_paste を rect_opt の位置に貼りつける
@@ -1303,7 +1336,8 @@ class D2_PasteByMask:
 
         return output_img
 
-    def _process_mode_rect_pos_mask(self, img_base_rgba, img_paste_rgba, mask_opt, x, y,
+    @classmethod
+    def _process_mode_rect_pos_mask(cls, img_base_rgba, img_paste_rgba, mask_opt, x, y,
                                    base_height, base_width, feather, feather_type):
         """
         矩形位置マスクモード - img_paste を mask_opt でマスキングして rect_opt の位置に貼りつける

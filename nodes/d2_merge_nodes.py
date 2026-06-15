@@ -1,26 +1,30 @@
 from typing import Optional
 from comfy_extras.nodes_model_merging import ModelMergeBlocks, CLIPMergeSimple
+from comfy_api.latest import io
 
-class D2_ModelAndCLIPMergeSDXL():
-    CATEGORY = "advanced/model_merging/model_specific"
+class D2_ModelAndCLIPMergeSDXL(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": { 
-                "model1": ("MODEL",),
-                "model2": ("MODEL",),
-                "clip1": ("CLIP",),
-                "clip2": ("CLIP",),
-                "weights": ("STRING",),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Model and CLIP Merge SDXL",
+            display_name="D2 Model and CLIP Merge SDXL",
+            category="D2/Merge",
+            inputs=[
+                io.Model.Input("model1"),
+                io.Model.Input("model2"),
+                io.Clip.Input("clip1"),
+                io.Clip.Input("clip2"),
+                io.String.Input("weights"),
+            ],
+            outputs=[
+                io.Model.Output(display_name="MODEL"),
+                io.Clip.Output(display_name="CLIP"),
+            ],
+        )
 
-    RETURN_TYPES = ("MODEL", "CLIP",)
-    FUNCTION = "merge"
-    CATEGORY = "D2/Merge"
-
-    def merge(self, model1, model2, clip1, clip2, weights):
+    @classmethod
+    def execute(cls, model1, model2, clip1, clip2, weights) -> io.NodeOutput:
         # Parse weights string into dictionary
         weight_parts = [w.strip() for w in weights.split(",")]
         weights_dict = {}
@@ -62,7 +66,7 @@ class D2_ModelAndCLIPMergeSDXL():
         clip_merger = CLIPMergeSimple()
         merged_clip = clip_merger.merge(clip1, clip2, clip_ratio)[0]
 
-        return (merged_model, merged_clip,)
+        return io.NodeOutput(merged_model, merged_clip)
 
 
 NODE_CLASS_MAPPINGS = {

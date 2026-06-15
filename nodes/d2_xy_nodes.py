@@ -20,6 +20,7 @@ from comfy_execution.graph_utils import GraphBuilder
 from comfy_execution.graph import ExecutionBlocker
 from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, SaveImage
 from server import PromptServer
+from comfy_api.latest import io
 
 from .modules import util
 from .modules.util import AnyType, D2_TD2Pipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe
@@ -37,26 +38,27 @@ from .modules import network_util
 D2 XY Annotation
 
 """
-class D2_XYAnnotation:
+class D2_XYAnnotation(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # "type": (["STRING","INT","FLOAT",],),
-                "title": ("STRING", {"default": ""}),
-                "list": ("STRING", {"multiline": True},),
-            },
-        }
-    
-    RETURN_TYPES = ("D2_TAnnotation",)
-    RETURN_NAMES = ("x / y_annotation",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Annotation",
+            display_name="D2 XY Annotation",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("title", default=""),
+                io.String.Input("list", multiline=True),
+            ],
+            outputs=[
+                io.Custom("D2_TAnnotation").Output(display_name="x / y_annotation"),
+            ],
+        )
 
-    def run(self, title, list):
-        annotation = self.__class__.get_annotation(title, list)
-        return (annotation,)
+    @classmethod
+    def execute(cls, title, list) -> io.NodeOutput:
+        annotation = cls.get_annotation(title, list)
+        return io.NodeOutput(annotation)
 
     @classmethod
     def get_annotation(cls, title:str, list:str) -> D2_TAnnotation:
@@ -71,43 +73,49 @@ class D2_XYAnnotation:
 D2 XY Plot
 
 """
-class D2_XYPlot:
+class D2_XYPlot(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "x_type": (["STRING","INT","FLOAT",],),
-                "x_title": ("STRING", {"default": ""}),
-                "x_list": ("STRING", {"multiline": True},),
-                "y_type": (["STRING","INT","FLOAT",],),
-                "y_title": ("STRING", {"default": ""}),
-                "y_list": ("STRING", {"multiline": True},),
-                "auto_queue": ("BOOLEAN", {"default": True},),
-                "start_index": ("INT", {"default": 0, "max": 65535},),
-            },
-            "optional": {
-                "reset": ("D2_BUTTON", {"default":""}),
-                "index": ("D2_XYPLOT_INDEX", {}),
-                "remaining_time": ("D2_TIME", {}),
-                "xy_seed": ("D2_SEED", {}),
-                "progress_bar": ("D2_PROGRESS_BAR", {}),
-            }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Plot",
+            display_name="D2 XY Plot",
+            category="D2/XY Plot",
+            inputs=[
+                io.Combo.Input("x_type", options=["STRING", "INT", "FLOAT"]),
+                io.String.Input("x_title", default=""),
+                io.String.Input("x_list", multiline=True),
+                io.Combo.Input("y_type", options=["STRING", "INT", "FLOAT"]),
+                io.String.Input("y_title", default=""),
+                io.String.Input("y_list", multiline=True),
+                io.Boolean.Input("auto_queue", default=True),
+                io.Int.Input("start_index", default=0, max=65535),
+                io.Custom("D2_BUTTON").Input("reset", optional=True),
+                io.Custom("D2_XYPLOT_INDEX").Input("index", optional=True),
+                io.Custom("D2_TIME").Input("remaining_time", optional=True),
+                io.Custom("D2_SEED").Input("xy_seed", optional=True),
+                io.Custom("D2_PROGRESS_BAR").Input("progress_bar", optional=True),
+            ],
+            outputs=[
+                io.Custom("D2_TGridPipe").Output(display_name="grid_pipe"),
+                io.AnyType.Output(display_name="X"),
+                io.AnyType.Output(display_name="Y"),
+                io.Custom("D2_TAnnotation").Output(display_name="x_annotation"),
+                io.Custom("D2_TAnnotation").Output(display_name="y_annotation"),
+                io.String.Output(display_name="status"),
+                io.Int.Output(display_name="index"),
+            ],
+        )
 
-        }
-    
-    RETURN_TYPES = ("D2_TGridPipe", AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
-    RETURN_NAMES = ("grid_pipe", "X", "Y", "x_annotation", "y_annotation", "status","index",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-
-    def run(self, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, start_index, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0):
+    @classmethod
+    def execute(cls, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, start_index, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
+        if index is None:
+            index = 0
         x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
         y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
 
-        x_array = self.__class__.change_type(x_type, x_annotation.values)
-        y_array = self.__class__.change_type(y_type, y_annotation.values)
+        x_array = cls.change_type(x_type, x_annotation.values)
+        y_array = cls.change_type(y_type, y_annotation.values)
         # 要素の数
         x_len = len(x_array)
         y_len = len(y_array)
@@ -131,16 +139,16 @@ class D2_XYPlot:
             status = status
         )
 
-        return {
-            "result": (grid_pipe, x_value, y_value, x_annotation, y_annotation, status,index,),
-            "ui": {
+        return io.NodeOutput(
+            grid_pipe, x_value, y_value, x_annotation, y_annotation, status, index,
+            ui={
                 "auto_queue": (auto_queue,),
                 "x_array": (x_array,),
                 "y_array": (y_array,),
                 "index": (index,),
                 "total": (total,),
-            }
-        }
+            },
+        )
 
     @classmethod
     def change_type(cls, type:str, values:list) -> list:
@@ -159,60 +167,84 @@ class D2_XYPlot:
 D2 XY Plot Easy
 
 """
-class D2_XYPlotEasy:
+class D2_XYPlotEasy(io.ComfyNode):
+    # D2_XYPlot と同じく、x_annotation/y_annotation を index==0 のときに生成して
+    # バッチ実行をまたいで再利用する（特に seed 型は create_seed(-1) でランダムになるため、
+    # 同一バッチ内で同じ値を使い続ける必要がある）。V1 はインスタンス属性 self.x_annotation を
+    # 使い ComfyUI の obj キャッシュ（CacheKeySetID）で再利用していたが、V3 の execute は
+    # classmethod で状態を持てないため unique_id をキーにしたクラス辞書で保持する。
+    _anno_state = {}
+
+    XY_INPUT_TYPES = ["none", "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name",
+                      "scheduler", "denoise", "STRING", "INT", "FLOAT"]
 
     @classmethod
-    def INPUT_TYPES(cls):
-        intput_types = ["none", "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name",
-                        "scheduler", "denoise", "STRING", "INT", "FLOAT",]
+    def _xy_inputs(cls):
+        return [
+            io.String.Input("positive", multiline=True),
+            io.String.Input("negative", multiline=True),
+            io.Combo.Input("ckpt_name", options=folder_paths.get_filename_list("checkpoints")),
+            io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+            io.Int.Input("steps", default=20, min=1, max=10000),
+            io.Float.Input("cfg", default=7.0, min=0.0, max=100.0),
+            io.Combo.Input("sampler_name", options=comfy.samplers.KSampler.SAMPLERS),
+            io.Combo.Input("scheduler", options=comfy.samplers.KSampler.SCHEDULERS),
+            io.Float.Input("denoise", default=1.0, min=0.0, max=1.0, step=0.01),
+            io.Combo.Input("x_type", options=cls.XY_INPUT_TYPES),
+            io.String.Input("x_list", multiline=True),
+            io.Combo.Input("y_type", options=cls.XY_INPUT_TYPES),
+            io.String.Input("y_list", multiline=True),
+            io.Boolean.Input("auto_queue", default=True),
+            io.Int.Input("start_index", default=0, max=65535),
+            io.Custom("D2_BUTTON").Input("reset", optional=True),
+            io.Custom("D2_XYPLOT_INDEX").Input("index", optional=True),
+            io.Custom("D2_TIME").Input("remaining_time", optional=True),
+            io.Custom("D2_SEED").Input("xy_seed", optional=True),
+            io.Custom("D2_PROGRESS_BAR").Input("progress_bar", optional=True),
+        ]
 
-        return {
-            "required": {
-                "positive": ("STRING", {"multiline": True},),
-                "negative": ("STRING", {"multiline": True},),
-                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
-                "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0}),
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, ),
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, ),
-                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-                "x_type": (intput_types,),
-                "x_list": ("STRING", {"multiline": True},),
-                "y_type": (intput_types,),
-                "y_list": ("STRING", {"multiline": True},),
-                "auto_queue": ("BOOLEAN", {"default": True},),
-                "start_index": ("INT", {"default": 0, "max": 65535},),
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Plot Easy",
+            display_name="D2 XY Plot Easy",
+            category="D2/XY Plot",
+            inputs=cls._xy_inputs(),
+            outputs=[
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
+                io.Custom("D2_TGridPipe").Output(display_name="grid_pipe"),
+                io.String.Output(display_name="positive"),
+                io.String.Output(display_name="negative"),
+                io.AnyType.Output(display_name="ckpt_name"),
+                io.Int.Output(display_name="seed"),
+                io.Int.Output(display_name="steps"),
+                io.Float.Output(display_name="cfg"),
+                io.AnyType.Output(display_name="sampler_name"),
+                io.AnyType.Output(display_name="scheduler"),
+                io.Float.Output(display_name="denoise"),
+                io.AnyType.Output(display_name="x_other"),
+                io.AnyType.Output(display_name="y_other"),
+                io.Custom("D2_TAnnotation").Output(display_name="x_annotation"),
+                io.Custom("D2_TAnnotation").Output(display_name="y_annotation"),
+                io.String.Output(display_name="status"),
+                io.Int.Output(display_name="index"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
 
-            },
-            "optional": {
-                "reset": ("D2_BUTTON", {"default":""}),
-                "index": ("D2_XYPLOT_INDEX", {}),
-                "remaining_time": ("D2_TIME", {}),
-                "xy_seed": ("D2_SEED", {}),
-                "progress_bar": ("D2_PROGRESS_BAR", {}),
-            }
-        }
-   
-    RETURN_TYPES = (
-        "D2_TD2Pipe", "D2_TGridPipe", "STRING", "STRING", AnyType("*"), "INT", "INT", "FLOAT", AnyType("*"), AnyType("*"), "FLOAT", 
-        AnyType("*"), AnyType("*"), "D2_TAnnotation", "D2_TAnnotation", "STRING", "INT",)
-    RETURN_NAMES = (
-        "d2_pipe", "grid_pipe", "positive", "negative", "ckpt_name", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", 
-        "x_other", "y_other", "x_annotation", "y_annotation", "status", "index",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-
-    def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0):
-        return self.run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+    @classmethod
+    def execute(cls, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
+        return cls._run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "full")
 
 
-    def run_xy(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0, mode="full"):
-        
+    @classmethod
+    def _run_xy(cls, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None, mode="full") -> io.NodeOutput:
+        if index is None:
+            index = 0
+
         org_values = {
             "positive": positive,
              "negative": negative,
@@ -227,22 +259,27 @@ class D2_XYPlotEasy:
              "y_other": "",
         }
 
-        # index = 0 の時、または x_annotation が存在しない時に値を変換する
-        # (ComfyUIはインスタンスを再生成することがあるため)
-        if index == 0 or not hasattr(self, 'x_annotation'):
+        # index = 0 の時、またはこのノードの annotation が未生成の時に値を変換する
+        # (ComfyUIはインスタンスを再生成することがあるため。状態は unique_id 毎に保持)
+        state = cls._anno_state.get(cls.hidden.unique_id)
+        if index == 0 or state is None:
             x_array = D2_XYPlot.change_type(x_type, x_list.strip().split('\n'))
             y_array = D2_XYPlot.change_type(y_type, y_list.strip().split('\n'))
-            self.x_annotation = D2_TAnnotation(x_type, x_array)
-            self.y_annotation = D2_TAnnotation(y_type, y_array)
+            x_annotation = D2_TAnnotation(x_type, x_array)
+            y_annotation = D2_TAnnotation(y_type, y_array)
+            cls._anno_state[cls.hidden.unique_id] = {"x": x_annotation, "y": y_annotation}
+        else:
+            x_annotation = state["x"]
+            y_annotation = state["y"]
 
         # 要素の数
-        x_len = len(self.x_annotation.values)
-        y_len = len(self.y_annotation.values)
+        x_len = len(x_annotation.values)
+        y_len = len(y_annotation.values)
         total = x_len * y_len
 
         # 採用する値
-        x_value = self.x_annotation.values[index % x_len]
-        y_value = self.y_annotation.values[math.floor(index / x_len)]
+        x_value = x_annotation.values[index % x_len]
+        y_value = y_annotation.values[math.floor(index / x_len)]
 
         # D2 Grid Image に送るステータス
         if index == 0:
@@ -253,8 +290,8 @@ class D2_XYPlotEasy:
             status = ""
 
         # 出力値をtypeによって変える
-        org_values = self.__class__.apply_xy("x", self.x_annotation, x_value, org_values)
-        org_values = self.__class__.apply_xy("y", self.y_annotation, y_value, org_values)
+        org_values = cls.apply_xy("x", x_annotation, x_value, org_values)
+        org_values = cls.apply_xy("y", y_annotation, y_value, org_values)
 
         # KSamplerに渡すパイプ
         d2_pipe = D2_TD2Pipe(
@@ -271,8 +308,8 @@ class D2_XYPlotEasy:
 
         # Grid Image に渡すパイプ
         grid_pipe = D2_TGridPipe(
-            x_annotation = self.x_annotation,
-            y_annotation = self.y_annotation,
+            x_annotation = x_annotation,
+            y_annotation = y_annotation,
             status = status
         )
 
@@ -280,32 +317,32 @@ class D2_XYPlotEasy:
             result = (
                 d2_pipe,
                 grid_pipe,
-                org_values["positive"], org_values["negative"], org_values["ckpt_name"], 
-                org_values["x_other"], org_values["y_other"], 
+                org_values["positive"], org_values["negative"], org_values["ckpt_name"],
+                org_values["x_other"], org_values["y_other"],
             )
         else:
             result = (
                 d2_pipe,
                 grid_pipe,
-                org_values["positive"], org_values["negative"], org_values["ckpt_name"], 
-                org_values["seed"], org_values["steps"], org_values["cfg"], 
-                org_values["sampler_name"], org_values["scheduler"], org_values["denoise"], 
-                org_values["x_other"], org_values["y_other"], 
-                self.x_annotation, self.y_annotation, status,index,
+                org_values["positive"], org_values["negative"], org_values["ckpt_name"],
+                org_values["seed"], org_values["steps"], org_values["cfg"],
+                org_values["sampler_name"], org_values["scheduler"], org_values["denoise"],
+                org_values["x_other"], org_values["y_other"],
+                x_annotation, y_annotation, status, index,
             )
 
 
-        return {
-            "result": result,
-            "ui": {
+        return io.NodeOutput(
+            *result,
+            ui={
                 "auto_queue": (auto_queue,),
-                "x_array": (self.x_annotation.values,),
-                "y_array": (self.y_annotation.values,),
+                "x_array": (x_annotation.values,),
+                "y_array": (y_annotation.values,),
                 "index": (index,),
                 "total": (total,),
-            }
-        }
-    
+            },
+        )
+
     @classmethod
     def apply_xy(cls, xy, annotation:D2_TAnnotation, val, org_values ):
         type = annotation.title
@@ -336,14 +373,40 @@ D2 XY Plot Easy Mini
 
 """
 class D2_XYPlotEasyMini(D2_XYPlotEasy):
-    RETURN_TYPES = (
-        "D2_TD2Pipe", "D2_TGridPipe", "STRING", "STRING", AnyType("*"), AnyType("*"), AnyType("*"),)
-    RETURN_NAMES = (
-        "d2_pipe", "grid_pipe", "positive", "negative", "ckpt_name", "x_other", "y_other",)
+    # 親 D2_XYPlotEasy と出力数が違う（17→7）。V3 の RETURN_TYPES などは
+    # GET_SCHEMA が `cls._RETURN_TYPES is None` のときだけ schema.outputs から構築する
+    # クラス属性キャッシュ。親の GET_SCHEMA が先に走ると親の値（17出力）がキャッシュされ、
+    # サブクラスは継承でその非 None 値を見て再計算をスキップしてしまう
+    # （結果 y_other 等のスロット/型が親基準になり型検証で誤判定する）。
+    # ここで None にリセットして Mini 自身の schema から再構築させる。
+    _RETURN_TYPES = None
+    _RETURN_NAMES = None
+    _OUTPUT_IS_LIST = None
+    _OUTPUT_TOOLTIPS = None
 
-    def run(self, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset="", index=0, remaining_time=0, xy_seed=0, progress_bar=0):
-        return self.run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Plot Easy Mini",
+            display_name="D2 XY Plot Easy Mini",
+            category="D2/XY Plot",
+            inputs=cls._xy_inputs(),
+            outputs=[
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
+                io.Custom("D2_TGridPipe").Output(display_name="grid_pipe"),
+                io.String.Output(display_name="positive"),
+                io.String.Output(display_name="negative"),
+                io.AnyType.Output(display_name="ckpt_name"),
+                io.AnyType.Output(display_name="x_other"),
+                io.AnyType.Output(display_name="y_other"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
+
+    @classmethod
+    def execute(cls, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
+        return cls._run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "mini")
 
 
@@ -352,39 +415,46 @@ class D2_XYPlotEasyMini(D2_XYPlotEasy):
 D2 XY Grid Image
 
 """
-class D2_XYGridImage:
+class D2_XYGridImage(io.ComfyNode):
+    # V1 はインスタンス属性 self.image_batch / self.finished に画像を蓄積し、
+    # ComfyUI の obj キャッシュ（CacheKeySetID）で実行間に状態を保っていた。
+    # V3 の execute は classmethod で状態を持てないため、unique_id をキーにした
+    # クラス辞書で per-node に保持する（V1 に hidden が無かったので unique_id を追加）。
+    _grid_state = {}
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "images": ("IMAGE",),
-                "font_size": ("INT", {"default": 24},),
-                "grid_gap": ("INT", {"default": 0},),
-                "swap_dimensions": ("BOOLEAN", {"default": False},),
-                "grid_only": ("BOOLEAN", {"default": True},),
-                "draw_x_label": ("BOOLEAN", {"default": True},),
-                "draw_y_label": ("BOOLEAN", {"default": True},),
-            },
-            "optional": {
-                "x_annotation": ("D2_TAnnotation", {}),
-                "y_annotation": ("D2_TAnnotation", {}),
-                "status": ("STRING", {"forceInput": True, "default": ""},),
-                "grid_pipe": ("D2_TGridPipe", {"forceInput": True}),
-            },
-        }
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Grid Image",
+            display_name="D2 XY Grid Image",
+            category="D2/XY Plot",
+            inputs=[
+                io.Image.Input("images"),
+                io.Int.Input("font_size", default=24),
+                io.Int.Input("grid_gap", default=0),
+                io.Boolean.Input("swap_dimensions", default=False),
+                io.Boolean.Input("grid_only", default=True),
+                io.Boolean.Input("draw_x_label", default=True),
+                io.Boolean.Input("draw_y_label", default=True),
+                io.Custom("D2_TAnnotation").Input("x_annotation", optional=True),
+                io.Custom("D2_TAnnotation").Input("y_annotation", optional=True),
+                # status は STRING(widget型)なので forceInput を維持。grid_pipe は
+                # カスタムソケット型のため forceInput は no-op で落とす。
+                io.String.Input("status", force_input=True, optional=True),
+                io.Custom("D2_TGridPipe").Input("grid_pipe", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="images"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
 
-    image_batch = None
-    finished = True
+    @classmethod
+    def execute(cls, images, font_size, grid_gap, swap_dimensions, grid_only, draw_x_label, draw_y_label,
+            x_annotation=None, y_annotation=None, status=None, grid_pipe=None) -> io.NodeOutput:
 
-    def run(self, images, font_size, grid_gap, swap_dimensions, grid_only, draw_x_label, draw_y_label,
-            x_annotation:Optional[D2_TAnnotation]=None, y_annotation:Optional[D2_TAnnotation]=None, status=None, grid_pipe:Optional[D2_TGridPipe]=None):
-        
+        state = cls._grid_state.setdefault(cls.hidden.unique_id, {"image_batch": None, "finished": True})
+
         if grid_pipe != None:
             x_annotation = grid_pipe.x_annotation if grid_pipe.x_annotation else x_annotation
             y_annotation = grid_pipe.y_annotation if grid_pipe.y_annotation else y_annotation
@@ -392,43 +462,37 @@ class D2_XYGridImage:
 
         # 最初の画像だったら初期化する
         if status == "INIT":
-            self.finished = False
-            self.image_batch = None
+            state["finished"] = False
+            state["image_batch"] = None
 
         # 画像をスタックしていく
-        if self.image_batch is None:
-            self.image_batch = images
+        if state["image_batch"] is None:
+            state["image_batch"] = images
         else:
-            self.image_batch = torch.cat((self.image_batch, images), dim=0)
+            state["image_batch"] = torch.cat((state["image_batch"], images), dim=0)
 
         # 最後の画像まで送られたらグリッド画像生成して完了状態にする
         # 未完了なら今回送られてきた画像を送るか、または処理を止める
         if status == "FINISH":
-            grid_image = self.__class__.create_grid_image(
-                image_batch = self.image_batch, 
-                x_annotation = x_annotation, 
-                y_annotation = y_annotation, 
+            grid_image = cls.create_grid_image(
+                image_batch = state["image_batch"],
+                x_annotation = x_annotation,
+                y_annotation = y_annotation,
                 draw_x_label = draw_x_label,
                 draw_y_label = draw_y_label,
-                font_size = font_size, 
-                grid_gap = grid_gap, 
+                font_size = font_size,
+                grid_gap = grid_gap,
                 swap_dimensions = swap_dimensions
             )
             grid_image = image_util.pil2tensor(grid_image)
-            self.finished = True
-            self.image_batch = None
+            state["finished"] = True
+            state["image_batch"] = None
 
-            return {
-                "result": (grid_image,),
-            }
+            return io.NodeOutput(grid_image)
         elif grid_only:
-            return {
-                "result": (ExecutionBlocker(None),),
-            }
+            return io.NodeOutput(ExecutionBlocker(None))
         else:
-            return {
-                "result": (images,),
-            }
+            return io.NodeOutput(images)
 
     """
     グリッド画像作成
@@ -510,31 +574,32 @@ class D2_XYGridImage:
 D2 XY Model List
 
 """
-class D2_XYModelList:
+class D2_XYModelList(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "model_type": (["checkpoints", "loras", "diffusion_models", "samplers", "schedulers", "upscaler", "bbox_segm", "controlnet"],),
-                "filter": ("STRING", {"default":""}),
-                "mode": (["simple", "a1111"],),
-                "sort_by": (["Name", "Date"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "get_list": ("D2_BUTTON", {}),
-                "model_list": ("STRING", {"multiline": True}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Model List",
+            display_name="D2 XY Model List",
+            category="D2/XY Plot",
+            inputs=[
+                io.Combo.Input("model_type", options=["checkpoints", "loras", "diffusion_models", "samplers", "schedulers", "upscaler", "bbox_segm", "controlnet"]),
+                io.String.Input("filter", default=""),
+                io.Combo.Input("mode", options=["simple", "a1111"]),
+                io.Combo.Input("sort_by", options=["Name", "Date"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_BUTTON").Input("get_list", optional=True),
+                io.String.Input("model_list", multiline=True, optional=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("x / y_list", "LIST")
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    def run(self, model_type, filter="", mode="simple", sort_by="Name", order_by="A-Z", get_list="", model_list=""):
+    @classmethod
+    def execute(cls, model_type, filter="", mode="simple", sort_by="Name", order_by="A-Z", get_list=None, model_list="") -> io.NodeOutput:
         list_list = model_list.split("\n")
-        return (model_list, list_list,)
+        return io.NodeOutput(model_list, list_list)
 
 
 
@@ -611,27 +676,27 @@ D2 XYPromptSR
 D2 XY Plot 用に作った文字列置換
 
 """
-class D2_XYPromptSR:
+class D2_XYPromptSR(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # プロンプト
-                "prompt": ("STRING", {"multiline":True, "default":""},),
-                # 検索ワード
-                "search": ("STRING", {"default":""}),
-                # 置換文字列
-                "replace": ("STRING", {"multiline":True, "default":""}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Prompt SR",
+            display_name="D2 XY Prompt SR",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("prompt", multiline=True, default=""),
+                io.String.Input("search", default=""),
+                io.String.Input("replace", multiline=True, default=""),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST")
-    RETURN_NAMES = ("x / y_list", "LIST")
-    FUNCTION = "replace_text"
-    CATEGORY = "D2/XY Plot"
-
-    def replace_text(self, prompt, search, replace):
+    @classmethod
+    def execute(cls, prompt, search, replace) -> io.NodeOutput:
         # 置換文字列を改行で分割
         replace_items = replace.strip().split('\n')
 
@@ -645,7 +710,7 @@ class D2_XYPromptSR:
 
         output_xy = "\n".join([prompt.replace('\n','') for prompt in output_list])
 
-        return (output_xy, output_list,)
+        return io.NodeOutput(output_xy, output_list)
 
 
 
@@ -655,29 +720,28 @@ D2 XYPromptSR2
 D2 XY Plot 用に作った文字列置換
 
 """
-class D2_XYPromptSR2:
+class D2_XYPromptSR2(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # 検索ワード
-                "search": ("STRING", {}),
-                # プロンプト
-                "prompt": ("STRING", {"multiline":True}),
-                # 置換文字列
-                "x_y": ("STRING", {"forceInput":True},),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Prompt SR2",
+            display_name="D2 XY Prompt SR2",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("search"),
+                io.String.Input("prompt", multiline=True),
+                io.String.Input("x_y", force_input=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="STRING"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
-    FUNCTION = "replace_text"
-    CATEGORY = "D2/XY Plot"
-
-    def replace_text(self, prompt, search, x_y):
+    @classmethod
+    def execute(cls, search, prompt, x_y) -> io.NodeOutput:
         new_prompt = prompt.replace(search, x_y)
-        return (new_prompt,)
+        return io.NodeOutput(new_prompt)
 
 
 """
@@ -686,38 +750,36 @@ D2 XY Seed
 SEEDのリストを出力するノード
 
 """
-class D2_XYSeed:
+class D2_XYSeed(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # プロンプト
-                "seeds": ("STRING",{"multiline": True, "default":"-1\n-1"},),
-                # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Seed",
+            display_name="D2 XY Seed",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("seeds", multiline=True, default="-1\n-1"),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+                # V1 の OUTPUT_IS_LIST=(False, False, True) を踏襲。BATCH はリスト出力
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST", AnyType("*"))
-    RETURN_NAMES = ("x / y_list", "LIST", "BATCH")
-    OUTPUT_IS_LIST = (False, False, True)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    ######
-    def run(self, seeds):
+    @classmethod
+    def execute(cls, seeds) -> io.NodeOutput:
 
         # 入力文字列を改行で分割
         seed_list = seeds.strip().split('\n')
-
-        # 出力リスト
-        output_list = []
 
         # seed値を生成
         output_list = [util.create_seed(seed) for seed in seed_list]
         output_xy = "\n".join(str(x) for x in output_list)
 
-        return (output_xy, output_list, output_list,)
+        return io.NodeOutput(output_xy, output_list, output_list)
 
 
 """
@@ -726,32 +788,35 @@ D2 XY Seed 2
 指定個数のSEEDのリストを出力するノード
 
 """
-class D2_XYSeed2:
+class D2_XYSeed2(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "initial_number": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
-                "count": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
-                "mode": (["fixed", "increment", "decrement", "randomize"], {"default": "randomize"}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Seed2",
+            display_name="D2 XY Seed2",
+            category="D2/XY Plot",
+            inputs=[
+                io.Int.Input("initial_number", default=-1, min=-1, max=0xffffffffffffffff),
+                io.Int.Input("count", default=1, min=0, max=0xffffffffffffffff),
+                io.Combo.Input("mode", options=["fixed", "increment", "decrement", "randomize"], default="randomize"),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+                # V1 の OUTPUT_IS_LIST=(False, False, True) を踏襲。BATCH はリスト出力
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST", AnyType("*"))
-    RETURN_NAMES = ("x / y_list", "LIST", "BATCH")
-    OUTPUT_IS_LIST = (False, False, True)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    ######
     """
     seed値を生成する
     initial_number: 元の数値
     count: 生成個数
     mode: モード（fixed / increment / decrement / randomize）
     """
-    def run(self, initial_number, count, mode):
+    @classmethod
+    def execute(cls, initial_number, count, mode) -> io.NodeOutput:
         # 出力リスト
         output_list = []
         # 初期番号生成
@@ -770,7 +835,7 @@ class D2_XYSeed2:
 
         output_xy = "\n".join(str(x) for x in output_list)
 
-        return (output_xy, output_list, output_list,)
+        return io.NodeOutput(output_xy, output_list, output_list)
 
 
 
@@ -779,25 +844,25 @@ class D2_XYSeed2:
 D2 XY List To XYPlot
 
 """
-class D2_XYListToPlot:
+class D2_XYListToPlot(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "LIST": ("LIST",),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY List To Plot",
+            display_name="D2 XY List To Plot",
+            category="D2/XY Plot",
+            inputs=[
+                io.Custom("LIST").Input("LIST"),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("x / y_list",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    def run(self, LIST):
+    @classmethod
+    def execute(cls, LIST) -> io.NodeOutput:
         output = util.list_to_text(LIST, util.LINE_BREAK)
-        return {
-            "result": (output,),
-        }
+        return io.NodeOutput(output)
 
 
 """
@@ -805,25 +870,29 @@ class D2_XYListToPlot:
 D2 XY String To XYPlot
 
 """
-class D2_XYStringToPlot:
+class D2_XYStringToPlot(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "string_count": ("INT", {"default": 3, "min": 1, "max": 50, "step": 1}),
-            }
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY String To Plot",
+            display_name="D2 XY String To Plot",
+            category="D2/XY Plot",
+            inputs=[
+                io.Int.Input("string_count", default=3, min=1, max=50, step=1),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+            ],
+            # JS が string_1..N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("x / y_list",)
-    FUNCTION = "string_to_plot"
-    CATEGORY = "D2/XY Plot"
-
-    def string_to_plot(self, string_count, **kwargs):
+    @classmethod
+    def execute(cls, string_count, **kwargs) -> io.NodeOutput:
 
         string_list = []
-        
+
         for i in range(1, string_count + 1):
             string = kwargs.get(f"string_{i}")
             if string is not None:
@@ -834,9 +903,9 @@ class D2_XYStringToPlot:
             cleaned = [s.replace('\n', '') for s in string_list]
             result = '\n'.join(cleaned)
 
-            return (result,)
+            return io.NodeOutput(result)
 
-        return (None,)
+        return io.NodeOutput(None)
 
 
 """
@@ -845,39 +914,38 @@ D2 XY Folder Images
 フォルダ内画像を渡す
 
 """
-class D2_XYFolderImages:
+class D2_XYFolderImages(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required":{
-                "folder": ("STRING", {"default": ""}),
-                "extension": ("STRING", {"default": "*.*"}),
-                "sort_by": (["Name", "Date", "Random"], {"default":"Name"}),
-                "order_by": (["A-Z", "Z-A"], {"default":"A-Z"}),
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {}),
-                "queue_seed": ("D2_SEED", {}),
-                "refresh_btn": ("D2_BUTTON", {})
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Folder Images",
+            display_name="D2 XY Folder Images",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("folder", default=""),
+                io.String.Input("extension", default="*.*"),
+                io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
+                io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SEED").Input("queue_seed", optional=True),
+                io.Custom("D2_BUTTON").Input("refresh_btn", optional=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+                io.Int.Output(display_name="image_count"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "LIST", "INT",)
-    RETURN_NAMES = ("x / y_list", "LIST", "image_count",)
-    FUNCTION = "run"
-    CATEGORY = "D2/XY Plot"
-
-    ######
-    def run(self, folder, extension, sort_by="Name", order_by="A-Z", image_count="", queue_seed=0, refresh_btn=""):
+    @classmethod
+    def execute(cls, folder, extension, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
         files = util.get_files(folder, extension, sort_by, order_by)
         output = util.list_to_text(files, util.LINE_BREAK)
 
-        return {
-            "result": (output, files, len(files),),
-            "ui": {
-                "image_count": (len(files),),
-            }
-        }
+        return io.NodeOutput(
+            output, files, len(files),
+            ui={"image_count": (len(files),)},
+        )
 
 
 
@@ -886,34 +954,34 @@ class D2_XYFolderImages:
 D2 Upload Image
 
 """
-class D2_XYUploadImage():
+class D2_XYUploadImage(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "image_list": ("STRING", {"multiline":True, "default":""}), 
-            },
-            "optional": {
-                "image_count": ("D2_SIMPLE_TEXT", {"default":0}),
-                "status": ("D2_SIMPLE_TEXT", {"default":""}),
-            },
-        }
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY Upload Image",
+            display_name="D2 XY Upload Image",
+            category="D2/XY Plot",
+            inputs=[
+                io.String.Input("image_list", multiline=True, default=""),
+                io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
+                io.Custom("D2_SIMPLE_TEXT").Input("status", optional=True),
+            ],
+            outputs=[
+                io.Custom("LIST").Output(display_name="LIST"),
+                io.String.Output(display_name="x / y_list"),
+                io.Int.Output(display_name="image_count"),
+            ],
+        )
 
-    RETURN_TYPES = ("LIST", "STRING", "INT",)
-    RETURN_NAMES = ("LIST", "x / y_list", "image_count",)
-    FUNCTION = "send_image_path"
-    CATEGORY = "D2/XY Plot"
-
-    def send_image_path(self, image_list, image_count=0, status=""):
+    @classmethod
+    def execute(cls, image_list, image_count=0, status="") -> io.NodeOutput:
         # 入力文字列を改行で分割
         image_batch = image_list.strip().split('\n')
 
-        return {
-            "result": (image_batch, image_list, image_count,),
-            "ui": {
-                "image_count": (len(image_batch),),
-            }
-        }
+        return io.NodeOutput(
+            image_batch, image_list, image_count,
+            ui={"image_count": (len(image_batch),)},
+        )
 
 
 
