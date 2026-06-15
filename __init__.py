@@ -94,6 +94,12 @@ from .nodes.d2_refiner_nodes import (
     D2_RefinerStepsA1111,
     D2_RefinerStepsTester,
 )
+from .nodes.d2_merge_nodes import (
+    D2_ModelAndCLIPMergeSDXL,
+)
+from .nodes.d2_audio_nodes import (
+    D2_SaveAudioEagle,
+)
 from .nodes.d2_image_nodes import (
     D2_SaveImage,
     D2_SaveImageEagle,
@@ -130,6 +136,9 @@ class D2Extension(ComfyExtension):
             D2_RefinerSteps,
             D2_RefinerStepsA1111,
             D2_RefinerStepsTester,
+            # D. Merge / Audio
+            D2_ModelAndCLIPMergeSDXL,
+            D2_SaveAudioEagle,
             # B. 重要度が高いもの（KSampler 系）
             D2_KSampler,
             D2_KSamplerAdvanced,
