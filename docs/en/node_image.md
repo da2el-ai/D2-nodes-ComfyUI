@@ -369,6 +369,10 @@ Compatible with images saved by the following nodes and UIs:
 - `output_size`: Output image size
     - `mask_size`: Mask size
     - `image_size`: Input image size (surroundings become transparent while preserving the input image position)
+- `round_to`: Round up the cut rectangle's width/height to the chosen unit (default `none`)
+    - Choose from `none` / `8px` / `16px` / `32px` / `64px`
+    - Only effective when `cut_type` is `rectangle` (ignored for `mask` / `square_thumb`)
+    - Intended to prevent blurry edges with local models that generate in 8px units. Expands while keeping the center, and never extends beyond the source image
 - `padding`: Number of pixels to expand the mask area (default 0)
 - `min_width`: Minimum width of mask size (default 0)
 - `min_height`: Minimum height of mask size (default 0)

@@ -184,6 +184,10 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.06.15**
+
+- `D2_CutByMask`: 切り出す短形を8px等の単位に切り上げる `round_to` を追加
+
 **2026.06.10**
 
 - `D2_PromptSanitizer`: 余分なカンマを整理する `remove_extra_comma` を追加

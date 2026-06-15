@@ -372,6 +372,10 @@ D:\ComfyUI\output\foo.png
 - `output_size`: 輸出圖像尺寸
     - `mask_size`: 遮罩尺寸
     - `image_size`: 輸入圖像尺寸（保持輸入圖像位置的同時周圍變為透明）
+- `round_to`: 將裁剪矩形的寬度・高度向上取整到指定單位（預設值 `none`）
+    - 可從 `none` / `8px` / `16px` / `32px` / `64px` 中選擇
+    - 僅在 `cut_type` 為 `rectangle` 時有效（`mask` / `square_thumb` 時忽略）
+    - 用於防止以 8px 單位生成的本地模型出現邊緣模糊。保持中心進行擴展，且不會超出原始圖像範圍
 - `square_thumb`: 以最大尺寸的正方形進行裁剪。適用於縮略圖的模式
 - `padding`: 擴展遮罩area的像素數（預設值 0）
 - `min_width`: 遮罩尺寸的最小寬度（預設值 0）

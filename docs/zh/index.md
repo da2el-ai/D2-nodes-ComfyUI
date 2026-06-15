@@ -183,6 +183,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.06.15**
+
+- `D2_CutByMask`：新增 `round_to`，可將裁剪矩形向上取整到 8px 等單位
+
 **2026.06.10**
 
 - `D2_PromptSanitizer`：新增 `remove_extra_comma`，用於整理多餘的逗號
