@@ -652,6 +652,7 @@ class D2_EmptyImageAlpha(io.ComfyNode):
                 io.Int.Input("green", default=0, min=0, max=255, step=1),
                 io.Int.Input("blue", default=0, min=0, max=255, step=1),
                 io.Float.Input("alpha", default=1.0, min=0, max=1.0, step=0.001),
+                io.Boolean.Input("output_alpha", default=True, optional=True),
                 io.Custom("D2_COLOR_CANVAS").Input("sample", optional=True),
             ],
             outputs=[
@@ -660,10 +661,14 @@ class D2_EmptyImageAlpha(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0, sample=None) -> io.NodeOutput:
+    def execute(cls, width, height, batch_size=1, red=0, green=0, blue=0, alpha=1.0, output_alpha=True, sample=None) -> io.NodeOutput:
         r = torch.full([batch_size, height, width, 1], red / 255.0)
         g = torch.full([batch_size, height, width, 1], green / 255.0)
         b = torch.full([batch_size, height, width, 1], blue / 255.0)
+        # output_alpha が False の時はαチャンネルを付与せず RGB(3ch) で出力する
+        # （RGB前提のノード = Anima ControlNet-LLLite 等にそのまま渡せる）
+        if output_alpha == False:
+            return io.NodeOutput(torch.cat((r, g, b), dim=-1))
         # アルファチャンネル追加
         a = torch.full([batch_size, height, width, 1], alpha)
         # RGBAを結合
