@@ -184,6 +184,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2026.06.15**
 
 - `D2_CutByMask`: Added `round_to` to round up the cut rectangle to a unit such as 8px
+- `D2_EmptyImageAlpha`: Added `output_alpha` to output RGB without an alpha channel
 
 **2026.06.10**
 

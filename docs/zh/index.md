@@ -186,6 +186,7 @@
 **2026.06.15**
 
 - `D2_CutByMask`：新增 `round_to`，可將裁剪矩形向上取整到 8px 等單位
+- `D2_EmptyImageAlpha`：新增 `output_alpha`，可不附加 α 通道而以 RGB 輸出
 
 **2026.06.10**
 

@@ -333,6 +333,8 @@ D:\ComfyUI\output\foo.png
 </figure>
 
 - 為 EmptyImage 添加 α 通道（透明度）
+- 將 `output_alpha` 設為 `false` 時，不附加 α 通道，以 RGB（3ch）輸出
+    - 可傳遞給以 RGB 為前提的節點（如 Anima ControlNet-LLLite）
 
 
 ---

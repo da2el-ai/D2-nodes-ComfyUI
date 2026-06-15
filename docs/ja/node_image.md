@@ -333,6 +333,8 @@ D:\ComfyUI\output\foo.png
 </figure>
 
 - EmptyImage にαチャンネル（透明度）を追加
+- `output_alpha` を `false` にするとαチャンネルを付与せず RGB（3ch）で出力する
+    - RGB を前提とするノード（Anima ControlNet-LLLite など）に渡せる
 
 
 ---

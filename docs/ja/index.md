@@ -187,6 +187,7 @@ D2 Nodes ComfyUI
 **2026.06.15**
 
 - `D2_CutByMask`: 切り出す短形を8px等の単位に切り上げる `round_to` を追加
+- `D2_EmptyImageAlpha`: αチャンネルを付与せず RGB 出力する `output_alpha` を追加
 
 **2026.06.10**
 

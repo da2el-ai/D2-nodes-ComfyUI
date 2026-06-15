@@ -330,6 +330,8 @@ Compatible with images saved by the following nodes and UIs:
 </figure>
 
 - Adds alpha channel (transparency) to EmptyImage
+- Setting `output_alpha` to `false` outputs RGB (3ch) without an alpha channel
+    - Can be passed to nodes that expect RGB (such as Anima ControlNet-LLLite)
 
 
 ---
