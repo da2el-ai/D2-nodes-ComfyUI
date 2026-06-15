@@ -310,6 +310,45 @@ def adjust_rectangle_dimensions(rect, width, height, padding=0, min_width=0, min
     return [int(x_min), int(y_min), int(rect_width), int(rect_height)]
 
 
+def round_up_rect_to_multiple(rect, multiple, width, height):
+    """
+    矩形の幅・高さを指定単位（8px 等）に切り上げる。
+
+    中心を保ったまま拡張し、元画像の外側には広げない。
+    切り上げ後のサイズが画像サイズを超える場合は画像サイズでクランプするため、
+    その辺だけは multiple の倍数にならないことがある。
+
+    Args:
+        rect (list): [x_min, y_min, rect_width, rect_height]
+        multiple (int): 切り上げ単位（例: 8）。1 以下なら何もしない
+        width (int): 元画像の幅
+        height (int): 元画像の高さ
+
+    Returns:
+        list: [x_min, y_min, rect_width, rect_height] の調整後の矩形
+    """
+    x_min, y_min, rect_width, rect_height = rect
+
+    if multiple <= 1:
+        return [int(x_min), int(y_min), int(rect_width), int(rect_height)]
+
+    # 中心座標（拡張後も中心を維持する）
+    center_x = x_min + rect_width // 2
+    center_y = y_min + rect_height // 2
+
+    # multiple の倍数に切り上げ。画像サイズは超えない
+    new_width = min(-(-rect_width // multiple) * multiple, width)
+    new_height = min(-(-rect_height // multiple) * multiple, height)
+
+    # 中心から新しい左上を計算し、画像内に収める
+    new_x = center_x - new_width // 2
+    new_x = max(0, min(new_x, width - new_width))
+    new_y = center_y - new_height // 2
+    new_y = max(0, min(new_y, height - new_height))
+
+    return [int(new_x), int(new_y), int(new_width), int(new_height)]
+
+
 def adjust_rectangle_to_area(rect, area_width, area_height):
     """
     矩形がエリア内に収まるように調整する関数
