@@ -10,3 +10,38 @@
 .d2-float-container__body {
   gap: 0.25rem;
 }
+
+/* ===== アクションバー収納（dock） ===== */
+
+/* 未ドラッグ・未ドック時（空）の枠は隠す */
+.d2-dock-group:empty {
+  display: none;
+}
+
+/* ドロップ枠（プレースホルダ）。ドラッグ中に border-dashed が付くとアクションバーが開く */
+.d2-dock-group.d2-dock-drop-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  min-height: 2rem;
+  border-radius: 0.5rem;
+  border-width: 2px;
+  border-color: var(--p-primary-color, #4a9eff);
+  opacity: 0.7;
+  transition: opacity 0.15s, background-color 0.15s;
+}
+
+/* カーソルが枠内に入ったときの強調 */
+.d2-dock-group.d2-dock-drop-ready {
+  opacity: 1;
+  background-color: color-mix(in srgb, var(--p-primary-color, #4a9eff) 20%, transparent);
+}
+
+/* dock 中のフレーム。float 用の余白を詰めてアクションバーに馴染ませる */
+.d2-dock-group.d2-dock-active .d2-float-container__frame {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}

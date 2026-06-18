@@ -11,8 +11,8 @@ class D2_QueueButton {
   floatContainer = undefined;
 
   constructor() {
-    // フロートコンテナ
-    this.floatContainer = new D2_FloatContainer('D2_QueueButton', 50, 50);
+    // フロートコンテナ（アクションバー収納を有効化）
+    this.floatContainer = new D2_FloatContainer('D2_QueueButton', 50, 50, { enableDock: true });
     
     this._createButtons();
 
