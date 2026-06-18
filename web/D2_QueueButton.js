@@ -30,17 +30,19 @@ class D2_QueueButton {
 
   /**
    * ボタンリセット
+   * @param {string} [settingValue] 設定値（onChange から渡される最新値）
    */
-  resetButton() {
+  resetButton(settingValue) {
     this.floatContainer.removeAllContent();
-    this._createButtons();
+    this._createButtons(settingValue);
   }
 
   /**
    * ボタン作成
+   * @param {string} [settingValue] 設定値（未指定時は設定ストアから読む）
    */
-  _createButtons() {
-    const counts = D2_QueueButton._getCounts();
+  _createButtons(settingValue) {
+    const counts = D2_QueueButton._getCounts(settingValue);
 
     counts.forEach((count) => {
       const button = document.createElement("button");
@@ -56,9 +58,13 @@ class D2_QueueButton {
 
   /**
    * 設定からボタン設定を読む
+   * @param {string} [settingValue] 渡されたらこの値を使う。未指定時のみ設定ストアから読む
+   *   （onChange 発火時点では設定ストアが旧値のままなので、引数の最新値を優先する）
    */
-  static _getCounts(string) {
-    const setting = app.ui.settings.getSettingValue("D2.QueueButton.BatchCount", D2_QUEUE_DEFAULT_COUNT);
+  static _getCounts(settingValue) {
+    const setting = settingValue !== undefined
+      ? settingValue
+      : app.ui.settings.getSettingValue("D2.QueueButton.BatchCount", D2_QUEUE_DEFAULT_COUNT);
     if (!setting || setting.trim() === "") return [];
 
     return setting
@@ -79,7 +85,7 @@ class D2_QueueButton {
     type: "string",
     defaultValue: D2_QUEUE_DEFAULT_COUNT,
     onChange(value) {
-      queueButton.resetButton();
+      queueButton.resetButton(value);
     },
   });
 
