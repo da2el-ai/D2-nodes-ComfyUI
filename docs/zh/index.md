@@ -183,6 +183,11 @@
 
 ## :blossom: 更新日誌
 
+**2026.06.18**
+
+- `D2_QueueButton`：可通過拖放收納至畫面上方的動作列（actionbar）
+- `D2_QueueButton`：修正變更 Batch count 時會反映前一個值的問題
+
 **2026.06.15**
 
 - `D2_CutByMask`：新增 `round_to`，可將裁剪矩形向上取整到 8px 等單位

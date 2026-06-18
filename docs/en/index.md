@@ -181,6 +181,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.06.18**
+
+- `D2_QueueButton`: Can now be docked into the actionbar at the top of the screen via drag and drop
+- `D2_QueueButton`: Fixed a bug where changing Batch count reflected the previous value
+
 **2026.06.15**
 
 - `D2_CutByMask`: Added `round_to` to round up the cut rectangle to a unit such as 8px
