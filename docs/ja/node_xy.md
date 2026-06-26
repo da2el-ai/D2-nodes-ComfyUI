@@ -32,7 +32,13 @@ Node
 - `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
   - KSampler に渡すための設定
 - `ckpt_name`
-  - D2 Checkpoint Loader に渡す設定
+  - D2 Checkpoint Loader に渡す Checkpoint モデル
+- `unet_name`
+  - D2 Load Diffusion Model に渡す Diffusion モデル
+- `ckpt_type`
+  - `ckpt_name` と `unet_name` のどちらを使うかを選択する
+  - `stable_diffusion`: `ckpt_name` を `ckpt_name` 出力に使う
+  - `diffusion`: `unet_name` を `ckpt_name` 出力に使う
 - `x_type` / `y_type`
   - XY Plot を実行する項目を指定
   - `STRING`、`INT`、`FLOAT` を指定すると `x_other`、`y_other` から出力する
@@ -54,7 +60,9 @@ Node
 - `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
   - KSampler に渡すパラメーター
 - `ckpt_name`
-  - D2 Checkpoint Loader に渡す設定
+  - `ckpt_type` で選択したモデル名（`stable_diffusion` なら `ckpt_name`、`diffusion` なら `unet_name`）
+- `ckpt_type`
+  - 入力で選択した `ckpt_type` をそのまま出力する
 - `x_other` / `y_other`
   - `x_type` `x_type` を `STRING` `INT` `FLOAT` に指定するとここから出力する
 - `x_annotation` / `y_annotation`

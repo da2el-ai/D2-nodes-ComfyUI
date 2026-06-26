@@ -29,7 +29,13 @@
 - `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
   - Settings to pass to KSampler
 - `ckpt_name`
-  - Setting to pass to D2 Checkpoint Loader
+  - Checkpoint model to pass to D2 Checkpoint Loader
+- `unet_name`
+  - Diffusion model to pass to D2 Load Diffusion Model
+- `ckpt_type`
+  - Selects whether to use `ckpt_name` or `unet_name`
+  - `stable_diffusion`: Uses `ckpt_name` for the `ckpt_name` output
+  - `diffusion`: Uses `unet_name` for the `ckpt_name` output
 - `x_type` / `y_type`
   - Specify items to execute in XY Plot
   - When `STRING`, `INT`, or `FLOAT` is specified, output will be from `x_other`, `y_other`
@@ -51,7 +57,9 @@
 - `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
   - Parameters to pass to KSampler
 - `ckpt_name`
-  - Setting to pass to D2 Checkpoint Loader
+  - Model name selected by `ckpt_type` (`ckpt_name` if `stable_diffusion`, `unet_name` if `diffusion`)
+- `ckpt_type`
+  - Outputs the `ckpt_type` selected in the input as-is
 - `x_other` / `y_other`
   - Outputs from here when `x_type` `y_type` is set to `STRING` `INT` `FLOAT`
 - `x_annotation` / `y_annotation`

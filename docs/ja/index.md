@@ -184,6 +184,10 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.06.26**
+
+- `D2_XYPlotEasy` / `D2_XYPlotEasyMini`: Diffusion モデルの選択項目 `unet_name` を追加。`ckpt_name` / `unet_name` のどちらを使うか選ぶ `ckpt_type` を追加。出力にも追加 `ckpt_type` を追加。
+
 **2026.06.18**
 
 - `D2_QueueButton`: 画面上部のアクションバーへドラッグ＆ドロップで収納できるように

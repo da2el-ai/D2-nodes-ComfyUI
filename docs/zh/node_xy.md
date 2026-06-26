@@ -30,7 +30,13 @@
 - `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
   - 傳遞給 KSampler 的設定
 - `ckpt_name`
-  - 傳遞給 D2 Checkpoint Loader 的設定
+  - 傳遞給 D2 Checkpoint Loader 的 Checkpoint 模型
+- `unet_name`
+  - 傳遞給 D2 Load Diffusion Model 的 Diffusion 模型
+- `ckpt_type`
+  - 選擇使用 `ckpt_name` 或 `unet_name`
+  - `stable_diffusion`：將 `ckpt_name` 用於 `ckpt_name` 輸出
+  - `diffusion`：將 `unet_name` 用於 `ckpt_name` 輸出
 - `x_type` / `y_type`
   - 指定要在 XY Plot 中執行的項目
   - 當指定為 `STRING`、`INT`、`FLOAT` 時，將從 `x_other`、`y_other` 輸出
@@ -52,7 +58,9 @@
 - `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
   - 傳遞給 KSampler 的參數
 - `ckpt_name`
-  - 傳遞給 D2 Checkpoint Loader 的設定
+  - 由 `ckpt_type` 選擇的模型名稱（`stable_diffusion` 時為 `ckpt_name`，`diffusion` 時為 `unet_name`）
+- `ckpt_type`
+  - 將輸入中選擇的 `ckpt_type` 原樣輸出
 - `x_other` / `y_other`
   - 當 `x_type` `y_type` 設定為 `STRING` `INT` `FLOAT` 時從此處輸出
 - `x_annotation` / `y_annotation`

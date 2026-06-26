@@ -181,6 +181,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.06.26**
+
+- `D2_XYPlotEasy` / `D2_XYPlotEasyMini`: Added `unet_name` input for selecting a Diffusion model. Added `ckpt_type` to choose whether to use `ckpt_name` or `unet_name`. Also added a `ckpt_type` output.
+
 **2026.06.18**
 
 - `D2_QueueButton`: Can now be docked into the actionbar at the top of the screen via drag and drop
