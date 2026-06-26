@@ -184,6 +184,8 @@ class D2_XYPlotEasy(io.ComfyNode):
             io.String.Input("positive", multiline=True),
             io.String.Input("negative", multiline=True),
             io.Combo.Input("ckpt_name", options=folder_paths.get_filename_list("checkpoints")),
+            io.Combo.Input("unet_name", options=folder_paths.get_filename_list("diffusion_models")),
+            io.Combo.Input("ckpt_type", options=["stable_diffusion", "diffusion"]),
             io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
             io.Int.Input("steps", default=20, min=1, max=10000),
             io.Float.Input("cfg", default=7.0, min=0.0, max=100.0),
@@ -216,6 +218,7 @@ class D2_XYPlotEasy(io.ComfyNode):
                 io.String.Output(display_name="positive"),
                 io.String.Output(display_name="negative"),
                 io.AnyType.Output(display_name="ckpt_name"),
+                io.String.Output(display_name="ckpt_type"),
                 io.Int.Output(display_name="seed"),
                 io.Int.Output(display_name="steps"),
                 io.Float.Output(display_name="cfg"),
@@ -233,14 +236,14 @@ class D2_XYPlotEasy(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+    def execute(cls, positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
-        return cls._run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+        return cls._run_xy(positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "full")
 
 
     @classmethod
-    def _run_xy(cls, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+    def _run_xy(cls, positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None, mode="full") -> io.NodeOutput:
         if index is None:
             index = 0
@@ -248,7 +251,7 @@ class D2_XYPlotEasy(io.ComfyNode):
         org_values = {
             "positive": positive,
              "negative": negative,
-             "ckpt_name": ckpt_name,
+             "ckpt_name": ckpt_name if ckpt_type == "stable_diffusion" else unet_name,
              "seed": seed,
              "steps": steps,
              "cfg": cfg,
@@ -317,14 +320,14 @@ class D2_XYPlotEasy(io.ComfyNode):
             result = (
                 d2_pipe,
                 grid_pipe,
-                org_values["positive"], org_values["negative"], org_values["ckpt_name"],
+                org_values["positive"], org_values["negative"], org_values["ckpt_name"], ckpt_type,
                 org_values["x_other"], org_values["y_other"],
             )
         else:
             result = (
                 d2_pipe,
                 grid_pipe,
-                org_values["positive"], org_values["negative"], org_values["ckpt_name"],
+                org_values["positive"], org_values["negative"], org_values["ckpt_name"], ckpt_type,
                 org_values["seed"], org_values["steps"], org_values["cfg"],
                 org_values["sampler_name"], org_values["scheduler"], org_values["denoise"],
                 org_values["x_other"], org_values["y_other"],
@@ -397,6 +400,7 @@ class D2_XYPlotEasyMini(D2_XYPlotEasy):
                 io.String.Output(display_name="positive"),
                 io.String.Output(display_name="negative"),
                 io.AnyType.Output(display_name="ckpt_name"),
+                io.String.Output(display_name="ckpt_type"),
                 io.AnyType.Output(display_name="x_other"),
                 io.AnyType.Output(display_name="y_other"),
             ],
@@ -404,9 +408,9 @@ class D2_XYPlotEasyMini(D2_XYPlotEasy):
         )
 
     @classmethod
-    def execute(cls, positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+    def execute(cls, positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
-        return cls._run_xy(positive, negative, ckpt_name, seed, steps, cfg, sampler_name, scheduler, denoise,
+        return cls._run_xy(positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
             x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "mini")
 
 
