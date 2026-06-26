@@ -184,6 +184,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2026.06.26**
 
 - `D2_XYPlotEasy` / `D2_XYPlotEasyMini`: Added `unet_name` input for selecting a Diffusion model. Added `ckpt_type` to choose whether to use `ckpt_name` or `unet_name`. Also added a `ckpt_type` output.
+- `D2_ImageResize`: Fixed an error that occurred when using a 3D VAE (e.g. qwen_image_vae) with `use_tiled_vae` set to `True`
 
 **2026.06.18**
 

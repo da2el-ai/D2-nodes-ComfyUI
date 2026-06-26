@@ -177,7 +177,14 @@ class D2_ImageResize(io.ComfyNode):
 
         if(vae is not None):
             if use_tiled_vae:
-                l = vae.encode_tiled(scaled_images[:,:,:,:3])
+                l = vae.encode_tiled(
+                    scaled_images[:,:,:,:3],
+                    tile_x=512,
+                    tile_y=512,
+                    overlap=64,
+                    tile_t=64,
+                    overlap_t=8,
+                )
             else:
                 l = vae.encode(scaled_images[:,:,:,:3])
             latent = {"samples":l}

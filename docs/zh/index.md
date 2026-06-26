@@ -186,6 +186,7 @@
 **2026.06.26**
 
 - `D2_XYPlotEasy` / `D2_XYPlotEasyMini`：新增選擇 Diffusion 模型的 `unet_name` 輸入，以及選擇使用 `ckpt_name` 或 `unet_name` 的 `ckpt_type`。輸出也新增 `ckpt_type`。
+- `D2_ImageResize`：修正將 `use_tiled_vae` 設為 `True` 並使用 3D VAE（如 qwen_image_vae）時發生錯誤的問題
 
 **2026.06.18**
 
