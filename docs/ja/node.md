@@ -36,20 +36,23 @@ Node
 - Controlnet専用の入力があり、シンプルに適用できる
 - 生成パラメーターをまとめた `d2_pipe` に対応
     - `D2 XY Plot` `D2 XY Plot Easy` `D2 XY Plot Easy Mini` から簡単に受け取れる
-    - `D2 Send Eagle` へ簡単にパラメーターを渡せる
+    - `D2 Checkpoint Loader` や `D2 Load Diffusion Model Set` から `model` / `clip` / `vae` をまとめて受け取れる
+    - `D2 Save Image Eagle` へ簡単にパラメーターを渡せる
 - プロンプトの重みアルゴリズムを変更できる（weight_interpretation）
 
 #### 注意点
 
 - `d2_pipe` が接続されている場合は `d2_pipe` のパラメーターが優先されます
 - 例えば `D2 KSampler` で **steps:20** を指定して、`D2 XYPlot Easy` で **steps:15** を指定。`d2_pipe` が接続されている状態だと　`D2 XYPlot Easy` の **steps:15** が採用されます。
+- ただし `model` / `clip` / `vae` / `positive_cond` / `negative_cond` は **直接接続した入力が優先**されます（`positive` / `negative` と同じ扱い）。直接接続が無いときだけ `d2_pipe` の値を使います。
 
 #### Input
 
 - 標準のKSamplerと同じもの
     - `model` / `clip` / `latent_image` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+    - `model` / `clip` は `d2_pipe` から渡せるようになったため、いずれも optional（任意接続）です
 - D2 KSampler で追加したもの
-    - `vae`
+    - `vae`: `d2_pipe` から渡せるため optional（任意接続）です
     - `cnet_stack`: `D2 Controlnet Loader` 接続用
     - `d2_pipe`: 生成パラメーターをまとめたもの。`D2 XY Plot` などから受け取る
     - `preview_method`: 生成時のプレビュー表示方式
@@ -83,7 +86,9 @@ Node
 </figure>
 
 - `d2_pipe` の内容を変更・取り出すためのノード
-- `d2_pipe` は D2 XY Plot Easy、D2 KSampler、D2 Send Eagle などでパラメーターをまとめて渡すためのもの
+- `d2_pipe` は D2 XY Plot Easy、D2 KSampler、D2 Save Image Eagle などでパラメーターをまとめて渡すためのもの
+- `ckpt_name` / `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise` / `width` / `height` に加え、`model` / `clip` / `vae` / `positive_cond` / `negative_cond` の入出力にも対応しました
+    - これらに直接入力を接続すると `d2_pipe` の該当項目を上書きできます。接続が無ければ `d2_pipe` の値をそのまま出力します
 
 
 ---
@@ -116,6 +121,8 @@ Node
     - 従来の CheckpointLoader と同じ。
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - Checkpoint 名、ハッシュ、フルパス。
+- `d2_pipe`
+    - `model` / `clip` / `vae` / `ckpt_name` をまとめたもの。`D2 KSampler` へ1本で接続できます。
 
 
 ---
@@ -139,6 +146,37 @@ Node
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - Checkpoint 名、ハッシュ、フルパス。
     - 正確には `unet_name` ですが、`D2 Checkpoint Loader` と揃えるために `ckpt_name` にしました
+- `d2_pipe`
+    - `model` / `ckpt_name` をまとめたもの。`D2 KSampler` へ接続できます。
+    - このノードは VAE / CLIP を読み込まないため、`d2_pipe` には `model` のみ含まれます（`clip` / `vae` は別途接続が必要です）
+
+
+---
+
+
+### D2 Load Diffusion Model Set
+
+<img src="../img/load_diffusion_model_set.png?2">
+
+- `Load Diffusion Model` ＋ `Load VAE` ＋ `Load CLIP` を1つにまとめたローダー
+- `model` / `clip` / `vae` をまとめて読み込み、`d2_pipe` として出力できる
+- `D2 KSampler` へ `d2_pipe` 1本で接続すれば、`model` / `clip` / `vae` の個別接続が不要になります
+
+#### Input
+
+- `unet_name` / `weight_dtype`: 標準の `Load Diffusion Model` と同じです
+- `vae_name`: 標準の `Load VAE` と同じです
+- `clip_name` / `clip_type`: 標準の `Load CLIP` と同じです
+
+#### Output
+
+- `model` / `clip` / `vae`
+    - 標準の各ローダーと同じ。
+- `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
+    - Diffusion Model 名、ハッシュ、フルパス。
+    - 正確には `unet_name` ですが、`D2 Checkpoint Loader` と揃えるために `ckpt_name` にしました
+- `d2_pipe`
+    - `model` / `clip` / `vae` / `ckpt_name` をまとめたもの。`D2 KSampler` へ1本で接続できます。
 
 
 ---

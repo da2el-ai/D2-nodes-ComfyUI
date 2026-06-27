@@ -42,6 +42,8 @@
   - 輸出模型文件完整路徑的 Checkpoint Loader
 - <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
   - 輸出模型文件完整路徑的 Load Diffusion Model
+- <a href="node.md#D2-Load-Diffusion-Model-Set">`D2 Load Diffusion Model Set`</a>
+  - 將 Load Diffusion Model ＋ Load VAE ＋ Load CLIP 整合為一的載入器
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - 連接到 `D2 KSampler` 可建立簡單工作流程的 Controlnet Loader。同時支援 Anima-LLLite
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
@@ -182,6 +184,14 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.06.27**
+
+- `D2_LoadDiffusionModelSet`：新增節點（整合 Load Diffusion Model ＋ Load VAE ＋ Load CLIP）
+- `D2_TD2Pipe`：擴充為可保存 `model` / `clip` / `vae` / `positive_cond` / `negative_cond`
+- `D2_KSampler` / `D2_KSamplerAdvanced`：將 `model` / `clip` / `vae` 改為 optional，只需單一 `d2_pipe` 連線即可連接
+- `D2_CheckpointLoader` / `D2_LoadDiffusionModel` / `D2_LoadDiffusionModelSet`：輸出新增 `d2_pipe`
+- `D2_Pipe`：新增 `model` / `clip` / `vae` / `positive_cond` / `negative_cond` 的輸入/輸出支援
 
 **2026.06.26**
 

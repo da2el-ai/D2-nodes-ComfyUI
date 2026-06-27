@@ -34,20 +34,23 @@
 - 有專用的Controlnet輸入，可以簡單地應用
 - 支援整合生成參數的 `d2_pipe`
     - 可以從 `D2 XY Plot`、`D2 XY Plot Easy`、`D2 XY Plot Easy Mini` 簡單接收
-    - 可以簡單地將參數傳遞給 `D2 Send Eagle`
+    - 可以從 `D2 Checkpoint Loader` 或 `D2 Load Diffusion Model Set` 一併接收 `model` / `clip` / `vae`
+    - 可以簡單地將參數傳遞給 `D2 Save Image Eagle`
 - 可以更改提示詞權重算法（weight_interpretation）
 
 #### 注意事項
 
 - 當連接 `d2_pipe` 時，`d2_pipe` 的參數優先
 - 例如，如果在 `D2 KSampler` 中指定 **steps:20**，在 `D2 XYPlot Easy` 中指定 **steps:15**，在連接 `d2_pipe` 的情況下，將採用 `D2 XYPlot Easy` 的 **steps:15**。
+- 但 `model` / `clip` / `vae` / `positive_cond` / `negative_cond` 會**優先使用直接連接的輸入**（與 `positive` / `negative` 相同）。只有在沒有直接連接時才使用 `d2_pipe` 的值。
 
 #### Input
 
 - 與標準KSampler相同
     - `model` / `clip` / `latent_image` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+    - `model` / `clip` 現在可以從 `d2_pipe` 傳入，因此兩者皆為 optional（可選連接）
 - D2 KSampler中新增
-    - `vae`
+    - `vae`：可從 `d2_pipe` 傳入，因此為 optional（可選連接）
     - `cnet_stack`：用於連接 `D2 Controlnet Loader`
     - `d2_pipe`：整合的生成參數。從 `D2 XY Plot` 等節點接收
     - `preview_method`：生成時的預覽顯示方式
@@ -78,7 +81,9 @@
 </figure>
 
 - 用於修改和提取 `d2_pipe` 內容的節點
-- `d2_pipe` 用於在 D2 XY Plot Easy、D2 KSampler、D2 Send Eagle 等節點中批量傳遞參數
+- `d2_pipe` 用於在 D2 XY Plot Easy、D2 KSampler、D2 Save Image Eagle 等節點中批量傳遞參數
+- 除了 `ckpt_name` / `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise` / `width` / `height` 之外，現在也支援 `model` / `clip` / `vae` / `positive_cond` / `negative_cond` 的輸入/輸出
+    - 為這些項目連接直接輸入時，會覆寫 `d2_pipe` 中對應的項目。若沒有連接，則直接傳遞 `d2_pipe` 的值
 
 
 ---
@@ -109,6 +114,8 @@
     - 與一般的 CheckpointLoader 相同。
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - 檢查點名稱、雜湊值和完整路徑。
+- `d2_pipe`
+    - 整合了 `model` / `clip` / `vae` / `ckpt_name`。可用單一連線連接到 `D2 KSampler`。
 
 
 ---
@@ -131,6 +138,37 @@
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - 檢查點名稱、雜湊值和完整路徑。
     - 雖然實際上是 `unet_name`，但為了與 `D2 Checkpoint Loader` 保持一致，命名為 `ckpt_name`
+- `d2_pipe`
+    - 整合了 `model` / `ckpt_name`。可以連接到 `D2 KSampler`。
+    - 由於此節點不載入 VAE / CLIP，`d2_pipe` 中只包含 `model`（`clip` / `vae` 需要另外連接）
+
+
+---
+
+
+### D2 Load Diffusion Model Set
+
+<img src="../img/load_diffusion_model_set.png?2">
+
+- 將 `Load Diffusion Model` ＋ `Load VAE` ＋ `Load CLIP` 整合為一的載入器
+- 一併載入 `model` / `clip` / `vae`，並可作為 `d2_pipe` 輸出
+- 只要用單一 `d2_pipe` 連線連接到 `D2 KSampler`，就不需要個別連接 `model` / `clip` / `vae`
+
+#### Input
+
+- `unet_name` / `weight_dtype`：與標準的 `Load Diffusion Model` 相同
+- `vae_name`：與標準的 `Load VAE` 相同
+- `clip_name` / `clip_type`：與標準的 `Load CLIP` 相同
+
+#### Output
+
+- `model` / `clip` / `vae`
+    - 與各標準載入器相同。
+- `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
+    - Diffusion Model 名稱、雜湊值和完整路徑。
+    - 雖然實際上是 `unet_name`，但為了與 `D2 Checkpoint Loader` 保持一致，命名為 `ckpt_name`
+- `d2_pipe`
+    - 整合了 `model` / `clip` / `vae` / `ckpt_name`。可用單一連線連接到 `D2 KSampler`。
 
 
 ---

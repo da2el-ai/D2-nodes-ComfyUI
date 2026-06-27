@@ -43,6 +43,8 @@ D2 Nodes ComfyUI
   - モデルファイルのフルパスを出力する Checkpoint Loader
 - <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
   - モデルファイルのフルパスを出力する Load Diffusion Model
+- <a href="node.md#D2-Load-Diffusion-Model-Set">`D2 Load Diffusion Model Set`</a>
+  - Load Diffusion Model ＋ Load VAE ＋ Load CLIP を1つにまとめたローダー
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - D2 KSampler に接続してシンプルなワークフローが作れる Controlnet Loader。Anima-LLLite にも対応
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
@@ -183,6 +185,14 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.06.27**
+
+- `D2_LoadDiffusionModelSet`: 新規追加（Load Diffusion Model ＋ Load VAE ＋ Load CLIP を合体）
+- `D2_TD2Pipe`: `model` / `clip` / `vae` / `positive_cond` / `negative_cond` を持てるように拡張
+- `D2_KSampler` / `D2_KSamplerAdvanced`: `model` / `clip` / `vae` を optional 化し、`d2_pipe` 1本だけでも接続できるように
+- `D2_CheckpointLoader` / `D2_LoadDiffusionModel` / `D2_LoadDiffusionModelSet`: 出力に `d2_pipe` を追加
+- `D2_Pipe`: `model` / `clip` / `vae` / `positive_cond` / `negative_cond` の入出力に対応
 
 **2026.06.26**
 

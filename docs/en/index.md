@@ -41,6 +41,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Checkpoint Loader that outputs full model file paths
 - <a href="node.md#D2-Load-Diffusion-Model">`D2 Load Diffusion Model`</a>
   - Load Diffusion Model that outputs full model file paths
+- <a href="node.md#D2-Load-Diffusion-Model-Set">`D2 Load Diffusion Model Set`</a>
+  - A loader that combines Load Diffusion Model + Load VAE + Load CLIP into one
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - Controlnet Loader that creates simple workflows when connected to D2 KSampler. Also supports Anima-LLLite
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
@@ -180,6 +182,14 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.06.27**
+
+- `D2_LoadDiffusionModelSet`: Added new node (combines Load Diffusion Model + Load VAE + Load CLIP)
+- `D2_TD2Pipe`: Extended to hold `model` / `clip` / `vae` / `positive_cond` / `negative_cond`
+- `D2_KSampler` / `D2_KSamplerAdvanced`: Made `model` / `clip` / `vae` optional so a single `d2_pipe` wire is enough to connect
+- `D2_CheckpointLoader` / `D2_LoadDiffusionModel` / `D2_LoadDiffusionModelSet`: Added `d2_pipe` output
+- `D2_Pipe`: Added input/output support for `model` / `clip` / `vae` / `positive_cond` / `negative_cond`
 
 **2026.06.26**
 

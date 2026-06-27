@@ -31,20 +31,23 @@
 - Has dedicated Controlnet input for simple application
 - Supports `d2_pipe` which consolidates generation parameters
     - Can easily receive from `D2 XY Plot`, `D2 XY Plot Easy`, `D2 XY Plot Easy Mini`
-    - Can easily pass parameters to `D2 Send Eagle`
+    - Can collectively receive `model` / `clip` / `vae` from `D2 Checkpoint Loader` or `D2 Load Diffusion Model Set`
+    - Can easily pass parameters to `D2 Save Image Eagle`
 - Can change prompt weight algorithm (weight_interpretation)
 
 #### Notes
 
 - When `d2_pipe` is connected, `d2_pipe` parameters take priority
 - For example, if you specify **steps:20** in `D2 KSampler` and **steps:15** in `D2 XYPlot Easy`, with `d2_pipe` connected, **steps:15** from `D2 XYPlot Easy` will be used.
+- However, `model` / `clip` / `vae` / `positive_cond` / `negative_cond` give priority to **directly connected inputs** (same handling as `positive` / `negative`). The `d2_pipe` values are used only when there is no direct connection.
 
 #### Input
 
 - Same as standard KSampler
     - `model` / `clip` / `latent_image` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise`
+    - `model` / `clip` can now be passed via `d2_pipe`, so both are optional
 - Added in D2 KSampler
-    - `vae`
+    - `vae`: optional, since it can be passed via `d2_pipe`
     - `cnet_stack`: For connecting to `D2 Controlnet Loader`
     - `d2_pipe`: Consolidated generation parameters. Received from nodes like `D2 XY Plot`
     - `preview_method`: Preview display method during generation
@@ -77,7 +80,9 @@
 </figure>
 
 - A node for modifying and extracting the contents of `d2_pipe`
-- `d2_pipe` is used to pass parameters collectively in nodes such as D2 XY Plot Easy, D2 KSampler, and D2 Send Eagle
+- `d2_pipe` is used to pass parameters collectively in nodes such as D2 XY Plot Easy, D2 KSampler, and D2 Save Image Eagle
+- In addition to `ckpt_name` / `positive` / `negative` / `seed` / `steps` / `cfg` / `sampler_name` / `scheduler` / `denoise` / `width` / `height`, it now also supports input/output of `model` / `clip` / `vae` / `positive_cond` / `negative_cond`
+    - Connecting a direct input to these overwrites the corresponding item in `d2_pipe`. If there is no connection, the `d2_pipe` value is passed through as is
 
 
 ---
@@ -108,6 +113,8 @@
     - Same as the conventional CheckpointLoader.
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - Checkpoint name, hash, and full path.
+- `d2_pipe`
+    - Consolidates `model` / `clip` / `vae` / `ckpt_name`. Can be connected to `D2 KSampler` with a single wire.
 
 
 ---
@@ -130,6 +137,37 @@
 - `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
     - Checkpoint name, hash, and full path.
     - Although it's technically `unet_name`, it has been named `ckpt_name` to align with `D2 Checkpoint Loader`
+- `d2_pipe`
+    - Consolidates `model` / `ckpt_name`. Can be connected to `D2 KSampler`.
+    - Since this node does not load VAE / CLIP, `d2_pipe` contains only `model` (`clip` / `vae` need to be connected separately)
+
+
+---
+
+
+### D2 Load Diffusion Model Set
+
+<img src="../img/load_diffusion_model_set.png?2">
+
+- A loader that combines `Load Diffusion Model` + `Load VAE` + `Load CLIP` into one
+- Loads `model` / `clip` / `vae` together and can output them as `d2_pipe`
+- By connecting a single `d2_pipe` wire to `D2 KSampler`, individual connections for `model` / `clip` / `vae` become unnecessary
+
+#### Input
+
+- `unet_name` / `weight_dtype`: Same as the standard `Load Diffusion Model`
+- `vae_name`: Same as the standard `Load VAE`
+- `clip_name` / `clip_type`: Same as the standard `Load CLIP`
+
+#### Output
+
+- `model` / `clip` / `vae`
+    - Same as each standard loader.
+- `ckpt_name` / `ckpt_hash` / `ckpt_fullpath`
+    - Diffusion Model name, hash, and full path.
+    - Although it's technically `unet_name`, it has been named `ckpt_name` to align with `D2 Checkpoint Loader`
+- `d2_pipe`
+    - Consolidates `model` / `clip` / `vae` / `ckpt_name`. Can be connected to `D2 KSampler` with a single wire.
 
 
 ---
