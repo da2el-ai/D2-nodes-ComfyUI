@@ -8,7 +8,6 @@ from comfy.cli_args import args
 from PIL.PngImagePlugin import PngInfo
 import piexif
 import piexif.helper
-from .util import D2_TD2Pipe
 
 
 

@@ -49,6 +49,12 @@ class D2_TD2Pipe:
     denoise: Optional[float] = None
     width: Optional[int] = None
     height: Optional[int] = None
+    # MODEL / CLIP / VAE などのオブジェクト系。型は ComfyUI のランタイムオブジェクトのため Optional[object]
+    model: Optional[object] = None
+    clip: Optional[object] = None
+    vae: Optional[object] = None
+    positive_cond: Optional[object] = None
+    negative_cond: Optional[object] = None
 
 @dataclass
 class D2_TGridPipe:

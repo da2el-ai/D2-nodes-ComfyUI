@@ -25,7 +25,7 @@ from server import PromptServer
 # from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
 from .modules import util
-from .modules.util import D2_TD2Pipe, AnyType, delete_comment
+from .modules.util import AnyType, delete_comment
 # from .modules import checkpoint_util
 # from .modules import pnginfo_util
 # from .modules import grid_image_util

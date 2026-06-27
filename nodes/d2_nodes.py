@@ -22,7 +22,7 @@ from nodes import common_ksampler, CLIPTextEncode, PreviewImage, LoadImage, Save
 from comfy_extras.nodes_controlnet import ControlNetInpaintingAliMamaApply
 from server import PromptServer
 from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
-from nodes import UNETLoader
+from nodes import UNETLoader, VAELoader, CLIPLoader
 
 from .modules import util
 from .modules.util import D2_TD2Pipe, D2_TDelivery, AnyType, AnyTypeTuple, AnyFalseList
@@ -74,9 +74,9 @@ class D2_KSampler(io.ComfyNode):
             category="D2",
             is_output_node=True,
             inputs=[
-                io.Model.Input("model"),
-                io.Clip.Input("clip"),
-                io.Vae.Input("vae"),
+                io.Model.Input("model", optional=True),
+                io.Clip.Input("clip", optional=True),
+                io.Vae.Input("vae", optional=True),
                 io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
                 io.Int.Input("steps", default=20, min=1, max=10000),
                 io.Float.Input("cfg", default=7.0, min=0.0, max=100.0, step=0.01),
@@ -106,8 +106,8 @@ class D2_KSampler(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
-            preview_method, positive, negative, cnet_stack=None, d2_pipe=None) -> io.NodeOutput:
+    def execute(cls, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
+            preview_method, positive, negative, model=None, clip=None, vae=None, cnet_stack=None, d2_pipe=None) -> io.NodeOutput:
         return cls._execute_core(
             model, clip, vae, seed, steps, cfg, sampler_name, scheduler, latent_image, denoise,
             preview_method, positive, negative,
@@ -152,6 +152,11 @@ class D2_KSampler(io.ComfyNode):
                 denoise = d2_pipe.denoise,
                 width = d2_pipe.width,
                 height = d2_pipe.height,
+                model = d2_pipe.model,
+                clip = d2_pipe.clip,
+                vae = d2_pipe.vae,
+                positive_cond = d2_pipe.positive_cond,
+                negative_cond = d2_pipe.negative_cond,
             )
             if positive:
                 d2_pipe.positive = positive
@@ -171,6 +176,27 @@ class D2_KSampler(io.ComfyNode):
             if d2_pipe.denoise is None:
                 d2_pipe.denoise = denoise
         # print("pipe2", d2_pipe)
+
+        # model / clip / vae / positive_cond / negative_cond は既存入力を優先する。
+        # 入力（引数）が None でなければそれで上書きし、None のときだけ pipe の値を使う
+        # （positive / negative と同じ「既存入力を優先」の方針）。
+        if model is not None:
+            d2_pipe.model = model
+        if clip is not None:
+            d2_pipe.clip = clip
+        if vae is not None:
+            d2_pipe.vae = vae
+        if positive_cond is not None:
+            d2_pipe.positive_cond = positive_cond
+        if negative_cond is not None:
+            d2_pipe.negative_cond = negative_cond
+
+        # 以降は pipe に統合された値を使う
+        model = d2_pipe.model
+        clip = d2_pipe.clip
+        vae = d2_pipe.vae
+        positive_cond = d2_pipe.positive_cond
+        negative_cond = d2_pipe.negative_cond
 
         # lora 適用を試みる
         lora_params, formatted_positive = D2_LoadLora.get_params_a1111(d2_pipe.positive)
@@ -330,9 +356,9 @@ class D2_KSamplerAdvanced(D2_KSampler):
             category="D2",
             is_output_node=True,
             inputs=[
-                io.Model.Input("model"),
-                io.Clip.Input("clip"),
-                io.Vae.Input("vae"),
+                io.Model.Input("model", optional=True),
+                io.Clip.Input("clip", optional=True),
+                io.Vae.Input("vae", optional=True),
                 io.Combo.Input("add_noise", options=["enable", "disable"]),
                 io.Int.Input("noise_seed", default=0, min=0, max=0xffffffffffffffff),
                 io.Int.Input("steps", default=20, min=1, max=10000),
@@ -369,9 +395,9 @@ class D2_KSamplerAdvanced(D2_KSampler):
         )
 
     @classmethod
-    def execute(cls, model, clip, vae, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image,
+    def execute(cls, add_noise, noise_seed, steps, cfg, sampler_name, scheduler, latent_image,
             start_at_step, end_at_step, return_with_leftover_noise, token_normalization, weight_interpretation,
-            preview_method, positive, negative, positive_cond=None, negative_cond=None, cnet_stack=None, d2_pipe=None) -> io.NodeOutput:
+            preview_method, positive, negative, model=None, clip=None, vae=None, positive_cond=None, negative_cond=None, cnet_stack=None, d2_pipe=None) -> io.NodeOutput:
 
         return cls._execute_core(model, clip, vae, noise_seed, steps, cfg, sampler_name, scheduler, latent_image, 1.0,
             preview_method, positive, negative,
@@ -413,6 +439,7 @@ class D2_CheckpointLoader(io.ComfyNode):
                 io.String.Output(display_name="ckpt_hash"),
                 io.String.Output(display_name="ckpt_fullpath"),
                 io.String.Output(display_name="sampling"),
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
             ],
             hidden=[io.Hidden.unique_id, io.Hidden.extra_pnginfo, io.Hidden.prompt],
         )
@@ -447,7 +474,15 @@ class D2_CheckpointLoader(io.ComfyNode):
 
         hash = checkpoint_util.get_file_hash(ckpt_path)
         ckpt_name = os.path.basename(ckpt_name)
-        return io.NodeOutput(model, clip, vae, ckpt_name, hash, ckpt_path, sampling)
+
+        # model / clip / vae / ckpt_name を詰めた d2_pipe を作成して出力する
+        d2_pipe = D2_TD2Pipe(
+            ckpt_name = ckpt_name,
+            model = model,
+            clip = clip,
+            vae = vae,
+        )
+        return io.NodeOutput(model, clip, vae, ckpt_name, hash, ckpt_path, sampling, d2_pipe)
 
 
 
@@ -473,6 +508,7 @@ class D2_LoadDiffusionModel(io.ComfyNode):
                 io.String.Output(display_name="ckpt_name"),
                 io.String.Output(display_name="ckpt_hash"),
                 io.String.Output(display_name="ckpt_fullpath"),
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
             ],
         )
 
@@ -486,7 +522,71 @@ class D2_LoadDiffusionModel(io.ComfyNode):
         out = UNETLoader().load_unet(unet_name, weight_dtype)
         model = out[0]
 
-        return io.NodeOutput(model, ckpt_name, hash, ckpt_path)
+        # model / ckpt_name を詰めた d2_pipe を作成して出力する
+        d2_pipe = D2_TD2Pipe(
+            ckpt_name = ckpt_name,
+            model = model,
+        )
+
+        return io.NodeOutput(model, ckpt_name, hash, ckpt_path, d2_pipe)
+
+
+
+"""
+
+D2_LoadDiffusionModelSet
+Load Diffusion Model + Load VAE + Load CLIP を1つにまとめたローダー。
+model / clip / vae をまとめて読み込み、最後に d2_pipe も出力する。
+
+"""
+class D2_LoadDiffusionModelSet(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        # VAE / CLIP の選択肢は本体ノードの定義から取得し、ComfyUI のバージョン差に追従する
+        vae_options = VAELoader.vae_list(VAELoader)
+        clip_type_options = CLIPLoader.INPUT_TYPES()["required"]["type"][0]
+
+        return io.Schema(
+            node_id="D2 Load Diffusion Model Set",
+            display_name="D2 Load Diffusion Model Set",
+            category="D2",
+            inputs=[
+                io.Combo.Input("unet_name", options=folder_paths.get_filename_list("diffusion_models")),
+                io.Combo.Input("weight_dtype", options=["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"]),
+                io.Combo.Input("vae_name", options=vae_options),
+                io.Combo.Input("clip_name", options=folder_paths.get_filename_list("text_encoders")),
+                io.Combo.Input("clip_type", options=clip_type_options),
+            ],
+            outputs=[
+                io.Model.Output(display_name="model"),
+                io.Clip.Output(display_name="clip"),
+                io.Vae.Output(display_name="vae"),
+                io.String.Output(display_name="ckpt_name"),
+                io.String.Output(display_name="ckpt_hash"),
+                io.String.Output(display_name="ckpt_fullpath"),
+                io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, unet_name, weight_dtype, vae_name, clip_name, clip_type) -> io.NodeOutput:
+        ckpt_path = folder_paths.get_full_path("diffusion_models", unet_name)
+        hash = checkpoint_util.get_file_hash(ckpt_path)
+        ckpt_name = os.path.basename(unet_name)
+
+        # V3 では V1 クラスを継承できないため、いずれもインスタンス経由で呼ぶ（挙動は同一）
+        model = UNETLoader().load_unet(unet_name, weight_dtype)[0]
+        vae = VAELoader().load_vae(vae_name)[0]
+        clip = CLIPLoader().load_clip(clip_name, clip_type)[0]
+
+        # model / clip / vae / ckpt_name を詰めた d2_pipe を作成して出力する
+        d2_pipe = D2_TD2Pipe(
+            ckpt_name = ckpt_name,
+            model = model,
+            clip = clip,
+            vae = vae,
+        )
+        return io.NodeOutput(model, clip, vae, ckpt_name, hash, ckpt_path, d2_pipe)
 
 
 
@@ -701,6 +801,11 @@ class D2_Pipe(io.ComfyNode):
                 io.Float.Input("denoise", force_input=True, optional=True),
                 io.Int.Input("width", force_input=True, optional=True),
                 io.Int.Input("height", force_input=True, optional=True),
+                io.Model.Input("model", optional=True),
+                io.Clip.Input("clip", optional=True),
+                io.Vae.Input("vae", optional=True),
+                io.Conditioning.Input("positive_cond", optional=True),
+                io.Conditioning.Input("negative_cond", optional=True),
             ],
             outputs=[
                 io.Custom("D2_TD2Pipe").Output(display_name="d2_pipe"),
@@ -715,11 +820,16 @@ class D2_Pipe(io.ComfyNode):
                 io.Float.Output(display_name="denoise"),
                 io.Int.Output(display_name="width"),
                 io.Int.Output(display_name="height"),
+                io.Model.Output(display_name="model"),
+                io.Clip.Output(display_name="clip"),
+                io.Vae.Output(display_name="vae"),
+                io.Conditioning.Output(display_name="positive_cond"),
+                io.Conditioning.Output(display_name="negative_cond"),
             ],
         )
 
     @classmethod
-    def execute(cls, d2_pipe=None, ckpt_name = None, positive = None, negative = None, seed = None, steps = None, cfg = None, sampler_name = None, scheduler = None, denoise = None, width = None, height = None) -> io.NodeOutput:
+    def execute(cls, d2_pipe=None, ckpt_name = None, positive = None, negative = None, seed = None, steps = None, cfg = None, sampler_name = None, scheduler = None, denoise = None, width = None, height = None, model = None, clip = None, vae = None, positive_cond = None, negative_cond = None) -> io.NodeOutput:
 
         # d2_pipeがNoneの場合、デフォルト値で新しいインスタンスを作成
         if d2_pipe is None:
@@ -737,7 +847,12 @@ class D2_Pipe(io.ComfyNode):
                 scheduler = d2_pipe.scheduler,
                 denoise = d2_pipe.denoise,
                 width = d2_pipe.width,
-                height = d2_pipe.height
+                height = d2_pipe.height,
+                model = d2_pipe.model,
+                clip = d2_pipe.clip,
+                vae = d2_pipe.vae,
+                positive_cond = d2_pipe.positive_cond,
+                negative_cond = d2_pipe.negative_cond,
             )
 
         # 個別のパラメータがNoneでない場合、d2_pipeの値を上書き
@@ -763,8 +878,18 @@ class D2_Pipe(io.ComfyNode):
             d2_pipe.width = width
         if height != None:
             d2_pipe.height = height
+        if model is not None:
+            d2_pipe.model = model
+        if clip is not None:
+            d2_pipe.clip = clip
+        if vae is not None:
+            d2_pipe.vae = vae
+        if positive_cond is not None:
+            d2_pipe.positive_cond = positive_cond
+        if negative_cond is not None:
+            d2_pipe.negative_cond = negative_cond
 
-        return io.NodeOutput(d2_pipe, d2_pipe.ckpt_name, d2_pipe.positive, d2_pipe.negative, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, d2_pipe.denoise, d2_pipe.width, d2_pipe.height)
+        return io.NodeOutput(d2_pipe, d2_pipe.ckpt_name, d2_pipe.positive, d2_pipe.negative, d2_pipe.seed, d2_pipe.steps, d2_pipe.cfg, d2_pipe.sampler_name, d2_pipe.scheduler, d2_pipe.denoise, d2_pipe.width, d2_pipe.height, d2_pipe.model, d2_pipe.clip, d2_pipe.vae, d2_pipe.positive_cond, d2_pipe.negative_cond)
 
 
 
@@ -936,6 +1061,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 KSampler(Advanced)": D2_KSamplerAdvanced,
     "D2 Checkpoint Loader": D2_CheckpointLoader,
     "D2 Load Diffusion Model": D2_LoadDiffusionModel,
+    "D2 Load Diffusion Model Set": D2_LoadDiffusionModelSet,
     "D2 Controlnet Loader": D2_ControlnetLoader,
     "D2 Load Lora": D2_LoadLora,
     "D2 Pipe": D2_Pipe,

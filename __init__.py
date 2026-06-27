@@ -61,6 +61,7 @@ from .nodes.d2_nodes import (
     D2_KSamplerAdvanced,
     D2_CheckpointLoader,
     D2_LoadDiffusionModel,
+    D2_LoadDiffusionModelSet,
     D2_ControlnetLoader,
     D2_LoadLora,
     D2_Pipe,
@@ -145,6 +146,7 @@ class D2Extension(ComfyExtension):
             # B. 重要度が高いもの（Loader 系）
             D2_CheckpointLoader,
             D2_LoadDiffusionModel,
+            D2_LoadDiffusionModelSet,
             D2_ControlnetLoader,
             D2_LoadLora,
             # B. 重要度が高いもの（Size 系）
