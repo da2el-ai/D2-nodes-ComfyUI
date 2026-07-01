@@ -67,6 +67,22 @@ class D2_TDelivery:
     package: dict = field(default_factory=dict)
 
 
+"""
+XY Plot のラベルと値を Eagle メモ用テキストに整形する
+D2_XYGridImage の memo 出力で使用する
+"""
+def format_xyplot_memo(x_annotation:Optional[D2_TAnnotation], y_annotation:Optional[D2_TAnnotation]) -> str:
+    lines = []
+    for axis_label, annotation in (("X", x_annotation), ("Y", y_annotation)):
+        if annotation is None:
+            continue
+        lines.append("-----------")
+        lines.append(f"{axis_label}: {annotation.title}")
+        lines.extend(str(value) for value in annotation.values)
+        lines.append("")
+    return "\n".join(lines)
+
+
 
 """
 seed値を作る

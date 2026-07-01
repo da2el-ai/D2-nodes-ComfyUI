@@ -23,7 +23,7 @@ from server import PromptServer
 from comfy_api.latest import io
 
 from .modules import util
-from .modules.util import AnyType, D2_TD2Pipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe
+from .modules.util import AnyType, D2_TD2Pipe, D2_TAnnotation, D2_TXyStatus, D2_TGridPipe, format_xyplot_memo
 from .modules import grid_image_util
 from .modules import image_util
 from .modules import network_util
@@ -449,6 +449,7 @@ class D2_XYGridImage(io.ComfyNode):
             ],
             outputs=[
                 io.Image.Output(display_name="images"),
+                io.String.Output(display_name="memo"),
             ],
             hidden=[io.Hidden.unique_id],
         )
@@ -492,11 +493,14 @@ class D2_XYGridImage(io.ComfyNode):
             state["finished"] = True
             state["image_batch"] = None
 
-            return io.NodeOutput(grid_image)
+            # XY Plot のパラメータを Eagle メモ用テキストに整形して出力
+            memo = format_xyplot_memo(x_annotation, y_annotation)
+
+            return io.NodeOutput(grid_image, memo)
         elif grid_only:
-            return io.NodeOutput(ExecutionBlocker(None))
+            return io.NodeOutput(ExecutionBlocker(None), ExecutionBlocker(None))
         else:
-            return io.NodeOutput(images)
+            return io.NodeOutput(images, "")
 
     """
     グリッド画像作成
