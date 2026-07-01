@@ -1,4 +1,5 @@
 from typing import Optional
+from dataclasses import replace
 import os
 import sys
 import re
@@ -430,6 +431,7 @@ class D2_CheckpointLoader(io.ComfyNode):
                 io.Combo.Input("sampling", options=["normal", "eps", "v_prediction", "lcm", "x0"]),
                 io.Boolean.Input("zsnr", default=False),
                 io.Float.Input("multiplier", default=0.6, min=0.0, max=1.0, step=0.01),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
             ],
             outputs=[
                 io.Model.Output(display_name="model"),
@@ -452,6 +454,7 @@ class D2_CheckpointLoader(io.ComfyNode):
             sampling = "normal",
             zsnr = False,
             multiplier = 0.6,
+            d2_pipe = None,
         ) -> io.NodeOutput:
         ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
         out = comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
@@ -475,13 +478,14 @@ class D2_CheckpointLoader(io.ComfyNode):
         hash = checkpoint_util.get_file_hash(ckpt_path)
         ckpt_name = os.path.basename(ckpt_name)
 
-        # model / clip / vae / ckpt_name を詰めた d2_pipe を作成して出力する
-        d2_pipe = D2_TD2Pipe(
-            ckpt_name = ckpt_name,
-            model = model,
-            clip = clip,
-            vae = vae,
-        )
+        # 入力 d2_pipe があればその値を引き継ぎ、無ければ新規作成する。
+        # 元インスタンスを変更しないよう replace でコピーしてから、このノードが読み込んだ値で上書きする
+        d2_pipe = D2_TD2Pipe() if d2_pipe is None else replace(d2_pipe)
+        d2_pipe.ckpt_name = ckpt_name
+        d2_pipe.model = model
+        d2_pipe.clip = clip
+        d2_pipe.vae = vae
+
         return io.NodeOutput(model, clip, vae, ckpt_name, hash, ckpt_path, sampling, d2_pipe)
 
 
@@ -502,6 +506,7 @@ class D2_LoadDiffusionModel(io.ComfyNode):
             inputs=[
                 io.Combo.Input("unet_name", options=folder_paths.get_filename_list("diffusion_models")),
                 io.Combo.Input("weight_dtype", options=["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"]),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
             ],
             outputs=[
                 io.Model.Output(display_name="model"),
@@ -513,7 +518,7 @@ class D2_LoadDiffusionModel(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, unet_name, weight_dtype) -> io.NodeOutput:
+    def execute(cls, unet_name, weight_dtype, d2_pipe = None) -> io.NodeOutput:
         ckpt_path = folder_paths.get_full_path("diffusion_models", unet_name)
         hash = checkpoint_util.get_file_hash(ckpt_path)
         ckpt_name = os.path.basename(unet_name)
@@ -522,11 +527,10 @@ class D2_LoadDiffusionModel(io.ComfyNode):
         out = UNETLoader().load_unet(unet_name, weight_dtype)
         model = out[0]
 
-        # model / ckpt_name を詰めた d2_pipe を作成して出力する
-        d2_pipe = D2_TD2Pipe(
-            ckpt_name = ckpt_name,
-            model = model,
-        )
+        # 入力 d2_pipe があればその値を引き継ぎ、無ければ新規作成する（元インスタンスは replace でコピー）
+        d2_pipe = D2_TD2Pipe() if d2_pipe is None else replace(d2_pipe)
+        d2_pipe.ckpt_name = ckpt_name
+        d2_pipe.model = model
 
         return io.NodeOutput(model, ckpt_name, hash, ckpt_path, d2_pipe)
 
@@ -556,6 +560,7 @@ class D2_LoadDiffusionModelSet(io.ComfyNode):
                 io.Combo.Input("vae_name", options=vae_options),
                 io.Combo.Input("clip_name", options=folder_paths.get_filename_list("text_encoders")),
                 io.Combo.Input("clip_type", options=clip_type_options),
+                io.Custom("D2_TD2Pipe").Input("d2_pipe", optional=True),
             ],
             outputs=[
                 io.Model.Output(display_name="model"),
@@ -569,7 +574,7 @@ class D2_LoadDiffusionModelSet(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, unet_name, weight_dtype, vae_name, clip_name, clip_type) -> io.NodeOutput:
+    def execute(cls, unet_name, weight_dtype, vae_name, clip_name, clip_type, d2_pipe = None) -> io.NodeOutput:
         ckpt_path = folder_paths.get_full_path("diffusion_models", unet_name)
         hash = checkpoint_util.get_file_hash(ckpt_path)
         ckpt_name = os.path.basename(unet_name)
@@ -579,13 +584,13 @@ class D2_LoadDiffusionModelSet(io.ComfyNode):
         vae = VAELoader().load_vae(vae_name)[0]
         clip = CLIPLoader().load_clip(clip_name, clip_type)[0]
 
-        # model / clip / vae / ckpt_name を詰めた d2_pipe を作成して出力する
-        d2_pipe = D2_TD2Pipe(
-            ckpt_name = ckpt_name,
-            model = model,
-            clip = clip,
-            vae = vae,
-        )
+        # 入力 d2_pipe があればその値を引き継ぎ、無ければ新規作成する（元インスタンスは replace でコピー）
+        d2_pipe = D2_TD2Pipe() if d2_pipe is None else replace(d2_pipe)
+        d2_pipe.ckpt_name = ckpt_name
+        d2_pipe.model = model
+        d2_pipe.clip = clip
+        d2_pipe.vae = vae
+
         return io.NodeOutput(model, clip, vae, ckpt_name, hash, ckpt_path, d2_pipe)
 
 
