@@ -280,6 +280,7 @@ D:\ComfyUI\output\foo.png
 
 - 輸出網格圖像
 - 支持水平和垂直排列
+- 在 D2 XY Plot 系列中，請使用 <a href="node_xy.md#d2-xy-grid-image">`D2 XY Grid Image`</a>。
 
 #### Input
 
@@ -348,6 +349,10 @@ D:\ComfyUI\output\foo.png
 
 - 添加馬賽克濾鏡效果
 - 可調整透明度、亮度和顏色反轉等設置
+
+我寫了一篇關於自動馬賽克工作流程的文章，請參考。
+
+> <a href="https://note.com/da2el_ai/n/n79d34b88e0bd" target="_blank">使用 ComfyUI 的自動馬賽克工作流程</a>
 
 
 ---

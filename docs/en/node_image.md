@@ -277,6 +277,7 @@ Compatible with images saved by the following nodes and UIs:
 
 - Outputs grid images
 - Supports both horizontal and vertical alignment
+- For D2 XY Plot workflows, please use <a href="node_xy.md#d2-xy-grid-image">`D2 XY Grid Image`</a>.
 
 #### Input
 
@@ -345,6 +346,10 @@ Compatible with images saved by the following nodes and UIs:
 
 - Applies a mosaic filter
 - Adjustable transparency, brightness, and color inversion options
+
+I've written an article about the automatic mosaic workflow, so please refer to it.
+
+> <a href="https://note.com/da2el_ai/n/n79d34b88e0bd" target="_blank">Automatic mosaic workflow using ComfyUI</a>
 
 
 ---

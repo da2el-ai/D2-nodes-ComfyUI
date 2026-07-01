@@ -13,16 +13,30 @@
 # Node
 
 
+## TIPS
+
+- I've written an article summarizing how to use XY Plot, so please refer to it as well.
+  - <a href="https://note.com/da2el_ai/n/n4bc9002c61b1" target="_blank">How to create a versatile ComfyUI XY Plot workflow that also works with Anima</a>
+
+- The processing order is `x_list` > `y_list`. When the order matters, such as for prompt rewriting, make sure it is arranged as x > y.
+
+- All of `x_list` is processed before moving on to the next `y_list`. For heavy processes such as loading a Checkpoint, it is recommended to use `y_list`.
+
+
+---
+
+
 ## :tomato: XY Plot Node
 
 
-### D2 XY Plot Easy
+### D2 XY Plot Easy / Easy Mini
 
 <figure>
 <img src="../img/xyplot_easy.png">
 </figure>
 
 - A node that creates XY Plots with simplified workflow limited to KSampler parameters
+- Easy Mini is a node that excludes rarely used outputs and has a smaller size
 
 #### Input
 

@@ -14,16 +14,30 @@
 # Node
 
 
+## TIPS
+
+- 我寫了一篇整理 XY Plot 使用方法的文章，也請一併參考。
+  - <a href="https://note.com/da2el_ai/n/n4bc9002c61b1" target="_blank">在 Anima 上也能使用的 ComfyUI 通用型 XY Plot 工作流程製作方法</a>
+
+- 處理順序為 `x_list` > `y_list`。當順序很重要時（例如提示詞的改寫），請確保排列為 x > y。
+
+- 會先處理完所有 `x_list` 後再進入下一個 `y_list`。對於 Checkpoint 載入等較重的處理，建議使用 `y_list`。
+
+
+---
+
+
 ## :tomato: XY Plot Node
 
 
-### D2 XY Plot Easy
+### D2 XY Plot Easy / Easy Mini
 
 <figure>
 <img src="../img/xyplot_easy.png">
 </figure>
 
 - 一個可建立限定於 KSampler 項目的簡化工作流程 XY Plot 的節點
+- Easy Mini 是排除了使用頻率較低的輸出、尺寸更小的節點
 
 #### 輸入
 

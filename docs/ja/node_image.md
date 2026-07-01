@@ -279,6 +279,7 @@ D:\ComfyUI\output\foo.png
 
 - グリッド画像を出力する
 - 横方向、縦方向、どちらも可能
+- D2 XY Plot系では <a href="node_xy.md#d2-xy-grid-image">`D2 XY Grid Image`</a> をお使いください。
 
 #### Input
 
@@ -349,7 +350,9 @@ D:\ComfyUI\output\foo.png
 - モザイクフィルターをかける
 - 透明度、明るさ、色の反転などを設定可能
 
+自動モザイクのワークフローについて記事を書きましたので参考にしてください。
 
+> <a href="https://note.com/da2el_ai/n/n79d34b88e0bd" target="_blank">ComfyUIを使った自動モザイクのワークフロー</a>
 
 
 ---

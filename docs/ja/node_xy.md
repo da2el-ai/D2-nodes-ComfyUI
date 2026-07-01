@@ -9,23 +9,35 @@
 - <a href="workflow.md">Workflow</a>
 
 
-
 <h1>
 Node
 </h1>
 
 
+## TIPS
+
+- XY Plotの使い方をまとめた記事を書きましたのでそちらも参考にしてください。
+  - <a href="https://note.com/da2el_ai/n/n4bc9002c61b1" target="_blank">Animaでも使えるComfyUIの汎用的XY Plotワークフローの作り方</a>
+
+- 処理の順番は `x_list` > `y_list` となっています。プロンプトの書き換えなどで順番が重要になる時は x > y になるようにしてください。
+
+- `x_list` を全て処理してから次の `y_list` に移ります。Checkpoint の読み込みなど重い処理は `y_list` を使うのがおすすめです。
+
+
+---
+
 
 ## :tomato: XY Plot Node
 
 
-### D2 XY Plot Easy
+### D2 XY Plot Easy / Easy Mini
 
 <figure>
 <img src="../img/xyplot_easy.png">
 </figure>
 
 - KSampler の項目に限定したシンプルなワークフローの XY Plot が作れるノード
+- Easy Mini は使用頻度の低い出力を除外し、サイズを小さくしたノード
 
 #### Input
 
