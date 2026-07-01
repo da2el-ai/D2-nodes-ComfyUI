@@ -1,0 +1,1438 @@
+{
+  "id": "f26f1111-07df-4bc1-b8c3-7322eeaa687f",
+  "revision": 0,
+  "last_node_id": 48,
+  "last_link_id": 91,
+  "nodes": [
+    {
+      "id": 41,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -300,
+        -300
+      ],
+      "size": [
+        460,
+        180
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            73
+          ]
+        }
+      ],
+      "title": "Positive",
+      "properties": {
+        "Node name for S&R": "PrimitiveStringMultiline",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.6.2"
+        }
+      },
+      "widgets_values": [
+        "1girl, oversized t-shirt, small_breasts, black hair, beach,\nmasterpiece, best quality, amazing quality, perfect quality, very aesthetic, absurdres,"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 42,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -300,
+        -60
+      ],
+      "size": [
+        460,
+        180
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            74
+          ]
+        }
+      ],
+      "title": "Negative",
+      "properties": {
+        "Node name for S&R": "PrimitiveStringMultiline",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.6.2"
+        }
+      },
+      "widgets_values": [
+        "bad quality,worst quality,worst detail,sketch,censor,text,speech_bubble, watermark, "
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 44,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -300,
+        220
+      ],
+      "size": [
+        460,
+        180
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            75
+          ]
+        }
+      ],
+      "title": "Prompt S/R",
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.6.2"
+        },
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "black hair,\nblonde hair,\nsilver hair, "
+      ]
+    },
+    {
+      "id": 28,
+      "type": "D2 Size Selector",
+      "pos": [
+        900,
+        360
+      ],
+      "size": [
+        220,
+        340
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "upscale_factor",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "prescale_factor",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "empty_latent",
+          "type": "LATENT",
+          "links": [
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Size Selector",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "preset": true,
+            "width": true,
+            "height": true,
+            "swap_dimensions": true,
+            "upscale_factor": true,
+            "prescale_factor": true,
+            "round_method": true,
+            "batch_size": true
+          },
+          "version": "7.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "768 x 1024",
+        1024,
+        1024,
+        false,
+        1,
+        1,
+        "Round",
+        1
+      ]
+    },
+    {
+      "id": 45,
+      "type": "D2 Pipe",
+      "pos": [
+        1160,
+        120
+      ],
+      "size": [
+        220,
+        360
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "d2_pipe",
+          "shape": 7,
+          "type": "D2_TD2Pipe",
+          "link": 81
+        },
+        {
+          "name": "ckpt_name",
+          "shape": 7,
+          "type": "STRING",
+          "link": 80
+        },
+        {
+          "name": "positive",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "name": "negative",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "name": "seed",
+          "shape": 7,
+          "type": "INT",
+          "link": null
+        },
+        {
+          "name": "steps",
+          "shape": 7,
+          "type": "INT",
+          "link": null
+        },
+        {
+          "name": "cfg",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": null
+        },
+        {
+          "name": "sampler_name",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "name": "scheduler",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "name": "denoise",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": null
+        },
+        {
+          "name": "width",
+          "shape": 7,
+          "type": "INT",
+          "link": null
+        },
+        {
+          "name": "height",
+          "shape": 7,
+          "type": "INT",
+          "link": null
+        },
+        {
+          "name": "model",
+          "shape": 7,
+          "type": "MODEL",
+          "link": null
+        },
+        {
+          "name": "clip",
+          "shape": 7,
+          "type": "CLIP",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "name": "positive_cond",
+          "shape": 7,
+          "type": "CONDITIONING",
+          "link": null
+        },
+        {
+          "name": "negative_cond",
+          "shape": 7,
+          "type": "CONDITIONING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "d2_pipe",
+          "type": "D2_TD2Pipe",
+          "links": [
+            82
+          ]
+        },
+        {
+          "name": "ckpt_name",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "positive",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "negative",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "cfg",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "sampler_name",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "scheduler",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "denoise",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": null
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": null
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "links": null
+        },
+        {
+          "name": "positive_cond",
+          "type": "CONDITIONING",
+          "links": null
+        },
+        {
+          "name": "negative_cond",
+          "type": "CONDITIONING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.1",
+          "input_ue_unconnectable": {}
+        },
+        "Node name for S&R": "D2 Pipe",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 11,
+      "type": "D2 KSampler",
+      "pos": [
+        1286.7880437771485,
+        -12.564382829944858
+      ],
+      "size": [
+        280,
+        718
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 37
+        },
+        {
+          "name": "model",
+          "shape": 7,
+          "type": "MODEL",
+          "link": 67
+        },
+        {
+          "name": "clip",
+          "shape": 7,
+          "type": "CLIP",
+          "link": 68
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": 69
+        },
+        {
+          "name": "cnet_stack",
+          "shape": 7,
+          "type": "D2_CNET_STACK",
+          "link": null
+        },
+        {
+          "name": "d2_pipe",
+          "shape": 7,
+          "type": "D2_TD2Pipe",
+          "link": 82
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            24,
+            46
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": null
+        },
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": null
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": null
+        },
+        {
+          "name": "positive",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "formatted_positive",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "negative",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "positive_cond",
+          "type": "CONDITIONING",
+          "links": null
+        },
+        {
+          "name": "negative_cond",
+          "type": "CONDITIONING",
+          "links": null
+        },
+        {
+          "name": "d2_pipe",
+          "type": "D2_TD2Pipe",
+          "links": [
+            85,
+            86
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 KSampler",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        504787273453503,
+        "randomize",
+        20,
+        7,
+        "euler",
+        "normal",
+        1,
+        "auto",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 43,
+      "type": "D2 XY Plot Easy Mini",
+      "pos": [
+        440,
+        -100
+      ],
+      "size": [
+        300,
+        900
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "STRING",
+          "widget": {
+            "name": "positive"
+          },
+          "link": 73
+        },
+        {
+          "name": "negative",
+          "type": "STRING",
+          "widget": {
+            "name": "negative"
+          },
+          "link": 74
+        },
+        {
+          "name": "x_list",
+          "type": "STRING",
+          "widget": {
+            "name": "x_list"
+          },
+          "link": 75
+        },
+        {
+          "name": "y_list",
+          "type": "STRING",
+          "widget": {
+            "name": "y_list"
+          },
+          "link": 91
+        }
+      ],
+      "outputs": [
+        {
+          "name": "d2_pipe",
+          "type": "D2_TD2Pipe",
+          "links": [
+            81
+          ]
+        },
+        {
+          "name": "grid_pipe",
+          "type": "D2_TGridPipe",
+          "links": [
+            84
+          ]
+        },
+        {
+          "name": "positive",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "negative",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "ckpt_name",
+          "type": "*",
+          "links": [
+            78
+          ]
+        },
+        {
+          "name": "ckpt_type",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "x_other",
+          "type": "*",
+          "links": null
+        },
+        {
+          "name": "y_other",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        },
+        "Node name for S&R": "D2 XY Plot Easy Mini"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "_SDXL_Illustrious\\anime\\catTowerNoobaiXL_chenkinnoobV12.safetensors",
+        "Anima\\HiyokoAnima_v1.safetensors",
+        "stable_diffusion",
+        186120904695304,
+        "randomize",
+        20,
+        5,
+        "euler",
+        "simple",
+        1,
+        "positive",
+        "",
+        "ckpt_name",
+        "",
+        true,
+        0,
+        0,
+        0,
+        1151,
+        94433,
+        0
+      ]
+    },
+    {
+      "id": 40,
+      "type": "D2 Checkpoint Loader",
+      "pos": [
+        885.0037930912667,
+        -5.428366820700353
+      ],
+      "size": [
+        240,
+        300
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "ckpt_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "ckpt_name"
+          },
+          "link": 78
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            67
+          ]
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": [
+            68
+          ]
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "links": [
+            69
+          ]
+        },
+        {
+          "name": "ckpt_name",
+          "type": "STRING",
+          "links": [
+            80,
+            88,
+            89
+          ]
+        },
+        {
+          "name": "ckpt_hash",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "ckpt_fullpath",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "sampling",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "d2_pipe",
+          "type": "D2_TD2Pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Checkpoint Loader",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.6.2"
+        }
+      },
+      "widgets_values": [
+        "HiyokoSemireal_2_01_00001_.safetensors",
+        true,
+        "normal",
+        false,
+        0.6
+      ]
+    },
+    {
+      "id": 32,
+      "type": "D2 Save Image Eagle",
+      "pos": [
+        2040,
+        380
+      ],
+      "size": [
+        280,
+        500
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 46
+        },
+        {
+          "name": "d2_pipe",
+          "shape": 7,
+          "type": "D2_TD2Pipe",
+          "link": 85
+        }
+      ],
+      "outputs": [
+        {
+          "name": "filenames",
+          "type": "LIST",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Save Image Eagle",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "filename_prefix": true,
+            "preview_only": true,
+            "format": true,
+            "lossless": true,
+            "quality": true,
+            "fps": true,
+            "eagle_folder": true,
+            "memo_text": true,
+            "popup_image": true
+          },
+          "version": "7.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "%date:yyyyMMdd-hhmmss%",
+        false,
+        "webp",
+        true,
+        80,
+        6,
+        "",
+        "",
+        0
+      ]
+    },
+    {
+      "id": 47,
+      "type": "D2 Filename Template",
+      "pos": [
+        1727.8532457041092,
+        392.8514877589529
+      ],
+      "size": [
+        280,
+        160
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "arg_1",
+          "type": "*",
+          "link": 89
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        },
+        "Node name for S&R": "D2 Filename Template"
+      },
+      "widgets_values": [
+        "%arg_1:ckpt_name%_%date:yyyyMMdd-hhmmss%",
+        1,
+        true,
+        503312011553939,
+        "randomize"
+      ]
+    },
+    {
+      "id": 46,
+      "type": "D2 Filename Template",
+      "pos": [
+        1744.3216600352891,
+        24.572849156374208
+      ],
+      "size": [
+        270,
+        194
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "arg_1",
+          "type": "*",
+          "link": 88
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            90
+          ]
+        }
+      ],
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        },
+        "Node name for S&R": "D2 Filename Template"
+      },
+      "widgets_values": [
+        "%arg_1:ckpt_name%_%date:yyyyMMdd-hhmmss%_xy",
+        1,
+        true,
+        1106644048805740,
+        "randomize"
+      ]
+    },
+    {
+      "id": 48,
+      "type": "D2 XY Model List",
+      "pos": [
+        -300,
+        460
+      ],
+      "size": [
+        660,
+        320
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "x / y_list",
+          "type": "STRING",
+          "links": [
+            91
+          ]
+        },
+        {
+          "name": "LIST",
+          "type": "LIST",
+          "links": null
+        }
+      ],
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        },
+        "Node name for S&R": "D2 XY Model List"
+      },
+      "widgets_values": [
+        "checkpoints",
+        "illustrious",
+        "simple",
+        "Name",
+        "A-Z",
+        0,
+        "_SDXL_Illustrious\\anime\\catTowerNoobaiXL_chenkinnoobV10.safetensors\n_SDXL_Illustrious\\anime\\catTowerNoobaiXL_chenkinnoobV11.safetensors\n_SDXL_Illustrious\\anime\\catTowerNoobaiXL_chenkinnoobV12.safetensors\n"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "D2 XY Grid Image",
+      "pos": [
+        1760,
+        -300
+      ],
+      "size": [
+        220,
+        260
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 24
+        },
+        {
+          "name": "x_annotation",
+          "shape": 7,
+          "type": "D2_TAnnotation",
+          "link": null
+        },
+        {
+          "name": "y_annotation",
+          "shape": 7,
+          "type": "D2_TAnnotation",
+          "link": null
+        },
+        {
+          "name": "status",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "name": "grid_pipe",
+          "shape": 7,
+          "type": "D2_TGridPipe",
+          "link": 84
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            48
+          ]
+        },
+        {
+          "name": "memo",
+          "type": "STRING",
+          "links": [
+            87
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 XY Grid Image",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        24,
+        0,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "id": 33,
+      "type": "D2 Save Image Eagle",
+      "pos": [
+        2080,
+        -300
+      ],
+      "size": [
+        280,
+        500
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 48
+        },
+        {
+          "name": "d2_pipe",
+          "shape": 7,
+          "type": "D2_TD2Pipe",
+          "link": 86
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": 90
+        },
+        {
+          "name": "memo_text",
+          "type": "STRING",
+          "widget": {
+            "name": "memo_text"
+          },
+          "link": 87
+        }
+      ],
+      "outputs": [
+        {
+          "name": "filenames",
+          "type": "LIST",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Save Image Eagle",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "filename_prefix": true,
+            "preview_only": true,
+            "format": true,
+            "lossless": true,
+            "quality": true,
+            "fps": true,
+            "eagle_folder": true,
+            "memo_text": true,
+            "popup_image": true
+          },
+          "version": "7.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "xy_%date:yyyyMMdd-hhmmss%",
+        false,
+        "jpeg",
+        true,
+        80,
+        6,
+        "",
+        "",
+        0
+      ]
+    }
+  ],
+  "links": [
+    [
+      24,
+      11,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ],
+    [
+      37,
+      28,
+      5,
+      11,
+      0,
+      "LATENT"
+    ],
+    [
+      46,
+      11,
+      0,
+      32,
+      0,
+      "IMAGE"
+    ],
+    [
+      48,
+      22,
+      0,
+      33,
+      0,
+      "IMAGE"
+    ],
+    [
+      67,
+      40,
+      0,
+      11,
+      1,
+      "MODEL"
+    ],
+    [
+      68,
+      40,
+      1,
+      11,
+      2,
+      "CLIP"
+    ],
+    [
+      69,
+      40,
+      2,
+      11,
+      3,
+      "VAE"
+    ],
+    [
+      73,
+      41,
+      0,
+      43,
+      0,
+      "STRING"
+    ],
+    [
+      74,
+      42,
+      0,
+      43,
+      1,
+      "STRING"
+    ],
+    [
+      75,
+      44,
+      0,
+      43,
+      2,
+      "STRING"
+    ],
+    [
+      78,
+      43,
+      4,
+      40,
+      0,
+      "COMBO"
+    ],
+    [
+      80,
+      40,
+      3,
+      45,
+      1,
+      "STRING"
+    ],
+    [
+      81,
+      43,
+      0,
+      45,
+      0,
+      "D2_TD2Pipe"
+    ],
+    [
+      82,
+      45,
+      0,
+      11,
+      5,
+      "D2_TD2Pipe"
+    ],
+    [
+      84,
+      43,
+      1,
+      22,
+      4,
+      "D2_TGridPipe"
+    ],
+    [
+      85,
+      11,
+      9,
+      32,
+      1,
+      "D2_TD2Pipe"
+    ],
+    [
+      86,
+      11,
+      9,
+      33,
+      1,
+      "D2_TD2Pipe"
+    ],
+    [
+      87,
+      22,
+      1,
+      33,
+      3,
+      "STRING"
+    ],
+    [
+      88,
+      40,
+      3,
+      46,
+      0,
+      "STRING"
+    ],
+    [
+      89,
+      40,
+      3,
+      47,
+      0,
+      "STRING"
+    ],
+    [
+      90,
+      46,
+      0,
+      33,
+      2,
+      "STRING"
+    ],
+    [
+      91,
+      48,
+      0,
+      43,
+      3,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "XY Setting",
+      "bounding": [
+        -360,
+        -380,
+        1160,
+        1240
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "Generate Image",
+      "bounding": [
+        859.8347359097652,
+        -135.47636098274992,
+        760,
+        900
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "Save Single Image",
+      "bounding": [
+        1700,
+        300,
+        640,
+        500
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "Save Grid Image",
+      "bounding": [
+        1700,
+        -380,
+        720,
+        640
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7223851447128709,
+      "offset": [
+        686.3344457093102,
+        443.15132340157686
+      ]
+    },
+    "workspace_info": {
+      "id": "jY8c9iFSI03OdhYbKancs"
+    },
+    "ue_links": [],
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "reroutes": [
+      {
+        "id": 5,
+        "pos": [
+          863.4110493807729,
+          -216.8248264646568
+        ],
+        "linkIds": [
+          84
+        ]
+      },
+      {
+        "id": 6,
+        "pos": [
+          1680,
+          134
+        ],
+        "linkIds": [
+          88,
+          89
+        ]
+      }
+    ],
+    "links_added_by_ue": [],
+    "linkExtensions": [
+      {
+        "id": 84,
+        "parentId": 5
+      },
+      {
+        "id": 88,
+        "parentId": 6
+      },
+      {
+        "id": 89,
+        "parentId": 6
+      }
+    ],
+    "frontendVersion": "1.45.19",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

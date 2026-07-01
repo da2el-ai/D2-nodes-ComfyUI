@@ -1,0 +1,479 @@
+{
+  "id": "728f4e5e-94a7-4905-a875-b9842ae955f7",
+  "revision": 0,
+  "last_node_id": 35,
+  "last_link_id": 67,
+  "nodes": [
+    {
+      "id": 8,
+      "type": "D2 KSampler",
+      "pos": [
+        1320,
+        400
+      ],
+      "size": [
+        500,
+        900
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 63
+        },
+        {
+          "name": "model",
+          "shape": 7,
+          "type": "MODEL",
+          "link": null
+        },
+        {
+          "name": "clip",
+          "shape": 7,
+          "type": "CLIP",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "name": "cnet_stack",
+          "shape": 7,
+          "type": "D2_CNET_STACK",
+          "link": null
+        },
+        {
+          "name": "d2_pipe",
+          "shape": 7,
+          "type": "D2_TD2Pipe",
+          "link": 67
+        },
+        {
+          "name": "positive",
+          "type": "STRING",
+          "widget": {
+            "name": "positive"
+          },
+          "link": 62
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            65
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": null
+        },
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": null
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": null
+        },
+        {
+          "name": "positive",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "formatted_positive",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "negative",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "positive_cond",
+          "type": "CONDITIONING",
+          "links": null
+        },
+        {
+          "name": "negative_cond",
+          "type": "CONDITIONING",
+          "links": null
+        },
+        {
+          "name": "d2_pipe",
+          "type": "D2_TD2Pipe",
+          "links": [
+            66
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 KSampler",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "bd23bb7286020ecd80ade85cd792404cca4bb810",
+        "ue_properties": {
+          "version": "7.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        604415656832985,
+        "randomize",
+        20,
+        5.000000000000001,
+        "euler_ancestral",
+        "normal",
+        1,
+        "auto",
+        "",
+        "worst quality, bad quality, error, extra digits, jpeg artifacts, low quality, lowres, signature, text, username, watermark, artist name, bad anatomy, bad hand, blurry, cropped, fewer digits, missing fingers, normal quality,"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "D2 Checkpoint Loader",
+      "pos": [
+        1020,
+        400
+      ],
+      "size": [
+        260,
+        300
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": []
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": []
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "links": []
+        },
+        {
+          "name": "ckpt_name",
+          "type": "STRING",
+          "links": []
+        },
+        {
+          "name": "ckpt_hash",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "ckpt_fullpath",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "sampling",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "d2_pipe",
+          "type": "D2_TD2Pipe",
+          "links": [
+            67
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Checkpoint Loader",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "bd23bb7286020ecd80ade85cd792404cca4bb810",
+        "ue_properties": {
+          "version": "7.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "_SDXL_Illustrious\\anime\\HiyokoDarkness_vpred_v2_20250329.safetensors",
+        true,
+        "normal",
+        false,
+        0.6
+      ]
+    },
+    {
+      "id": 34,
+      "type": "D2 Size Selector",
+      "pos": [
+        1000,
+        1040
+      ],
+      "size": [
+        280,
+        340
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "upscale_factor",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "prescale_factor",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "empty_latent",
+          "type": "LATENT",
+          "links": [
+            63
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Size Selector",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "preset": true,
+            "width": true,
+            "height": true,
+            "swap_dimensions": true,
+            "upscale_factor": true,
+            "prescale_factor": true,
+            "round_method": true,
+            "batch_size": true
+          },
+          "version": "7.6.2",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "768 x 1024",
+        1024,
+        1024,
+        false,
+        1,
+        1,
+        "Round",
+        1
+      ]
+    },
+    {
+      "id": 35,
+      "type": "D2 Save Image",
+      "pos": [
+        1860,
+        400
+      ],
+      "size": [
+        400,
+        580
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 65
+        },
+        {
+          "name": "d2_pipe",
+          "shape": 7,
+          "type": "D2_TD2Pipe",
+          "link": 66
+        }
+      ],
+      "outputs": [
+        {
+          "name": "filenames",
+          "type": "LIST",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Save Image",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "c7f049d95be30df1fdbcd85d960947bbc76f8867",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "filename_prefix": true,
+            "preview_only": true,
+            "format": true,
+            "lossless": true,
+            "quality": true,
+            "fps": true,
+            "popup_image": true
+          },
+          "version": "7.6.2",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "%date:yyyyMMdd-hhmmss%",
+        false,
+        "png",
+        true,
+        80,
+        6,
+        0
+      ]
+    },
+    {
+      "id": 33,
+      "type": "D2 Prompt",
+      "pos": [
+        740,
+        760
+      ],
+      "size": [
+        540,
+        220
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            62
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "D2 Prompt",
+        "cnr_id": "d2-nodes-comfyui",
+        "ver": "bd23bb7286020ecd80ade85cd792404cca4bb810",
+        "ue_properties": {
+          "version": "7.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "<lora:Illustrious\\character\\Ani_(Grok)_Illustrious_2.0-XL_v1.safetensors:0.8>\nani \\(xai\\)\n1girl, blonde hair, twintails, black dress, bare_shoulders, black_gloves, \nupper_body, smile,\nmasterpiece, best quality, absurdres, amazing quality, perfect quality, very aesthetic,\n",
+        "# + // + /**/",
+        "CHOOSE",
+        86
+      ]
+    }
+  ],
+  "links": [
+    [
+      62,
+      33,
+      0,
+      8,
+      6,
+      "STRING"
+    ],
+    [
+      63,
+      34,
+      5,
+      8,
+      0,
+      "LATENT"
+    ],
+    [
+      65,
+      8,
+      0,
+      35,
+      0,
+      "IMAGE"
+    ],
+    [
+      66,
+      8,
+      9,
+      35,
+      1,
+      "D2_TD2Pipe"
+    ],
+    [
+      67,
+      31,
+      7,
+      8,
+      5,
+      "D2_TD2Pipe"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "ue_links": [],
+    "ds": {
+      "scale": 1,
+      "offset": [
+        -574.98828125,
+        -257.24609375
+      ]
+    },
+    "links_added_by_ue": [],
+    "frontendVersion": "1.45.19",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

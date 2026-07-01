@@ -19,6 +19,8 @@ Node
 - XY Plotの使い方をまとめた記事を書きましたのでそちらも参考にしてください。
   - <a href="https://note.com/da2el_ai/n/n4bc9002c61b1" target="_blank">Animaでも使えるComfyUIの汎用的XY Plotワークフローの作り方</a>
 
+- <a href="./workflow.md#card_index_dividers-xy-plot-checkpoint--prompt-sr">サンプルワークフロー</a>を参考にしてください。
+
 - 処理の順番は `x_list` > `y_list` となっています。プロンプトの書き換えなどで順番が重要になる時は x > y になるようにしてください。
 
 - `x_list` を全て処理してから次の `y_list` に移ります。Checkpoint の読み込みなど重い処理は `y_list` を使うのがおすすめです。
@@ -155,7 +157,31 @@ Node
   - `true`: グリッド画像のみ出力する
   - `false`: 個別画像も出力する
 
+#### Output
 
+- `image`
+  - 生成したグリッド画像を出力
+- `memo`
+  - 生成パラメーターの一覧をテキストで出力
+
+### memo の出力
+
+XY Plotで比較対象となったパラメーターの一覧をテキストで出力する。
+`D2 Save Image Eagle` の `memo_text` に繋ぐことを意図している。
+
+```
+-----------
+X: positive
+black hair,
+blonde hair,
+silver hair,
+
+-----------
+Y: steps
+20
+15
+10
+```
 
 ---
 

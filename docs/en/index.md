@@ -183,6 +183,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.07.01**
+
+- `D2_XYGridImage`: Added a `memo` output that outputs a text list of the generation parameters (for connecting to `memo_text` of `D2 Save Image Eagle`)
+- `D2_CheckpointLoader` / `D2_LoadDiffusionModel` / `D2_LoadDiffusionModelSet`: Added a `d2_pipe` input (so `model` and others can be merged into a received pipe, e.g. when used together with `D2_XYPlotEasy`)
+
 **2026.06.27**
 
 - `D2_LoadDiffusionModelSet`: Added new node (combines Load Diffusion Model + Load VAE + Load CLIP)

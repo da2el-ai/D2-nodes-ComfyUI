@@ -186,6 +186,11 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.07.01**
+
+- `D2_XYGridImage`: 生成パラメーターの一覧をテキストで出力する `memo` 出力を追加（`D2 Save Image Eagle` の `memo_text` 接続用）
+- `D2_CheckpointLoader` / `D2_LoadDiffusionModel` / `D2_LoadDiffusionModelSet`: 入力に `d2_pipe` を追加（`D2_XYPlotEasy` 併用時などに受け取った pipe に `model` などを合流できるように）
+
 **2026.06.27**
 
 - `D2_LoadDiffusionModelSet`: 新規追加（Load Diffusion Model ＋ Load VAE ＋ Load CLIP を合体）

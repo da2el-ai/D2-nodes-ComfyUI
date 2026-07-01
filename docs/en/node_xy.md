@@ -18,6 +18,8 @@
 - I've written an article summarizing how to use XY Plot, so please refer to it as well.
   - <a href="https://note.com/da2el_ai/n/n4bc9002c61b1" target="_blank">How to create a versatile ComfyUI XY Plot workflow that also works with Anima</a>
 
+- Please refer to the <a href="./workflow.md#card_index_dividers-xy-plot-checkpoint--prompt-sr">sample workflow</a>.
+
 - The processing order is `x_list` > `y_list`. When the order matters, such as for prompt rewriting, make sure it is arranged as x > y.
 
 - All of `x_list` is processed before moving on to the next `y_list`. For heavy processes such as loading a Checkpoint, it is recommended to use `y_list`.
@@ -150,6 +152,32 @@
 - `grid_only`
   - `true`: Output only grid image
   - `false`: Output individual images too
+
+#### Output
+
+- `image`
+  - Outputs the generated grid image
+- `memo`
+  - Outputs a text list of the generation parameters
+
+### memo output
+
+Outputs a text list of the parameters compared in the XY Plot.
+It is intended to be connected to `memo_text` of `D2 Save Image Eagle`.
+
+```
+-----------
+X: positive
+black hair,
+blonde hair,
+silver hair,
+
+-----------
+Y: steps
+20
+15
+10
+```
 
 ---
 

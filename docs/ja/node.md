@@ -106,6 +106,8 @@ Node
 
 #### Input
 
+- `d2_pipe`
+  - このノード自身では使用しないが、受け取った `d2_pipe` に `model` などを追加する
 - `ckpt_name`
   - チェックポイント名
 - `auto_vpred`
@@ -137,6 +139,8 @@ Node
 
 #### Input
 
+- `d2_pipe`
+  - このノード自身では使用しないが、受け取った `d2_pipe` に `model` などを追加する
 - `unet_name` / `weight_dtype`: 標準の `Load Diffusion Model` と同じです
 
 #### Output
@@ -164,6 +168,8 @@ Node
 
 #### Input
 
+- `d2_pipe`
+  - このノード自身では使用しないが、受け取った `d2_pipe` に `model` などを追加する
 - `unet_name` / `weight_dtype`: 標準の `Load Diffusion Model` と同じです
 - `vae_name`: 標準の `Load VAE` と同じです
 - `clip_name` / `clip_type`: 標準の `Load CLIP` と同じです

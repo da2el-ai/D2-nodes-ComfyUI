@@ -99,6 +99,8 @@
 
 #### Input
 
+- `d2_pipe`
+  - 此節點本身不使用，但會將 `model` 等加入接收到的 `d2_pipe`
 - `ckpt_name`
   - 檢查點名稱
 - `auto_vpred`
@@ -129,6 +131,8 @@
 
 #### Input
 
+- `d2_pipe`
+  - 此節點本身不使用，但會將 `model` 等加入接收到的 `d2_pipe`
 - `unet_name` / `weight_dtype`: 與標準的 `Load Diffusion Model` 相同
 
 #### Output
@@ -156,6 +160,8 @@
 
 #### Input
 
+- `d2_pipe`
+  - 此節點本身不使用，但會將 `model` 等加入接收到的 `d2_pipe`
 - `unet_name` / `weight_dtype`：與標準的 `Load Diffusion Model` 相同
 - `vae_name`：與標準的 `Load VAE` 相同
 - `clip_name` / `clip_type`：與標準的 `Load CLIP` 相同

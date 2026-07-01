@@ -185,6 +185,11 @@
 
 ## :blossom: 更新日誌
 
+**2026.07.01**
+
+- `D2_XYGridImage`：新增以文字輸出生成參數列表的 `memo` 輸出（用於連接 `D2 Save Image Eagle` 的 `memo_text`）
+- `D2_CheckpointLoader` / `D2_LoadDiffusionModel` / `D2_LoadDiffusionModelSet`：輸入新增 `d2_pipe`（例如與 `D2_XYPlotEasy` 併用時，可將 `model` 等合流到接收到的 pipe 中）
+
 **2026.06.27**
 
 - `D2_LoadDiffusionModelSet`：新增節點（整合 Load Diffusion Model ＋ Load VAE ＋ Load CLIP）

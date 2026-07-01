@@ -98,6 +98,8 @@
 
 #### Input
 
+- `d2_pipe`
+  - Not used by this node itself, but adds `model` and others to the received `d2_pipe`
 - `ckpt_name`
   - Checkpoint name
 - `auto_vpred`
@@ -128,6 +130,8 @@
 
 #### Input
 
+- `d2_pipe`
+  - Not used by this node itself, but adds `model` and others to the received `d2_pipe`
 - `unet_name` / `weight_dtype`: Same as the standard `Load Diffusion Model`
 
 #### Output
@@ -155,6 +159,8 @@
 
 #### Input
 
+- `d2_pipe`
+  - Not used by this node itself, but adds `model` and others to the received `d2_pipe`
 - `unet_name` / `weight_dtype`: Same as the standard `Load Diffusion Model`
 - `vae_name`: Same as the standard `Load VAE`
 - `clip_name` / `clip_type`: Same as the standard `Load CLIP`

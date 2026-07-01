@@ -19,6 +19,8 @@
 - 我寫了一篇整理 XY Plot 使用方法的文章，也請一併參考。
   - <a href="https://note.com/da2el_ai/n/n4bc9002c61b1" target="_blank">在 Anima 上也能使用的 ComfyUI 通用型 XY Plot 工作流程製作方法</a>
 
+- 請參考<a href="./workflow.md#card_index_dividers-xy-plot-checkpoint--prompt-sr">範例工作流程</a>。
+
 - 處理順序為 `x_list` > `y_list`。當順序很重要時（例如提示詞的改寫），請確保排列為 x > y。
 
 - 會先處理完所有 `x_list` 後再進入下一個 `y_list`。對於 Checkpoint 載入等較重的處理，建議使用 `y_list`。
@@ -152,7 +154,31 @@
   - `true`: 僅輸出網格圖像
   - `false`: 也輸出個別圖像
 
+#### Output
 
+- `image`
+  - 輸出生成的網格圖像
+- `memo`
+  - 以文字輸出生成參數的列表
+
+### memo 輸出
+
+以文字輸出在 XY Plot 中作為比較對象的參數列表。
+用意是連接到 `D2 Save Image Eagle` 的 `memo_text`。
+
+```
+-----------
+X: positive
+black hair,
+blonde hair,
+silver hair,
+
+-----------
+Y: steps
+20
+15
+10
+```
 
 ---
 
