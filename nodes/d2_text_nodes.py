@@ -25,6 +25,7 @@ from server import PromptServer
 # from nodes import NODE_CLASS_MAPPINGS as nodes_NODE_CLASS_MAPPINGS
 
 from .modules import util
+from .modules import caption_util
 from .modules.util import AnyType, delete_comment
 # from .modules import checkpoint_util
 # from .modules import pnginfo_util
@@ -669,6 +670,82 @@ class D2_PromptSanitizer(io.ComfyNode):
 
 
 
+"""
+
+D2 Load Text
+テキストファイルを読み込む汎用ノード
+キャプション編集ではファイルパスを D2 Folder Image Queue から受け取る想定
+
+"""
+class D2_LoadText(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Load Text",
+            display_name="D2 Load Text",
+            category="D2",
+            inputs=[
+                io.String.Input("file_path", default=""),
+                io.Boolean.Input("encode_to_utf8", default=False),
+            ],
+            outputs=[
+                io.String.Output(display_name="text"),
+                io.String.Output(display_name="file_path"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, file_path="", encode_to_utf8=False) -> io.NodeOutput:
+        text = caption_util.load_text_file(file_path, encode_to_utf8)
+        return io.NodeOutput(text, file_path)
+
+
+"""
+
+D2 Save Caption
+タグ整形をしてキャプションファイルを保存するノード
+保存先は base_filename の拡張子を extension に置換したパス
+
+"""
+class D2_SaveCaption(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Save Caption",
+            display_name="D2 Save Caption",
+            category="D2",
+            inputs=[
+                io.String.Input("base_filename", default=""),
+                io.String.Input("text", force_input=True, multiline=True, default=""),
+                io.String.Input("extension", default="txt"),
+                io.String.Input("exclude_tags", multiline=True, default=""),
+                io.String.Input("prepend_tags", default=""),
+                io.Boolean.Input("replace_underscore", default=False),
+                io.Boolean.Input("trailing_comma", default=False),
+                io.Boolean.Input("ignore_case", default=True),
+                io.Boolean.Input("backup", default=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="text"),
+                io.String.Output(display_name="file_path"),
+            ],
+            is_output_node=True,
+        )
+
+    @classmethod
+    def execute(cls, base_filename="", text="", extension="txt", exclude_tags="", prepend_tags="", replace_underscore=False, trailing_comma=False, ignore_case=True, backup=True) -> io.NodeOutput:
+        formatted = caption_util.format_caption(
+            text,
+            exclude_tags=exclude_tags,
+            prepend_tags=prepend_tags,
+            replace_underscore=replace_underscore,
+            trailing_comma=trailing_comma,
+            ignore_case=ignore_case,
+        )
+        save_path = caption_util.save_caption(base_filename, formatted, extension, backup)
+        return io.NodeOutput(formatted, save_path)
+
+
 NODE_CLASS_MAPPINGS = {
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Regex Replace": D2_RegexReplace,
@@ -679,4 +756,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Filename Template2": D2_FilenameTemplate2,
     "D2 Prompt": D2_Prompt,
     "D2 Prompt Sanitizer": D2_PromptSanitizer,
+    "D2 Load Text": D2_LoadText,
+    "D2 Save Caption": D2_SaveCaption,
 }

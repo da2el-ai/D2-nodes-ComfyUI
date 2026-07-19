@@ -55,6 +55,8 @@ from .nodes.d2_text_nodes import (
     D2_RegexReplace,
     D2_TokenCounter,
     D2_Prompt,
+    D2_LoadText,
+    D2_SaveCaption,
 )
 from .nodes.d2_nodes import (
     D2_KSampler,
@@ -133,6 +135,9 @@ class D2Extension(ComfyExtension):
             D2_RegexReplace,
             D2_TokenCounter,
             D2_Prompt,
+            # D. キャプション編集系
+            D2_LoadText,
+            D2_SaveCaption,
             # D. Refiner 系
             D2_RefinerSteps,
             D2_RefinerStepsA1111,

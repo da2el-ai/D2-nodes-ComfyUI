@@ -1,1 +1,2 @@
 piexif
+charset-normalizer
