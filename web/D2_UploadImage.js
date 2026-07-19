@@ -124,8 +124,9 @@ app.registerExtension({
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "D2 XY Upload Image") return;
 
-        // ファイルアップロードクラスのインスタンスを作成
-        const fileUploader = new D2FileUploader();
+        // インスタンスはノードごとに onNodeCreated 内で生成する。
+        // 1個だけ生成して共有すると、複数ノード配置時に widget 参照が最後のノードを
+        // 指してしまい、アップロード結果やステータスが別ノードに反映される。
 
         /**
          * ノード作成された
@@ -134,6 +135,10 @@ app.registerExtension({
         const origOnNodeCreated = nodeType.prototype.onNodeCreated;
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+
+            // このノード専用のインスタンスを生成して保持する
+            const fileUploader = new D2FileUploader();
+            this.d2FileUploader = fileUploader;
 
             const statusWidget =  findWidgetByName(this, "status");
             const imageListWidget = findWidgetByName(this, "image_list");
