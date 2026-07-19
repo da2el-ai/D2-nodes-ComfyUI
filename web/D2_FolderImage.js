@@ -81,7 +81,9 @@ app.registerExtension({
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "D2 XY Folder Images" && nodeData.name !== "D2 Load Folder Images") return;
 
-        const folderImageController = new FolderImageController();
+        // インスタンスはノードごとに onNodeCreated 内で生成する。
+        // 1個だけ生成して共有すると、複数ノード配置時に widget 参照が最後のノードを
+        // 指してしまい、image count 表示が混線する。
 
         /**
          * ノード作成された
@@ -90,6 +92,10 @@ app.registerExtension({
         const origOnNodeCreated = nodeType.prototype.onNodeCreated;
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+
+            // このノード専用のインスタンスを生成して保持する
+            const folderImageController = new FolderImageController();
+            this.d2FolderImageController = folderImageController;
 
             const folderWidget = findWidgetByName(this, "folder");
             const extensionWidget = findWidgetByName(this, "extension");
@@ -132,8 +138,9 @@ app.registerExtension({
             // seedWidget.updateSeed();
             
             const imageCount = message["image_count"][0];
-            folderImageController.imageCount = imageCount;
-            folderImageController.refreshImageCount();
+            // このノード専用インスタンスを使う（共有すると複数ノードで表示が混線する）
+            this.d2FolderImageController.imageCount = imageCount;
+            this.d2FolderImageController.refreshImageCount();
         };
     },
 });

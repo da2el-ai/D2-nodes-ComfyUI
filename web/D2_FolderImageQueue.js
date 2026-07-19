@@ -120,7 +120,9 @@ app.registerExtension({
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "D2 Folder Image Queue") return;
 
-        const folderImageQueue = new FolderImageQueue();
+        // インスタンスはノードごとに onNodeCreated 内で生成する。
+        // beforeRegisterNodeDef で1個だけ生成して共有すると、複数ノード配置時に
+        // widget 参照が最後のノードを指してしまい、start_at が進まず無限ループになる。
 
         /**
          * ノード作成された
@@ -129,6 +131,10 @@ app.registerExtension({
         const origOnNodeCreated = nodeType.prototype.onNodeCreated;
         nodeType.prototype.onNodeCreated = function () {
             const r = origOnNodeCreated ? origOnNodeCreated.apply(this) : undefined;
+
+            // このノード専用のインスタンスを生成して保持する
+            const folderImageQueue = new FolderImageQueue();
+            this.d2FolderImageQueue = folderImageQueue;
 
             const progressBarWidget = findWidgetByName(this, "progress_bar");
             const folderWidget = findWidgetByName(this, "folder");
@@ -146,7 +152,7 @@ app.registerExtension({
                 await folderImageQueue.getImageCount();
                 folderImageQueue.refreshImageCount();
             };
-            
+
             folderImageQueue.initWidget(
                 this.id,
                 folderWidget,
@@ -171,10 +177,11 @@ app.registerExtension({
             // seed更新
             const seedWidget = findWidgetByName(this, "queue_seed");
             seedWidget.updateSeed();
-            
+
             const imageCount = message["image_count"][0];
             const startAt = message["start_at"][0];
-            folderImageQueue.onExecuted(imageCount, startAt);
+            // このノード専用インスタンスを使う（共有すると複数ノードで start_at が混線する）
+            this.d2FolderImageQueue.onExecuted(imageCount, startAt);
         };
     },
 
