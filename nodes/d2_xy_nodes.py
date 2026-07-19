@@ -932,6 +932,7 @@ class D2_XYFolderImages(io.ComfyNode):
             inputs=[
                 io.String.Input("folder", default=""),
                 io.String.Input("extension", default="*.*"),
+                io.Boolean.Input("include_subfolders", default=False),
                 io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
                 io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
                 io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
@@ -946,8 +947,8 @@ class D2_XYFolderImages(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, folder, extension, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
-        files = util.get_files(folder, extension, sort_by, order_by)
+    def execute(cls, folder, extension, include_subfolders=False, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
+        files = util.get_files(folder, extension, sort_by, order_by, include_subfolders)
         output = util.list_to_text(files, util.LINE_BREAK)
 
         return io.NodeOutput(

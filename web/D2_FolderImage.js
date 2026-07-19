@@ -7,6 +7,7 @@ const API_BASE_URL = "/D2/folder-image-queue/";
 class FolderImageController {
     folderWidget;
     extensionWidget;
+    includeSubfoldersWidget;
     imageCountWidget;
     autoQueueWidget;
     imageCount = 0;
@@ -19,7 +20,8 @@ class FolderImageController {
         return new Promise(async (resolve) => {
             const folder = this.folderWidget.value;
             const extension = this.extensionWidget.value;
-            const url = API_BASE_URL + `get_image_count?folder=${folder}&extension=${extension}`;
+            const includeSubfolders = this.includeSubfoldersWidget.value;
+            const url = API_BASE_URL + `get_image_count?folder=${folder}&extension=${extension}&include_subfolders=${includeSubfolders}`;
 
             const response = await fetch(url);
             const data = await response.json();
@@ -39,10 +41,11 @@ class FolderImageController {
      * 入力フィールドのイベント設定
      * パス、拡張子が入力されたら枚数を取得する
      */
-    initWidget(id, folderWidget, extensionWidget, imageCountWidget, autoQueueWidget) {
+    initWidget(id, folderWidget, extensionWidget, includeSubfoldersWidget, imageCountWidget, autoQueueWidget) {
         this.id = id;
         this.folderWidget = folderWidget;
         this.extensionWidget = extensionWidget;
+        this.includeSubfoldersWidget = includeSubfoldersWidget;
         this.imageCountWidget = imageCountWidget;
         this.autoQueueWidget = autoQueueWidget;
 
@@ -52,6 +55,10 @@ class FolderImageController {
             this.refreshImageCount();
         };
         extensionWidget.callback = async () => {
+            await this.getImageCount();
+            this.refreshImageCount();
+        };
+        includeSubfoldersWidget.callback = async () => {
             await this.getImageCount();
             this.refreshImageCount();
         };
@@ -85,6 +92,7 @@ app.registerExtension({
 
             const folderWidget = findWidgetByName(this, "folder");
             const extensionWidget = findWidgetByName(this, "extension");
+            const includeSubfoldersWidget = findWidgetByName(this, "include_subfolders");
             const autoQueueWidget = findWidgetByName(this, "auto_queue");
             const imageCountWidget = findWidgetByName(this, "image_count");
             imageCountWidget.textTemplate = "Image count: <%value%>"
@@ -103,6 +111,7 @@ app.registerExtension({
                 this.id,
                 folderWidget,
                 extensionWidget,
+                includeSubfoldersWidget,
                 imageCountWidget,
                 autoQueueWidget
             );

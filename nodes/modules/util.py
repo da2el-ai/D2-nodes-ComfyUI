@@ -175,26 +175,31 @@ def get_config_path(filename) -> Path:
 
 """
 ファイルリスト取得
+include_subfolders=True なら ** でサブフォルダも再帰的に対象にする。
+folder に直接 ** を書いても効くよう glob は常に recursive=True で呼ぶ。
 """
-def get_files(folder, extension, sort_by="Name", order_by="A-Z") -> list[str]:
-    search_pattern = os.path.join(folder, extension)
-    file_list = glob.glob(search_pattern)
-    
-    # 絶対パスに変換
-    file_list = [os.path.abspath(file) for file in file_list]
-    
-    # sort_byに基づいてソート
+def get_files(folder, extension, sort_by="Name", order_by="A-Z", include_subfolders=False) -> list[str]:
+    if include_subfolders:
+        search_pattern = os.path.join(folder, "**", extension)
+    else:
+        search_pattern = os.path.join(folder, extension)
+    file_list = glob.glob(search_pattern, recursive=True)
+
+    # 絶対パスに変換。extension="*.*" 等でサブフォルダ自身がヒットするのでファイルのみ残す
+    file_list = [os.path.abspath(file) for file in file_list if os.path.isfile(file)]
+
+    # sort_byに基づいてソート。Name はフルパスで並べてフォルダごとにまとまるようにする
     if sort_by == "Name":
-        file_list = sorted(file_list, key=lambda x: os.path.basename(x))
+        file_list = sorted(file_list)
     elif sort_by == "Date":
         file_list = sorted(file_list, key=lambda x: os.path.getmtime(x))
     elif sort_by == "Random":
         random.shuffle(file_list)
-    
+
     # order_byに基づいて順序を反転（Randomの場合は適用しない）
     if order_by == "Z-A" and sort_by != "Random":
         file_list.reverse()
-    
+
     return file_list
 
 

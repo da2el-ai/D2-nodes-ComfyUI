@@ -397,6 +397,7 @@ class D2_LoadFolderImages(io.ComfyNode):
             inputs=[
                 io.String.Input("folder", default=""),
                 io.String.Input("extension", default="*.*"),
+                io.Boolean.Input("include_subfolders", default=False),
                 io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
                 io.Combo.Input("order_by", options=["A-Z", "Z-A"], default="A-Z"),
                 io.Custom("D2_SIMPLE_TEXT").Input("image_count", optional=True),
@@ -410,8 +411,8 @@ class D2_LoadFolderImages(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, folder="", extension="*.*", sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
-        files = util.get_files(folder, extension, sort_by, order_by)
+    def execute(cls, folder="", extension="*.*", include_subfolders=False, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
+        files = util.get_files(folder, extension, sort_by, order_by, include_subfolders)
         load_image = LoadImage()
         image_list = []
 
@@ -566,6 +567,7 @@ class D2_FolderImageQueue(io.ComfyNode):
             inputs=[
                 io.String.Input("folder", default=""),
                 io.String.Input("extension", default="*.*"),
+                io.Boolean.Input("include_subfolders", default=False),
                 io.Int.Input("start_at", default=0, min=0),
                 io.Boolean.Input("auto_queue", default=True),
                 io.Combo.Input("sort_by", options=["Name", "Date", "Random"], default="Name"),
@@ -583,11 +585,11 @@ class D2_FolderImageQueue(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, folder="", extension="*.*", start_at=0, auto_queue=True, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, progress_bar=None, refresh_btn=None) -> io.NodeOutput:
+    def execute(cls, folder="", extension="*.*", include_subfolders=False, start_at=0, auto_queue=True, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, progress_bar=None, refresh_btn=None) -> io.NodeOutput:
         state = cls._queue_state.setdefault(cls.hidden.unique_id, {"files": [], "is_finished": False})
 
         if len(state["files"]) <= 0:
-            state["files"] = util.get_files(folder, extension, sort_by, order_by)
+            state["files"] = util.get_files(folder, extension, sort_by, order_by, include_subfolders)
             state["is_finished"] = False
 
         image_path = state["files"][start_at]
@@ -619,7 +621,8 @@ async def route_d2_folder_image_get_image_count(request):
     try:
         folder = request.query.get('folder')
         extension = request.query.get('extension')
-        files = util.get_files(folder, extension)
+        include_subfolders = request.query.get('include_subfolders') == 'true'
+        files = util.get_files(folder, extension, include_subfolders=include_subfolders)
 
         image_count = len(files)
     except:
