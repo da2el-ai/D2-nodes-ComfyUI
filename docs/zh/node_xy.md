@@ -320,6 +320,7 @@ Y: steps
 </figure>
 
 - 傳遞指定資料夾內圖像路徑到 `D2 XY Plot` 的節點
+- 將 `include_subfolders` 設為 `true` 可同時處理子資料夾內的圖像（也可在 `folder` 中直接寫入 `**`）
 
 ---
 

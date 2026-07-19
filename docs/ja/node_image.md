@@ -232,6 +232,10 @@ D:\ComfyUI\output\foo.png
 - `extension`
   - JPEG画像だけを読み込むなら `*.jpg` のように指定する
   - `*silver*.webp` のような指定も可能
+- `include_subfolders`
+  - `true`: サブフォルダー内の画像も対象にする
+  - `false`: 指定フォルダー直下のみ
+  - `folder` に `画像フォルダー/**` のように `**` を直接書いても再帰的に取得できる
 
 
 
@@ -256,6 +260,10 @@ D:\ComfyUI\output\foo.png
   - ファイル名のフィルタを指定
   - `*.*`: 全ての画像
   - `*.png`: PNG形式のみ対象
+- `include_subfolders`
+  - `true`: サブフォルダー内の画像も対象にする
+  - `false`: 指定フォルダー直下のみ
+  - `folder` に `画像フォルダー/**` のように `**` を直接書いても再帰的に取得できる
 - `start_at`
   - 処理を開始する画像番号
 - `auto_queue`

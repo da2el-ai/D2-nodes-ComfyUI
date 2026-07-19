@@ -183,6 +183,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.07.19**
+
+- `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`: Added `include_subfolders` to also target images in subfolders (you can also write `**` directly in `folder`)
+
 **2026.07.01**
 
 - `D2_XYGridImage`: Added a `memo` output that outputs a text list of the generation parameters (for connecting to `memo_text` of `D2 Save Image Eagle`)

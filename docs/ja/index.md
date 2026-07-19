@@ -186,6 +186,10 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.07.19**
+
+- `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`: サブフォルダー内の画像も対象にする `include_subfolders` を追加（`folder` に `**` を直接書いても可）
+
 **2026.07.01**
 
 - `D2_XYGridImage`: 生成パラメーターの一覧をテキストで出力する `memo` 出力を追加（`D2 Save Image Eagle` の `memo_text` 接続用）

@@ -332,6 +332,7 @@ Y: steps
 </figure>
 
 - 指定したフォルダー内の画像パスを `D2 XY Plot` に渡すノード
+- `include_subfolders` を `true` にするとサブフォルダー内の画像も対象にする（`folder` に `**` を直接書いてもよい）
 
 
 

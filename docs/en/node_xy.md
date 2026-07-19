@@ -319,6 +319,7 @@ Removed. Please use `D2 XY Model List` instead.
 </figure>
 
 - Node to pass image paths from specified folder to `D2 XY Plot`
+- Set `include_subfolders` to `true` to also include images in subfolders (you can also write `**` directly in `folder`)
 
 ---
 

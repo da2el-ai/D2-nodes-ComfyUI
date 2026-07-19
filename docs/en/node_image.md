@@ -236,6 +236,10 @@ Compatible with images saved by the following nodes and UIs:
 - `extension`
   - Specify like `*.jpg` to load only JPEG images
   - Can also specify patterns like `*silver*.webp`
+- `include_subfolders`
+  - `true`: Also includes images in subfolders
+  - `false`: Only directly under the specified folder
+  - You can also write `**` directly in `folder`, like `image_folder/**`, to search recursively
 
 ---
 
@@ -256,6 +260,10 @@ Compatible with images saved by the following nodes and UIs:
   - Specify file name filter
   - `*.*`: All images
   - `*.png`: PNG format only
+- `include_subfolders`
+  - `true`: Also includes images in subfolders
+  - `false`: Only directly under the specified folder
+  - You can also write `**` directly in `folder`, like `image_folder/**`, to search recursively
 - `start_at`
   - Image number to start processing
 - `auto_queue`

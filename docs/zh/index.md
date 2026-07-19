@@ -185,6 +185,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.07.19**
+
+- `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`：新增 `include_subfolders`，可同時處理子資料夾內的圖像（也可在 `folder` 中直接寫入 `**`）
+
 **2026.07.01**
 
 - `D2_XYGridImage`：新增以文字輸出生成參數列表的 `memo` 輸出（用於連接 `D2 Save Image Eagle` 的 `memo_text`）
