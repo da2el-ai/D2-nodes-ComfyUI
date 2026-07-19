@@ -236,6 +236,7 @@ Compatible with images saved by the following nodes and UIs:
 - `extension`
   - Specify like `*.jpg` to load only JPEG images
   - Can also specify patterns like `*silver*.webp`
+  - Can specify multiple extensions comma-separated, like `*.png, *.jpg, *.webp`
 - `include_subfolders`
   - `true`: Also includes images in subfolders
   - `false`: Only directly under the specified folder
@@ -260,6 +261,7 @@ Compatible with images saved by the following nodes and UIs:
   - Specify file name filter
   - `*.*`: All images
   - `*.png`: PNG format only
+  - Can specify multiple extensions comma-separated, like `*.png, *.jpg, *.webp`
 - `include_subfolders`
   - `true`: Also includes images in subfolders
   - `false`: Only directly under the specified folder

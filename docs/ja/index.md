@@ -103,6 +103,12 @@ D2 Nodes ComfyUI
   - テキストのコメントを削除やトークン数の表示があるテキストノード
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - プロンプト文字列を整形する（`_` を空白に変換、カンマ後に空白を挿入）
+- <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
+  - テキストファイルを読み込む汎用ノード
+- <a href="node_text.md#D2-Save-Caption">`D2 Save Caption`</a>
+  - タグを整形して学習用キャプションファイルを保存する
+- <a href="node_text.md#D2-Tag-Report">`D2 Tag Report`</a>
+  - フォルダー内キャプションのタグ出現頻度を集計し、除外タグリストを作る
 
 ### Image
 
@@ -188,7 +194,9 @@ D2 Nodes ComfyUI
 
 **2026.07.19**
 
+- `D2_LoadText` / `D2_SaveCaption` / `D2_TagReport`: 学習用キャプションを編集するノードを新規追加
 - `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`: サブフォルダー内の画像も対象にする `include_subfolders` を追加（`folder` に `**` を直接書いても可）
+- `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`: `extension` を `*.png, *.jpg, *.webp` のようにカンマ区切りで複数指定できるように
 
 **2026.07.01**
 

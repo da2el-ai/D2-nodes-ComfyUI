@@ -101,6 +101,12 @@ If you have installed any of the following custom nodes previously, please remov
   - Text node with comment deletion function and token count display
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - Cleans up prompt strings (convert `_` to space, add a space after commas)
+- <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
+  - A general-purpose node that loads a text file
+- <a href="node_text.md#D2-Save-Caption">`D2 Save Caption`</a>
+  - Formats tags and saves a training caption file
+- <a href="node_text.md#D2-Tag-Report">`D2 Tag Report`</a>
+  - Aggregates tag frequency from captions in a folder and builds an exclude-tag list
 
 
 
@@ -185,7 +191,9 @@ If you have installed any of the following custom nodes previously, please remov
 
 **2026.07.19**
 
+- `D2_LoadText` / `D2_SaveCaption` / `D2_TagReport`: Added nodes for editing training captions
 - `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`: Added `include_subfolders` to also target images in subfolders (you can also write `**` directly in `folder`)
+- `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`: `extension` now accepts multiple comma-separated patterns like `*.png, *.jpg, *.webp`
 
 **2026.07.01**
 

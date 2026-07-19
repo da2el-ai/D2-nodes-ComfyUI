@@ -280,3 +280,112 @@ Output text
 </figure>
 
 - 計算提示詞的標記數量
+
+---
+
+### D2 Load Text
+
+<figure>
+  <img src="../img/load_text.png">
+</figure>
+
+- 讀取文字檔案的通用節點
+- 批次編輯訓練用標註時，用於讀取 `D2 Folder Image Queue` 以 `*.txt` 取得的路徑
+
+#### Input
+
+- `file_path`
+  - 要讀取的文字檔案完整路徑
+- `encode_to_utf8`
+  - `true`: 自動判別字元編碼並轉換為 utf-8 後讀取
+  - `false`: 不轉換（以 utf-8 讀取）
+
+#### Output
+
+- `text`
+  - 檔案內容（原樣返回，不整形；檔案不存在時為空字串）
+- `file_path`
+  - 將輸入的 `file_path` 原樣輸出（用於傳給 `D2 Save Caption` 的 `base_filename`）
+
+---
+
+### D2 Save Caption
+
+<figure>
+  <img src="../img/save_caption.png">
+</figure>
+
+- 整形標籤並儲存標註檔案的節點
+- 儲存到將 `base_filename` 的副檔名替換為 `extension` 的路徑（例 `d:/images/aaa.jpg` -> `d:/images/aaa.txt`）
+- 整形依「分割 -> 去除前後空白 -> `_` 替換 -> 排除 -> 去除重複 -> 開頭追加 -> 結尾逗號」的順序進行
+
+#### Input
+
+- `base_filename`
+  - 儲存目標的來源路徑。接收 `D2 Folder Image Queue` 的 `image_path` 或 `D2 Load Text` 的 `file_path`
+  - 為空時以錯誤停止（避免儲存到非預期的位置）
+- `text`
+  - 標註內容（來自 `WD14 Tagger` 或 `D2 Load Text`）
+- `extension`
+  - 儲存檔案的副檔名（例 `txt`）
+- `exclude_tags`
+  - 要排除的標籤。以逗號與換行兩者分隔
+  - 寫成 `regex/pattern/` 時排除符合正規表示式的標籤（僅排除）
+- `prepend_tags`
+  - 追加到開頭的標籤。以逗號分隔。已存在的標籤不會追加
+- `replace_underscore`
+  - `true`: 將 `_` 轉換為空格
+- `trailing_comma`
+  - `true`: 在結尾追加逗號
+- `ignore_case`
+  - `true`: 排除判定時忽略大小寫
+- `backup`
+  - `true`: 若有同名檔案，先將舊檔案重新命名為 `.bak` 再儲存
+- `dry_run`
+  - `true`: 不儲存到檔案，僅以 `text` 輸出確認整形結果（轉換結果的預覽）
+
+#### Output
+
+- `text`
+  - 整形後的標註
+- `file_path`
+  - 儲存目標的完整路徑（`dry_run` 時為預定儲存的路徑）
+
+---
+
+### D2 Tag Report
+
+<figure>
+  <img src="../img/tag_report.png">
+</figure>
+
+- 從指定資料夾內的標註集計標籤出現頻率，並建立排除標籤清單的節點
+- `Get tags` 按鈕會將集計結果顯示於 `text`。使用者編輯要保留・刪除的標籤，再傳給 `D2 Save Caption` 的 `exclude_tags`
+- 在行首加上 `//` 或 `#` 即為註解行
+
+#### Input
+
+- `folder`
+  - 存放標註檔案的資料夾（完整路徑）
+- `include_subfolders`
+  - `true`: 同時處理子資料夾
+- `extension`
+  - 目標副檔名（例 `txt`）
+- `order_by`
+  - `count_9-0`: 依出現次數由多到少
+  - `count_0-9`: 依出現次數由少到多
+  - `tag_a-z`: 依標籤名稱（A->Z）
+  - `tag_z-a`: 依標籤名稱（Z->A）
+- `without_count`
+  - `true`: 報告中不顯示出現次數
+- `output_type`
+  - `remove_comment`: 刪除註解行並輸出其餘（運用：以註解標記要刪除的標籤）
+  - `output_comment`: 僅輸出註解行（運用：僅將要刪除的標籤註解化）
+- `separator`
+  - `newline`: 以換行分隔輸出（建議，使 `regex/pattern/` 等含逗號的項目不會被破壞）
+  - `comma`: 以逗號＋空格的單行輸出
+
+#### Output
+
+- `text`
+  - 編輯後的標籤清單（傳給 `D2 Save Caption` 的 `exclude_tags`）

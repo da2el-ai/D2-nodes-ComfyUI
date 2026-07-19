@@ -291,3 +291,114 @@ Output text
 </figure>
 
 - プロンプトのトークンを数える
+
+---
+
+### D2 Load Text
+
+<figure>
+  <img src="../img/load_text.png">
+</figure>
+
+- テキストファイルを読み込む汎用ノード
+- 学習用キャプションの一括編集では、`D2 Folder Image Queue` で `*.txt` のパスを取得して読み込む用途で使う
+
+#### Input
+
+- `file_path`
+  - 読み込むテキストファイルのフルパス
+- `encode_to_utf8`
+  - `true`: 文字コードを自動判別して utf-8 に変換して読み込む
+  - `false`: 変換しない（utf-8 として読み込む）
+
+#### Output
+
+- `text`
+  - ファイルの中身（整形せずそのまま。ファイルが存在しない場合は空文字）
+- `file_path`
+  - 入力した `file_path` をそのまま出力（`D2 Save Caption` の `base_filename` に渡す用）
+
+---
+
+### D2 Save Caption
+
+<figure>
+  <img src="../img/save_caption.png">
+</figure>
+
+- タグを整形してキャプションファイルを保存するノード
+- `base_filename` の拡張子を `extension` に置き換えたパスに保存する（例 `d:/images/aaa.jpg` → `d:/images/aaa.txt`）
+- 整形は「分割 → 前後空白除去 → `_` 置換 → 除外 → 重複除去 → 先頭追加 → 末尾カンマ」の順で行う
+
+#### Input
+
+- `base_filename`
+  - 保存先の元パス。`D2 Folder Image Queue` の `image_path` や `D2 Load Text` の `file_path` を受け取る
+  - 空の場合はエラーで停止する（意図しない場所への保存を防ぐため）
+- `text`
+  - キャプション本文（`WD14 Tagger` や `D2 Load Text` から）
+- `extension`
+  - 保存するファイルの拡張子（例 `txt`）
+- `exclude_tags`
+  - 除外するタグ。カンマ・改行の両方で区切る
+  - `regex/パターン/` と書くと正規表現にマッチしたタグを除外する（除外専用）
+- `prepend_tags`
+  - 先頭に追加するタグ。カンマ区切り。既に存在するタグは追加しない
+- `replace_underscore`
+  - `true`: `_` を空白に変換
+- `trailing_comma`
+  - `true`: 末尾にカンマを追加
+- `ignore_case`
+  - `true`: 除外の判定で大文字小文字を無視する
+- `backup`
+  - `true`: 同名ファイルがあれば旧ファイルを `.bak` にリネームしてから保存
+- `dry_run`
+  - `true`: 変換結果のプレビュー用。ファイルに保存せず、整形結果を `text` 出力で確認する
+
+#### Output
+
+- `text`
+  - 整形後のキャプション
+- `file_path`
+  - 保存先のフルパス（`dry_run` 時は保存予定のパス）
+
+---
+
+### D2 Tag Report
+
+<figure>
+  <img src="../img/tag_report.png">
+</figure>
+
+- `D2 Save Caption` の `exclude_tags`（除外タグ） に繋ぐ除外タグリストを作成するためのノード
+- 指定フォルダー内のキャプションからタグの出現頻度を集計し、除外タグリストを作る
+  - `Get tags` ボタンで集計結果を `text` に表示する
+  - ユーザーは残す・消すを編集し、`D2 Save Caption` の `exclude_tags` に渡す
+- 行頭に `//` または `#` を付けるとコメント行になる
+
+#### Input
+
+- `folder`
+  - キャプションファイルのあるフォルダー（フルパス）
+- `include_subfolders`
+  - `true`: サブフォルダーも対象にする
+- `extension`
+  - 対象とする拡張子（例 `txt`）
+- `order_by`
+  - `count_9-0`: 出現回数の多い順
+  - `count_0-9`: 出現回数の少ない順
+  - `tag_a-z`: タグ名順（A→Z）
+  - `tag_z-a`: タグ名順（Z→A）
+- `without_count`
+  - `true`: レポートに出現回数を表示しない
+- `output_type`
+  - `remove_comment`: コメント行を削除して残りを出力（消したいタグをコメントでマークする運用）
+  - `output_comment`: コメント行のみを出力（消したいタグだけコメント化する運用）
+- `separator`
+  - `newline`: 改行区切りで出力（`regex/パターン/` などカンマを含むエントリが壊れないため推奨）
+  - `comma`: カンマ＋空白の1行で出力
+
+#### Output
+
+- `text`
+  - 編集後のタグリスト（`D2 Save Caption` の `exclude_tags` に渡す）

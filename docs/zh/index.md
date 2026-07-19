@@ -103,6 +103,12 @@
   - 具有刪除註解功能和顯示令牌數量的文字節點
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - 整理提示詞字串（將 `_` 轉換為空格、逗號後插入空格）
+- <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
+  - 讀取文字檔案的通用節點
+- <a href="node_text.md#D2-Save-Caption">`D2 Save Caption`</a>
+  - 整形標籤並儲存訓練用標註檔案
+- <a href="node_text.md#D2-Tag-Report">`D2 Tag Report`</a>
+  - 從資料夾內的標註集計標籤出現頻率，並建立排除標籤清單
 
 
 
@@ -187,7 +193,9 @@
 
 **2026.07.19**
 
+- `D2_LoadText` / `D2_SaveCaption` / `D2_TagReport`：新增編輯訓練用標註的節點
 - `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`：新增 `include_subfolders`，可同時處理子資料夾內的圖像（也可在 `folder` 中直接寫入 `**`）
+- `D2_FolderImageQueue` / `D2_LoadFolderImages` / `D2_XYFolderImages`：`extension` 可以 `*.png, *.jpg, *.webp` 這樣以逗號分隔指定多個副檔名
 
 **2026.07.01**
 

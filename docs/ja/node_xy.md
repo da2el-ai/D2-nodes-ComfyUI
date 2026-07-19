@@ -333,6 +333,7 @@ Y: steps
 
 - 指定したフォルダー内の画像パスを `D2 XY Plot` に渡すノード
 - `include_subfolders` を `true` にするとサブフォルダー内の画像も対象にする（`folder` に `**` を直接書いてもよい）
+- `extension` は `*.png, *.jpg, *.webp` のようにカンマ区切りで複数の拡張子を指定できる
 
 
 

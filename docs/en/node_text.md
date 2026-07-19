@@ -253,3 +253,112 @@ Output text
 </figure>
 
 - Counts tokens in prompts
+
+---
+
+### D2 Load Text
+
+<figure>
+  <img src="../img/load_text.png">
+</figure>
+
+- A general-purpose node that loads a text file
+- For batch-editing training captions, use it to read the path obtained by `D2 Folder Image Queue` with `*.txt`
+
+#### Input
+
+- `file_path`
+  - Full path of the text file to load
+- `encode_to_utf8`
+  - `true`: Auto-detect the character encoding and convert to utf-8 when reading
+  - `false`: No conversion (read as utf-8)
+
+#### Output
+
+- `text`
+  - The file content (returned as-is, no formatting; empty string if the file does not exist)
+- `file_path`
+  - Passes through the input `file_path` (for feeding into `base_filename` of `D2 Save Caption`)
+
+---
+
+### D2 Save Caption
+
+<figure>
+  <img src="../img/save_caption.png">
+</figure>
+
+- A node that formats tags and saves a caption file
+- Saves to the path obtained by replacing the extension of `base_filename` with `extension` (e.g. `d:/images/aaa.jpg` -> `d:/images/aaa.txt`)
+- Formatting runs in this order: split -> trim -> `_` replace -> exclude -> dedupe -> prepend -> trailing comma
+
+#### Input
+
+- `base_filename`
+  - The source path for saving. Receives `image_path` of `D2 Folder Image Queue` or `file_path` of `D2 Load Text`
+  - Stops with an error if empty (to prevent saving to an unintended location)
+- `text`
+  - The caption body (from `WD14 Tagger` or `D2 Load Text`)
+- `extension`
+  - Extension of the file to save (e.g. `txt`)
+- `exclude_tags`
+  - Tags to exclude. Separated by both commas and line breaks
+  - Writing `regex/pattern/` excludes tags matching the regular expression (exclude only)
+- `prepend_tags`
+  - Tags to prepend. Comma-separated. Tags that already exist are not added
+- `replace_underscore`
+  - `true`: Convert `_` to spaces
+- `trailing_comma`
+  - `true`: Add a trailing comma
+- `ignore_case`
+  - `true`: Ignore case when matching for exclusion
+- `backup`
+  - `true`: If a file of the same name exists, rename the old file to `.bak` before saving
+- `dry_run`
+  - `true`: Do not save to file; only check the formatted result in the `text` output (preview of the conversion)
+
+#### Output
+
+- `text`
+  - The formatted caption
+- `file_path`
+  - Full path of the save destination (the planned path when `dry_run`)
+
+---
+
+### D2 Tag Report
+
+<figure>
+  <img src="../img/tag_report.png">
+</figure>
+
+- A node that aggregates tag frequency from captions in the specified folder and builds an exclude-tag list
+- The `Get tags` button shows the aggregated result in `text`. The user edits which tags to keep/remove and passes it to `exclude_tags` of `D2 Save Caption`
+- Prefixing a line with `//` or `#` makes it a comment line
+
+#### Input
+
+- `folder`
+  - The folder containing the caption files (full path)
+- `include_subfolders`
+  - `true`: Also target subfolders
+- `extension`
+  - Target extension (e.g. `txt`)
+- `order_by`
+  - `count_9-0`: Descending by occurrence count
+  - `count_0-9`: Ascending by occurrence count
+  - `tag_a-z`: By tag name (A->Z)
+  - `tag_z-a`: By tag name (Z->A)
+- `without_count`
+  - `true`: Do not show occurrence counts in the report
+- `output_type`
+  - `remove_comment`: Remove comment lines and output the rest (workflow: mark tags to remove with comments)
+  - `output_comment`: Output only comment lines (workflow: comment out only the tags to remove)
+- `separator`
+  - `newline`: Output line-separated (recommended, so entries containing commas such as `regex/pattern/` are not broken)
+  - `comma`: Output as a single line separated by comma + space
+
+#### Output
+
+- `text`
+  - The edited tag list (passed to `exclude_tags` of `D2 Save Caption`)

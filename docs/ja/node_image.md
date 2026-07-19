@@ -232,6 +232,7 @@ D:\ComfyUI\output\foo.png
 - `extension`
   - JPEG画像だけを読み込むなら `*.jpg` のように指定する
   - `*silver*.webp` のような指定も可能
+  - `*.png, *.jpg, *.webp` のようにカンマ区切りで複数の拡張子を指定できる
 - `include_subfolders`
   - `true`: サブフォルダー内の画像も対象にする
   - `false`: 指定フォルダー直下のみ
@@ -260,6 +261,7 @@ D:\ComfyUI\output\foo.png
   - ファイル名のフィルタを指定
   - `*.*`: 全ての画像
   - `*.png`: PNG形式のみ対象
+  - `*.png, *.jpg, *.webp` のようにカンマ区切りで複数の拡張子を指定できる
 - `include_subfolders`
   - `true`: サブフォルダー内の画像も対象にする
   - `false`: 指定フォルダー直下のみ

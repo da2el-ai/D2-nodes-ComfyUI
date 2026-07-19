@@ -239,6 +239,7 @@ D:\ComfyUI\output\foo.png
 - `extension`
   - 如僅載入 JPEG 圖像則指定為 `*.jpg`
   - 也可使用 `*silver*.webp` 等指定方式
+  - 可以 `*.png, *.jpg, *.webp` 這樣以逗號分隔指定多個副檔名
 - `include_subfolders`
   - `true`: 同時處理子資料夾內的圖像
   - `false`: 僅限指定資料夾直接下方
@@ -263,6 +264,7 @@ D:\ComfyUI\output\foo.png
   - 指定文件名過濾器
   - `*.*`: 所有圖像
   - `*.png`: 僅 PNG 格式
+  - 可以 `*.png, *.jpg, *.webp` 這樣以逗號分隔指定多個副檔名
 - `include_subfolders`
   - `true`: 同時處理子資料夾內的圖像
   - `false`: 僅限指定資料夾直接下方
