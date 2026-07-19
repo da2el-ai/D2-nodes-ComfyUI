@@ -13,7 +13,8 @@ app.registerExtension({
          */
         const getTagReport = (folder, extension, includeSubfolders, orderBy, withoutCount) => {
             return new Promise(async (resolve) => {
-                const url = `/D2/tag-report/get-tags?folder=${folder}&extension=${extension}&include_subfolders=${includeSubfolders}&order_by=${orderBy}&without_count=${withoutCount}`;
+                // folder / extension はスペースや記号を含むため encodeURIComponent する
+                const url = `/D2/tag-report/get-tags?folder=${encodeURIComponent(folder)}&extension=${encodeURIComponent(extension)}&include_subfolders=${includeSubfolders}&order_by=${orderBy}&without_count=${withoutCount}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 resolve(data.report);

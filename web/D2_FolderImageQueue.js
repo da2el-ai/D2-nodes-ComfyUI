@@ -22,7 +22,8 @@ class FolderImageQueue {
             const folder = this.folderWidget.value;
             const extension = this.extensionWidget.value;
             const includeSubfolders = this.includeSubfoldersWidget.value;
-            const url = API_BASE_URL + `get_image_count?folder=${folder}&extension=${extension}&include_subfolders=${includeSubfolders}`;
+            // extension はカンマ区切りの複数パターンやスペースを含むため encodeURIComponent する
+            const url = API_BASE_URL + `get_image_count?folder=${encodeURIComponent(folder)}&extension=${encodeURIComponent(extension)}&include_subfolders=${includeSubfolders}`;
 
             const response = await fetch(url);
             const data = await response.json();
