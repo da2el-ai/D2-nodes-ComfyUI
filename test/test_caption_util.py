@@ -161,6 +161,30 @@ class TestSaveCaption(unittest.TestCase):
             save_caption("   ", "1girl", "txt")
         self.assertFalse(os.path.isfile(".txt"))
 
+    def test_dry_run_does_not_write(self):
+        """dry_run は書き込まず保存予定パスを返す"""
+        with tempfile.TemporaryDirectory() as tmp:
+            base = os.path.join(tmp, "img.jpg")
+            save_path = save_caption(base, "1girl", "txt", dry_run=True)
+            self.assertEqual(save_path, os.path.join(tmp, "img.txt"))
+            self.assertFalse(os.path.isfile(save_path))
+
+    def test_dry_run_no_backup(self):
+        """dry_run は既存ファイルを .bak にリネームしない（書き換えない）"""
+        with tempfile.TemporaryDirectory() as tmp:
+            base = os.path.join(tmp, "img.jpg")
+            txt_path = os.path.join(tmp, "img.txt")
+            save_caption(base, "old", "txt", backup=False)
+            save_caption(base, "new", "txt", backup=True, dry_run=True)
+            # 既存ファイルは変更されず、.bak も作られない
+            with open(txt_path, "r", encoding="utf-8") as f:
+                self.assertEqual(f.read(), "old")
+            self.assertFalse(os.path.isfile(txt_path + ".bak"))
+
+    def test_dry_run_empty_base_filename_returns_empty(self):
+        """dry_run 時は base_filename が空でもエラーにせず空文字を返す"""
+        self.assertEqual(save_caption("", "1girl", "txt", dry_run=True), "")
+
 
 class TestCountTags(unittest.TestCase):
     def _make_files(self, tmp, contents):
@@ -218,20 +242,31 @@ class TestBuildTagReport(unittest.TestCase):
 class TestFormatTagReport(unittest.TestCase):
     EDITED = "1girl,100\n// black hair,90\n# twintails,90\nschool uniform,80"
 
-    def test_remove_comment(self):
-        """コメント行を捨てて残りをタグリスト化"""
+    def test_remove_comment_newline(self):
+        """コメント行を捨てて残りをタグリスト化（デフォルトは改行区切り）"""
         result = format_tag_report(self.EDITED, "remove_comment")
-        self.assertEqual(result, "1girl, school uniform")
+        self.assertEqual(result, "1girl\nschool uniform")
 
-    def test_output_comment(self):
-        """コメント行のみをタグリスト化"""
+    def test_output_comment_newline(self):
+        """コメント行のみをタグリスト化（改行区切り）"""
         result = format_tag_report(self.EDITED, "output_comment")
-        self.assertEqual(result, "black hair, twintails")
+        self.assertEqual(result, "black hair\ntwintails")
+
+    def test_separator_comma(self):
+        """separator=comma はカンマ＋空白の1行で結合"""
+        result = format_tag_report(self.EDITED, "remove_comment", "comma")
+        self.assertEqual(result, "1girl, school uniform")
 
     def test_line_without_count(self):
         """回数の無い行（手書きの regex 行など）もそのまま通す"""
         result = format_tag_report("regex/.*hair/\n1girl,10", "remove_comment")
-        self.assertEqual(result, "regex/.*hair/, 1girl")
+        self.assertEqual(result, "regex/.*hair/\n1girl")
+
+    def test_regex_with_comma_survives_roundtrip(self):
+        """改行区切りなら、カンマを含む正規表現がそのまま exclude エントリとして復元される"""
+        report = format_tag_report("regex/a{2,3}/\n1girl,10", "remove_comment")
+        entries = parse_exclude_tags(report)
+        self.assertEqual(entries, ["regex/a{2,3}/", "1girl"])
 
     def test_empty(self):
         self.assertEqual(format_tag_report("", "remove_comment"), "")

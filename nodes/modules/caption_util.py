@@ -139,12 +139,19 @@ def format_caption(text, exclude_tags="", prepend_tags="", replace_underscore=Fa
 - base_filename が空だと ".txt" 等の相対パスがカレントディレクトリに書かれてしまう。
   キャプション付けは大量処理のため、間違いに気づかず全件無駄になるのを防ぐべく
   空の場合は ValueError で停止する（キューは ComfyUI 本体の中止ボタンで止める想定）
+- dry_run=True なら書き込み・バックアップをせず、保存予定パスだけ返す（変換結果の確認用）。
+  この場合 base_filename が空でもエラーにせず空文字を返す（保存しないため）
 """
-def save_caption(base_filename, text, extension="txt", backup=True) -> str:
+def save_caption(base_filename, text, extension="txt", backup=True, dry_run=False) -> str:
     if not base_filename or not base_filename.strip():
+        if dry_run:
+            return ""
         raise ValueError("D2 Save Caption: base_filename が空です。保存先を特定できないため停止しました。")
 
     save_path = os.path.splitext(base_filename)[0] + "." + extension
+
+    if dry_run:
+        return save_path
 
     if backup and os.path.isfile(save_path):
         bak_path = save_path + ".bak"
@@ -202,9 +209,12 @@ def build_tag_report(items, without_count=False) -> str:
 編集後レポートを exclude_tags 用のタグリストに整形する
 - remove_comment: コメント行（// #）を捨てて残りを採用
 - output_comment: コメント行のみ採用（コメント記号は除去）
-- 各行から末尾の ",出現回数" を除去し、カンマ＋空白区切りの1行にする
+- 各行から末尾の ",出現回数" を除去して結合する
+- separator: "newline" なら改行区切り、"comma" ならカンマ＋空白区切り
+  改行区切りは 1タグ1行になるので、手書きの regex/a{2,3}/ のような
+  カンマを含む正規表現エントリが分割されず保護される
 """
-def format_tag_report(text, output_type="remove_comment") -> str:
+def format_tag_report(text, output_type="remove_comment", separator="newline") -> str:
     tags = []
     for line in text.splitlines():
         stripped = line.strip()
@@ -225,4 +235,5 @@ def format_tag_report(text, output_type="remove_comment") -> str:
         if entry:
             tags.append(entry)
 
-    return ", ".join(tags)
+    joiner = "\n" if separator == "newline" else ", "
+    return joiner.join(tags)

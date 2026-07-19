@@ -724,6 +724,7 @@ class D2_SaveCaption(io.ComfyNode):
                 io.Boolean.Input("trailing_comma", default=False),
                 io.Boolean.Input("ignore_case", default=True),
                 io.Boolean.Input("backup", default=True),
+                io.Boolean.Input("dry_run", default=False),
             ],
             outputs=[
                 io.String.Output(display_name="text"),
@@ -733,7 +734,7 @@ class D2_SaveCaption(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, base_filename="", text="", extension="txt", exclude_tags="", prepend_tags="", replace_underscore=False, trailing_comma=False, ignore_case=True, backup=True) -> io.NodeOutput:
+    def execute(cls, base_filename="", text="", extension="txt", exclude_tags="", prepend_tags="", replace_underscore=False, trailing_comma=False, ignore_case=True, backup=True, dry_run=False) -> io.NodeOutput:
         formatted = caption_util.format_caption(
             text,
             exclude_tags=exclude_tags,
@@ -742,8 +743,69 @@ class D2_SaveCaption(io.ComfyNode):
             trailing_comma=trailing_comma,
             ignore_case=ignore_case,
         )
-        save_path = caption_util.save_caption(base_filename, formatted, extension, backup)
+        save_path = caption_util.save_caption(base_filename, formatted, extension, backup, dry_run)
         return io.NodeOutput(formatted, save_path)
+
+
+"""
+
+D2 Tag Report
+フォルダ内キャプションのタグ出現頻度を集計し、除外タグリストを作るノード
+get_tags ボタンで集計結果を text に表示し、ユーザーが編集して exclude_tags に渡す
+
+"""
+class D2_TagReport(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Tag Report",
+            display_name="D2 Tag Report",
+            category="D2",
+            inputs=[
+                io.String.Input("folder", default=""),
+                io.Boolean.Input("include_subfolders", default=False),
+                io.String.Input("extension", default="txt"),
+                io.Combo.Input("order_by", options=["count_9-0", "count_0-9", "tag_a-z", "tag_z-a"], default="count_9-0"),
+                io.Boolean.Input("without_count", default=False),
+                io.Combo.Input("output_type", options=["remove_comment", "output_comment"], default="remove_comment"),
+                io.Combo.Input("separator", options=["newline", "comma"], default="newline"),
+                io.Custom("D2_BUTTON").Input("get_tags", optional=True),
+                io.String.Input("text", multiline=True, default=""),
+            ],
+            outputs=[
+                io.String.Output(display_name="text"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, folder="", include_subfolders=False, extension="txt", order_by="count_9-0", without_count=False, output_type="remove_comment", separator="newline", get_tags=None, text="") -> io.NodeOutput:
+        result = caption_util.format_tag_report(text, output_type, separator)
+        return io.NodeOutput(result)
+
+
+"""
+フォルダ内キャプションのタグを集計してレポートを返す
+D2/tag-report/get-tags?folder=***&extension=***&include_subfolders=***&order_by=***&without_count=***
+という形式でリクエストが届く
+"""
+@PromptServer.instance.routes.get("/D2/tag-report/get-tags")
+async def route_d2_tag_report_get_tags(request):
+    try:
+        folder = request.query.get('folder')
+        extension = request.query.get('extension')
+        include_subfolders = request.query.get('include_subfolders') == 'true'
+        order_by = request.query.get('order_by')
+        without_count = request.query.get('without_count') == 'true'
+
+        files = util.get_files(folder, f"*.{extension}", include_subfolders=include_subfolders)
+        items = caption_util.count_tags(files, order_by)
+        report = caption_util.build_tag_report(items, without_count)
+    except:
+        report = ""
+
+    # JSON応答を返す
+    json_data = json.dumps({"report": report})
+    return web.Response(text=json_data, content_type='application/json')
 
 
 NODE_CLASS_MAPPINGS = {
@@ -758,4 +820,5 @@ NODE_CLASS_MAPPINGS = {
     "D2 Prompt Sanitizer": D2_PromptSanitizer,
     "D2 Load Text": D2_LoadText,
     "D2 Save Caption": D2_SaveCaption,
+    "D2 Tag Report": D2_TagReport,
 }
