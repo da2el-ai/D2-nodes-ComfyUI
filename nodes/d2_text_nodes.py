@@ -694,6 +694,14 @@ class D2_LoadText(io.ComfyNode):
             ],
         )
 
+    # 同じ file_path でも外部アプリでファイルが更新されたら再読込させるため mtime を返す。
+    # 返り値が前回と変わると ComfyUI がキャッシュを無効化し execute を再実行する。
+    @classmethod
+    def fingerprint_inputs(cls, file_path="", encode_to_utf8=False):
+        if file_path and os.path.isfile(file_path):
+            return os.path.getmtime(file_path)
+        return file_path
+
     @classmethod
     def execute(cls, file_path="", encode_to_utf8=False) -> io.NodeOutput:
         text = caption_util.load_text_file(file_path, encode_to_utf8)
