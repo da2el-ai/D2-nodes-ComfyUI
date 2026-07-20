@@ -375,6 +375,8 @@ Output text
   - `Get tags` ボタンで集計結果を `text` に表示する
   - ユーザーは残す・消すを編集し、`D2 Save Caption` の `exclude_tags` に渡す
 - 行頭に `//` または `#` を付けるとコメント行になる
+- `D2 Tag Report` `D2 Save Caption` の使い方はこちらの記事をご覧ください
+  - https://note.com/da2el_ai/n/ne1fc9b3bea89?app_launch=false
 
 #### Input
 

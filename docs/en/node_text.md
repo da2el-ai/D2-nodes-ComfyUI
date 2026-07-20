@@ -335,6 +335,8 @@ Output text
 - A node that aggregates tag frequency from captions in the specified folder and builds an exclude-tag list
 - The `Get tags` button shows the aggregated result in `text`. The user edits which tags to keep/remove and passes it to `exclude_tags` of `D2 Save Caption`
 - Prefixing a line with `//` or `#` makes it a comment line
+- For how to use `D2 Tag Report` and `D2 Save Caption`, see this article (Japanese)
+  - https://note.com/da2el_ai/n/ne1fc9b3bea89?app_launch=false
 
 #### Input
 

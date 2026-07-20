@@ -362,6 +362,8 @@ Output text
 - 從指定資料夾內的標註集計標籤出現頻率，並建立排除標籤清單的節點
 - `Get tags` 按鈕會將集計結果顯示於 `text`。使用者編輯要保留・刪除的標籤，再傳給 `D2 Save Caption` 的 `exclude_tags`
 - 在行首加上 `//` 或 `#` 即為註解行
+- `D2 Tag Report` `D2 Save Caption` 的使用方式請參閱這篇文章（日文）
+  - https://note.com/da2el_ai/n/ne1fc9b3bea89?app_launch=false
 
 #### Input
 
