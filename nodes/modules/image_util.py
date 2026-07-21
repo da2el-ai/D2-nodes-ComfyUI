@@ -4,12 +4,70 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 import os
 import json
+import comfy.model_management
+import node_helpers
 from comfy.cli_args import args
+from comfy_api.latest import InputImpl
 from PIL.PngImagePlugin import PngInfo
 import piexif
 import piexif.helper
 
 
+
+
+def load_image_from_path(image_path):
+    """
+    画像ファイルを IMAGE / MASK の Tensor に変換する。
+    標準ノード LoadImage.load_image（ComfyUI v0.28）からパス解決部分を除いた移植。
+    セキュリティ強化で folder_paths.get_annotated_filepath が input/output/temp 外の
+    パスを拒否するようになったため、管理外フォルダの画像はこの関数で読み込む。
+
+    Args:
+        image_path (str): 画像ファイルのパス
+
+    Returns:
+        tuple: (IMAGE Tensor [batch, height, width, channels], MASK Tensor [batch, height, width])
+    """
+    dtype = comfy.model_management.intermediate_dtype()
+    device = comfy.model_management.intermediate_device()
+
+    components = InputImpl.VideoFromFile(image_path).get_components()
+    if components.images.shape[0] > 0:
+        return (components.images.to(device=device, dtype=dtype), (1.0 - components.alpha[..., -1]).to(device=device, dtype=dtype) if components.alpha is not None else torch.zeros((components.images.shape[0], 64, 64), dtype=dtype, device=device))
+
+    # pyav が読み込めないアニメーション webp はここで処理される（本家と同じ扱い）
+    img = node_helpers.pillow(Image.open, image_path)
+
+    output_images = []
+    output_masks = []
+    w, h = None, None
+
+    for i in ImageSequence.Iterator(img):
+        i = node_helpers.pillow(ImageOps.exif_transpose, i)
+
+        image = i.convert("RGB")
+
+        if len(output_images) == 0:
+            w = image.size[0]
+            h = image.size[1]
+
+        if image.size[0] != w or image.size[1] != h:
+            continue
+
+        image = np.array(image).astype(np.float32) / 255.0
+        image = torch.from_numpy(image)[None,]
+        if 'A' in i.getbands():
+            mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
+            mask = 1. - torch.from_numpy(mask)
+        else:
+            mask = torch.zeros((64, 64), dtype=torch.float32, device="cpu")
+        output_images.append(image.to(dtype=dtype))
+        output_masks.append(mask.unsqueeze(0).to(dtype=dtype))
+
+    output_image = torch.cat(output_images, dim=0)
+    output_mask = torch.cat(output_masks, dim=0)
+
+    return (output_image.to(device=device, dtype=dtype), output_mask.to(device=device, dtype=dtype))
 
 
 def tensor2pil(image):

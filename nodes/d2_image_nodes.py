@@ -365,10 +365,15 @@ class D2_LoadImage(io.ComfyNode):
         if image_path != None:
             image = image_path.strip()
 
-        # オリジナルのLoadImage処理（V1 クラスをインスタンス経由で呼ぶ）
-        output_images, output_masks = LoadImage().load_image(image)
+        # get_annotated_filepath が input/output/temp 外のパスを拒否するようになったため、
+        # 管理内のファイルだけ注釈付きパスとして解決し、管理外は絶対パスをそのまま使う
+        if folder_paths.exists_annotated_filepath(image):
+            image_path = folder_paths.get_annotated_filepath(image)
+        else:
+            image_path = image
 
-        image_path = folder_paths.get_annotated_filepath(image)
+        # 標準 LoadImage と同じ変換処理（folder_paths を経由しない移植版）
+        output_images, output_masks = image_util.load_image_from_path(image_path)
 
         with Image.open(image_path) as img:
             width = img.size[0]
@@ -413,12 +418,27 @@ class D2_LoadFolderImages(io.ComfyNode):
     @classmethod
     def execute(cls, folder="", extension="*.*", include_subfolders=False, sort_by="Name", order_by="A-Z", image_count=None, queue_seed=None, refresh_btn=None) -> io.NodeOutput:
         files = util.get_files(folder, extension, sort_by, order_by, include_subfolders)
-        load_image = LoadImage()
         image_list = []
+        base_size = None
+        base_file = None
 
         for img_path in files:
-            # オリジナルのLoadImage処理
-            output_images, output_masks = load_image.load_image(img_path)
+            # 管理外フォルダの絶対パスを扱うため、標準 LoadImage ではなく移植版で読み込む
+            output_images, output_masks = image_util.load_image_from_path(img_path)
+
+            # IMAGE バッチは全画像が同サイズ必須。torch.cat で分かりにくく落ちる前に、
+            # どのファイルが不一致かを明示して止める
+            size = (output_images.shape[2], output_images.shape[1])
+            if base_size is None:
+                base_size = size
+                base_file = img_path
+            elif size != base_size:
+                raise ValueError(
+                    f"D2 Load Folder Images: image size mismatch. "
+                    f"'{img_path}' is {size[0]}x{size[1]}, but '{base_file}' is {base_size[0]}x{base_size[1]}. "
+                    f"All images in the folder must be the same size."
+                )
+
             image_list.append(output_images)
 
         image_batch = torch.cat(image_list, dim=0)
