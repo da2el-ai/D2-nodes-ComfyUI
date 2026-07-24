@@ -743,10 +743,10 @@ class D2_LoadCSV(io.ComfyNode):
                 io.String.Input("file_path", default=""),
                 io.Combo.Input("file_type", options=["csv", "tsv"], default="csv"),
                 io.Boolean.Input("encode_to_utf8", default=False),
-                io.Combo.Input("output_mode", options=["list", "csv"], default="list"),
+                io.Combo.Input("output_mode", options=["list", "csv"], default="csv"),
                 io.String.Input("row_index", default=""),
                 io.String.Input("column_index", default=""),
-                io.Boolean.Input("use_doublequote", default=True),
+                io.Boolean.Input("use_doublequote", default=False),
             ],
             outputs=[
                 io.AnyType.Output(display_name="output"),
@@ -757,13 +757,13 @@ class D2_LoadCSV(io.ComfyNode):
 
     # 同じ file_path でも外部アプリでファイルが更新されたら再読込させるため mtime を返す。
     @classmethod
-    def fingerprint_inputs(cls, file_path="", file_type="csv", encode_to_utf8=False, output_mode="list", row_index="", column_index="", use_doublequote=True):
+    def fingerprint_inputs(cls, file_path="", file_type="csv", encode_to_utf8=False, output_mode="csv", row_index="", column_index="", use_doublequote=False):
         if file_path and os.path.isfile(file_path):
             return os.path.getmtime(file_path)
         return file_path
 
     @classmethod
-    def execute(cls, file_path="", file_type="csv", encode_to_utf8=False, output_mode="list", row_index="", column_index="", use_doublequote=True) -> io.NodeOutput:
+    def execute(cls, file_path="", file_type="csv", encode_to_utf8=False, output_mode="csv", row_index="", column_index="", use_doublequote=False) -> io.NodeOutput:
         text = caption_util.load_text_file(file_path, encode_to_utf8)
         # row_index / column_index が壊れた書式なら csv_util が ValueError を投げ、
         # ワークフローの実行が停止する（誤った結果を流さない）。
@@ -799,7 +799,7 @@ class D2_SaveCaption(io.ComfyNode):
                 io.String.Input("exclude_tags", multiline=True, default=""),
                 io.String.Input("prepend_tags", default=""),
                 io.Combo.Input("word_separator", options=["underscore", "space", "none"], default="underscore"),
-                io.Boolean.Input("remove_escape", default=False),
+                io.Boolean.Input("remove_escape", default=True),
                 io.Boolean.Input("trailing_comma", default=False),
                 io.Boolean.Input("ignore_case", default=True),
                 io.Boolean.Input("backup", default=True),
@@ -813,7 +813,7 @@ class D2_SaveCaption(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, base_filename="", text="", extension="txt", exclude_tags="", prepend_tags="", word_separator="underscore", remove_escape=False, trailing_comma=False, ignore_case=True, backup=True, dry_run=False) -> io.NodeOutput:
+    def execute(cls, base_filename="", text="", extension="txt", exclude_tags="", prepend_tags="", word_separator="underscore", remove_escape=True, trailing_comma=False, ignore_case=True, backup=True, dry_run=False) -> io.NodeOutput:
         formatted = caption_util.format_caption(
             text,
             exclude_tags=exclude_tags,
