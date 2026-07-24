@@ -27,6 +27,7 @@ from server import PromptServer
 from .modules import util
 from .modules import caption_util
 from .modules import text_util
+from .modules import csv_util
 from .modules.util import AnyType, delete_comment
 # from .modules import checkpoint_util
 # from .modules import pnginfo_util
@@ -727,6 +728,58 @@ class D2_LoadText(io.ComfyNode):
 
 """
 
+D2 Load CSV
+CSV / TSV を読み込み、行・列の範囲を指定して取り出すノード
+
+"""
+class D2_LoadCSV(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Load CSV",
+            display_name="D2 Load CSV",
+            category="D2",
+            inputs=[
+                io.String.Input("file_path", default=""),
+                io.Combo.Input("file_type", options=["csv", "tsv"], default="csv"),
+                io.Boolean.Input("encode_to_utf8", default=False),
+                io.Combo.Input("output_mode", options=["list", "csv"], default="list"),
+                io.String.Input("row_index", default=""),
+                io.String.Input("column_index", default=""),
+                io.Boolean.Input("use_doublequote", default=True),
+            ],
+            outputs=[
+                io.AnyType.Output(display_name="output"),
+                io.Int.Output(display_name="lines_count"),
+                io.String.Output(display_name="file_path"),
+            ],
+        )
+
+    # 同じ file_path でも外部アプリでファイルが更新されたら再読込させるため mtime を返す。
+    @classmethod
+    def fingerprint_inputs(cls, file_path="", file_type="csv", encode_to_utf8=False, output_mode="list", row_index="", column_index="", use_doublequote=True):
+        if file_path and os.path.isfile(file_path):
+            return os.path.getmtime(file_path)
+        return file_path
+
+    @classmethod
+    def execute(cls, file_path="", file_type="csv", encode_to_utf8=False, output_mode="list", row_index="", column_index="", use_doublequote=True) -> io.NodeOutput:
+        text = caption_util.load_text_file(file_path, encode_to_utf8)
+        # row_index / column_index が壊れた書式なら csv_util が ValueError を投げ、
+        # ワークフローの実行が停止する（誤った結果を流さない）。
+        output, lines_count = csv_util.load_csv(
+            text,
+            file_type=file_type,
+            output_mode=output_mode,
+            row_index=row_index,
+            column_index=column_index,
+            use_doublequote=use_doublequote,
+        )
+        return io.NodeOutput(output, lines_count, file_path)
+
+
+"""
+
 D2 Save Caption
 タグ整形をしてキャプションファイルを保存するノード
 保存先は base_filename の拡張子を extension に置換したパス
@@ -846,6 +899,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Prompt": D2_Prompt,
     "D2 Prompt Sanitizer": D2_PromptSanitizer,
     "D2 Load Text": D2_LoadText,
+    "D2 Load CSV": D2_LoadCSV,
     "D2 Save Caption": D2_SaveCaption,
     "D2 Tag Report": D2_TagReport,
 }
