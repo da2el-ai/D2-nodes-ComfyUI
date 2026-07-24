@@ -195,6 +195,7 @@ If you have installed any of the following custom nodes previously, please remov
 
 - `D2_TextConcat`: Added a text concatenation node with an adjustable number of inputs
 - `D2_ListToString` / `D2_RegexSwitcher` / `D2_TagReport`: Unified the separator options (`Comma + Space` / `Comma` / `Line break` / `Semicolon` / `Space` / `None`). Values saved in old workflows keep working
+- `D2_PromptSanitizer`: Added line-break conversion (`newline_mode`), duplicate tag removal (`remove_duplicate_tags`), and trailing comma removal (`strip_trailing_comma`)
 
 **2026.07.19**
 

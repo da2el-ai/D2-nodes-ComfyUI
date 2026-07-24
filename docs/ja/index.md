@@ -198,6 +198,7 @@ D2 Nodes ComfyUI
 
 - `D2_TextConcat`: 入力数を調整できるテキスト結合ノードを新規追加
 - `D2_ListToString` / `D2_RegexSwitcher` / `D2_TagReport`: 区切り文字（separator）の選択肢の表記を統一（`Comma + Space` / `Comma` / `Line break` / `Semicolon` / `Space` / `None`）。旧ワークフローの値も引き続き動作する
+- `D2_PromptSanitizer`: 改行の変換（`newline_mode`）、重複タグの削除（`remove_duplicate_tags`）、末尾カンマの削除（`strip_trailing_comma`）を追加
 
 **2026.07.19**
 

@@ -311,13 +311,14 @@ Output text
 ### D2 Prompt Sanitizer
 
 <figure>
-  <img src="../img/prompt_sanitizer.png">
+  <img src="../img/prompt_sanitizer_2.png">
 </figure>
 
 - 整理提示詞字串的節點
 - 將 `_`（底線）轉換為半形空格（`long_hair` → `long hair`）
 - 在每個 `,`（逗號）之後確保有一個半形空格，並整理前後多餘的空白（`a ,  b` → `a, b`）
 - 合併多餘的連續逗號，並刪除行首的逗號（`a,, ,b` → `a, b`）
+- 也可以轉換換行、刪除重複的標籤
 - 各項處理皆可獨立切換開關
 
 #### Input
@@ -327,6 +328,16 @@ Output text
 - `remove_extra_comma`：將多餘的連續逗號（`,,` / `, ,`）合併為一個，並刪除行首的逗號（保留換行）
 - `protect_lora`：保護以 `<...>` 包圍的 LoRA 表記不被轉換（保留 `<lora:my_lora:1>` 中的底線）
 - `protect_score`：保護 Pony 系的品質標籤 `score_9` / `score_8_up` 等不被轉換
+- `newline_mode`：換行的轉換方式
+    - `keep`：不做任何處理（保留換行）
+    - `add_comma`：在每行結尾加上 `,`（保留換行；空行與已以 `,` 結尾的行不會添加）
+    - `to_comma`：將換行轉換為 `,` 並合併為一行
+    - `to_space`：將換行轉換為半形空格
+    - `remove`：刪除換行（`1girl\nsmile` → `1girlsmile`；適合結合日文文字）
+- `remove_duplicate_tags`：刪除重複的標籤（保留先出現的；比較時忽略 `_` 與半形空格的差異、以及大小寫）
+- `strip_trailing_comma`：刪除整個字串結尾的逗號（適合與 `add_comma` 搭配使用）
+
+> 處理順序為「刪除重複標籤 → 轉換換行 → 轉換底線 → 移除多餘逗號 → 整理逗號 → 刪除結尾逗號」。`remove_duplicate_tags` 殘留的 `,,` 會由 `remove_extra_comma` 清理，因此兩者都開啟即可整理得乾淨。
 
 ---
 

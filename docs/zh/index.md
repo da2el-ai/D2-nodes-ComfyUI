@@ -197,6 +197,7 @@
 
 - `D2_TextConcat`：新增可調整輸入數量的文字結合節點
 - `D2_ListToString` / `D2_RegexSwitcher` / `D2_TagReport`：統一分隔字元（separator）的選項表記（`Comma + Space` / `Comma` / `Line break` / `Semicolon` / `Space` / `None`）。舊工作流程中儲存的值仍可正常運作
+- `D2_PromptSanitizer`：新增換行轉換（`newline_mode`）、重複標籤刪除（`remove_duplicate_tags`）、結尾逗號刪除（`strip_trailing_comma`）
 
 **2026.07.19**
 

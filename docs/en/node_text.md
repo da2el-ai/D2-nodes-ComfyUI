@@ -283,13 +283,14 @@ Output text
 ### D2 Prompt Sanitizer
 
 <figure>
-  <img src="../img/prompt_sanitizer.png">
+  <img src="../img/prompt_sanitizer_2.png">
 </figure>
 
 - A node that cleans up prompt strings
 - Converts `_` (underscore) to a space (`long_hair` → `long hair`)
 - Ensures a single space after each `,` (comma) and tidies up surrounding whitespace (`a ,  b` → `a, b`)
 - Collapses redundant consecutive commas and removes commas at the start of a line (`a,, ,b` → `a, b`)
+- Can also convert line breaks and remove duplicate tags
 - Each transformation can be toggled on / off individually
 
 #### Input
@@ -299,6 +300,16 @@ Output text
 - `remove_extra_comma`: Collapse redundant consecutive commas (`,,` / `, ,`) into one and remove commas at the start of a line (line breaks are preserved)
 - `protect_lora`: Protect LoRA notation enclosed in `<...>` from conversion (keeps the underscores in `<lora:my_lora:1>`)
 - `protect_score`: Protect Pony quality tags such as `score_9` / `score_8_up` from conversion
+- `newline_mode`: How to convert line breaks
+    - `keep`: Do nothing (preserve line breaks)
+    - `add_comma`: Append `,` to the end of each line (line breaks preserved; empty lines and lines already ending with `,` are left as-is)
+    - `to_comma`: Convert line breaks to `,` and join into a single line
+    - `to_space`: Convert line breaks to a space
+    - `remove`: Remove line breaks (`1girl\nsmile` → `1girlsmile`; useful for joining Japanese text)
+- `remove_duplicate_tags`: Remove duplicate tags (keeps the first occurrence; comparison ignores `_` vs. space differences and letter case)
+- `strip_trailing_comma`: Remove a comma at the very end of the whole string (useful together with `add_comma`)
+
+> The transformations run in this order: remove duplicate tags → convert line breaks → convert underscores → remove extra commas → normalize commas → strip trailing comma. Any `,,` left behind by `remove_duplicate_tags` is cleaned up by `remove_extra_comma`, so turning both on gives a tidy result.
 
 ---
 

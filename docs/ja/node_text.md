@@ -321,13 +321,14 @@ Output text
 ### D2 Prompt Sanitizer
 
 <figure>
-  <img src="../img/prompt_sanitizer.png">
+  <img src="../img/prompt_sanitizer_2.png">
 </figure>
 
 - プロンプト文字列を整形するノード
 - `_`（アンダースコア）を半角スペースに変換する（`long_hair` → `long hair`）
 - `,`（カンマ）の後に必ず半角スペースを1つ入れ、前後の余分な空白を整理する（`a ,  b` → `a, b`）
 - 連続した余分なカンマをまとめ、行頭のカンマを削除する（`a,, ,b` → `a, b`）
+- 改行の変換、重複タグの削除もできる
 - 各処理は個別に ON / OFF できる
 
 #### Input
@@ -337,6 +338,16 @@ Output text
 - `remove_extra_comma`：連続した余分なカンマ（`,,` / `, ,`）を1つにまとめ、行頭のカンマを削除する（改行は保持）
 - `protect_lora`：`<...>` で囲まれた LoRA 表記などを変換対象から保護する（`<lora:my_lora:1>` のアンダースコアを残す）
 - `protect_score`：Pony 系の品質タグ `score_9` / `score_8_up` などを変換対象から保護する
+- `newline_mode`：改行の変換方式
+    - `keep`：何もしない（改行を保持）
+    - `add_comma`：各行末に `,` を追加する（改行は保持。空行・既に `,` で終わる行には追加しない）
+    - `to_comma`：改行を `,` に変換して1行にまとめる
+    - `to_space`：改行を半角スペースに変換する
+    - `remove`：改行を削除する（`1girl\nsmile` → `1girlsmile`。日本語テキストの結合向け）
+- `remove_duplicate_tags`：重複したタグを削除する（先に出てきたものを残す。`_` と半角スペースの違い・大文字小文字は無視して比較する）
+- `strip_trailing_comma`：文字列全体の末尾にあるカンマを削除する（`add_comma` との併用向け）
+
+> 処理は「重複タグ削除 → 改行変換 → アンダースコア変換 → 余分なカンマ除去 → カンマ整形 → 末尾カンマ削除」の順で行われる。`remove_duplicate_tags` で残る `,,` は `remove_extra_comma` が掃除するので、両方 ON にしておくときれいに整う。
 
 ---
 
