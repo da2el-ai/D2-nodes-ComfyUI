@@ -21,7 +21,22 @@ from comfy.cli_args import args
 MAX_RESOLUTION = 16384
 MAX_SEED = 0xffffffffffffffff
 LINE_BREAK = "Line break"
-SEPARATOR = [LINE_BREAK, ",", ";"]
+SEPARATOR = ["Comma + Space", "Comma", "Line break", "Semicolon", "Space", "None"]
+# separator ラベル → 実際の区切り文字。
+# 末尾のエイリアスは旧ワークフロー（旧 SEPARATOR / 旧 D2 Tag Report）の後方互換用。
+SEPARATOR_CHARS = {
+    "Comma + Space": ", ",
+    "Comma": ",",
+    "Semicolon": ";",
+    "Line break": "\n",
+    "Space": " ",
+    "None": "",
+    # 旧表記エイリアス
+    ",": ",",
+    ";": ";",
+    "newline": "\n",   # 旧 D2 Tag Report
+    "comma": ", ",     # 旧 D2 Tag Report（旧実装は ", " で結合していた）
+}
 
 D2_MODULE_PATH = Path(__file__)
 D2_ROOT_PATH = D2_MODULE_PATH.parent.parent.parent.absolute()
@@ -138,11 +153,18 @@ class AnyFalseList:
 
 
 """
+separator ラベルを実際の区切り文字へ変換する。
+未知の値はその文字列自体を区切りとして使う（フォールバック）。
+"""
+def get_separator_str(separator):
+    return SEPARATOR_CHARS.get(separator, separator)
+
+
+"""
 リストを文字結合する
 """
 def list_to_text(list, separator):
-    separator = "\n" if separator == "Line break" else separator
-    return separator.join(list)
+    return get_separator_str(separator).join(list)
 
 
 """

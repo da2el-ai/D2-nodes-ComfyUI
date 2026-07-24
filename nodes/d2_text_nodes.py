@@ -42,12 +42,6 @@ D2 RegexSwitcher
 """
 class D2_RegexSwitcher(io.ComfyNode):
 
-    DELIMITER = {
-        "Comma": ",",
-        "Line break": "\n",
-        "None": "",
-    }
-
     @classmethod
     def define_schema(cls) -> io.Schema:
         return io.Schema(
@@ -99,10 +93,10 @@ class D2_RegexSwitcher(io.ComfyNode):
         parts = []
         if prefix:
             parts.append(prefix)
-            parts.append(cls.DELIMITER[pre_delim])
+            parts.append(util.get_separator_str(pre_delim))
         parts.append(match_text)
         if suffix:
-            parts.append(cls.DELIMITER[suf_delim])
+            parts.append(util.get_separator_str(suf_delim))
             parts.append(suffix)
 
         combined_text = "".join(parts)
@@ -511,7 +505,7 @@ class D2_ListToString(io.ComfyNode):
             category="D2",
             inputs=[
                 io.Custom("LIST").Input("LIST"),
-                io.Combo.Input("separator", options=util.SEPARATOR),
+                io.Combo.Input("separator", options=util.SEPARATOR, default=util.LINE_BREAK),
             ],
             outputs=[
                 io.String.Output(display_name="STRING"),
@@ -776,7 +770,7 @@ class D2_TagReport(io.ComfyNode):
                 io.Combo.Input("order_by", options=["count_9-0", "count_0-9", "tag_a-z", "tag_z-a"], default="count_9-0"),
                 io.Boolean.Input("without_count", default=False),
                 io.Combo.Input("output_type", options=["remove_comment", "output_comment"], default="remove_comment"),
-                io.Combo.Input("separator", options=["newline", "comma"], default="newline"),
+                io.Combo.Input("separator", options=["Line break", "Comma + Space"], default="Line break"),
                 io.Custom("D2_BUTTON").Input("get_tags", optional=True),
                 io.String.Input("text", multiline=True, default=""),
             ],
@@ -786,8 +780,9 @@ class D2_TagReport(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, folder="", include_subfolders=False, extension="txt", order_by="count_9-0", without_count=False, output_type="remove_comment", separator="newline", get_tags=None, text="") -> io.NodeOutput:
-        result = caption_util.format_tag_report(text, output_type, separator)
+    def execute(cls, folder="", include_subfolders=False, extension="txt", order_by="count_9-0", without_count=False, output_type="remove_comment", separator="Line break", get_tags=None, text="") -> io.NodeOutput:
+        # separator ラベルを実際の区切り文字へ変換して渡す（caption_util は comfy 非依存のため util を import しない）
+        result = caption_util.format_tag_report(text, output_type, util.get_separator_str(separator))
         return io.NodeOutput(result)
 
 

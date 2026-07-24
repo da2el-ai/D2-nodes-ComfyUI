@@ -253,9 +253,16 @@ class TestFormatTagReport(unittest.TestCase):
         self.assertEqual(result, "black hair\ntwintails")
 
     def test_separator_comma(self):
-        """separator=comma はカンマ＋空白の1行で結合"""
+        """separator=comma（旧表記エイリアス）はカンマ＋空白の1行で結合"""
         result = format_tag_report(self.EDITED, "remove_comment", "comma")
         self.assertEqual(result, "1girl, school uniform")
+
+    def test_separator_literal_string(self):
+        """separator に実際の区切り文字列を渡せる（新契約）"""
+        result = format_tag_report(self.EDITED, "remove_comment", ", ")
+        self.assertEqual(result, "1girl, school uniform")
+        result = format_tag_report(self.EDITED, "remove_comment", "\n")
+        self.assertEqual(result, "1girl\nschool uniform")
 
     def test_line_without_count(self):
         """回数の無い行（手書きの regex 行など）もそのまま通す"""

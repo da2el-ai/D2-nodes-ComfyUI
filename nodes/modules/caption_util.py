@@ -210,11 +210,17 @@ def build_tag_report(items, without_count=False) -> str:
 - remove_comment: コメント行（// #）を捨てて残りを採用
 - output_comment: コメント行のみ採用（コメント記号は除去）
 - 各行から末尾の ",出現回数" を除去して結合する
-- separator: "newline" なら改行区切り、"comma" ならカンマ＋空白区切り
+- separator: 実際の区切り文字（例: "\n" / ", "）を受け取る。
+  旧表記 "newline" / "comma" もローカルに解釈して後方互換を保つ。
   改行区切りは 1タグ1行になるので、手書きの regex/a{2,3}/ のような
   カンマを含む正規表現エントリが分割されず保護される
 """
-def format_tag_report(text, output_type="remove_comment", separator="newline") -> str:
+def format_tag_report(text, output_type="remove_comment", separator="\n") -> str:
+    # 旧表記エイリアス（直接呼び出し・旧テスト互換）
+    if separator == "newline":
+        separator = "\n"
+    elif separator == "comma":
+        separator = ", "
     tags = []
     for line in text.splitlines():
         stripped = line.strip()
@@ -235,5 +241,4 @@ def format_tag_report(text, output_type="remove_comment", separator="newline") -
         if entry:
             tags.append(entry)
 
-    joiner = "\n" if separator == "newline" else ", "
-    return joiner.join(tags)
+    return separator.join(tags)
