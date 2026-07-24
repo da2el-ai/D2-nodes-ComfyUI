@@ -26,6 +26,7 @@ from server import PromptServer
 
 from .modules import util
 from .modules import caption_util
+from .modules import text_util
 from .modules.util import AnyType, delete_comment
 # from .modules import checkpoint_util
 # from .modules import pnginfo_util
@@ -659,6 +660,9 @@ class D2_PromptSanitizer(io.ComfyNode):
                 io.Boolean.Input("remove_extra_comma", default=True),
                 io.Boolean.Input("protect_lora", default=True),
                 io.Boolean.Input("protect_score", default=True),
+                io.Combo.Input("newline_mode", options=text_util.NEWLINE_MODES, default="keep"),
+                io.Boolean.Input("remove_duplicate_tags", default=False),
+                io.Boolean.Input("strip_trailing_comma", default=False),
             ],
             outputs=[
                 io.String.Output(display_name="prompt"),
@@ -666,42 +670,18 @@ class D2_PromptSanitizer(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True) -> io.NodeOutput:
-        # 保護対象（LoRA等の <...> と Pony 品質タグ score_9 / score_8_up 等）を
-        # プレースホルダへ退避し、整形対象から除外する
-        protected = []
-
-        def _stash(match):
-            protected.append(match.group(0))
-            return f"\x00{len(protected) - 1}\x00"
-
-        text = prompt
-
-        # <...> を退避（LoRA ファイル名のアンダースコアを保護）
-        if protect_lora:
-            text = re.sub(r"<[^>]*>", _stash, text)
-        # score_数字_語 を退避
-        if protect_score:
-            text = re.sub(r"score_\d+(?:_[a-zA-Z0-9]+)*", _stash, text)
-
-        # アンダースコアを半角スペースへ変換
-        if underscore_to_space:
-            text = text.replace("_", " ")
-
-        # 連続するカンマ（間が空白・タブのみ。例: ",," ", ,"）を1つにまとめる（改行はまたがない）
-        if remove_extra_comma:
-            text = re.sub(r",(?:[ \t]*,)+", ",", text)
-            # 行頭のカンマを削除（各行頭・文字列先頭。改行は保持）
-            text = re.sub(r"(?m)^[ \t]*,[ \t]*", "", text)
-
-        # カンマ前後の空白（スペース・タブ）を整理し ", " に統一（改行は保持）
-        if space_after_comma:
-            text = re.sub(r"[ \t]*,[ \t]*", ", ", text)
-
-        # 退避した保護対象を復元
-        if protected:
-            text = re.sub(r"\x00(\d+)\x00", lambda m: protected[int(m.group(1))], text)
-
+    def execute(cls, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True, newline_mode="keep", remove_duplicate_tags=False, strip_trailing_comma=False) -> io.NodeOutput:
+        text = text_util.sanitize_prompt(
+            prompt,
+            underscore_to_space=underscore_to_space,
+            space_after_comma=space_after_comma,
+            remove_extra_comma=remove_extra_comma,
+            protect_lora=protect_lora,
+            protect_score=protect_score,
+            newline_mode=newline_mode,
+            remove_duplicate_tags=remove_duplicate_tags,
+            strip_trailing_comma=strip_trailing_comma,
+        )
         return io.NodeOutput(text)
 
 
