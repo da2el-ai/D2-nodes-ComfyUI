@@ -49,6 +49,7 @@ from .nodes.d2_text_nodes import (
     D2_PromptSanitizer,
     D2_MultiOutput,
     D2_ListToString,
+    D2_TextConcat,
     D2_FilenameTemplate,
     D2_FilenameTemplate2,
     D2_RegexSwitcher,
@@ -129,6 +130,7 @@ class D2Extension(ComfyExtension):
             D2_PromptSanitizer,
             D2_MultiOutput,
             D2_ListToString,
+            D2_TextConcat,
             D2_FilenameTemplate,
             D2_FilenameTemplate2,
             # D. Text 系残り

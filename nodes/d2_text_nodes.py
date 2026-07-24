@@ -520,6 +520,49 @@ class D2_ListToString(io.ComfyNode):
 
 """
 
+D2 Text Concat
+入力数を調整できるテキスト結合ノード
+
+"""
+class D2_TextConcat(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Text Concat",
+            display_name="D2 Text Concat",
+            category="D2",
+            inputs=[
+                io.Int.Input("text_count", default=3, min=1, max=50, step=1),
+                io.Combo.Input("separator", options=util.SEPARATOR, default="Comma + Space"),
+                io.Boolean.Input("skip_empty", default=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="text"),
+            ],
+            # JS が text_1..text_N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
+
+    @classmethod
+    def execute(cls, text_count, separator="Comma + Space", skip_empty=True, **kwargs) -> io.NodeOutput:
+        texts = []
+        for i in range(1, text_count + 1):
+            text = kwargs.get(f"text_{i}")
+            if text is None:
+                continue
+            if skip_empty:
+                # 前後の空白・改行を除去し、空になったものはスキップ
+                text = text.strip()
+                if text == "":
+                    continue
+            texts.append(text)
+
+        output = util.get_separator_str(separator).join(texts)
+        return io.NodeOutput(output)
+
+
+"""
+
 D2 Filename Template
 
 """
@@ -817,6 +860,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Token Counter": D2_TokenCounter,
     "D2 Multi Output": D2_MultiOutput,
     "D2 List To String": D2_ListToString,
+    "D2 Text Concat": D2_TextConcat,
     "D2 Filename Template": D2_FilenameTemplate,
     "D2 Filename Template2": D2_FilenameTemplate2,
     "D2 Prompt": D2_Prompt,
