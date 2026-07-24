@@ -798,7 +798,8 @@ class D2_SaveCaption(io.ComfyNode):
                 io.String.Input("extension", default="txt"),
                 io.String.Input("exclude_tags", multiline=True, default=""),
                 io.String.Input("prepend_tags", default=""),
-                io.Boolean.Input("replace_underscore", default=False),
+                io.Combo.Input("word_separator", options=["underscore", "space", "none"], default="underscore"),
+                io.Boolean.Input("remove_escape", default=False),
                 io.Boolean.Input("trailing_comma", default=False),
                 io.Boolean.Input("ignore_case", default=True),
                 io.Boolean.Input("backup", default=True),
@@ -812,14 +813,15 @@ class D2_SaveCaption(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, base_filename="", text="", extension="txt", exclude_tags="", prepend_tags="", replace_underscore=False, trailing_comma=False, ignore_case=True, backup=True, dry_run=False) -> io.NodeOutput:
+    def execute(cls, base_filename="", text="", extension="txt", exclude_tags="", prepend_tags="", word_separator="underscore", remove_escape=False, trailing_comma=False, ignore_case=True, backup=True, dry_run=False) -> io.NodeOutput:
         formatted = caption_util.format_caption(
             text,
             exclude_tags=exclude_tags,
             prepend_tags=prepend_tags,
-            replace_underscore=replace_underscore,
+            word_separator=word_separator,
             trailing_comma=trailing_comma,
             ignore_case=ignore_case,
+            remove_escape=remove_escape,
         )
         save_path = caption_util.save_caption(base_filename, formatted, extension, backup, dry_run)
         return io.NodeOutput(formatted, save_path)

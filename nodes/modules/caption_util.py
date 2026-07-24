@@ -53,12 +53,39 @@ def parse_exclude_tags(exclude_text) -> list[str]:
 
 
 """
+比較用にプロンプト括弧のエスケープを外す。
+A1111 系プロンプトは重み付けを避けるため `\\(` `\\)` `\\[` `\\]` とエスケープするが、
+除外タグ側は素の `()` `[]` で書くのが自然。完全一致の突き合わせで両者を同一視するため、
+比較キーからのみエスケープを除去する（出力するタグ本体には手を加えない）。
+"""
+def _unescape_brackets(s):
+    return (s.replace("\\(", "(").replace("\\)", ")")
+             .replace("\\[", "[").replace("\\]", "]"))
+
+
+"""
+単語区切りを統一する。
+`blue eyes`（スペース）と `blue_hair`（アンダースコア）が混在するのを揃えるため。
+- "underscore": スペース → `_`（アンダースコアに統一）
+- "space":      `_` → スペース（スペースに統一）
+- "none":       何もしない
+"""
+def _apply_word_separator(s, mode):
+    if mode == "underscore":
+        return s.replace(" ", "_")
+    if mode == "space":
+        return s.replace("_", " ")
+    return s
+
+
+"""
 exclude エントリから (完全一致セット, コンパイル済み正規表現リスト) を作る
-- replace_underscore=True ならエントリ側にも underscore 置換を適用してから比較する
-  （タグレポート由来の `_` 付きタグが不一致にならないように）
+- word_separator でエントリ側にも同じ区切り統一を適用してから比較する
+  （タグ側と揃えないと `_`/スペースの差で不一致になるため）
+- 完全一致キーは括弧エスケープを除去して比較する（`rem_(re:zero)` と `rem_\\(re:zero\\)` を同一視）
 - 不正な正規表現はスキップして警告を出す
 """
-def _build_exclude_matchers(exclude_text, replace_underscore, ignore_case):
+def _build_exclude_matchers(exclude_text, word_separator, ignore_case):
     exact_set = set()
     regex_list = []
     flags = re.IGNORECASE if ignore_case else 0
@@ -71,32 +98,38 @@ def _build_exclude_matchers(exclude_text, replace_underscore, ignore_case):
             except re.error as e:
                 print(f"[D2 Save Caption] 不正な正規表現をスキップ: {entry} ({e})")
         else:
-            if replace_underscore:
-                entry = entry.replace("_", " ")
-            exact_set.add(entry.lower() if ignore_case else entry)
+            entry = _apply_word_separator(entry, word_separator)
+            key = entry.lower() if ignore_case else entry
+            exact_set.add(_unescape_brackets(key))
 
     return exact_set, regex_list
 
 
 """
 キャプションのタグ整形
-処理順: 分割 → trim → underscore置換 → exclude除去 → 重複除去 → prepend → trailing_comma → 結合
+処理順: 分割 → trim → 区切り統一 → escape除去 → exclude除去 → 重複除去 → prepend → trailing_comma → 結合
+- word_separator で単語区切りを統一する（"underscore" / "space" / "none"）
+- remove_escape=True なら出力タグから括弧エスケープ（`\\(` `\\)` `\\[` `\\]`）を外す（学習用キャプション向け）
 """
-def format_caption(text, exclude_tags="", prepend_tags="", replace_underscore=False, trailing_comma=False, ignore_case=True) -> str:
+def format_caption(text, exclude_tags="", prepend_tags="", word_separator="underscore", trailing_comma=False, ignore_case=True, remove_escape=False) -> str:
     # 分割・trim（空要素は捨てる）
     tags = [tag.strip() for tag in text.split(",")]
     tags = [tag for tag in tags if tag]
 
-    # underscore 置換
-    if replace_underscore:
-        tags = [tag.replace("_", " ") for tag in tags]
+    # 単語区切りの統一（スペース/アンダースコア）
+    tags = [_apply_word_separator(tag, word_separator) for tag in tags]
+
+    # 括弧エスケープ除去（以降は素の括弧で exclude/重複判定・出力される）
+    if remove_escape:
+        tags = [_unescape_brackets(tag) for tag in tags]
 
     # exclude 除去（通常エントリは完全一致、regex/pattern/ は re.search）
-    exact_set, regex_list = _build_exclude_matchers(exclude_tags, replace_underscore, ignore_case)
+    exact_set, regex_list = _build_exclude_matchers(exclude_tags, word_separator, ignore_case)
 
     def is_excluded(tag):
         key = tag.lower() if ignore_case else tag
-        if key in exact_set:
+        # 完全一致は括弧エスケープを外して比較（regex は元のタグに対してそのまま）
+        if _unescape_brackets(key) in exact_set:
             return True
         return any(regex.search(tag) for regex in regex_list)
 
@@ -113,8 +146,7 @@ def format_caption(text, exclude_tags="", prepend_tags="", replace_underscore=Fa
 
     # prepend（既にあるタグは追加しない。判定は exclude と同じ正規化・大小規則）
     prepend_list = [tag.strip() for tag in prepend_tags.split(",") if tag.strip()]
-    if replace_underscore:
-        prepend_list = [tag.replace("_", " ") for tag in prepend_list]
+    prepend_list = [_apply_word_separator(tag, word_separator) for tag in prepend_list]
 
     existing = {tag.lower() if ignore_case else tag for tag in unique_tags}
     prepended = []

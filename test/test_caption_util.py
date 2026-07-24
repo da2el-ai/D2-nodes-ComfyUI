@@ -45,14 +45,24 @@ class TestParseExcludeTags(unittest.TestCase):
 
 class TestFormatCaption(unittest.TestCase):
     def test_basic_trim_and_join(self):
-        """分割・trim・カンマ空白区切りで結合"""
-        result = format_caption(" 1girl ,black hair,  ,smile")
+        """分割・trim・カンマ空白区切りで結合（区切り統一なし）"""
+        result = format_caption(" 1girl ,black hair,  ,smile", word_separator="none")
         self.assertEqual(result, "1girl, black hair, smile")
 
-    def test_replace_underscore(self):
-        """underscore を空白に変換"""
-        result = format_caption("black_hair, school_uniform", replace_underscore=True)
+    def test_word_separator_space(self):
+        """word_separator=space は `_` を空白に統一"""
+        result = format_caption("black_hair, school_uniform", word_separator="space")
         self.assertEqual(result, "black hair, school uniform")
+
+    def test_word_separator_underscore(self):
+        """word_separator=underscore（デフォルト）は空白を `_` に統一"""
+        result = format_caption("blue eyes, blue_hair")
+        self.assertEqual(result, "blue_eyes, blue_hair")
+
+    def test_word_separator_none(self):
+        """word_separator=none は変換しない"""
+        result = format_caption("blue eyes, blue_hair", word_separator="none")
+        self.assertEqual(result, "blue eyes, blue_hair")
 
     def test_exclude_exact(self):
         """完全一致で除去"""
@@ -66,7 +76,7 @@ class TestFormatCaption(unittest.TestCase):
 
     def test_exclude_case_sensitive(self):
         """ignore_case=False は大小区別"""
-        result = format_caption("1girl, Black Hair", exclude_tags="black hair", ignore_case=False)
+        result = format_caption("1girl, Black Hair", exclude_tags="black hair", ignore_case=False, word_separator="none")
         self.assertEqual(result, "1girl, Black Hair")
 
     def test_exclude_regex(self):
@@ -74,10 +84,40 @@ class TestFormatCaption(unittest.TestCase):
         result = format_caption("1girl, black hair, blonde hair, smile", exclude_tags="regex/.*hair/")
         self.assertEqual(result, "1girl, smile")
 
-    def test_exclude_underscore_normalized(self):
-        """replace_underscore=True なら exclude 側の `_` も揃えて比較する"""
-        result = format_caption("black_hair, smile", exclude_tags="black_hair", replace_underscore=True)
+    def test_exclude_word_separator_normalized(self):
+        """word_separator=space なら exclude 側の `_` も揃えて比較する"""
+        result = format_caption("black_hair, smile", exclude_tags="black_hair", word_separator="space")
         self.assertEqual(result, "smile")
+
+    def test_exclude_escaped_bracket(self):
+        """エスケープ括弧 \\( \\) と素の ( ) を同一視して除去（丸括弧）"""
+        result = format_caption(r"rem_\(re:zero\), smile", exclude_tags="rem_(re:zero)")
+        self.assertEqual(result, "smile")
+
+    def test_exclude_escaped_bracket_reverse(self):
+        """text 側が素の括弧・exclude 側がエスケープでも除去できる"""
+        result = format_caption("rem_(re:zero), smile", exclude_tags=r"rem_\(re:zero\)")
+        self.assertEqual(result, "smile")
+
+    def test_exclude_escaped_square_bracket(self):
+        """角括弧 \\[ \\] も同一視"""
+        result = format_caption(r"foo_\[bar\], smile", exclude_tags="foo_[bar]")
+        self.assertEqual(result, "smile")
+
+    def test_exclude_escaped_bracket_with_word_separator(self):
+        """word_separator=space と併用しても括弧同一視が効く"""
+        result = format_caption(r"rem_\(re:zero\), smile", exclude_tags="rem (re:zero)", word_separator="space")
+        self.assertEqual(result, "smile")
+
+    def test_remove_escape_output(self):
+        """remove_escape=True で出力タグの括弧エスケープを外す"""
+        result = format_caption(r"rem_\(re:zero\), foo_\[bar\]", remove_escape=True)
+        self.assertEqual(result, "rem_(re:zero), foo_[bar]")
+
+    def test_remove_escape_default_keeps(self):
+        """デフォルト（remove_escape=False）はエスケープを保持"""
+        result = format_caption(r"rem_\(re:zero\)")
+        self.assertEqual(result, r"rem_\(re:zero\)")
 
     def test_invalid_regex_skipped(self):
         """不正な正規表現はスキップ（エラーにしない）"""
@@ -105,12 +145,12 @@ class TestFormatCaption(unittest.TestCase):
         self.assertEqual(result, "")
 
     def test_process_order(self):
-        """underscore置換 → exclude → 重複除去 → prepend の順で処理される"""
+        """区切り統一 → exclude → 重複除去 → prepend の順で処理される"""
         result = format_caption(
             "black_hair, black hair, 1girl",
             exclude_tags="1girl",
             prepend_tags="1girl, masterpiece",
-            replace_underscore=True,
+            word_separator="space",
         )
         # black_hair は black hair になり重複除去、1girl は除去、prepend の 1girl は追加される
         self.assertEqual(result, "1girl, masterpiece, black hair")
