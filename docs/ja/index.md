@@ -107,6 +107,8 @@ D2 Nodes ComfyUI
   - プロンプト文字列を整形する（`_` を空白に変換、カンマ後に空白を挿入）
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
   - テキストファイルを読み込む汎用ノード
+- <a href="node_text.md#D2-Load-CSV">`D2 Load CSV`</a>
+  - CSV / TSV を読み込み、行・列の範囲を指定して取り出す
 - <a href="node_text.md#D2-Save-Caption">`D2 Save Caption`</a>
   - タグを整形して学習用キャプションファイルを保存する
 - <a href="node_text.md#D2-Tag-Report">`D2 Tag Report`</a>
@@ -193,6 +195,13 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.07.25**
+
+- `D2_LoadCSV`: CSV / TSV を読み込み、行・列の範囲を指定して取り出すノードを新規追加
+- `D2_SaveCaption`: 除外タグの比較で括弧のエスケープ（`\(` `\)` `\[` `\]`）と素の括弧を同一視するように修正
+- `D2_SaveCaption`: 出力タグの括弧エスケープを外す `remove_escape` を追加
+- `D2_SaveCaption`: `replace_underscore` を `word_separator`（`underscore` / `space` / `none`）に変更。単語区切りをスペース・アンダースコアのどちらにも統一できるように
 
 **2026.07.24**
 

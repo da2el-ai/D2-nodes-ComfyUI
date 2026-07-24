@@ -377,15 +377,58 @@ Output text
 
 ---
 
+### D2 Load CSV
+
+<figure>
+  <img src="../img/load_csv.png">
+</figure>
+
+- 讀取 CSV / TSV 檔案，並指定行・列的範圍取出的節點
+- 像提示詞這種含有逗號的資料，前提是已用雙引號括起（標準的 CSV 跳脫）
+- 為了即使是大型檔案也能抑制記憶體用量，輸出只有一個，並以 `output_mode` 切換格式
+
+#### Input
+
+- `file_path`
+  - 要讀取的檔案完整路徑
+- `file_type`
+  - `csv`: 逗號分隔 / `tsv`: 定位字元（Tab）分隔。輸入檔案的分隔字元
+- `encode_to_utf8`
+  - `true`: 自動判別字元編碼並轉換為 utf-8 後讀取
+- `output_mode`
+  - `list`: 以 2 維陣列輸出
+  - `csv`: 以換行＋逗號分隔的文字輸出
+- `row_index` / `column_index`
+  - 要輸出的行・列範圍（從 1 開始）。留空表示全部
+  - `3`: 只有第 3 行（列）
+  - `2-`: 從第 2 行（列）到最後
+  - `-4`: 第 1〜4 行（列）
+  - `2-4`: 第 2〜4 行（列）
+  - 格式錯誤（`0`・`2--4`・非數值等）會以錯誤停止執行（避免流出錯誤的資料）
+- `use_doublequote`
+  - 當 `output_mode:csv` 時，將所有儲存格加上雙引號
+  - 設為 `false` 則為單純的逗號結合，含逗號的儲存格會失去分隔（`"AAA,BBB","XXX,YYY"` -> `AAA,BBB,XXX,YYY`）
+
+#### Output
+
+- `output`
+  - 選取範圍的資料。依 `output_mode` 為 2 維陣列或文字
+- `lines_count`
+  - 選取範圍的行數
+- `file_path`
+  - 將輸入的 `file_path` 原樣輸出
+
+---
+
 ### D2 Save Caption
 
 <figure>
-  <img src="../img/save_caption.png">
+  <img src="../img/save_caption_2.png">
 </figure>
 
 - 整形標籤並儲存標註檔案的節點
 - 儲存到將 `base_filename` 的副檔名替換為 `extension` 的路徑（例 `d:/images/aaa.jpg` -> `d:/images/aaa.txt`）
-- 整形依「分割 -> 去除前後空白 -> `_` 替換 -> 排除 -> 去除重複 -> 開頭追加 -> 結尾逗號」的順序進行
+- 整形依「分割 -> 去除前後空白 -> 統一分隔 -> 移除跳脫 -> 排除 -> 去除重複 -> 開頭追加 -> 結尾逗號」的順序進行
 
 #### Input
 
@@ -399,10 +442,16 @@ Output text
 - `exclude_tags`
   - 要排除的標籤。以逗號與換行兩者分隔
   - 寫成 `regex/pattern/` 時排除符合正規表示式的標籤（僅排除）
+  - 比較時忽略括號的跳脫（提示詞的 `rem_\(re:zero\)` 可用排除標籤 `rem_(re:zero)` 排除）
 - `prepend_tags`
   - 追加到開頭的標籤。以逗號分隔。已存在的標籤不會追加
-- `replace_underscore`
-  - `true`: 將 `_` 轉換為空格
+- `word_separator`
+  - 統一單字分隔（整合 `blue eyes` 與 `blue_hair` 的混用）
+  - `underscore`（預設）: 將空格統一為 `_`（`blue eyes` -> `blue_eyes`）
+  - `space`: 將 `_` 統一為空格（`blue_hair` -> `blue hair`）
+  - `none`: 不轉換
+- `remove_escape`
+  - `true`: 從輸出標籤移除括號的跳脫（`\(` `\)` `\[` `\]`）（`rem_\(re:zero\)` -> `rem_(re:zero)`）。適合訓練用標註
 - `trailing_comma`
   - `true`: 在結尾追加逗號
 - `ignore_case`

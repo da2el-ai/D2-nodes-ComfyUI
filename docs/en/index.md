@@ -105,6 +105,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Cleans up prompt strings (convert `_` to space, add a space after commas)
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
   - A general-purpose node that loads a text file
+- <a href="node_text.md#D2-Load-CSV">`D2 Load CSV`</a>
+  - Loads a CSV / TSV file and extracts a range of rows and columns
 - <a href="node_text.md#D2-Save-Caption">`D2 Save Caption`</a>
   - Formats tags and saves a training caption file
 - <a href="node_text.md#D2-Tag-Report">`D2 Tag Report`</a>
@@ -190,6 +192,13 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.07.25**
+
+- `D2_LoadCSV`: Added a node that loads a CSV / TSV file and extracts a range of rows and columns
+- `D2_SaveCaption`: Fixed exclude matching to treat escaped brackets (`\(` `\)` `\[` `\]`) as equal to their bare forms
+- `D2_SaveCaption`: Added `remove_escape` to strip bracket escaping from the output tags
+- `D2_SaveCaption`: Replaced `replace_underscore` with `word_separator` (`underscore` / `space` / `none`), so word separators can be unified to either spaces or underscores
 
 **2026.07.24**
 

@@ -107,6 +107,8 @@
   - 整理提示詞字串（將 `_` 轉換為空格、逗號後插入空格）
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
   - 讀取文字檔案的通用節點
+- <a href="node_text.md#D2-Load-CSV">`D2 Load CSV`</a>
+  - 讀取 CSV / TSV 檔案，並指定行・列的範圍取出
 - <a href="node_text.md#D2-Save-Caption">`D2 Save Caption`</a>
   - 整形標籤並儲存訓練用標註檔案
 - <a href="node_text.md#D2-Tag-Report">`D2 Tag Report`</a>
@@ -192,6 +194,13 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.07.25**
+
+- `D2_LoadCSV`：新增讀取 CSV / TSV 檔案並指定行・列範圍取出的節點
+- `D2_SaveCaption`：修正排除標籤的比較，將括號的跳脫（`\(` `\)` `\[` `\]`）與素括號視為相同
+- `D2_SaveCaption`：新增從輸出標籤移除括號跳脫的 `remove_escape`
+- `D2_SaveCaption`：將 `replace_underscore` 改為 `word_separator`（`underscore` / `space` / `none`），可將單字分隔統一為空格或底線任一方
 
 **2026.07.24**
 

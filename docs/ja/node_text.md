@@ -387,15 +387,58 @@ Output text
 
 ---
 
+### D2 Load CSV
+
+<figure>
+  <img src="../img/load_csv.png">
+</figure>
+
+- CSV / TSV ファイルを読み込み、行・列の範囲を指定して取り出すノード
+- プロンプトのようにカンマを含むデータは、ダブルクォートされている前提（標準的な CSV エスケープ）
+- 巨大なファイルでもメモリを抑えるため、出力は1つにし `output_mode` で形式を切り替える
+
+#### Input
+
+- `file_path`
+  - 読み込むファイルのフルパス
+- `file_type`
+  - `csv`: カンマ区切り / `tsv`: タブ区切り。入力ファイルの区切り文字
+- `encode_to_utf8`
+  - `true`: 文字コードを自動判別して utf-8 に変換して読み込む
+- `output_mode`
+  - `list`: 2次元配列で出力
+  - `csv`: 改行＋カンマ区切りのテキストで出力
+- `row_index` / `column_index`
+  - 出力する行・列の範囲（1スタート）。無指定（空）で全て
+  - `3`: 3行（列）目のみ
+  - `2-`: 2行（列）目から最後まで
+  - `-4`: 1〜4行（列）目
+  - `2-4`: 2〜4行（列）目
+  - 壊れた書式（`0`・`2--4`・非数値など）はエラーで実行を停止する（誤ったデータを流さないため）
+- `use_doublequote`
+  - `output_mode:csv` のとき、全セルをダブルクォートする
+  - `false` にすると素のカンマ結合になり、カンマを含むセルは区切りが失われる（`"AAA,BBB","XXX,YYY"` → `AAA,BBB,XXX,YYY`）
+
+#### Output
+
+- `output`
+  - 選択範囲のデータ。`output_mode` により2次元配列またはテキスト
+- `lines_count`
+  - 選択範囲の行数
+- `file_path`
+  - 入力した `file_path` をそのまま出力
+
+---
+
 ### D2 Save Caption
 
 <figure>
-  <img src="../img/save_caption.png">
+  <img src="../img/save_caption_2.png">
 </figure>
 
 - タグを整形してキャプションファイルを保存するノード
 - `base_filename` の拡張子を `extension` に置き換えたパスに保存する（例 `d:/images/aaa.jpg` → `d:/images/aaa.txt`）
-- 整形は「分割 → 前後空白除去 → `_` 置換 → 除外 → 重複除去 → 先頭追加 → 末尾カンマ」の順で行う
+- 整形は「分割 → 前後空白除去 → 区切り統一 → エスケープ除去 → 除外 → 重複除去 → 先頭追加 → 末尾カンマ」の順で行う
 
 #### Input
 
@@ -409,10 +452,16 @@ Output text
 - `exclude_tags`
   - 除外するタグ。カンマ・改行の両方で区切る
   - `regex/パターン/` と書くと正規表現にマッチしたタグを除外する（除外専用）
+  - 括弧のエスケープは無視して比較する（プロンプトの `rem_\(re:zero\)` を除外タグ `rem_(re:zero)` で除外できる）
 - `prepend_tags`
   - 先頭に追加するタグ。カンマ区切り。既に存在するタグは追加しない
-- `replace_underscore`
-  - `true`: `_` を空白に変換
+- `word_separator`
+  - 単語区切りを統一する（`blue eyes` と `blue_hair` の混在を揃える）
+  - `underscore`（デフォルト）: スペースを `_` に統一（`blue eyes` → `blue_eyes`）
+  - `space`: `_` をスペースに統一（`blue_hair` → `blue hair`）
+  - `none`: 変換しない
+- `remove_escape`
+  - `true`: 出力タグから括弧のエスケープ（`\(` `\)` `\[` `\]`）を外す（`rem_\(re:zero\)` → `rem_(re:zero)`）。学習用キャプション向け
 - `trailing_comma`
   - `true`: 末尾にカンマを追加
 - `ignore_case`

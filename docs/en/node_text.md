@@ -349,15 +349,58 @@ Output text
 
 ---
 
+### D2 Load CSV
+
+<figure>
+  <img src="../img/load_csv.png">
+</figure>
+
+- A node that loads a CSV / TSV file and extracts a range of rows and columns
+- Data with commas (like prompts) is assumed to be double-quoted (standard CSV escaping)
+- To keep memory bounded even for large files, there is a single output whose format is switched by `output_mode`
+
+#### Input
+
+- `file_path`
+  - Full path of the file to load
+- `file_type`
+  - `csv`: comma-separated / `tsv`: tab-separated. The delimiter of the input file
+- `encode_to_utf8`
+  - `true`: Auto-detect the character encoding and convert to utf-8 when reading
+- `output_mode`
+  - `list`: Output as a 2D array
+  - `csv`: Output as line-break + comma separated text
+- `row_index` / `column_index`
+  - Range of rows/columns to output (1-based). Empty means all
+  - `3`: only the 3rd row (column)
+  - `2-`: from the 2nd row (column) to the end
+  - `-4`: rows (columns) 1 to 4
+  - `2-4`: rows (columns) 2 to 4
+  - A malformed format (`0`, `2--4`, non-numeric, etc.) stops execution with an error (so wrong data is not passed on)
+- `use_doublequote`
+  - When `output_mode:csv`, double-quote every cell
+  - `false` produces a plain comma join, so cells containing commas lose their separation (`"AAA,BBB","XXX,YYY"` -> `AAA,BBB,XXX,YYY`)
+
+#### Output
+
+- `output`
+  - The selected data. A 2D array or text depending on `output_mode`
+- `lines_count`
+  - Number of rows in the selected range
+- `file_path`
+  - Passes through the input `file_path`
+
+---
+
 ### D2 Save Caption
 
 <figure>
-  <img src="../img/save_caption.png">
+  <img src="../img/save_caption_2.png">
 </figure>
 
 - A node that formats tags and saves a caption file
 - Saves to the path obtained by replacing the extension of `base_filename` with `extension` (e.g. `d:/images/aaa.jpg` -> `d:/images/aaa.txt`)
-- Formatting runs in this order: split -> trim -> `_` replace -> exclude -> dedupe -> prepend -> trailing comma
+- Formatting runs in this order: split -> trim -> unify separator -> remove escape -> exclude -> dedupe -> prepend -> trailing comma
 
 #### Input
 
@@ -371,10 +414,16 @@ Output text
 - `exclude_tags`
   - Tags to exclude. Separated by both commas and line breaks
   - Writing `regex/pattern/` excludes tags matching the regular expression (exclude only)
+  - Bracket escaping is ignored in the comparison (a prompt tag `rem_\(re:zero\)` can be excluded by an exclude tag `rem_(re:zero)`)
 - `prepend_tags`
   - Tags to prepend. Comma-separated. Tags that already exist are not added
-- `replace_underscore`
-  - `true`: Convert `_` to spaces
+- `word_separator`
+  - Unify the word separator (to align a mix of `blue eyes` and `blue_hair`)
+  - `underscore` (default): Unify spaces to `_` (`blue eyes` -> `blue_eyes`)
+  - `space`: Unify `_` to spaces (`blue_hair` -> `blue hair`)
+  - `none`: No conversion
+- `remove_escape`
+  - `true`: Strip bracket escaping (`\(` `\)` `\[` `\]`) from the output tags (`rem_\(re:zero\)` -> `rem_(re:zero)`). For training captions
 - `trailing_comma`
   - `true`: Add a trailing comma
 - `ignore_case`
