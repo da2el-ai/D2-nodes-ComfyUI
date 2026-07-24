@@ -95,6 +95,8 @@
   - 以列表形式輸出 SEED / STRING / INT / FLOAT
 - <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
   - 將陣列轉換為字串
+- <a href="node_text.md#D2-Text-Concat">`D2 Text Concat`</a>
+  - 可調整輸入數量的文字結合節點
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - 生成文件名稱
 - <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
@@ -190,6 +192,11 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.07.24**
+
+- `D2_TextConcat`：新增可調整輸入數量的文字結合節點
+- `D2_ListToString` / `D2_RegexSwitcher` / `D2_TagReport`：統一分隔字元（separator）的選項表記（`Comma + Space` / `Comma` / `Line break` / `Semicolon` / `Space` / `None`）。舊工作流程中儲存的值仍可正常運作
 
 **2026.07.19**
 

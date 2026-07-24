@@ -120,7 +120,7 @@ Output text
 ### D2 Multi Output
 
 <figure>
-<img src="../img/multi.png">
+<img src="../img/multi_2.png">
 </figure>
 
 - Node that outputs generic parameters like seed and cfg as lists
@@ -135,6 +135,62 @@ Output text
 - `Add Random`
     - Adds random numbers to input field
     - Only shown when `type` is `SEED`
+
+### Output
+
+- `LIST`
+  - Splits by line break and outputs as an array
+- `x/y_list`
+  - Plain line-break separated text
+  - Used with `D2 XY Plot`, `D2 XY Plot Easy`, `D2 XY Plot Easy Mini`
+
+---
+
+### D2 List To String
+
+<figure>
+  <img src="../img/list_to_string.png">
+</figure>
+
+- Node that joins an array (LIST) into a single string
+- Choose the delimiter with `separator`
+
+#### Input
+
+- `separator`
+    - `Comma + Space`: Join with `, `
+    - `Comma`: Join with `,`
+    - `Line break`: Join with line breaks
+    - `Semicolon`: Join with `;`
+    - `Space`: Join with a space
+    - `None`: Join with no delimiter
+
+---
+
+### D2 Text Concat
+
+<figure>
+  <img src="../img/text_concat.png">
+</figure>
+
+- Text concatenation node with an adjustable number of inputs
+- Adjust the number of input fields with `text_count`, then join the texts connected to `text_1` .. `text_N`
+- `separator` is shared with `D2 List To String`
+
+#### Input
+
+- `text_count`
+    - Adjusts the number of input fields (1 to 50)
+- `separator`
+    - `Comma + Space`: Join with `, `
+    - `Comma`: Join with `,`
+    - `Line break`: Join with line breaks
+    - `Semicolon`: Join with `;`
+    - `Space`: Join with a space
+    - `None`: Join with no delimiter
+- `skip_empty`
+    - When `true`, skips unconnected or empty (whitespace/line-break only) inputs
+    - Prevents stray delimiters (`, , `) from appearing
 
 ---
 

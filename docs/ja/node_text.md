@@ -156,7 +156,7 @@ Output text
 ### D2 Multi Output
 
 <figure>
-  <img src="../img/multi.png">
+  <img src="../img/multi_2.png">
 </figure>
 
 - seed や cfg など汎用的なパラメータをリスト出力するノード
@@ -172,6 +172,62 @@ Output text
     - 入力欄に乱数を追加する
     - `type` が `SEED` の時だけ表示される
 
+### Output
+
+- `LIST`
+  - 改行で分解して配列で出力する
+- `x/y_list`
+  - 普通の改行区切りテキスト
+  - `D2 XY Plot`、`D2 XY Plot Easy`、`D2 XY Plot Easy Mini` で使用する
+
+
+---
+
+### D2 List To String
+
+<figure>
+  <img src="../img/list_to_string.png">
+</figure>
+
+- 配列（LIST）を1つの文字列に結合するノード
+- `separator` で区切り文字を選択する
+
+#### Input
+
+- `separator`
+    - `Comma + Space`: `, ` で結合
+    - `Comma`: `,` で結合
+    - `Line break`: 改行で結合
+    - `Semicolon`: `;` で結合
+    - `Space`: 半角スペースで結合
+    - `None`: 区切り文字なしで結合
+
+---
+
+### D2 Text Concat
+
+<figure>
+  <img src="../img/text_concat.png">
+</figure>
+
+- 入力数を調整できるテキスト結合ノード
+- `text_count` で入力欄を増減し、`text_1` 〜 `text_N` に接続したテキストを結合する
+- `separator` は `D2 List To String` と共通
+
+#### Input
+
+- `text_count`
+    - 入力欄の数を増減する（1〜50）
+- `separator`
+    - `Comma + Space`: `, ` で結合
+    - `Comma`: `,` で結合
+    - `Line break`: 改行で結合
+    - `Semicolon`: `;` で結合
+    - `Space`: 半角スペースで結合
+    - `None`: 区切り文字なしで結合
+- `skip_empty`
+    - `true` のとき、未接続や空（空白・改行のみ）の入力をスキップして結合する
+    - 余計な区切り文字（`, , `）が入るのを防ぐ
 
 ---
 

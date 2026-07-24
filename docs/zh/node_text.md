@@ -145,7 +145,7 @@ Output text
 ### D2 Multi Output
 
 <figure>
-<img src="../img/multi.png">
+<img src="../img/multi_2.png">
 </figure>
 
 - 以列表形式輸出 seed、cfg 等通用參數的節點
@@ -160,6 +160,63 @@ Output text
 - `Add Random`
     - 在輸入欄位添加隨機數
     - 僅在 `type` 為 `SEED` 時顯示
+
+### Output
+
+- `LIST`
+  - 以換行分解並以陣列形式輸出
+- `x/y_list`
+  - 普通的換行分隔文字
+  - 用於 `D2 XY Plot`、`D2 XY Plot Easy`、`D2 XY Plot Easy Mini`
+
+
+---
+
+### D2 List To String
+
+<figure>
+  <img src="../img/list_to_string.png">
+</figure>
+
+- 將陣列（LIST）結合成單一字串的節點
+- 以 `separator` 選擇分隔字元
+
+#### Input
+
+- `separator`
+    - `Comma + Space`: 以 `, ` 結合
+    - `Comma`: 以 `,` 結合
+    - `Line break`: 以換行結合
+    - `Semicolon`: 以 `;` 結合
+    - `Space`: 以半形空格結合
+    - `None`: 不使用分隔字元結合
+
+---
+
+### D2 Text Concat
+
+<figure>
+  <img src="../img/text_concat.png">
+</figure>
+
+- 可調整輸入數量的文字結合節點
+- 以 `text_count` 增減輸入欄位，結合連接到 `text_1` 〜 `text_N` 的文字
+- `separator` 與 `D2 List To String` 共用
+
+#### Input
+
+- `text_count`
+    - 增減輸入欄位的數量（1〜50）
+- `separator`
+    - `Comma + Space`: 以 `, ` 結合
+    - `Comma`: 以 `,` 結合
+    - `Line break`: 以換行結合
+    - `Semicolon`: 以 `;` 結合
+    - `Space`: 以半形空格結合
+    - `None`: 不使用分隔字元結合
+- `skip_empty`
+    - 為 `true` 時，跳過未連接或空白（僅空格・換行）的輸入再結合
+    - 可避免混入多餘的分隔字元（`, , `）
 
 
 ---

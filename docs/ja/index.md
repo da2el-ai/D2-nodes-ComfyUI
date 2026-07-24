@@ -95,6 +95,8 @@ D2 Nodes ComfyUI
   - SEED / STRING / INT / FLOAT をリスト出力する
 - <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
   - 配列を文字列に変換する
+- <a href="node_text.md#D2-Text-Concat">`D2 Text Concat`</a>
+  - 入力数を調整できるテキスト結合ノード
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - ファイルネームを作る
 - <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
@@ -191,6 +193,11 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.07.24**
+
+- `D2_TextConcat`: 入力数を調整できるテキスト結合ノードを新規追加
+- `D2_ListToString` / `D2_RegexSwitcher` / `D2_TagReport`: 区切り文字（separator）の選択肢の表記を統一（`Comma + Space` / `Comma` / `Line break` / `Semicolon` / `Space` / `None`）。旧ワークフローの値も引き続き動作する
 
 **2026.07.19**
 

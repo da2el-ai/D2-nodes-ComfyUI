@@ -93,6 +93,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Outputs SEED / STRING / INT / FLOAT as lists
 - <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
   - Converts arrays to strings
+- <a href="node_text.md#D2-Text-Concat">`D2 Text Concat`</a>
+  - Text concatenation node with an adjustable number of inputs
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
   - Creates filenames
 - <a href="node_text.md#D2-Token-Counter">`D2 Token Counter`</a>
@@ -188,6 +190,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.07.24**
+
+- `D2_TextConcat`: Added a text concatenation node with an adjustable number of inputs
+- `D2_ListToString` / `D2_RegexSwitcher` / `D2_TagReport`: Unified the separator options (`Comma + Space` / `Comma` / `Line break` / `Semicolon` / `Space` / `None`). Values saved in old workflows keep working
 
 **2026.07.19**
 
