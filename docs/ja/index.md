@@ -158,6 +158,8 @@ D2 Nodes ComfyUI
   - 必要な回数の Queue を自動的に実行する
 - <a href="node_xy.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
   - グリッド画像を生成するノード
+- <a href="node_xy.md#D2-XY-List-Collector">`D2 XY List Collector`</a>
+  - XY Plot のループ実行中にデータを蓄積し、最後に配列として出力する
 - <a href="node_xy.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
   - テキストを検索・置換してリストで返す。D2 XY Plotの前に置くタイプ
 - <a href="node_xy.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
@@ -195,6 +197,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.07.27**
+
+- `D2_XYListCollector`: XY Plot のループ実行中にデータを蓄積し、最後に配列として出力するノードを新規追加
 
 **2026.07.25**
 

@@ -182,6 +182,40 @@ Y: steps
 
 ---
 
+### D2 XY List Collector
+
+<figure>
+<img src="../img/xy_list_collector.png">
+</figure>
+
+- 配合 `D2 XY Plot` / `D2 XY Plot Easy` / `D2 XY Plot Easy Mini` 的循環執行，將 `data` 累積到陣列中，並在最後一次執行時一併輸出的節點
+- 累積期間不執行下游節點
+- 若 `D2 XY Plot` 的項目只有 1 個，不會發生 `FINISH`，因此不會輸出任何內容
+
+#### Input
+
+- `data`
+  - 要加入陣列的資料
+- `skip_empty`
+  - `true`: 空字串或 `0` 等空值不加入陣列
+  - `false`: 空值也照樣加入
+- `xy_status`
+  - 連接到 `D2 XY Plot` 的控制文字
+  - `INIT`: 初始化陣列
+  - `FINISH`: 輸出陣列
+  - `{空字串}`: 其他狀態
+- `grid_pipe`
+  - 連接 `D2 XY Plot Easy` / `D2 XY Plot Easy Mini` 的 `grid_pipe`
+  - 用於代替 `xy_status`。`D2 XY Plot Easy Mini` 不輸出 `status`，因此連接此項
+
+#### Output
+
+- `output`
+  - 累積資料的陣列
+  - 可接受任何資料型別
+
+---
+
 ### D2 XY Prompt SR
 
 <figure>

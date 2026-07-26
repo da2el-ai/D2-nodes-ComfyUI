@@ -186,6 +186,41 @@ Y: steps
 ---
 
 
+### D2 XY List Collector
+
+<figure>
+<img src="../img/xy_list_collector.png">
+</figure>
+
+- `D2 XY Plot` / `D2 XY Plot Easy` / `D2 XY Plot Easy Mini` のループ実行に合わせて `data` を配列に蓄積し、最後の実行でまとめて出力するノード
+- 蓄積中は下流のノードを実行しない
+- `D2 XY Plot` の要素が1個だけの場合は `FINISH` が発生しないため、何も出力されない
+
+#### Input
+
+- `data`
+  - 配列に追加するデータ
+- `skip_empty`
+  - `true`: 空文字や `0` などの空の値は配列に追加しない
+  - `false`: 空の値もそのまま追加する
+- `xy_status`
+  - `D2 XY Plot` に接続する制御テキスト
+  - `INIT`: 配列を初期化する
+  - `FINISH`: 配列を出力する
+  - `{空文字}`: それ以外の状態
+- `grid_pipe`
+  - `D2 XY Plot Easy` / `D2 XY Plot Easy Mini` の `grid_pipe` を接続する
+  - `xy_status` の代わりに使う。`D2 XY Plot Easy Mini` は `status` を出力しないのでこちらを繋ぐ
+
+#### Output
+
+- `output`
+  - 蓄積したデータの配列
+  - あらゆるデータ型を受け入れ可能
+
+---
+
+
 ### D2 XY Prompt SR
 
 <figure>

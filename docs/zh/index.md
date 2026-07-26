@@ -161,6 +161,8 @@
   - 自動執行所需次數的佇列
 - <a href="node_xy.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
   - 生成網格圖像的節點
+- <a href="node_xy.md#D2-XY-List-Collector">`D2 XY List Collector`</a>
+  - 在 XY Plot 的循環執行中累積資料，並在最後以陣列輸出
 - <a href="node_xy.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
   - 搜索替換文字並以列表返回，放在 `D2 XY Plot` 前的類型
 - <a href="node_xy.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
@@ -194,6 +196,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.07.27**
+
+- `D2_XYListCollector`: 新增在 XY Plot 的循環執行中累積資料、並在最後以陣列輸出的節點
 
 **2026.07.25**
 

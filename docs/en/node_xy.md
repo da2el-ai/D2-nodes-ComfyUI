@@ -181,6 +181,40 @@ Y: steps
 
 ---
 
+### D2 XY List Collector
+
+<figure>
+<img src="../img/xy_list_collector.png">
+</figure>
+
+- A node that accumulates `data` into an array along with the loop execution of `D2 XY Plot` / `D2 XY Plot Easy` / `D2 XY Plot Easy Mini`, and outputs the whole array on the last run
+- Downstream nodes are not executed while accumulating
+- If `D2 XY Plot` has only one item, `FINISH` never occurs, so nothing is output
+
+#### Input
+
+- `data`
+  - Data to add to the array
+- `skip_empty`
+  - `true`: Empty values such as an empty string or `0` are not added to the array
+  - `false`: Empty values are added as they are
+- `xy_status`
+  - Control text from `D2 XY Plot`
+  - `INIT`: Initialize the array
+  - `FINISH`: Output the array
+  - `{empty string}`: Other states
+- `grid_pipe`
+  - Connect `grid_pipe` of `D2 XY Plot Easy` / `D2 XY Plot Easy Mini`
+  - Used instead of `xy_status`. `D2 XY Plot Easy Mini` does not output `status`, so connect this one
+
+#### Output
+
+- `output`
+  - Array of the accumulated data
+  - Accepts any data type
+
+---
+
 ### D2 XY Prompt SR
 
 <figure>

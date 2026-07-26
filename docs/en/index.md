@@ -158,6 +158,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Automatically executes required number of queues
 - <a href="node_xy.md#D2-XY-Grid-Image">`D2 XY Grid Image`</a>
   - Node for generating grid images
+- <a href="node_xy.md#D2-XY-List-Collector">`D2 XY List Collector`</a>
+  - Accumulates data during the XY Plot loop and outputs it as an array at the end
 - <a href="node_xy.md#D2-XY-Prompt-SR">`D2 XY Prompt SR`</a>
   - Searches and replaces text, returns as list. Placed before D2 XY Plot
 - <a href="node_xy.md#D2-XY-Prompt-SR2">`D2 XY Prompt SR2`</a>
@@ -192,6 +194,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.07.27**
+
+- `D2_XYListCollector`: Added a node that accumulates data during the XY Plot loop and outputs it as an array at the end
 
 **2026.07.25**
 
