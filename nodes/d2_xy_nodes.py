@@ -995,6 +995,86 @@ class D2_XYUploadImage(io.ComfyNode):
 
 
 
+"""
+
+D2 XY List Collector
+XY Plot のループ実行に合わせてデータを配列に蓄積し、最後にまとめて出力する
+
+"""
+class D2_XYListCollector(io.ComfyNode):
+    # D2_XYGridImage と同じく、V3 の execute は classmethod で状態を持てないため
+    # unique_id をキーにしたクラス辞書で per-node に蓄積する
+    _collect_state = {}
+
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 XY List Collector",
+            display_name="D2 XY List Collector",
+            category="D2/XY Plot",
+            inputs=[
+                io.AnyType.Input("data"),
+                io.Boolean.Input("skip_empty", default=True),
+                # xy_status は STRING(widget型)なので forceInput で入力ソケットにする。
+                # grid_pipe はカスタムソケット型のため forceInput は no-op で落とす
+                io.String.Input("xy_status", force_input=True, optional=True),
+                io.Custom("D2_TGridPipe").Input("grid_pipe", optional=True),
+            ],
+            outputs=[
+                io.AnyType.Output(display_name="output"),
+            ],
+            hidden=[io.Hidden.unique_id],
+        )
+
+    # data が空文字の実行が連続すると入力が前回と同一になり、出力キャッシュで
+    # execute 自体がスキップされて蓄積が抜ける。毎回実行させるため NaN を返す
+    @classmethod
+    def fingerprint_inputs(cls, data=None, skip_empty=True, xy_status=None, grid_pipe=None):
+        return float("NaN")
+
+    @classmethod
+    def execute(cls, data, skip_empty, xy_status=None, grid_pipe=None) -> io.NodeOutput:
+        state = cls._collect_state.setdefault(cls.hidden.unique_id, {"items": []})
+
+        if grid_pipe != None:
+            xy_status = grid_pipe.status if grid_pipe.status else xy_status
+
+        # 最初のデータだったら初期化する
+        if xy_status == "INIT":
+            state["items"] = []
+
+        if not (skip_empty and cls.is_empty(data)):
+            state["items"].append(data)
+
+        # 最後のデータまで送られたら出力して片付ける
+        # 未完了なら下流の実行を止める
+        if xy_status == "FINISH":
+            output = state["items"]
+            state["items"] = []
+            return io.NodeOutput(output)
+
+        return io.NodeOutput(ExecutionBlocker(None))
+
+    """
+    値が空（falsy）かどうか判定する
+    data は AnyType なので `not data` では要素数2以上の tensor で例外になる
+    """
+    @classmethod
+    def is_empty(cls, data) -> bool:
+        if data is None:
+            return True
+        if isinstance(data, str):
+            return data.strip() == ""
+        if isinstance(data, (bool, int, float)):
+            return not data
+        if isinstance(data, (list, tuple, dict, set)):
+            return len(data) == 0
+        # tensor など判定できない型は空扱いしない
+        return False
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "D2 XY Plot": D2_XYPlot,
     "D2 XY Plot Easy": D2_XYPlotEasy,
@@ -1007,6 +1087,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 XY String To Plot": D2_XYStringToPlot,
     "D2 XY Folder Images": D2_XYFolderImages,
     "D2 XY Upload Image": D2_XYUploadImage,
+    "D2 XY List Collector": D2_XYListCollector,
     "D2 XY Seed": D2_XYSeed,
     "D2 XY Seed2": D2_XYSeed2,
     "D2 XY Annotation": D2_XYAnnotation,

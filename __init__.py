@@ -94,6 +94,7 @@ from .nodes.d2_xy_nodes import (
     D2_XYGridImage,
     D2_XYFolderImages,
     D2_XYUploadImage,
+    D2_XYListCollector,
 )
 from .nodes.d2_refiner_nodes import (
     D2_RefinerSteps,
@@ -205,6 +206,7 @@ class D2Extension(ComfyExtension):
             D2_XYGridImage,
             D2_XYFolderImages,
             D2_XYUploadImage,
+            D2_XYListCollector,
         ]
 
 
