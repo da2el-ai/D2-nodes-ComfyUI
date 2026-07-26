@@ -201,6 +201,7 @@ D2 Nodes ComfyUI
 **2026.07.27**
 
 - `D2_XYListCollector`: XY Plot のループ実行中にデータを蓄積し、最後に配列として出力するノードを新規追加
+- Text 系ノード（`D2_RegexSwitcher` / `D2_Prompt` / `D2_LoadCSV` など）: ノードメニューのカテゴリを `D2` から `D2/Text` に変更
 
 **2026.07.25**
 

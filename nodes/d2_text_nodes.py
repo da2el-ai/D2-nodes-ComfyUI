@@ -49,7 +49,7 @@ class D2_RegexSwitcher(io.ComfyNode):
         return io.Schema(
             node_id="D2 Regex Switcher",
             display_name="D2 Regex Switcher",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("text", force_input=True, multiline=True, default=""),
                 io.String.Input("regex_and_output", multiline=True, default="pony\n--\nscore_9,\n--\n--\nhighres, high quality,"),
@@ -162,7 +162,7 @@ class D2_RegexReplace(io.ComfyNode):
         return io.Schema(
             node_id="D2 Regex Replace",
             display_name="D2 Regex Replace",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("text", force_input=True, multiline=True, default=""),
                 io.Combo.Input("mode", options=["Tag", "Advanced"]),
@@ -271,7 +271,7 @@ class D2_MultiOutput(io.ComfyNode):
         return io.Schema(
             node_id="D2 Multi Output",
             display_name="D2 Multi Output",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 # 入力タイプ
                 io.Combo.Input("type", options=["FLOAT", "INT", "STRING", "SEED"]),
@@ -415,7 +415,7 @@ class D2_TokenCounter(io.ComfyNode):
         return io.Schema(
             node_id="D2 Token Counter",
             display_name="D2 Token Counter",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("text", multiline=True),
                 io.Combo.Input("clip_name", options=["ViT-L/14", "ViT-B/32", "ViT-B/16"], default="ViT-L/14"),
@@ -474,7 +474,7 @@ class D2_Prompt(io.ComfyNode):
         return io.Schema(
             node_id="D2 Prompt",
             display_name="D2 Prompt",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("prompt", multiline=True),
                 io.Combo.Input("comment_type", options=["# + // + /**/", "# only", "// only", "/* */ only", "None"]),
@@ -504,7 +504,7 @@ class D2_ListToString(io.ComfyNode):
         return io.Schema(
             node_id="D2 List To String",
             display_name="D2 List To String",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.Custom("LIST").Input("LIST"),
                 io.Combo.Input("separator", options=util.SEPARATOR, default=util.LINE_BREAK),
@@ -532,7 +532,7 @@ class D2_TextConcat(io.ComfyNode):
         return io.Schema(
             node_id="D2 Text Concat",
             display_name="D2 Text Concat",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.Int.Input("text_count", default=3, min=1, max=50, step=1),
                 io.Combo.Input("separator", options=util.SEPARATOR, default="Comma + Space"),
@@ -579,7 +579,7 @@ class D2_FilenameTemplate(io.ComfyNode):
         return io.Schema(
             node_id="D2 Filename Template",
             display_name="D2 Filename Template",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("format", tooltip=tooltip),
                 io.Int.Input("arg_count", default=3, min=1, max=50, step=1),
@@ -627,7 +627,7 @@ class D2_FilenameTemplate2(D2_FilenameTemplate):
         return io.Schema(
             node_id="D2 Filename Template2",
             display_name="D2 Filename Template2",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("format", tooltip=tooltip, multiline=True),
                 io.Int.Input("arg_count", default=3, min=1, max=50, step=1),
@@ -653,7 +653,7 @@ class D2_PromptSanitizer(io.ComfyNode):
         return io.Schema(
             node_id="D2 Prompt Sanitizer",
             display_name="D2 Prompt Sanitizer",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("prompt", force_input=True),
                 io.Boolean.Input("underscore_to_space", default=True),
@@ -701,7 +701,7 @@ class D2_LoadText(io.ComfyNode):
         return io.Schema(
             node_id="D2 Load Text",
             display_name="D2 Load Text",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("file_path", default=""),
                 io.Boolean.Input("encode_to_utf8", default=False),
@@ -738,7 +738,7 @@ class D2_LoadCSV(io.ComfyNode):
         return io.Schema(
             node_id="D2 Load CSV",
             display_name="D2 Load CSV",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("file_path", default=""),
                 io.Combo.Input("file_type", options=["csv", "tsv"], default="csv"),
@@ -791,7 +791,7 @@ class D2_SaveCaption(io.ComfyNode):
         return io.Schema(
             node_id="D2 Save Caption",
             display_name="D2 Save Caption",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("base_filename", default=""),
                 io.String.Input("text", force_input=True, multiline=True, default=""),
@@ -840,7 +840,7 @@ class D2_TagReport(io.ComfyNode):
         return io.Schema(
             node_id="D2 Tag Report",
             display_name="D2 Tag Report",
-            category="D2",
+            category="D2/Text",
             inputs=[
                 io.String.Input("folder", default=""),
                 io.Boolean.Input("include_subfolders", default=False),

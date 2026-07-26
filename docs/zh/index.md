@@ -200,6 +200,7 @@
 **2026.07.27**
 
 - `D2_XYListCollector`: 新增在 XY Plot 的循環執行中累積資料、並在最後以陣列輸出的節點
+- Text 系節點（`D2_RegexSwitcher` / `D2_Prompt` / `D2_LoadCSV` 等）: 將節點選單的分類從 `D2` 變更為 `D2/Text`
 
 **2026.07.25**
 

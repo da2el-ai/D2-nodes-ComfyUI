@@ -198,6 +198,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2026.07.27**
 
 - `D2_XYListCollector`: Added a node that accumulates data during the XY Plot loop and outputs it as an array at the end
+- Text nodes (`D2_RegexSwitcher` / `D2_Prompt` / `D2_LoadCSV`, etc.): Changed the node menu category from `D2` to `D2/Text`
 
 **2026.07.25**
 
