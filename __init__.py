@@ -122,6 +122,7 @@ from .nodes.d2_image_nodes import (
     D2_CutByMask,
     D2_PasteByMask,
     D2_GridImage,
+    D2_CreatePoint,
 )
 
 
@@ -190,6 +191,8 @@ class D2Extension(ComfyExtension):
             D2_PasteByMask,
             # C. グリッド画像（状態保持・ExecutionBlocker）
             D2_GridImage,
+            # 座標指定（JS連動: 可変出力・キャンバスウィジェット）
+            D2_CreatePoint,
             # C. XY Plot コア
             D2_XYPlot,
             D2_XYPlotEasy,
