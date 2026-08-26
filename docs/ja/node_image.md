@@ -454,3 +454,38 @@ input `optional`:
 <figure>
 <img src="../img/paste-by-mask_cross.png">
 </figure>
+
+---
+
+### D2 Create Point
+
+<figure>
+<img src="../img/create_point.png">
+</figure>
+
+- マーカーをドラッグして XY 座標を出力するノード
+- マーカーは `marker_count` で増減し、出力 `x_1` / `y_1` … も連動して増減する
+- ノードに画像をドラッグ＆ドロップすると、キャンバスの背景に表示され `width` / `height` にも反映される
+
+#### Input
+
+- `marker_count`: マーカーの数（1〜16）。出力 `x_N` / `y_N` の数と連動する
+- `mode`
+  - `absolute`: 実際のピクセル座標を出力する
+  - `relative`: 0.0〜1.0 の相対値を出力する
+- `width` / `height`: 座標系のサイズ。キャンバスのアスペクト比もこれで決まる
+- `image`: 背景に表示する画像。空欄なら黒いキャンバスになる
+- `markers`: マーカー座標の JSON。ドラッグすると自動で更新されるので、通常は触らなくてよい
+
+#### Output
+
+- `image`: 指定した画像。画像を指定していない場合は `width` × `height` の黒画像
+- `width` / `height`: 座標系のサイズ
+- `x_1` / `y_1`: マーカー1の座標。`marker_count` が「3」なら `x_2` `y_2` `x_3` `y_3` も出力される
+
+#### mode について
+
+`markers` は mode に関わらず常に相対値（0.0〜1.0）で保持しているため、`absolute` と `relative` を切り替えてもマーカーは動きません。`width` / `height` を変えたときも同じです。
+
+上の画像は同じマーカー位置で mode だけを変えたものです。`relative` の `0.163305` に `width` の `832` を掛けると、`absolute` の `136` になります。
+

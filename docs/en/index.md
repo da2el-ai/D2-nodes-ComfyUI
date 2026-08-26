@@ -147,6 +147,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Cut an image using a mask
 - <a href="node_image.md#D2-Paste-By-Mask">`D2 Paste By Mask`</a>
   - Paste an image using a mask
+- <a href="node_image.md#D2-Create-Point">`D2 Create Point`</a>
+  - Output XY coordinates by dragging markers
 
 
 ### XY Plot
@@ -194,6 +196,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.08.26**
+
+- `D2_CreatePoint`: Added a node that outputs XY coordinates by dragging markers
 
 **2026.07.27**
 

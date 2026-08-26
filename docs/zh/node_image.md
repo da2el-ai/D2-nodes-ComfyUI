@@ -455,3 +455,37 @@ input `optional`:
 <figure>
 <img src="../img/paste-by-mask_cross.png">
 </figure>
+
+---
+
+### D2 Create Point
+
+<figure>
+<img src="../img/create_point.png">
+</figure>
+
+- 透過拖曳標記來輸出 XY 座標的節點
+- 標記會依 `marker_count` 增減，輸出 `x_1` / `y_1` … 也會連動增減
+- 將圖像拖放到節點上，就會顯示在畫布背景，並套用其尺寸到 `width` / `height`
+
+#### Input
+
+- `marker_count`: 標記的數量（1〜16）。輸出 `x_N` / `y_N` 的數量會與此連動
+- `mode`
+  - `absolute`: 輸出實際的像素座標
+  - `relative`: 輸出 0.0〜1.0 的相對值
+- `width` / `height`: 座標系的尺寸。畫布的長寬比也由此決定
+- `image`: 顯示於背景的圖像。留空則為黑色畫布
+- `markers`: 標記座標的 JSON。拖曳時會自動更新，通常不需要修改
+
+#### Output
+
+- `image`: 指定的圖像。未指定圖像時為 `width` × `height` 的黑色圖像
+- `width` / `height`: 座標系的尺寸
+- `x_1` / `y_1`: 標記1的座標。若 `marker_count` 為「3」，也會輸出 `x_2` `y_2` `x_3` `y_3`
+
+#### 關於 mode
+
+`markers` 無論 mode 為何都以相對值（0.0〜1.0）保存，因此切換 `absolute` 與 `relative` 時標記不會移動。變更 `width` / `height` 時也相同。
+
+上方的圖像是在相同標記位置下只變更 mode 的結果。將 `relative` 的 `0.163305` 乘上 `width` 的 `832`，即為 `absolute` 的 `136`。

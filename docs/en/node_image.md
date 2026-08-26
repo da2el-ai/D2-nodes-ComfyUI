@@ -451,3 +451,37 @@ input `optional`:
 <figure>
 <img src="../img/paste-by-mask_cross.png">
 </figure>
+
+---
+
+### D2 Create Point
+
+<figure>
+<img src="../img/create_point.png">
+</figure>
+
+- Node that outputs XY coordinates by dragging markers
+- Markers increase or decrease with `marker_count`, and the `x_1` / `y_1` ... outputs follow along
+- Dropping an image onto the node shows it as the canvas background and applies its size to `width` / `height`
+
+#### Input
+
+- `marker_count`: Number of markers (1-16). The number of `x_N` / `y_N` outputs follows this value
+- `mode`
+  - `absolute`: Outputs actual pixel coordinates
+  - `relative`: Outputs relative values from 0.0 to 1.0
+- `width` / `height`: Size of the coordinate system. It also determines the aspect ratio of the canvas
+- `image`: Image shown in the background. Leave it empty for a black canvas
+- `markers`: JSON of the marker coordinates. It updates automatically when you drag, so you normally don't need to touch it
+
+#### Output
+
+- `image`: The specified image. If no image is specified, a black image of `width` x `height`
+- `width` / `height`: Size of the coordinate system
+- `x_1` / `y_1`: Coordinates of marker 1. If `marker_count` is "3", `x_2` `y_2` `x_3` `y_3` are also output
+
+#### About mode
+
+`markers` always holds relative values (0.0 to 1.0) regardless of mode, so switching between `absolute` and `relative` does not move the markers. The same applies when you change `width` / `height`.
+
+The image above shows the same marker positions with only the mode changed. Multiplying `0.163305` in `relative` by `832` of `width` gives `136` in `absolute`.

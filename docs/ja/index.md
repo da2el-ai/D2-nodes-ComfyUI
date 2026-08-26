@@ -147,6 +147,8 @@ D2 Nodes ComfyUI
   - マスクを使って画像をカットする
 - <a href="node_image.md#D2-Paste-By-Mask">`D2 Paste By Mask`</a>
   - マスクを使って画像をペーストする
+- <a href="node_image.md#D2-Create-Point">`D2 Create Point`</a>
+  - マーカーをドラッグして XY 座標を出力する
 
 
 ### XY Plot
@@ -197,6 +199,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.08.26**
+
+- `D2_CreatePoint`: マーカーをドラッグして XY 座標を出力するノードを新規追加
 
 **2026.07.27**
 

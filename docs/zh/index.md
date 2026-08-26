@@ -150,6 +150,8 @@
   - 使用遮罩裁剪圖像
 - <a href="node_image.md#D2-Paste-By-Mask">`D2 Paste By Mask`</a>
   - 使用遮罩貼上圖像
+- <a href="node_image.md#D2-Create-Point">`D2 Create Point`</a>
+  - 透過拖曳標記來輸出 XY 座標
 
 
 ### XY Plot
@@ -196,6 +198,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.08.26**
+
+- `D2_CreatePoint`: 新增透過拖曳標記來輸出 XY 座標的節點
 
 **2026.07.27**
 
