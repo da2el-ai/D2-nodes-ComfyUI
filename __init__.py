@@ -11,208 +11,43 @@ from comfy_api.latest import ComfyExtension, io
 from .nodes.modules import util
 
 # =============================================================================
-# V3 スキーマ移行作業中
+# ノードの登録について
 # -----------------------------------------------------------------------------
-# V1 と V3 を混在したカスタムノードは ComfyUI に許可されないため、
-# 公開方式を comfy_entrypoint（V3）へ全面的に切り替えている。
-# get_node_list には「V3 化が済んだノード」だけを列挙する。
-# 未移行ノードは import / リストともにコメントアウトしておき、
-# 移行が済んだものからコメントを解除していく。
-# 詳細は .claude/specs/v3-migration-strategy.md を参照。
+# 登録元は各 nodes/d2_*.py 末尾の NODE_CLASS_MAPPINGS ただ一つ。
+# このファイルはそれを束ねて get_node_list() に渡すだけなので、
+# 【ノードを追加するときは nodes/d2_*.py の NODE_CLASS_MAPPINGS に登録すれば足りる】。
+# このファイルを編集するのは「ノード定義ファイルを新規作成したとき」だけ。
+#
+# ComfyUI は V1（NODE_CLASS_MAPPINGS を公開する方式）と V3（comfy_entrypoint 方式）の
+# 混在を許可しないため、公開は comfy_entrypoint に一本化している。
+# ノード名は各ノードの Schema の node_id が使われるので、
+# NODE_CLASS_MAPPINGS のキー文字列は ComfyUI からは参照されない（可読性のために揃えておく）。
 # =============================================================================
 
-# --- V1 公開方式（移行完了まで凍結） -----------------------------------------
-# from .nodes.d2_nodes import NODE_CLASS_MAPPINGS as D2_CLASS_MAPPIGS
-# from .nodes.d2_size_nodes import NODE_CLASS_MAPPINGS as D2_SIZE_CLASS_MAPPIGS
-# from .nodes.d2_xy_nodes import NODE_CLASS_MAPPINGS as D2_XY_CLASS_MAPPIGS
-# from .nodes.d2_refiner_nodes import NODE_CLASS_MAPPINGS as D2_REFINER_CLASS_MAPPIGS
-# from .nodes.d2_merge_nodes import NODE_CLASS_MAPPINGS as D2_MERGE_CLASS_MAPPIGS
-# from .nodes.d2_text_nodes import NODE_CLASS_MAPPINGS as D2_TEXT_CLASS_MAPPIGS
-# from .nodes.d2_image_nodes import NODE_CLASS_MAPPINGS as D2_IMAGE_CLASS_MAPPIGS
-# from .nodes.d2_audio_nodes import NODE_CLASS_MAPPINGS as D2_AUDIO_CLASS_MAPPIGS
-#
-# NODE_CLASS_MAPPINGS = {
-#     **D2_CLASS_MAPPIGS,
-#     **D2_SIZE_CLASS_MAPPIGS,
-#     **D2_XY_CLASS_MAPPIGS,
-#     **D2_REFINER_CLASS_MAPPIGS,
-#     **D2_MERGE_CLASS_MAPPIGS,
-#     **D2_TEXT_CLASS_MAPPIGS,
-#     **D2_IMAGE_CLASS_MAPPIGS,
-#     **D2_AUDIO_CLASS_MAPPIGS,
-# }
-# NODE_DISPLAY_NAME_MAPPINGS = []
-# -----------------------------------------------------------------------------
+from .nodes.d2_nodes import NODE_CLASS_MAPPINGS as D2_CLASS_MAPPINGS
+from .nodes.d2_size_nodes import NODE_CLASS_MAPPINGS as D2_SIZE_CLASS_MAPPINGS
+from .nodes.d2_xy_nodes import NODE_CLASS_MAPPINGS as D2_XY_CLASS_MAPPINGS
+from .nodes.d2_refiner_nodes import NODE_CLASS_MAPPINGS as D2_REFINER_CLASS_MAPPINGS
+from .nodes.d2_merge_nodes import NODE_CLASS_MAPPINGS as D2_MERGE_CLASS_MAPPINGS
+from .nodes.d2_text_nodes import NODE_CLASS_MAPPINGS as D2_TEXT_CLASS_MAPPINGS
+from .nodes.d2_image_nodes import NODE_CLASS_MAPPINGS as D2_IMAGE_CLASS_MAPPINGS
+from .nodes.d2_audio_nodes import NODE_CLASS_MAPPINGS as D2_AUDIO_CLASS_MAPPINGS
 
-# --- V3 化済みノードの import ------------------------------------------------
-from .nodes.d2_text_nodes import (
-    D2_PromptSanitizer,
-    D2_MultiOutput,
-    D2_ListToString,
-    D2_TextConcat,
-    D2_FilenameTemplate,
-    D2_FilenameTemplate2,
-    D2_RegexSwitcher,
-    D2_RegexReplace,
-    D2_TokenCounter,
-    D2_Prompt,
-    D2_LoadText,
-    D2_LoadCSV,
-    D2_SaveCaption,
-    D2_TagReport,
-)
-from .nodes.d2_nodes import (
-    D2_KSampler,
-    D2_KSamplerAdvanced,
-    D2_CheckpointLoader,
-    D2_LoadDiffusionModel,
-    D2_LoadDiffusionModelSet,
-    D2_ControlnetLoader,
-    D2_MergeCnet,
-    D2_LoadLora,
-    D2_Pipe,
-    D2_AnyDelivery,
-    D2_PresetSelector,
-)
-from .nodes.d2_size_nodes import (
-    D2_ResizeCalculator,
-    D2_ImageResize,
-    D2_SizeSelector,
-    D2_GetImageSize,
-)
-from .nodes.d2_xy_nodes import (
-    D2_XYPlot,
-    D2_XYPlotEasy,
-    D2_XYPlotEasyMini,
-    D2_XYModelList,
-    D2_XYPromptSR,
-    D2_XYPromptSR2,
-    D2_XYListToPlot,
-    D2_XYStringToPlot,
-    D2_XYSeed,
-    D2_XYSeed2,
-    D2_XYAnnotation,
-    D2_XYGridImage,
-    D2_XYFolderImages,
-    D2_XYUploadImage,
-    D2_XYListCollector,
-)
-from .nodes.d2_refiner_nodes import (
-    D2_RefinerSteps,
-    D2_RefinerStepsA1111,
-    D2_RefinerStepsTester,
-)
-from .nodes.d2_merge_nodes import (
-    D2_ModelAndCLIPMergeSDXL,
-)
-from .nodes.d2_audio_nodes import (
-    D2_SaveAudioEagle,
-)
-from .nodes.d2_image_nodes import (
-    D2_SaveImage,
-    D2_SaveImageEagle,
-    D2_SendFileEagle,
-    D2_PreviewImage,
-    D2_LoadImage,
-    D2_EmptyImageAlpha,
-    D2_LoadFolderImages,
-    D2_MosaicFilter,
-    D2_FolderImageQueue,
-    D2_ImageStack,
-    D2_ImageMaskStack,
-    D2_CutByMask,
-    D2_PasteByMask,
-    D2_GridImage,
-    D2_CreatePoint,
-)
+D2_NODE_MAPPINGS = {
+    **D2_CLASS_MAPPINGS,
+    **D2_SIZE_CLASS_MAPPINGS,
+    **D2_XY_CLASS_MAPPINGS,
+    **D2_REFINER_CLASS_MAPPINGS,
+    **D2_MERGE_CLASS_MAPPINGS,
+    **D2_TEXT_CLASS_MAPPINGS,
+    **D2_IMAGE_CLASS_MAPPINGS,
+    **D2_AUDIO_CLASS_MAPPINGS,
+}
 
 
 class D2Extension(ComfyExtension):
     async def get_node_list(self) -> list[type[io.ComfyNode]]:
-        return [
-            # A. 他モジュール依存がなく環境変化の影響を受けないもの
-            D2_PromptSanitizer,
-            D2_MultiOutput,
-            D2_ListToString,
-            D2_TextConcat,
-            D2_FilenameTemplate,
-            D2_FilenameTemplate2,
-            # D. Text 系残り
-            D2_RegexSwitcher,
-            D2_RegexReplace,
-            D2_TokenCounter,
-            D2_Prompt,
-            # D. キャプション編集系
-            D2_LoadText,
-            D2_LoadCSV,
-            D2_SaveCaption,
-            D2_TagReport,
-            # D. Refiner 系
-            D2_RefinerSteps,
-            D2_RefinerStepsA1111,
-            D2_RefinerStepsTester,
-            # D. Merge / Audio
-            D2_ModelAndCLIPMergeSDXL,
-            D2_SaveAudioEagle,
-            # B. 重要度が高いもの（KSampler 系）
-            D2_KSampler,
-            D2_KSamplerAdvanced,
-            # B. 重要度が高いもの（Loader 系）
-            D2_CheckpointLoader,
-            D2_LoadDiffusionModel,
-            D2_LoadDiffusionModelSet,
-            D2_ControlnetLoader,
-            D2_MergeCnet,
-            D2_LoadLora,
-            # B. 重要度が高いもの（Size 系）
-            D2_ResizeCalculator,
-            D2_ImageResize,
-            D2_SizeSelector,
-            D2_GetImageSize,
-            # B. 重要度が高いもの（Pipe / Delivery）
-            D2_Pipe,
-            D2_AnyDelivery,
-            # B. 重要度が高いもの（Preset Selector）
-            D2_PresetSelector,
-            # B. 重要度が高いもの（Image 保存・読込）
-            D2_SaveImage,
-            D2_SaveImageEagle,
-            D2_SendFileEagle,
-            D2_PreviewImage,
-            D2_LoadImage,
-            # C. 環境依存（影響の小さいもの）
-            D2_EmptyImageAlpha,
-            D2_LoadFolderImages,
-            D2_MosaicFilter,
-            # C. 環境依存（JS 連動: 動的入力・キュー）
-            D2_FolderImageQueue,
-            D2_ImageStack,
-            D2_ImageMaskStack,
-            # C. 環境依存（複雑なマスク処理）
-            D2_CutByMask,
-            D2_PasteByMask,
-            # C. グリッド画像（状態保持・ExecutionBlocker）
-            D2_GridImage,
-            # 座標指定（JS連動: 可変出力・キャンバスウィジェット）
-            D2_CreatePoint,
-            # C. XY Plot コア
-            D2_XYPlot,
-            D2_XYPlotEasy,
-            D2_XYPlotEasyMini,
-            # C. XY Plot テキスト系
-            D2_XYModelList,
-            D2_XYPromptSR,
-            D2_XYPromptSR2,
-            D2_XYListToPlot,
-            D2_XYStringToPlot,
-            D2_XYSeed,
-            D2_XYSeed2,
-            D2_XYAnnotation,
-            D2_XYGridImage,
-            D2_XYFolderImages,
-            D2_XYUploadImage,
-            D2_XYListCollector,
-        ]
+        return list(D2_NODE_MAPPINGS.values())
 
 
 async def comfy_entrypoint() -> ComfyExtension:
