@@ -45,6 +45,8 @@ If you have installed any of the following custom nodes previously, please remov
   - A loader that combines Load Diffusion Model + Load VAE + Load CLIP into one
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - Controlnet Loader that creates simple workflows when connected to D2 KSampler. Also supports Anima-LLLite
+- <a href="node.md#D2-Merge-Cnet">`D2 Merge Cnet`</a>
+  - Merges multiple `cnet_stack` into one
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - Lora loader that can be specified with text
 
@@ -196,6 +198,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.09.09**
+
+- `D2_MergeCnet`: Added a node that merges multiple `cnet_stack` into one
 
 **2026.08.26**
 

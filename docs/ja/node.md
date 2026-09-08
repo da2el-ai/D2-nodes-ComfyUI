@@ -216,6 +216,34 @@ Node
 ---
 
 
+### D2 Merge Cnet
+
+<figure>
+<img src="../img/merge-cnet.png">
+</figure>
+
+- 複数の `cnet_stack` を1つにまとめるノード
+- `cnet_stack_count` の数だけ入力が増減する
+- 未接続の入力は無視されるので、一部だけ接続した状態でも使える
+- 複数の Controlnet を使ってる状況で、特定の Controlnet だけ無効化したい時などに使う
+
+#### Input
+
+- `cnet_stack_count`
+  - 入力する `cnet_stack` の数（1〜10）
+- `cnet_stack_1` 〜 `cnet_stack_10`
+  - `D2 Controlnet Loader` などの `cnet_stack` を接続する
+
+#### Output
+
+- `cnet_stack`
+  - `D2 KSampler` または `D2 Controlnet Loader` 接続用
+
+
+
+---
+
+
 ### D2 Load Lora
 
 <figure>

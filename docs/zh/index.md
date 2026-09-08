@@ -46,6 +46,8 @@
   - 將 Load Diffusion Model ＋ Load VAE ＋ Load CLIP 整合為一的載入器
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - 連接到 `D2 KSampler` 可建立簡單工作流程的 Controlnet Loader。同時支援 Anima-LLLite
+- <a href="node.md#D2-Merge-Cnet">`D2 Merge Cnet`</a>
+  - 將多個 `cnet_stack` 整合為一
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - 可通過文本指定的 Lora 加載器
 
@@ -198,6 +200,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.09.09**
+
+- `D2_MergeCnet`: 新增將多個 `cnet_stack` 整合為一的節點
 
 **2026.08.26**
 

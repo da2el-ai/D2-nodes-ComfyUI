@@ -47,6 +47,8 @@ D2 Nodes ComfyUI
   - Load Diffusion Model ＋ Load VAE ＋ Load CLIP を1つにまとめたローダー
 - <a href="node.md#D2-Controlnet-Loader">`D2 Controlnet Loader`</a>
   - D2 KSampler に接続してシンプルなワークフローが作れる Controlnet Loader。Anima-LLLite にも対応
+- <a href="node.md#D2-Merge-Cnet">`D2 Merge Cnet`</a>
+  - 複数の `cnet_stack` を1つにまとめる
 - <a href="node.md#D2-Load-Lora">`D2 Load Lora`</a>
   - テキストで指定するLoraローダー
 
@@ -199,6 +201,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.09.09**
+
+- `D2_MergeCnet`: 複数の `cnet_stack` を1つにまとめるノードを新規追加
 
 **2026.08.26**
 

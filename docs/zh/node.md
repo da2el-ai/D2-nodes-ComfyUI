@@ -206,6 +206,34 @@
 ---
 
 
+### D2 Merge Cnet
+
+<figure>
+<img src="../img/merge-cnet.png">
+</figure>
+
+- 將多個 `cnet_stack` 整合為一的節點
+- 輸入會依照 `cnet_stack_count` 的數量增減
+- 未連接的輸入會被忽略，因此只連接其中一部分也能使用
+- 適合在使用多個 Controlnet 時，只想停用特定 Controlnet 的情況
+
+#### Input
+
+- `cnet_stack_count`
+  - 要輸入的 `cnet_stack` 數量（1〜10）
+- `cnet_stack_1` 〜 `cnet_stack_10`
+  - 連接 `D2 Controlnet Loader` 等的 `cnet_stack`
+
+#### Output
+
+- `cnet_stack`
+  - 用於連接 `D2 KSampler` 或 `D2 Controlnet Loader`
+
+
+
+---
+
+
 ### D2 Load Lora
 
 <figure>

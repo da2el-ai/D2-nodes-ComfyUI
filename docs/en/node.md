@@ -205,6 +205,34 @@
 ---
 
 
+### D2 Merge Cnet
+
+<figure>
+<img src="../img/merge-cnet.png">
+</figure>
+
+- A node that merges multiple `cnet_stack` into one
+- The number of inputs increases or decreases according to `cnet_stack_count`
+- Unconnected inputs are ignored, so you can use it with only some of them connected
+- Useful when you are using several Controlnets and want to disable only a specific one
+
+#### Input
+
+- `cnet_stack_count`
+  - Number of `cnet_stack` inputs (1-10)
+- `cnet_stack_1` - `cnet_stack_10`
+  - Connect the `cnet_stack` from `D2 Controlnet Loader` etc.
+
+#### Output
+
+- `cnet_stack`
+  - For connecting to `D2 KSampler` or `D2 Controlnet Loader`
+
+
+
+---
+
+
 ### D2 Load Lora
 
 <figure>
