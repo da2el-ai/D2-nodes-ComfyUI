@@ -68,6 +68,7 @@ from .nodes.d2_nodes import (
     D2_LoadDiffusionModel,
     D2_LoadDiffusionModelSet,
     D2_ControlnetLoader,
+    D2_MergeCnet,
     D2_LoadLora,
     D2_Pipe,
     D2_AnyDelivery,
@@ -161,6 +162,7 @@ class D2Extension(ComfyExtension):
             D2_LoadDiffusionModel,
             D2_LoadDiffusionModelSet,
             D2_ControlnetLoader,
+            D2_MergeCnet,
             D2_LoadLora,
             # B. 重要度が高いもの（Size 系）
             D2_ResizeCalculator,

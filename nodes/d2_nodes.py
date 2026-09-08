@@ -641,6 +641,46 @@ class D2_ControlnetLoader(io.ComfyNode):
 
 """
 
+D2 Merge Cnet
+    複数の cnet_stack を1本にマージするノード
+
+"""
+class D2_MergeCnet(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Merge Cnet",
+            display_name="D2 Merge Cnet",
+            category="D2",
+            inputs=[
+                io.Int.Input("cnet_stack_count", default=2, min=1, max=10, step=1),
+            ],
+            outputs=[
+                io.Custom("D2_CNET_STACK").Output(display_name="cnet_stack"),
+            ],
+            # JS が cnet_stack_1..N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
+
+    @classmethod
+    def execute(cls, cnet_stack_count, **kwargs) -> io.NodeOutput:
+        # 上流のリストを書き換えないよう新しいリストに詰め直す
+        merged_stack = []
+
+        for i in range(1, cnet_stack_count + 1):
+            cnet_stack = kwargs.get(f"cnet_stack_{i}")
+            if isinstance(cnet_stack, list):
+                merged_stack.extend(cnet_stack)
+
+        if len(merged_stack) == 0:
+            return io.NodeOutput(None)
+
+        return io.NodeOutput(merged_stack)
+
+
+
+"""
+
 D2 Load Lora
     Loraの指定をテキストで行うノード
 
@@ -1068,6 +1108,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Load Diffusion Model": D2_LoadDiffusionModel,
     "D2 Load Diffusion Model Set": D2_LoadDiffusionModelSet,
     "D2 Controlnet Loader": D2_ControlnetLoader,
+    "D2 Merge Cnet": D2_MergeCnet,
     "D2 Load Lora": D2_LoadLora,
     "D2 Pipe": D2_Pipe,
     "D2 Any Delivery": D2_AnyDelivery,
