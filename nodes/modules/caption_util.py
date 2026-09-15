@@ -1,5 +1,7 @@
 import os
 import re
+import csv
+import io
 from collections import Counter
 
 
@@ -11,6 +13,11 @@ COMMENT_PATTERN = re.compile(r"^\s*(?://|#)\s*")
 
 # レポート行末尾の出現回数: ",数値"
 COUNT_PATTERN = re.compile(r",\s*\d+\s*$")
+
+# タグ辞書の入力をファイルパスとみなす最大文字数
+# 貼り付けられた辞書テキスト（数MB）を os.path.isfile() に渡すと環境によっては
+# 例外になるため、明らかにパスではない長さで先に切り捨てる
+MAX_DICT_PATH_LENGTH = 1000
 
 
 """
@@ -198,12 +205,90 @@ def save_caption(base_filename, text, extension="txt", backup=True, dry_run=Fals
 
 
 """
+タグを突き合わせ用のキーに正規化する
+辞書側・集計側の両方に同じ正規化を掛けて比較する（出力するタグ本体は変えない）
+- 前後空白を除去
+- 小文字化（大小は常に無視する）
+- 括弧エスケープを除去（`rem_\\(re:zero\\)` と辞書の `rem_(re:zero)` を同一視）
+- スペースを `_` に統一（辞書は `long_hair`、WD14 出力は `long hair` のため）
+"""
+def normalize_tag_key(tag) -> str:
+    key = _unescape_brackets(tag.strip().lower())
+    return key.replace(" ", "_")
+
+
+"""
+辞書の1行目が見出し行かどうかを判定する
+2カラム目以降に数値カラムが1つも無ければ見出し行とみなす
+- `1girl,4114588`            → 2カラム目が数値なのでデータ行
+- `tag,category,count,alias` → 数値カラムが無いので見出し行
+- 1カラムだけの行            → 判定対象外（タグを並べただけのリストを壊さない）
+"""
+def _is_header_row(row) -> bool:
+    if len(row) < 2:
+        return False
+    return not any(col.strip().isdigit() for col in row[1:])
+
+
+"""
+タグ辞書テキスト（CSV）を比較キーの集合にパースする
+- csv.reader で読み、1カラム目をタグとして採用する
+- 最初の非空行が見出し行なら捨てる
+- 空行・1カラム目が空の行は無視する
+"""
+def parse_tag_dictionary(text) -> set[str]:
+    keys = set()
+    is_first_row = True
+
+    for row in csv.reader(io.StringIO(text)):
+        if not row:
+            continue
+        tag = row[0].strip()
+        if not tag:
+            continue
+
+        # 見出し判定は最初の非空行に対してだけ行う
+        if is_first_row:
+            is_first_row = False
+            if _is_header_row(row):
+                continue
+
+        keys.add(normalize_tag_key(tag))
+
+    return keys
+
+
+"""
+exclude_tags の入力からタグ辞書を読み込む
+- 1行だけの文字列が実在するファイルならファイルとして読む（数MBの辞書を想定）
+- そうでなければ貼り付けられた CSV テキストとして扱う
+- 空なら空集合（除外なし）
+"""
+def load_tag_dictionary(exclude_tags) -> set[str]:
+    if not exclude_tags or not exclude_tags.strip():
+        return set()
+
+    path = exclude_tags.strip()
+    if "\n" not in path and len(path) <= MAX_DICT_PATH_LENGTH:
+        try:
+            if os.path.isfile(path):
+                return parse_tag_dictionary(load_text_file(path))
+        except (OSError, ValueError):
+            # パスとして不正な文字列。貼り付けテキストとして扱う
+            pass
+
+    return parse_tag_dictionary(exclude_tags)
+
+
+"""
 キャプションファイル群からタグの出現回数を集計する
 - カンマ・改行をタグ区切りとして数える
 - order_by: count_9-0（多い順）/ count_0-9（少ない順）/ tag_a-z / tag_z-a
+- exclude_keys: normalize_tag_key 済みの除外キー集合。一致するタグは数えない
+  （辞書に載っていないタグ＝誤入力の疑いがあるタグだけをレポートに残すため）
 - (タグ, 回数) のリストを返す
 """
-def count_tags(file_list, order_by="count_9-0") -> list[tuple[str, int]]:
+def count_tags(file_list, order_by="count_9-0", exclude_keys=None) -> list[tuple[str, int]]:
     counter = Counter()
     for file_path in file_list:
         try:
@@ -213,8 +298,11 @@ def count_tags(file_list, order_by="count_9-0") -> list[tuple[str, int]]:
             continue
         for tag in content.replace("\n", ",").split(","):
             tag = tag.strip()
-            if tag:
-                counter[tag] += 1
+            if not tag:
+                continue
+            if exclude_keys and normalize_tag_key(tag) in exclude_keys:
+                continue
+            counter[tag] += 1
 
     items = list(counter.items())
     if order_by == "count_0-9":

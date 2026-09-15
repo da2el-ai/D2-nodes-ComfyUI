@@ -832,6 +832,8 @@ class D2_SaveCaption(io.ComfyNode):
 D2 Tag Report
 フォルダ内キャプションのタグ出現頻度を集計し、除外タグリストを作るノード
 get_tags ボタンで集計結果を text に表示し、ユーザーが編集して exclude_tags に渡す
+exclude_tags にタグ辞書を指定すると、辞書に載っていないタグだけを集計する
+（カンマ忘れ・空白ミスなど誤って入力したプロンプトを炙り出す用途）
 
 """
 class D2_TagReport(io.ComfyNode):
@@ -847,6 +849,7 @@ class D2_TagReport(io.ComfyNode):
                 io.String.Input("extension", default="txt"),
                 io.Combo.Input("order_by", options=["count_9-0", "count_0-9", "tag_a-z", "tag_z-a"], default="count_9-0"),
                 io.Boolean.Input("without_count", default=False),
+                io.String.Input("exclude_tags", default=""),
                 io.Combo.Input("output_type", options=["remove_comment", "output_comment"], default="remove_comment"),
                 io.Combo.Input("separator", options=["Line break", "Comma + Space"], default="Line break"),
                 io.Custom("D2_BUTTON").Input("get_tags", optional=True),
@@ -858,7 +861,8 @@ class D2_TagReport(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, folder="", include_subfolders=False, extension="txt", order_by="count_9-0", without_count=False, output_type="remove_comment", separator="Line break", get_tags=None, text="") -> io.NodeOutput:
+    def execute(cls, folder="", include_subfolders=False, extension="txt", order_by="count_9-0", without_count=False, exclude_tags="", output_type="remove_comment", separator="Line break", get_tags=None, text="") -> io.NodeOutput:
+        # exclude_tags は Get tags ボタン（集計）でのみ使うため、実行時は参照しない
         # separator ラベルを実際の区切り文字へ変換して渡す（caption_util は comfy 非依存のため util を import しない）
         result = caption_util.format_tag_report(text, output_type, util.get_separator_str(separator))
         return io.NodeOutput(result)
@@ -866,22 +870,29 @@ class D2_TagReport(io.ComfyNode):
 
 """
 フォルダ内キャプションのタグを集計してレポートを返す
-D2/tag-report/get-tags?folder=***&extension=***&include_subfolders=***&order_by=***&without_count=***
-という形式でリクエストが届く
+D2/tag-report/get-tags に下記の JSON を POST する
+{ folder, extension, include_subfolders, order_by, without_count, exclude_tags }
+exclude_tags（タグ辞書）は数MBになりうるので、URLクエリではなく POST ボディで受け取る
 """
-@PromptServer.instance.routes.get("/D2/tag-report/get-tags")
+@PromptServer.instance.routes.post("/D2/tag-report/get-tags")
 async def route_d2_tag_report_get_tags(request):
     try:
-        folder = request.query.get('folder')
-        extension = request.query.get('extension')
-        include_subfolders = request.query.get('include_subfolders') == 'true'
-        order_by = request.query.get('order_by')
-        without_count = request.query.get('without_count') == 'true'
+        data = await request.json()
+        folder = data.get('folder', '')
+        extension = data.get('extension', '')
+        include_subfolders = data.get('include_subfolders', False)
+        order_by = data.get('order_by', 'count_9-0')
+        without_count = data.get('without_count', False)
+        exclude_tags = data.get('exclude_tags', '')
+
+        # 辞書（パス or 貼り付けテキスト）を比較キーの集合にする
+        exclude_keys = caption_util.load_tag_dictionary(exclude_tags)
 
         files = util.get_files(folder, f"*.{extension}", include_subfolders=include_subfolders)
-        items = caption_util.count_tags(files, order_by)
+        items = caption_util.count_tags(files, order_by, exclude_keys)
         report = caption_util.build_tag_report(items, without_count)
-    except:
+    except Exception as e:
+        print(f"[D2 Tag Report] 集計に失敗しました: {e}")
         report = ""
 
     # JSON応答を返す

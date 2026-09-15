@@ -10,12 +10,15 @@ app.registerExtension({
 
         /**
          * フォルダ内キャプションのタグ集計レポートを取得
+         * exclude_tags（タグ辞書）は数MBになりうるので POST ボディで送る
          */
-        const getTagReport = (folder, extension, includeSubfolders, orderBy, withoutCount) => {
+        const getTagReport = (params) => {
             return new Promise(async (resolve) => {
-                // folder / extension はスペースや記号を含むため encodeURIComponent する
-                const url = `/D2/tag-report/get-tags?folder=${encodeURIComponent(folder)}&extension=${encodeURIComponent(extension)}&include_subfolders=${includeSubfolders}&order_by=${orderBy}&without_count=${withoutCount}`;
-                const response = await fetch(url);
+                const response = await fetch("/D2/tag-report/get-tags", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(params),
+                });
                 const data = await response.json();
                 resolve(data.report);
             });
@@ -35,17 +38,20 @@ app.registerExtension({
             const extensionWidget = findWidgetByName(this, "extension");
             const orderByWidget = findWidgetByName(this, "order_by");
             const withoutCountWidget = findWidgetByName(this, "without_count");
+            const excludeTagsWidget = findWidgetByName(this, "exclude_tags");
             const textWidget = findWidgetByName(this, "text");
 
             getTagsBtnWidget.name = "Get tags";
             getTagsBtnWidget.callback = async () => {
-                const report = await getTagReport(
-                    folderWidget.value,
-                    extensionWidget.value,
-                    includeSubfoldersWidget.value,
-                    orderByWidget.value,
-                    withoutCountWidget.value
-                );
+                const report = await getTagReport({
+                    folder: folderWidget.value,
+                    extension: extensionWidget.value,
+                    include_subfolders: includeSubfoldersWidget.value,
+                    order_by: orderByWidget.value,
+                    without_count: withoutCountWidget.value,
+                    // ウィジェットの値のみ対応（他ノードから接続された値は取得できない）
+                    exclude_tags: excludeTagsWidget?.value ?? "",
+                });
                 textWidget.value = report;
             };
 

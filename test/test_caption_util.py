@@ -13,6 +13,9 @@ from nodes.modules.caption_util import (
     count_tags,
     build_tag_report,
     format_tag_report,
+    normalize_tag_key,
+    parse_tag_dictionary,
+    load_tag_dictionary,
 )
 
 
@@ -268,6 +271,27 @@ class TestCountTags(unittest.TestCase):
         """対象0件は空リスト"""
         self.assertEqual(count_tags([], "count_9-0"), [])
 
+    def test_exclude_keys(self):
+        """辞書に載っているタグは集計しない（誤入力タグだけが残る）"""
+        with tempfile.TemporaryDirectory() as tmp:
+            files = self._make_files(tmp, ["1girl, blondehair, blue eyes twintails, blue sky,"])
+            exclude_keys = parse_tag_dictionary("1girl,4114588\nblue_sky,100")
+            items = count_tags(files, "count_9-0", exclude_keys)
+            self.assertEqual(items, [("blondehair", 1), ("blue eyes twintails", 1)])
+
+    def test_exclude_keys_none(self):
+        """exclude_keys 未指定なら全タグを集計する"""
+        with tempfile.TemporaryDirectory() as tmp:
+            files = self._make_files(tmp, ["1girl, smile"])
+            self.assertEqual(count_tags(files, "tag_a-z"), [("1girl", 1), ("smile", 1)])
+
+    def test_exclude_keys_space_and_case(self):
+        """スペース・大小の違いを吸収して除外する（辞書は long_hair、タグは Long Hair）"""
+        with tempfile.TemporaryDirectory() as tmp:
+            files = self._make_files(tmp, ["Long Hair, smile"])
+            exclude_keys = parse_tag_dictionary("long_hair,100")
+            self.assertEqual(count_tags(files, "tag_a-z", exclude_keys), [("smile", 1)])
+
 
 class TestBuildTagReport(unittest.TestCase):
     def test_with_count(self):
@@ -317,6 +341,96 @@ class TestFormatTagReport(unittest.TestCase):
 
     def test_empty(self):
         self.assertEqual(format_tag_report("", "remove_comment"), "")
+
+
+class TestNormalizeTagKey(unittest.TestCase):
+    def test_lower_and_trim(self):
+        """前後空白を落として小文字化する"""
+        self.assertEqual(normalize_tag_key("  1Girl  "), "1girl")
+
+    def test_space_to_underscore(self):
+        """スペースはアンダースコアに統一する"""
+        self.assertEqual(normalize_tag_key("blue eyes"), "blue_eyes")
+
+    def test_unescape_brackets(self):
+        """括弧エスケープを外して辞書の素の括弧と同一視する"""
+        self.assertEqual(normalize_tag_key(r"rem_\(re:zero\)"), "rem_(re:zero)")
+
+    def test_square_brackets(self):
+        self.assertEqual(normalize_tag_key(r"tag_\[x\]"), "tag_[x]")
+
+
+class TestParseTagDictionary(unittest.TestCase):
+    def test_two_columns_without_header(self):
+        """見出し無し2カラム（ComfyUI Custom Scripts 形式）"""
+        text = "1girl,4114588\nsolo,3426446\nhighres,3008413"
+        self.assertEqual(parse_tag_dictionary(text), {"1girl", "solo", "highres"})
+
+    def test_header_row_dropped(self):
+        """見出しあり4カラム（Auto Complete Plus 形式）。見出し行は捨てる"""
+        text = (
+            'tag,category,count,alias\n'
+            '1girl,0,4974288,"女の子,女性,少女,girl"\n'
+            'solo,0,4005860,"ソロ,solo,ひとり"'
+        )
+        self.assertEqual(parse_tag_dictionary(text), {"1girl", "solo"})
+
+    def test_quoted_comma_does_not_break_first_column(self):
+        """alias の引用符付きカンマがあっても1カラム目は壊れない"""
+        text = 'long_hair,0,3608339,"ロングヘアー,長髪,长发"'
+        self.assertEqual(parse_tag_dictionary(text), {"long_hair"})
+
+    def test_single_column_list(self):
+        """1カラムだけのタグ列は見出し判定の対象外（1行目も残す）"""
+        text = "1girl\nsolo\nhighres"
+        self.assertEqual(parse_tag_dictionary(text), {"1girl", "solo", "highres"})
+
+    def test_blank_lines_ignored(self):
+        """空行・1カラム目が空の行は無視する"""
+        text = "1girl,100\n\n,50\nsolo,20\n"
+        self.assertEqual(parse_tag_dictionary(text), {"1girl", "solo"})
+
+    def test_header_detected_after_blank_line(self):
+        """先頭に空行があっても最初の非空行を見出し判定する"""
+        text = "\ntag,category,count\n1girl,0,100"
+        self.assertEqual(parse_tag_dictionary(text), {"1girl"})
+
+    def test_numeric_second_column_is_data(self):
+        """2カラム目が数値なら1行目もデータ行として残す"""
+        text = "tag,0\n1girl,100"
+        self.assertEqual(parse_tag_dictionary(text), {"tag", "1girl"})
+
+    def test_keys_are_normalized(self):
+        """辞書側のキーも正規化して格納する"""
+        text = "Blue Eyes,100"
+        self.assertEqual(parse_tag_dictionary(text), {"blue_eyes"})
+
+    def test_empty(self):
+        self.assertEqual(parse_tag_dictionary(""), set())
+
+
+class TestLoadTagDictionary(unittest.TestCase):
+    def test_empty_returns_empty_set(self):
+        """空文字は除外なし"""
+        self.assertEqual(load_tag_dictionary(""), set())
+        self.assertEqual(load_tag_dictionary("   "), set())
+
+    def test_pasted_text(self):
+        """貼り付けられた CSV テキストとして解析する"""
+        self.assertEqual(load_tag_dictionary("1girl,100\nsolo,50"), {"1girl", "solo"})
+
+    def test_file_path(self):
+        """実在するファイルパス1行ならファイルを読む"""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "dic.csv")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("1girl,4114588\nsolo,3426446")
+            self.assertEqual(load_tag_dictionary(path), {"1girl", "solo"})
+
+    def test_missing_path_treated_as_text(self):
+        """存在しないパスはテキストとして扱う（エラーにしない）"""
+        result = load_tag_dictionary("d:/not_exists/dic.csv")
+        self.assertEqual(result, {"d:/not_exists/dic.csv"})
 
 
 if __name__ == "__main__":
