@@ -491,6 +491,8 @@ Output text
   - `Get tags` ボタンで集計結果を `text` に表示する
   - ユーザーは残す・消すを編集し、`D2 Save Caption` の `exclude_tags` に渡す
 - 行頭に `//` または `#` を付けるとコメント行になる
+- `exclude_tags` にタグ辞書を指定すると、**辞書に載っていないタグだけ**を集計する
+  - カンマ忘れ（`blue eyes twintails`）や空白ミス（`blondehair`）など、誤って入力したプロンプトを炙り出せる
 - `D2 Tag Report` `D2 Save Caption` の使い方はこちらの記事をご覧ください
   - https://note.com/da2el_ai/n/ne1fc9b3bea89?app_launch=false
 
@@ -509,6 +511,9 @@ Output text
   - `tag_z-a`: タグ名順（Z→A）
 - `without_count`
   - `true`: レポートに出現回数を表示しない
+- `exclude_tags`
+  - 集計から除外するタグ辞書のファイルパス（フルパス）
+  - 辞書の中身ではなく、辞書ファイルのパスを指定することに注意
 - `output_type`
   - `remove_comment`: コメント行を削除して残りを出力（消したいタグをコメントでマークする運用）
   - `output_comment`: コメント行のみを出力（消したいタグだけコメント化する運用）
@@ -520,3 +525,32 @@ Output text
 
 - `text`
   - 編集後のタグリスト（`D2 Save Caption` の `exclude_tags` に渡す）
+
+#### exclude_tags について
+
+- 辞書に掲載されていないタグ＝**誤入力の疑いがあるタグ**をあぶり出すための機能
+- 辞書に載っているタグは集計されないので、辞書に無いタグだけがレポートに残る
+- 対応する辞書の書式は3種類。いずれも1カラム目をタグとして読む
+  - タグだけのリスト
+
+    ```csv
+    1girl
+    solo
+    ```
+
+  - 見出し行の無い形式（ComfyUI Custom Scripts など）
+
+    ```csv
+    1girl,4114588
+    solo,3426446
+    ```
+
+  - 見出し行のある形式（ComfyUI Auto Complete Plus など）
+
+    ```csv
+    tag,category,count,alias
+    1girl,0,4974288,"女の子,女性,少女"
+    ```
+
+- 大文字小文字、スペースとアンダースコアの違い（`long hair` と `long_hair`）、括弧のエスケープ（`\(` と `(`）は区別せずに照合する
+- **注意**: `Get tags` ボタンはワークフロー実行前に動くため、他のノードから接続した値は読み取れない。辞書は必ずこの欄にパスを直接書いて指定する

@@ -451,6 +451,8 @@ Output text
 - A node that aggregates tag frequency from captions in the specified folder and builds an exclude-tag list
 - The `Get tags` button shows the aggregated result in `text`. The user edits which tags to keep/remove and passes it to `exclude_tags` of `D2 Save Caption`
 - Prefixing a line with `//` or `#` makes it a comment line
+- When a tag dictionary is given to `exclude_tags`, only the tags **not listed in the dictionary** are counted
+  - This surfaces mistyped prompts such as a missing comma (`blue eyes twintails`) or a missing space (`blondehair`)
 - For how to use `D2 Tag Report` and `D2 Save Caption`, see this article (Japanese)
   - https://note.com/da2el_ai/n/ne1fc9b3bea89?app_launch=false
 
@@ -469,6 +471,9 @@ Output text
   - `tag_z-a`: By tag name (Z->A)
 - `without_count`
   - `true`: Do not show occurrence counts in the report
+- `exclude_tags`
+  - The file path of the tag dictionary to exclude from counting (full path)
+  - Note that you specify the path of the dictionary file, not its contents
 - `output_type`
   - `remove_comment`: Remove comment lines and output the rest (workflow: mark tags to remove with comments)
   - `output_comment`: Output only comment lines (workflow: comment out only the tags to remove)
@@ -480,3 +485,32 @@ Output text
 
 - `text`
   - The edited tag list (passed to `exclude_tags` of `D2 Save Caption`)
+
+#### About exclude_tags
+
+- A feature for surfacing **tags that are likely mistyped**, that is, tags not listed in the dictionary
+- Tags listed in the dictionary are not counted, so only tags missing from the dictionary remain in the report
+- Three dictionary formats are supported. In all of them the first column is read as the tag
+  - A plain list of tags
+
+    ```csv
+    1girl
+    solo
+    ```
+
+  - A format without a header row (such as ComfyUI Custom Scripts)
+
+    ```csv
+    1girl,4114588
+    solo,3426446
+    ```
+
+  - A format with a header row (such as ComfyUI Auto Complete Plus)
+
+    ```csv
+    tag,category,count,alias
+    1girl,0,4974288,"girl,woman,lady"
+    ```
+
+- Matching ignores letter case, the difference between spaces and underscores (`long hair` and `long_hair`), and bracket escaping (`\(` and `(`)
+- **Note**: The `Get tags` button runs before the workflow executes, so a value connected from another node cannot be read. Always type the dictionary path directly into this field

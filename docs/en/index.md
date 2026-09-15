@@ -199,6 +199,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.09.15**
+
+- `D2_TagReport`: Added `exclude_tags`, which excludes tags listed in a tag dictionary from counting. Only tags missing from the dictionary remain, surfacing mistyped prompts such as missing commas and missing spaces
+
 **2026.09.09**
 
 - `D2_MergeCnet`: Added a node that merges multiple `cnet_stack` into one

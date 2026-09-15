@@ -202,6 +202,10 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.09.15**
+
+- `D2_TagReport`: タグ辞書を指定して集計から除外する `exclude_tags` を追加。辞書に無いタグだけが残るので、カンマ忘れや空白ミスなど誤って入力したプロンプトを炙り出せる
+
 **2026.09.09**
 
 - `D2_MergeCnet`: 複数の `cnet_stack` を1つにまとめるノードを新規追加

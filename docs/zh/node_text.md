@@ -479,6 +479,8 @@ Output text
 - 從指定資料夾內的標註集計標籤出現頻率，並建立排除標籤清單的節點
 - `Get tags` 按鈕會將集計結果顯示於 `text`。使用者編輯要保留・刪除的標籤，再傳給 `D2 Save Caption` 的 `exclude_tags`
 - 在行首加上 `//` 或 `#` 即為註解行
+- 於 `exclude_tags` 指定標籤字典後，只會集計**未收錄於字典中的標籤**
+  - 可藉此找出漏打逗號（`blue eyes twintails`）或漏打空格（`blondehair`）等誤輸入的提示詞
 - `D2 Tag Report` `D2 Save Caption` 的使用方式請參閱這篇文章（日文）
   - https://note.com/da2el_ai/n/ne1fc9b3bea89?app_launch=false
 
@@ -497,6 +499,9 @@ Output text
   - `tag_z-a`: 依標籤名稱（Z->A）
 - `without_count`
   - `true`: 報告中不顯示出現次數
+- `exclude_tags`
+  - 要從集計中排除的標籤字典檔案路徑（完整路徑）
+  - 請注意這裡指定的是字典檔案的路徑，而非字典的內容
 - `output_type`
   - `remove_comment`: 刪除註解行並輸出其餘（運用：以註解標記要刪除的標籤）
   - `output_comment`: 僅輸出註解行（運用：僅將要刪除的標籤註解化）
@@ -508,3 +513,32 @@ Output text
 
 - `text`
   - 編輯後的標籤清單（傳給 `D2 Save Caption` 的 `exclude_tags`）
+
+#### 關於 exclude_tags
+
+- 用於找出未收錄於字典中的標籤，也就是**疑似誤輸入的標籤**
+- 字典中已收錄的標籤不會被集計，因此報告中只會留下字典裡沒有的標籤
+- 支援三種字典格式。三者皆讀取第1欄作為標籤
+  - 僅有標籤的清單
+
+    ```csv
+    1girl
+    solo
+    ```
+
+  - 沒有標題行的格式（如 ComfyUI Custom Scripts）
+
+    ```csv
+    1girl,4114588
+    solo,3426446
+    ```
+
+  - 有標題行的格式（如 ComfyUI Auto Complete Plus）
+
+    ```csv
+    tag,category,count,alias
+    1girl,0,4974288,"女孩,女性,少女"
+    ```
+
+- 比對時不區分大小寫、空格與底線的差異（`long hair` 與 `long_hair`）、以及括號的跳脫字元（`\(` 與 `(`）
+- **注意**: `Get tags` 按鈕會在工作流程執行前運作，因此無法讀取從其他節點連接的值。字典請務必在此欄位直接輸入路徑
