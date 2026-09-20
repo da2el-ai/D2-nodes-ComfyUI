@@ -1,14 +1,9 @@
 import { app } from "/scripts/app.js";
-import { api } from "../../scripts/api.js";
 import { findWidgetByName, findOutputByName, getReadOnlyWidgetBase } from "./modules/utils.js";
+import { CANVAS_MARGIN, computeCanvasSize, buildInputImageUrl } from "./modules/util_node_canvas.js";
 
 const NODE_TITLE = "D2 Create Point";
 
-const CANVAS_MARGIN = 10;
-const CANVAS_MAX_HEIGHT = 1280;
-const MIN_CANVAS_HEIGHT = 64;
-// computeSize が引数なしで呼ばれ、かつノード幅もまだ無いときの保険
-const DEFAULT_NODE_WIDTH = 240;
 const MARKER_RADIUS = 10;
 const GRAB_RADIUS = 16;
 // 座標 JSON の小数桁。6桁なら最大解像度 16384px でも 0.02px 未満の誤差に収まる
@@ -140,30 +135,6 @@ const updateCanvasSize = (node) => {
 };
 
 /**
- * image ウィジェットの値から /view の URL を組み立てる。
- * modules/utils.js の getImageUrlFromApi は temp / output 用で type=input を付けられず、
- * input フォルダの画像が 404 になるためここで組み立てる。
- */
-const buildImageUrl = (imageValue) => {
-    let value = String(imageValue).trim();
-    let type = "input";
-
-    // "ファイル名 [input]" 形式の注釈を外す
-    const annotated = value.match(/^(.*)\s+\[(\w+)\]$/);
-    if (annotated) {
-        value = annotated[1];
-        type = annotated[2];
-    }
-
-    const separator = value.lastIndexOf("/");
-    const subfolder = separator >= 0 ? value.substring(0, separator) : "";
-    const filename = separator >= 0 ? value.substring(separator + 1) : value;
-
-    const params = `filename=${encodeURIComponent(filename)}&type=${encodeURIComponent(type)}&subfolder=${encodeURIComponent(subfolder)}`;
-    return api.apiURL(`/view?${params}`);
-};
-
-/**
  * 背景画像を読み込む。
  * updateSize はユーザーの選択・アップロード操作のときだけ true にする。
  * ワークフロー復元時に true にすると、手で変えて保存した width / height が潰れる。
@@ -199,7 +170,7 @@ const loadCanvasImage = (node, updateSize) => {
         node.setDirtyCanvas(true, true);
     };
 
-    image.src = buildImageUrl(imageValue);
+    image.src = buildInputImageUrl(imageValue);
 };
 
 /**
@@ -411,31 +382,13 @@ app.registerExtension({
                 widget.endDrag = () => {};
 
                 widget.computeSize = function (width) {
-                    // ノードのウィジェット配置（_arrangeWidgets）は computeSize() を引数なしで呼び、
-                    // ノードサイズ計算（LGraphNode.computeSize）は幅付きで呼ぶ。
-                    // 引数なしのまま width で計算すると NaN になり、computedHeight → 後続ウィジェットの y
-                    // まで NaN が伝播して DOM ウィジェット（markers）が画面外へ飛ぶ。
-                    const nodeWidth = Number.isFinite(width) ? width : (node.size?.[0] ?? DEFAULT_NODE_WIDTH);
-                    const available = Math.max(nodeWidth - CANVAS_MARGIN * 2, 1);
                     const ratio = getNumber(node, "height", 1024) / getNumber(node, "width", 1024);
+                    const size = computeCanvasSize(width, ratio, node.size?.[0]);
 
-                    let canvasWidth = available;
-                    let height = Math.round(available * ratio);
-
-                    // 上限に当たったら、高さを切るだけでなく幅も縮めてアスペクト比を保つ。
-                    // 高さだけ切ると画像とマーカー配置が横に引き伸ばされ、
-                    // 「実際の位置を見て決める」というこのノードの目的が崩れる。
-                    if (Number.isFinite(ratio) && ratio > 0 && height > CANVAS_MAX_HEIGHT) {
-                        height = CANVAS_MAX_HEIGHT;
-                        canvasWidth = Math.max(Math.round(height / ratio), 1);
-                    }
-
-                    // 幅・高さが不正でも必ず有限値を返す
-                    const safeHeight = Number.isFinite(height) && height > 0 ? height : MIN_CANVAS_HEIGHT;
-
-                    this.canvasWidth = Math.min(canvasWidth, available);
-                    this.size = [nodeWidth, safeHeight];
-                    return [nodeWidth, safeHeight];
+                    // 高さ上限で幅を縮めたときの実キャンバス幅。draw の中央寄せで使う
+                    this.canvasWidth = size.canvasWidth;
+                    this.size = [size.nodeWidth, size.height];
+                    return [size.nodeWidth, size.height];
                 };
 
                 widget.draw = function (ctx, node, width, y) {
