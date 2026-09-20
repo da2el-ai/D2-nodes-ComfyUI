@@ -151,6 +151,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Paste an image using a mask
 - <a href="node_image.md#D2-Create-Point">`D2 Create Point`</a>
   - Output XY coordinates by dragging markers
+- <a href="node_image.md#D2-Create-Masks">`D2 Create Masks`</a>
+  - Output multiple masks by dragging rectangles
 
 
 ### XY Plot
@@ -198,6 +200,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.09.20**
+
+- `D2_CreateMasks`: Added a node that outputs multiple masks by dragging rectangles on a canvas
 
 **2026.09.15**
 

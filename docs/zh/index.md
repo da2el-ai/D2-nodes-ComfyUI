@@ -154,6 +154,8 @@
   - 使用遮罩貼上圖像
 - <a href="node_image.md#D2-Create-Point">`D2 Create Point`</a>
   - 透過拖曳標記來輸出 XY 座標
+- <a href="node_image.md#D2-Create-Masks">`D2 Create Masks`</a>
+  - 透過拖曳長方形來輸出多個遮罩
 
 
 ### XY Plot
@@ -200,6 +202,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.09.20**
+
+- `D2_CreateMasks`: 新增可在畫布上拖曳長方形以輸出多個遮罩的節點
 
 **2026.09.15**
 

@@ -151,6 +151,8 @@ D2 Nodes ComfyUI
   - マスクを使って画像をペーストする
 - <a href="node_image.md#D2-Create-Point">`D2 Create Point`</a>
   - マーカーをドラッグして XY 座標を出力する
+- <a href="node_image.md#D2-Create-Masks">`D2 Create Masks`</a>
+  - 長方形をドラッグして複数のマスクを出力する
 
 
 ### XY Plot
@@ -201,6 +203,10 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.09.20**
+
+- `D2_CreateMasks`: キャンバス上の長方形をドラッグして複数のマスクを出力するノードを新規追加
 
 **2026.09.15**
 
