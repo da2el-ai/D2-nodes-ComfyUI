@@ -31,6 +31,7 @@ from .modules import mask_util
 from .modules import template_util
 from .modules.eagle_api import EagleAPI, send_to_eagle
 from .modules import marker_util
+from .modules import mask_rect_util
 from .modules.util import AnyType, AnyTypeTuple, AnyFalseList, D2_TD2Pipe
 from comfy_api.latest import io
 
@@ -1462,7 +1463,7 @@ class D2_CreatePoint(io.ComfyNode):
         if not image:
             return ""
 
-        image_path = cls._resolve_image_path(image)
+        image_path = image_util.resolve_input_image_path(image)
         if not os.path.isfile(image_path):
             # 存在チェックとエラー通知は execute に任せる（ここではファイル名の変化だけ拾う）
             return image
@@ -1470,32 +1471,8 @@ class D2_CreatePoint(io.ComfyNode):
         return os.path.getmtime(image_path)
 
     @classmethod
-    def _resolve_image_path(cls, image):
-        """image ウィジェットの値を実ファイルパスへ解決する"""
-        if folder_paths.exists_annotated_filepath(image):
-            return folder_paths.get_annotated_filepath(image)
-        return image
-
-    @classmethod
-    def _load_image(cls, image, width, height):
-        """
-        image が空なら width × height の黒画像、指定されていれば実ファイルを読む。
-        ファイルが見つからないときに黒画像でごまかすと、間違いに気づかないまま
-        大量に実行される事故になるので ValueError で止める。
-        """
-        if not image:
-            return torch.zeros((1, height, width, 3))
-
-        image_path = cls._resolve_image_path(image)
-        if not os.path.isfile(image_path):
-            raise ValueError(f"D2 Create Point: 画像が見つかりません: {image}")
-
-        output_images, _ = image_util.load_image_from_path(image_path)
-        return output_images
-
-    @classmethod
     def execute(cls, marker_count, mode, width, height, image="", canvas=None, markers="[]") -> io.NodeOutput:
-        output_image = cls._load_image(image, width, height)
+        output_image = image_util.load_canvas_image(image, width, height, "D2 Create Point")
         marker_list = marker_util.parse_markers(markers, marker_count)
         coords = marker_util.markers_to_outputs(marker_list, width, height, mode)
 
@@ -1503,9 +1480,94 @@ class D2_CreatePoint(io.ComfyNode):
         return io.NodeOutput(output_image, width, height, *coords)
 
 
+"""
+
+D2 Create Masks
+キャンバス上の長方形をドラッグして複数のマスクを作る
+
+"""
+class D2_CreateMasks(io.ComfyNode):
+    # 可変出力ノード。JS が addOutput("mask_N", "MASK") で mask_2 以降を動的に増やすため、
+    # 出力型検証（RETURN_TYPES[slot]）が宣言数を超えても落ちないよう AnyTypeTuple を使う。
+    # 詳細は .claude/knowledge.md 2026-06-13「可変出力ノード」および D2_CreatePoint を参照。
+    _RETURN_TYPES = AnyTypeTuple(("IMAGE", "INT", "INT", "MASK"))
+    _RETURN_NAMES = AnyTypeTuple(("image", "width", "height", "mask_1"))
+    _OUTPUT_IS_LIST = AnyFalseList()
+    _OUTPUT_TOOLTIPS = (None, None, None, None)
+
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        input_dir = folder_paths.get_input_directory()
+        files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+        return io.Schema(
+            node_id="D2 Create Masks",
+            display_name="D2 Create Masks",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("mask_count", default=1, min=1, max=mask_rect_util.MAX_MASK_COUNT),
+                # アクティブなマスクの番号。完全に重なったマスクを掴めないときの選択手段で、
+                # キャンバスのクリックと双方向に同期する。バックエンドでは使わない。
+                io.Int.Input("select_mask", default=1, min=1, max=mask_rect_util.MAX_MASK_COUNT),
+                io.Int.Input("width", default=1024, min=8, max=util.MAX_RESOLUTION, step=8),
+                io.Int.Input("height", default=1024, min=8, max=util.MAX_RESOLUTION, step=8),
+                # image は required に置く必要がある。フロントエンドの Comfy.UploadImage 拡張は
+                # input.required しか走査せず、optional に置くと IMAGEUPLOAD が合成されない
+                # （＝ノードへの画像ドラッグ＆ドロップ・ペースト・アップロードボタンが付かない）。
+                io.Combo.Input("image", options=[""] + sorted(files), default="", upload=io.UploadType.image),
+                # ウィジェットは required 群 → optional 群の順に生成され、宣言順が効くのは群の中だけ。
+                io.Custom("D2_MASK_CANVAS").Input("canvas", optional=True),
+                io.String.Input("masks", multiline=True, default="[]", optional=True),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                io.Mask.Output(display_name="mask_1"),
+            ],
+        )
+
+    # image は空欄可で、JS のアップロードで増えたファイルも受ける必要がある。
+    # 引数名に image を含めると ComfyUI が既定の combo 照合をスキップする。
+    @classmethod
+    def validate_inputs(cls, image):
+        return True
+
+    # 同名ファイルを再アップロードすると入力シグネチャが変わらず、
+    # outputs キャッシュが古い画像を返し続けるため mtime で無効化する。
+    @classmethod
+    def fingerprint_inputs(cls, mask_count, select_mask, width, height, image="", canvas=None, masks="[]"):
+        if not image:
+            return ""
+
+        image_path = image_util.resolve_input_image_path(image)
+        if not os.path.isfile(image_path):
+            # 存在チェックとエラー通知は execute に任せる（ここではファイル名の変化だけ拾う）
+            return image
+
+        return os.path.getmtime(image_path)
+
+    @classmethod
+    def _rect_to_mask(cls, rect, width, height):
+        """相対矩形を、矩形内が 1.0 の MASK テンソルにする"""
+        mask = torch.zeros((1, height, width), dtype=torch.float32)
+        x0, y0, x1, y1 = mask_rect_util.rect_to_pixels(rect, width, height)
+        mask[:, y0:y1, x0:x1] = 1.0
+        return mask
+
+    @classmethod
+    def execute(cls, mask_count, select_mask, width, height, image="", canvas=None, masks="[]") -> io.NodeOutput:
+        output_image = image_util.load_canvas_image(image, width, height, "D2 Create Masks")
+        rects = mask_rect_util.parse_masks(masks, mask_count)
+        mask_tensors = [cls._rect_to_mask(rect, width, height) for rect in rects]
+
+        # 出力数は戻り値タプルの長さで決まる（RETURN_TYPES の長さには依存しない）
+        return io.NodeOutput(output_image, width, height, *mask_tensors)
+
+
 
 NODE_CLASS_MAPPINGS = {
     "D2 Create Point": D2_CreatePoint,
+    "D2 Create Masks": D2_CreateMasks,
     "D2 Send File Eagle": D2_SendFileEagle,
     "D2 Save Image Eagle": D2_SaveImageEagle,
     "D2 Save Image": D2_SaveImage,

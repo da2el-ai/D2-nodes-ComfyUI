@@ -5,6 +5,7 @@ from scipy.ndimage import gaussian_filter
 import os
 import json
 import comfy.model_management
+import folder_paths
 import node_helpers
 from comfy.cli_args import args
 from comfy_api.latest import InputImpl
@@ -68,6 +69,33 @@ def load_image_from_path(image_path):
     output_mask = torch.cat(output_masks, dim=0)
 
     return (output_image.to(device=device, dtype=dtype), output_mask.to(device=device, dtype=dtype))
+
+
+def resolve_input_image_path(image):
+    """
+    image ウィジェット（input フォルダのファイル名）の値を実ファイルパスへ解決する。
+    """
+    if folder_paths.exists_annotated_filepath(image):
+        return folder_paths.get_annotated_filepath(image)
+    return image
+
+
+def load_canvas_image(image, width, height, node_name):
+    """
+    ノード内キャンバスの背景画像を読み込む（D2 Create Point / D2 Create Masks 共用）。
+    image が空なら width × height の黒画像を返す。
+    ファイルが見つからないときに黒画像でごまかすと、間違いに気づかないまま
+    大量に実行される事故になるので ValueError で止める。
+    """
+    if not image:
+        return torch.zeros((1, height, width, 3))
+
+    image_path = resolve_input_image_path(image)
+    if not os.path.isfile(image_path):
+        raise ValueError(f"{node_name}: 画像が見つかりません: {image}")
+
+    output_images, _ = load_image_from_path(image_path)
+    return output_images
 
 
 def tensor2pil(image):
