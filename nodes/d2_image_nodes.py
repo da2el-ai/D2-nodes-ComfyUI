@@ -32,6 +32,7 @@ from .modules import template_util
 from .modules.eagle_api import EagleAPI, send_to_eagle
 from .modules import marker_util
 from .modules import mask_rect_util
+from .modules import random_util
 from .modules.util import AnyType, AnyTypeTuple, AnyFalseList, D2_TD2Pipe
 from comfy_api.latest import io
 
@@ -1564,10 +1565,119 @@ class D2_CreateMasks(io.ComfyNode):
         return io.NodeOutput(output_image, width, height, *mask_tensors)
 
 
+"""
+
+D2 Random Point
+ランダムな XY 座標を1つ出力する
+
+"""
+class D2_RandomPoint(io.ComfyNode):
+
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Random Point",
+            display_name="D2 Random Point",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("width", default=1024, min=8, max=util.MAX_RESOLUTION, step=8),
+                io.Int.Input("height", default=1024, min=8, max=util.MAX_RESOLUTION, step=8),
+                # min / max は mode に関わらず常に相対値。まず relative で計算してから absolute へ写すので、
+                # mode や width / height を変えても「範囲」の意味が変わらない。
+                io.Float.Input("min_x", default=0.0, min=0.0, max=1.0, step=0.01),
+                io.Float.Input("max_x", default=1.0, min=0.0, max=1.0, step=0.01),
+                io.Float.Input("min_y", default=0.0, min=0.0, max=1.0, step=0.01),
+                io.Float.Input("max_y", default=1.0, min=0.0, max=1.0, step=0.01),
+                io.Combo.Input("mode", options=random_util.MODES, default=random_util.MODE_ABSOLUTE),
+                # relative のときは無視される（int に丸めると 0 か 1 にしかならないため）
+                io.Combo.Input("number_type", options=random_util.NUMBER_TYPES, default=random_util.NUMBER_TYPE_INT),
+                # control_after_generate を付けるとフロントエンドが Queue のたびに seed を書き換える。
+                # ランダムノードはこれが無いと入力シグネチャが変わらず、outputs キャッシュが返り続ける。
+                # fixed を選べば同じ結果を再現できる。
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff, control_after_generate=True),
+            ],
+            outputs=[
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                # 実際の型は mode / number_type で変わるので * にする。
+                # こうすれば設定を切り替えても配線が切れず、INT 入力にも FLOAT 入力にも挿せる。
+                io.AnyType.Output(display_name="x"),
+                io.AnyType.Output(display_name="y"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, seed, width, height, min_x, max_x, min_y, max_y, mode, number_type) -> io.NodeOutput:
+        # グローバルの random を触ると他ノードの結果まで引きずられるのでインスタンスを作る
+        rng = random.Random(seed)
+
+        rel_x = random_util.random_relative(rng, min_x, max_x)
+        rel_y = random_util.random_relative(rng, min_y, max_y)
+
+        x = random_util.to_point_value(rel_x, width, mode, number_type)
+        y = random_util.to_point_value(rel_y, height, mode, number_type)
+
+        return io.NodeOutput(width, height, x, y)
+
+
+"""
+
+D2 Random Mask
+ランダムな長方形のマスクを1枚出力する
+
+"""
+class D2_RandomMask(io.ComfyNode):
+
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Random Mask",
+            display_name="D2 Random Mask",
+            category="D2/Image",
+            inputs=[
+                io.Int.Input("width", default=1024, min=8, max=util.MAX_RESOLUTION, step=8),
+                io.Int.Input("height", default=1024, min=8, max=util.MAX_RESOLUTION, step=8),
+                # 長方形の寸法はピクセル単位。既定は min = max = 512 なので位置だけがランダムに動く。
+                # width / height と違って 8 の倍数に縛る理由がないので step は 1。
+                io.Int.Input("min_width", default=512, min=1, max=util.MAX_RESOLUTION),
+                io.Int.Input("max_width", default=512, min=1, max=util.MAX_RESOLUTION),
+                io.Int.Input("min_height", default=512, min=1, max=util.MAX_RESOLUTION),
+                io.Int.Input("max_height", default=512, min=1, max=util.MAX_RESOLUTION),
+                # D2 Random Point と同じ理由で control_after_generate を付ける
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff, control_after_generate=True),
+            ],
+            outputs=[
+                # width / height は入力のスループット（D2 Create Masks と同じ扱い）。
+                # ランダムに決まった長方形の実値は mask_* のほうで返す。
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+                io.Mask.Output(display_name="mask"),
+                io.Int.Output(display_name="mask_x"),
+                io.Int.Output(display_name="mask_y"),
+                io.Int.Output(display_name="mask_w"),
+                io.Int.Output(display_name="mask_h"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, seed, width, height, min_width, max_width, min_height, max_height) -> io.NodeOutput:
+        # グローバルの random を触ると他ノードの結果まで引きずられるのでインスタンスを作る
+        rng = random.Random(seed)
+
+        rect = random_util.random_rect(rng, width, height, min_width, max_width, min_height, max_height)
+
+        mask = torch.zeros((1, height, width), dtype=torch.float32)
+        mask[:, rect["y"]:rect["y"] + rect["h"], rect["x"]:rect["x"] + rect["w"]] = 1.0
+
+        return io.NodeOutput(width, height, mask, rect["x"], rect["y"], rect["w"], rect["h"])
+
+
 
 NODE_CLASS_MAPPINGS = {
     "D2 Create Point": D2_CreatePoint,
     "D2 Create Masks": D2_CreateMasks,
+    "D2 Random Point": D2_RandomPoint,
+    "D2 Random Mask": D2_RandomMask,
     "D2 Send File Eagle": D2_SendFileEagle,
     "D2 Save Image Eagle": D2_SaveImageEagle,
     "D2 Save Image": D2_SaveImage,
