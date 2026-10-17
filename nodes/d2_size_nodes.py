@@ -247,7 +247,9 @@ class D2_SizeSelector(io.ComfyNode):
 
         latent = torch.zeros([batch_size, 4, height // 8, width // 8])
 
-        return io.NodeOutput(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent})
+        # downscale_ratio_spacial: 本体 EmptyLatentImage と同じく縮小率を明示する
+        # （Flux2 系など縮小率 16 のモデルでサンプラー側が latent を補正するのに使われる）
+        return io.NodeOutput(width, height, upscale_factor, prescale_factor, batch_size, {"samples":latent, "downscale_ratio_spacial": 8})
 
 
 
