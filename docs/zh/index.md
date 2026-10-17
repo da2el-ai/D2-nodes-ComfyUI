@@ -156,6 +156,10 @@
   - 透過拖曳標記來輸出 XY 座標
 - <a href="node_image.md#D2-Create-Masks">`D2 Create Masks`</a>
   - 透過拖曳長方形來輸出多個遮罩
+- <a href="node_image.md#D2-Random-Point">`D2 Random Point`</a>
+  - 輸出隨機的 XY 座標
+- <a href="node_image.md#D2-Random-Mask">`D2 Random Mask`</a>
+  - 輸出隨機的長方形遮罩
 
 
 ### XY Plot
@@ -202,6 +206,11 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.09.22**
+
+- `D2_RandomPoint`: 新增輸出隨機 XY 座標的節點
+- `D2_RandomMask`: 新增輸出隨機長方形遮罩的節點
 
 **2026.09.20**
 

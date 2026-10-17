@@ -518,3 +518,75 @@ The image above shows the same marker positions with only the mode changed. Mult
 The mask you click becomes "active": it is shown in front of the others and white circles for resizing appear at its corners.
 
 When masks overlap completely you cannot click the one underneath, so pick its number with `select_mask` instead. Conversely, changing the active mask by clicking also updates `select_mask`.
+
+---
+
+### D2 Random Point
+
+<figure>
+<img src="../img/random_point.png">
+</figure>
+
+- Node that outputs random XY coordinates
+- You can limit the range by setting min / max
+
+#### Input
+
+- `width` / `height`: Size of the coordinate system
+- `min_x` / `max_x`: Range of the X coordinate
+- `min_y` / `max_y`: Range of the Y coordinate
+- `mode`
+  - `absolute`: Outputs actual pixel coordinates
+  - `relative`: Outputs a relative value from 0.0 to 1.0
+- `number_type`: `int` / `float`. It only takes effect when `mode` is `absolute`
+- `seed`: Random seed. The same value gives the same coordinates
+
+#### Output
+
+- `width` / `height`: The size of the coordinate system you entered is output as is
+- `x` / `y`: The randomly chosen coordinates
+
+#### About the range
+
+`min_x` `max_x` `min_y` `max_y` are always specified as relative values from 0.0 to 1.0, regardless of `mode`.
+
+For example, setting `min_x` to `0.25` and `max_x` to `0.75` keeps the coordinates near the center. Changing `width` does not change what "near the center" means.
+
+Entering the same value for `min` and `max` fixes the coordinate at that position.
+
+#### About number_type
+
+When `mode` is `absolute`, `int` outputs an integer like `100` and `float` outputs a decimal like `100.3968`.
+
+`relative` is a range from 0 to 1, so it is always a decimal.
+
+---
+
+### D2 Random Mask
+
+<figure>
+<img src="../img/random_mask.png">
+</figure>
+
+- Node that outputs a random rectangular mask
+- The rectangle is placed so that it never extends beyond `width` / `height`
+
+#### Input
+
+- `width` / `height`: Size of the output mask
+- `min_width` / `max_width`: Range of the rectangle width (pixels)
+- `min_height` / `max_height`: Range of the rectangle height (pixels)
+- `seed`: Random seed. The same value gives the same rectangle
+
+#### Output
+
+- `width` / `height`: The mask size you entered is output as is
+- `mask`: Mask that is white inside the rectangle
+- `mask_x` / `mask_y`: Top-left coordinates of the rectangle
+- `mask_w` / `mask_h`: Width and height of the rectangle
+
+#### About the rectangle size
+
+Entering the same value for `min_width` and `max_width` fixes the width, so only the position moves randomly.
+
+When `max` is smaller than `min` the two are swapped, and a size larger than `width` / `height` is reduced to the mask size. The rectangle never extends outside the mask.

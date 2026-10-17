@@ -153,6 +153,10 @@ If you have installed any of the following custom nodes previously, please remov
   - Output XY coordinates by dragging markers
 - <a href="node_image.md#D2-Create-Masks">`D2 Create Masks`</a>
   - Output multiple masks by dragging rectangles
+- <a href="node_image.md#D2-Random-Point">`D2 Random Point`</a>
+  - Output random XY coordinates
+- <a href="node_image.md#D2-Random-Mask">`D2 Random Mask`</a>
+  - Output a random rectangular mask
 
 
 ### XY Plot
@@ -200,6 +204,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.09.22**
+
+- `D2_RandomPoint`: Added a node that outputs random XY coordinates
+- `D2_RandomMask`: Added a node that outputs a random rectangular mask
 
 **2026.09.20**
 

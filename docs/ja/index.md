@@ -153,6 +153,10 @@ D2 Nodes ComfyUI
   - マーカーをドラッグして XY 座標を出力する
 - <a href="node_image.md#D2-Create-Masks">`D2 Create Masks`</a>
   - 長方形をドラッグして複数のマスクを出力する
+- <a href="node_image.md#D2-Random-Point">`D2 Random Point`</a>
+  - ランダムな XY 座標を出力する
+- <a href="node_image.md#D2-Random-Mask">`D2 Random Mask`</a>
+  - ランダムな長方形のマスクを出力する
 
 
 ### XY Plot
@@ -203,6 +207,11 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.09.22**
+
+- `D2_RandomPoint`: ランダムな XY 座標を出力するノードを新規追加
+- `D2_RandomMask`: ランダムな長方形のマスクを出力するノードを新規追加
 
 **2026.09.20**
 
