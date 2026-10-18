@@ -12,6 +12,7 @@ from comfy_api.latest import InputImpl
 from PIL.PngImagePlugin import PngInfo
 import piexif
 import piexif.helper
+from . import nai_stealth_util
 
 
 
@@ -34,10 +35,18 @@ def load_image_from_path(image_path):
 
     components = InputImpl.VideoFromFile(image_path).get_components()
     if components.images.shape[0] > 0:
-        return (components.images.to(device=device, dtype=dtype), (1.0 - components.alpha[..., -1]).to(device=device, dtype=dtype) if components.alpha is not None else torch.zeros((components.images.shape[0], 64, 64), dtype=dtype, device=device))
+        output_image = components.images.to(device=device, dtype=dtype)
+        if components.alpha is None:
+            return (output_image, torch.zeros((components.images.shape[0], 64, 64), dtype=dtype, device=device))
+
+        output_mask = (1.0 - components.alpha[..., -1]).to(device=device, dtype=dtype)
+        with node_helpers.pillow(Image.open, image_path) as img:
+            is_stealth = nai_stealth_util.has_stealth_info(img)
+        return (output_image, _remove_stealth_mask(output_mask, is_stealth))
 
     # pyav が読み込めないアニメーション webp はここで処理される（本家と同じ扱い）
     img = node_helpers.pillow(Image.open, image_path)
+    is_stealth = nai_stealth_util.has_stealth_info(img)
 
     output_images = []
     output_masks = []
@@ -68,7 +77,15 @@ def load_image_from_path(image_path):
     output_image = torch.cat(output_images, dim=0)
     output_mask = torch.cat(output_masks, dim=0)
 
-    return (output_image.to(device=device, dtype=dtype), output_mask.to(device=device, dtype=dtype))
+    return (output_image.to(device=device, dtype=dtype), _remove_stealth_mask(output_mask, is_stealth).to(device=device, dtype=dtype))
+
+
+def _remove_stealth_mask(mask, is_stealth):
+    """
+    NovelAI の stealth info（アルファ LSB の透かし）があれば MASK を全面 0（不透明扱い）にする。
+    透かし部分だけ MASK が 1/255 になり、img2img でそこだけ描き直されてしまうのを防ぐ。
+    """
+    return torch.zeros_like(mask) if is_stealth else mask
 
 
 def resolve_input_image_path(image):

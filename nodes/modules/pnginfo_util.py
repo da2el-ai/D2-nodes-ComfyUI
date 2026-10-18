@@ -7,15 +7,36 @@ import zlib
 from PIL import Image, PngImagePlugin
 import piexif
 import piexif.helper
+from . import nai_stealth_util
 
 
 
 #
 # 画像からプロンプトを取り出す
+# メタデータから取れないときは NovelAI stealth info（アルファ LSB の埋め込み）を試す
 #
 # @return {positive:str, negative:str}
 #
 def get_prompt(img:Image.Image) -> dict[str, str]:
+  prompt = _get_prompt_from_metadata(img)
+
+  if not prompt['positive'] and not prompt['negative']:
+    stealth_info = nai_stealth_util.read_stealth_info(img)
+    if stealth_info and "Comment" in stealth_info:
+      try:
+        (prompt['positive'], prompt['negative']) = _get_prompt_nai(stealth_info)
+      except (json.JSONDecodeError, TypeError):
+        pass
+
+  return prompt
+
+
+#
+# Exif / PNG Info からプロンプトを取り出す
+#
+# @return {positive:str, negative:str}
+#
+def _get_prompt_from_metadata(img:Image.Image) -> dict[str, str]:
 
   prompt = {'positive':'', 'negative':''}
   items = (img.info or {}).copy()
@@ -257,6 +278,11 @@ def get_pnginfo(img:Image.Image) -> str:
 
   result += f"\n{json.dumps(pnginfo, indent=2, ensure_ascii=False)}\n"
 
+  stealth_info = nai_stealth_util.read_stealth_info(img)
+  if stealth_info:
+    result += f"\n=== NovelAI Stealth情報 ===\n"
+    result += f"{json.dumps(_expand_stealth_comment(stealth_info), indent=2, ensure_ascii=False)}\n"
+
   # 画像の基本情報も追加
   result += f"\n=== 画像基本情報 ===\n"
   result += f"フォーマット: {img.format}\n"
@@ -264,6 +290,18 @@ def get_pnginfo(img:Image.Image) -> str:
   result += f"モード: {img.mode}\n"
   
   return result
+
+
+#
+# stealth info の Comment（JSON 文字列）を展開できれば展開する
+#
+def _expand_stealth_comment(stealth_info:dict) -> dict:
+  info = stealth_info.copy()
+  try:
+    info["Comment"] = json.loads(info["Comment"])
+  except (KeyError, json.JSONDecodeError, TypeError):
+    pass
+  return info
 
 
 #
