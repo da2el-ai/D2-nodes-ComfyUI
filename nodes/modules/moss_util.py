@@ -1,6 +1,6 @@
 """
 MOSS-Image のレイアウトプロンプト（JSON）を組み立てる純粋関数群。
-D2 Moss Prompt / D2 Create Moss Prompt から使う。
+D2 Moss Item / D2 Moss Prompt から使う。
 仕様は .claude/specs/d2-moss-prompt.md を参照。
 """
 import json
@@ -61,7 +61,7 @@ def build_item(label, caption, text, bbox):
         # 1行入力の欄では改行を打てないので、\n の2文字を改行の代わりにする
         text = text.replace("\\n", "\n")
         if not text.strip():
-            raise ValueError("[D2 Moss Prompt] label が text のときは text を入力してください")
+            raise ValueError("[D2 Moss Item] label が text のときは text を入力してください")
         item["text"] = text
 
     item["bbox"] = bbox
@@ -76,7 +76,7 @@ sizes は (width, height) のリスト。
 def check_item_sizes(sizes):
     if len(set(sizes)) > 1:
         size_list = ", ".join(f"{w}x{h}" for w, h in sizes)
-        raise ValueError(f"[D2 Create Moss Prompt] アイテムのマスクサイズが揃っていません: {size_list}")
+        raise ValueError(f"[D2 Moss Prompt] アイテムのマスクサイズが揃っていません: {size_list}")
 
 
 """

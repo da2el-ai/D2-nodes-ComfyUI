@@ -904,16 +904,16 @@ async def route_d2_tag_report_get_tags(request):
 
 """
 
-D2 Moss Prompt
+D2 Moss Item
 マスクから MOSS-Image のレイアウトアイテム1件を作る
 
 """
-class D2_MossPrompt(io.ComfyNode):
+class D2_MossItem(io.ComfyNode):
     @classmethod
     def define_schema(cls) -> io.Schema:
         return io.Schema(
-            node_id="D2 Moss Prompt",
-            display_name="D2 Moss Prompt",
+            node_id="D2 Moss Item",
+            display_name="D2 Moss Item",
             category="D2/Text",
             inputs=[
                 io.Mask.Input("mask"),
@@ -939,16 +939,16 @@ class D2_MossPrompt(io.ComfyNode):
 
 """
 
-D2 Create Moss Prompt
+D2 Moss Prompt
 複数の moss_item をまとめて MOSS-Image のレイアウトプロンプト（JSON）を作る
 
 """
-class D2_CreateMossPrompt(io.ComfyNode):
+class D2_MossPrompt(io.ComfyNode):
     @classmethod
     def define_schema(cls) -> io.Schema:
         return io.Schema(
-            node_id="D2 Create Moss Prompt",
-            display_name="D2 Create Moss Prompt",
+            node_id="D2 Moss Prompt",
+            display_name="D2 Moss Prompt",
             category="D2/Text",
             inputs=[
                 io.String.Input("meta", default=""),
@@ -991,6 +991,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Load CSV": D2_LoadCSV,
     "D2 Save Caption": D2_SaveCaption,
     "D2 Tag Report": D2_TagReport,
+    "D2 Moss Item": D2_MossItem,
     "D2 Moss Prompt": D2_MossPrompt,
-    "D2 Create Moss Prompt": D2_CreateMossPrompt,
 }

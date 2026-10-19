@@ -11,10 +11,10 @@ const changeInputVisibility = (node, val) => {
 ///////////////////////////
 ///////////////////////////
 app.registerExtension({
-    name: "Comfy.D2.D2_CreateMossPrompt",
+    name: "Comfy.D2.D2_MossPrompt",
 
     nodeCreated(node) {
-        if (node.constructor.title == "D2 Create Moss Prompt") {
+        if (node.constructor.title == "D2 Moss Prompt") {
             if (node.widgets) {
                 const countWidget = findWidgetByName(node, "item_count");
                 let widgetValue = countWidget.value;
