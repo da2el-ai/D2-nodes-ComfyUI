@@ -28,7 +28,8 @@ from .modules import util
 from .modules import caption_util
 from .modules import text_util
 from .modules import csv_util
-from .modules.util import AnyType, delete_comment
+from .modules import moss_util
+from .modules.util import AnyType, delete_comment, D2_TMossItem
 # from .modules import checkpoint_util
 # from .modules import pnginfo_util
 # from .modules import grid_image_util
@@ -900,6 +901,81 @@ async def route_d2_tag_report_get_tags(request):
     return web.Response(text=json_data, content_type='application/json')
 
 
+
+"""
+
+D2 Moss Prompt
+マスクから MOSS-Image のレイアウトアイテム1件を作る
+
+"""
+class D2_MossPrompt(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Moss Prompt",
+            display_name="D2 Moss Prompt",
+            category="D2/Text",
+            inputs=[
+                io.Mask.Input("mask"),
+                io.Combo.Input("label", options=moss_util.LABELS, default=moss_util.LABEL_OBJECT),
+                io.String.Input("caption", default="", multiline=True),
+                # 複数行欄を2つ置くと高さが均等に割られ caption が狭くなるため1行にする。
+                # 改行は \n の2文字で書くか、外部ノードをつないで入れる
+                io.String.Input("text", default=""),
+            ],
+            outputs=[
+                io.Custom("D2_MOSS_ITEM").Output(display_name="moss_item"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, mask, label, caption="", text="") -> io.NodeOutput:
+        bbox = moss_util.mask_to_bbox(mask)
+        item = moss_util.build_item(label, caption, text, bbox)
+        height, width = mask.shape[-2:]
+        return io.NodeOutput(D2_TMossItem(item=item, width=int(width), height=int(height)))
+
+
+
+"""
+
+D2 Create Moss Prompt
+複数の moss_item をまとめて MOSS-Image のレイアウトプロンプト（JSON）を作る
+
+"""
+class D2_CreateMossPrompt(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Create Moss Prompt",
+            display_name="D2 Create Moss Prompt",
+            category="D2/Text",
+            inputs=[
+                io.String.Input("meta", default=""),
+                io.String.Input("canvas_type", default="single"),
+                io.String.Input("summary_caption", default="", multiline=True),
+                io.Int.Input("item_count", default=2, min=1, max=50, step=1),
+            ],
+            outputs=[
+                io.String.Output(display_name="prompt"),
+            ],
+            # JS が moss_item_1..N を addInput で動的追加するため **kwargs で受ける
+            accept_all_inputs=True,
+        )
+
+    @classmethod
+    def execute(cls, meta, canvas_type, summary_caption, item_count, **kwargs) -> io.NodeOutput:
+        moss_items = []
+        for i in range(1, item_count + 1):
+            moss_item = kwargs.get(f"moss_item_{i}")
+            if isinstance(moss_item, D2_TMossItem):
+                moss_items.append(moss_item)
+
+        moss_util.check_item_sizes([(m.width, m.height) for m in moss_items])
+        prompt = moss_util.build_prompt(meta, canvas_type, summary_caption, [m.item for m in moss_items])
+        return io.NodeOutput(prompt)
+
+
 NODE_CLASS_MAPPINGS = {
     "D2 Regex Switcher": D2_RegexSwitcher,
     "D2 Regex Replace": D2_RegexReplace,
@@ -915,4 +991,6 @@ NODE_CLASS_MAPPINGS = {
     "D2 Load CSV": D2_LoadCSV,
     "D2 Save Caption": D2_SaveCaption,
     "D2 Tag Report": D2_TagReport,
+    "D2 Moss Prompt": D2_MossPrompt,
+    "D2 Create Moss Prompt": D2_CreateMossPrompt,
 }

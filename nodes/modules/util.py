@@ -81,6 +81,14 @@ class D2_TGridPipe:
 class D2_TDelivery:
     package: dict = field(default_factory=dict)
 
+@dataclass
+class D2_TMossItem:
+    # MOSS-Image レイアウトのアイテム1件（JSON にそのまま入る dict）
+    item: dict
+    # 元のマスクのサイズ。D2 Create Moss Prompt でアイテム間のサイズ一致を確かめるのに使う
+    width: int
+    height: int
+
 
 """
 XY Plot のラベルと値を Eagle メモ用テキストに整形する
