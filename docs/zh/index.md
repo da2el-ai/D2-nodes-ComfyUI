@@ -107,6 +107,8 @@
   - 具有刪除註解功能和顯示令牌數量的文字節點
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - 整理提示詞字串（將 `_` 轉換為空格、逗號後插入空格）
+- <a href="node_text.md#D2-Moss-Item">`D2 Moss Item / D2 Moss Prompt`</a>
+  - 從遮罩建立 MOSS-Image 的版面提示詞（JSON）
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
   - 讀取文字檔案的通用節點
 - <a href="node_text.md#D2-Load-CSV">`D2 Load CSV`</a>
@@ -206,6 +208,10 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.10.19**
+
+- `D2_MossItem` / `D2_MossPrompt`: 新增從遮罩建立 MOSS-Image 版面提示詞（JSON）的節點
 
 **2026.09.22**
 

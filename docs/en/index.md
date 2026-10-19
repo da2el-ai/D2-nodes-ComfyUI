@@ -105,6 +105,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Text node with comment deletion function and token count display
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - Cleans up prompt strings (convert `_` to space, add a space after commas)
+- <a href="node_text.md#D2-Moss-Item">`D2 Moss Item / D2 Moss Prompt`</a>
+  - Builds MOSS-Image layout prompts (JSON) from masks
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
   - A general-purpose node that loads a text file
 - <a href="node_text.md#D2-Load-CSV">`D2 Load CSV`</a>
@@ -204,6 +206,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.10.19**
+
+- `D2_MossItem` / `D2_MossPrompt`: Added nodes that build MOSS-Image layout prompts (JSON) from masks
 
 **2026.09.22**
 
