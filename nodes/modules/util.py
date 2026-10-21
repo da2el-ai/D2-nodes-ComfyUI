@@ -38,6 +38,11 @@ SEPARATOR_CHARS = {
     "comma": ", ",     # 旧 D2 Tag Report（旧実装は ", " で結合していた）
 }
 
+# delete_comment の type。先頭が全種類を消す既定値
+COMMENT_TYPES = ["# + // + /**/", "# only", "// only", "/* */ only", "None"]
+COMMENT_TYPE_ALL = COMMENT_TYPES[0]
+COMMENT_TYPE_NONE = "None"
+
 D2_MODULE_PATH = Path(__file__)
 D2_ROOT_PATH = D2_MODULE_PATH.parent.parent.parent.absolute()
 D2_WEB_PATH = D2_ROOT_PATH / "web"

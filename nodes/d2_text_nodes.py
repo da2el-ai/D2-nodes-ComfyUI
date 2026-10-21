@@ -478,7 +478,7 @@ class D2_Prompt(io.ComfyNode):
             category="D2/Text",
             inputs=[
                 io.String.Input("prompt", multiline=True),
-                io.Combo.Input("comment_type", options=["# + // + /**/", "# only", "// only", "/* */ only", "None"]),
+                io.Combo.Input("comment_type", options=util.COMMENT_TYPES),
                 io.Combo.Input("insert_lora", options=["CHOOSE"] + folder_paths.get_filename_list("loras")),
                 io.Boolean.Input("token_count", default=False),
             ],
@@ -665,6 +665,8 @@ class D2_PromptSanitizer(io.ComfyNode):
                 io.Combo.Input("newline_mode", options=text_util.NEWLINE_MODES, default="keep"),
                 io.Boolean.Input("remove_duplicate_tags", default=False),
                 io.Boolean.Input("strip_trailing_comma", default=False),
+                # 既存ワークフローのウィジェット値は並び順で復元されるため、後から足す入力は末尾に置く
+                io.Combo.Input("comment_type", options=util.COMMENT_TYPES, default=util.COMMENT_TYPE_NONE),
             ],
             outputs=[
                 io.String.Output(display_name="prompt"),
@@ -672,7 +674,9 @@ class D2_PromptSanitizer(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True, newline_mode="keep", remove_duplicate_tags=False, strip_trailing_comma=False) -> io.NodeOutput:
+    def execute(cls, prompt, underscore_to_space=True, space_after_comma=True, remove_extra_comma=True, protect_lora=True, protect_score=True, newline_mode="keep", remove_duplicate_tags=False, strip_trailing_comma=False, comment_type=util.COMMENT_TYPE_NONE) -> io.NodeOutput:
+        # 改行変換で行頭の # や // が行頭でなくなる前に消す
+        prompt = delete_comment(prompt, comment_type)
         text = text_util.sanitize_prompt(
             prompt,
             underscore_to_space=underscore_to_space,
@@ -931,6 +935,8 @@ class D2_MossItem(io.ComfyNode):
     @classmethod
     def execute(cls, mask, label, caption="", text="") -> io.NodeOutput:
         bbox = moss_util.mask_to_bbox(mask)
+        # text は描かせる文字なので # などを残す。コメント削除は caption だけ
+        caption = delete_comment(caption, util.COMMENT_TYPE_ALL)
         item = moss_util.build_item(label, caption, text, bbox)
         height, width = mask.shape[-2:]
         return io.NodeOutput(D2_TMossItem(item=item, width=int(width), height=int(height)))
@@ -972,6 +978,7 @@ class D2_MossPrompt(io.ComfyNode):
                 moss_items.append(moss_item)
 
         moss_util.check_item_sizes([(m.width, m.height) for m in moss_items])
+        summary_caption = delete_comment(summary_caption, util.COMMENT_TYPE_ALL)
         prompt = moss_util.build_prompt(meta, canvas_type, summary_caption, [m.item for m in moss_items])
         return io.NodeOutput(prompt)
 
