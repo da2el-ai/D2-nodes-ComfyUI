@@ -73,7 +73,9 @@ Node
     - `positive` / `negative`: Inputのものをそのまま出力
     - `formatted_positive`: A1111方式のLoRA書式を削除したpositiveプロンプト
     - `positive_cond` / `negative_cond`: Controlnet適用済みのCONDITIONING
+        - Controlnet の画像は画像全体のものなので、FaceDetailer など画像の一部を切り出して再描画するノードに渡すと、切り出した範囲と Controlnet の位置がずれて画像が崩れることがあります
     - `d2_pipe`: 生成パラメーターをまとめたもの
+        - D2 KSampler 内で作成した CONDITIONING は `d2_pipe` の `positive_cond` / `negative_cond` には格納されません。入力された値（未入力なら空）がそのまま入ります
 
 
 ---

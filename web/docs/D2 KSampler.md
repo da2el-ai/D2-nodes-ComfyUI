@@ -44,5 +44,7 @@
     - `positive` / `negative`: Input passthrough
     - `formatted_positive`: Positive prompt with A1111-style LoRA format removed
     - `positive_cond` / `negative_cond`: CONDITIONING with Controlnet applied
+        - Since the Controlnet image covers the whole image, passing these to nodes that crop and redraw part of the image (such as FaceDetailer) may misalign the cropped area and the Controlnet, which can break the image
     - `d2_pipe`: Consolidated generation parameters
+        - The CONDITIONING created inside D2 KSampler is not stored in `positive_cond` / `negative_cond` of `d2_pipe`. The input values (empty if not connected) are passed through as is
 

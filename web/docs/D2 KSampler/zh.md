@@ -44,4 +44,6 @@
     - `positive` / `negative`：輸入的直接傳遞
     - `formatted_positive`：已刪除A1111方式LoRA格式的positive提示詞
     - `positive_cond` / `negative_cond`：已套用Controlnet的CONDITIONING
+        - 由於 Controlnet 的圖像是針對整張圖像，若傳給 FaceDetailer 等裁切圖像局部後重繪的節點，裁切範圍與 Controlnet 的位置可能錯位，導致圖像崩壞
     - `d2_pipe`：整合的生成參數
+        - D2 KSampler 內部建立的 CONDITIONING 不會存入 `d2_pipe` 的 `positive_cond` / `negative_cond`。會直接傳遞輸入的值（未輸入時為空）

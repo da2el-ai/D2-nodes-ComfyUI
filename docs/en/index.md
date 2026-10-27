@@ -207,6 +207,10 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.10.27**
+
+- `D2_KSampler`: Added notes to the documentation about the `positive_cond` / `negative_cond` outputs and the CONDITIONING in `d2_pipe`
+
 **2026.10.19**
 
 - `D2_MossItem` / `D2_MossPrompt`: Added nodes that build MOSS-Image layout prompts (JSON) from masks

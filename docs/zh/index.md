@@ -209,6 +209,10 @@
 
 ## :blossom: 更新日誌
 
+**2026.10.27**
+
+- `D2_KSampler`：在說明文件中新增關於 `positive_cond` / `negative_cond` 輸出與 `d2_pipe` 中 CONDITIONING 的注意事項
+
 **2026.10.19**
 
 - `D2_MossItem` / `D2_MossPrompt`: 新增從遮罩建立 MOSS-Image 版面提示詞（JSON）的節點

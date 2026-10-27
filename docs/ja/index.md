@@ -210,6 +210,10 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.10.27**
+
+- `D2_KSampler`: ドキュメントに `positive_cond` / `negative_cond` 出力と `d2_pipe` の CONDITIONING についての注意点を追記
+
 **2026.10.19**
 
 - `D2_MossItem` / `D2_MossPrompt`: MOSS-Image のレイアウトプロンプト（JSON）をマスクから作るノードを新規追加
