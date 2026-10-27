@@ -214,6 +214,7 @@ If you have installed any of the following custom nodes previously, please remov
 **2026.10.19**
 
 - `D2_MossItem` / `D2_MossPrompt`: Added nodes that build MOSS-Image layout prompts (JSON) from masks
+- `D2_PromptSanitizer`: Added `comment_type`, which removes comments the same way as `D2 Prompt`
 
 **2026.09.22**
 

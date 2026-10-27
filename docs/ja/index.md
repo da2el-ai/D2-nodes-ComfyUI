@@ -217,6 +217,7 @@ D2 Nodes ComfyUI
 **2026.10.19**
 
 - `D2_MossItem` / `D2_MossPrompt`: MOSS-Image のレイアウトプロンプト（JSON）をマスクから作るノードを新規追加
+- `D2_PromptSanitizer`: `D2 Prompt` と同じコメント削除を行う `comment_type` を追加
 
 **2026.09.22**
 

@@ -290,7 +290,7 @@ Output text
 - Converts `_` (underscore) to a space (`long_hair` → `long hair`)
 - Ensures a single space after each `,` (comma) and tidies up surrounding whitespace (`a ,  b` → `a, b`)
 - Collapses redundant consecutive commas and removes commas at the start of a line (`a,, ,b` → `a, b`)
-- Can also convert line breaks and remove duplicate tags
+- Can also convert line breaks, remove duplicate tags and remove comments
 - Each transformation can be toggled on / off individually
 
 #### Input
@@ -308,8 +308,12 @@ Output text
     - `remove`: Remove line breaks (`1girl\nsmile` → `1girlsmile`; useful for joining Japanese text)
 - `remove_duplicate_tags`: Remove duplicate tags (keeps the first occurrence; comparison ignores `_` vs. space differences and letter case)
 - `strip_trailing_comma`: Remove a comma at the very end of the whole string (useful together with `add_comma`)
+- `comment_type`: Which comment styles to remove. Same as `D2 Prompt`
+    - `# + // + /**/`: Remove lines starting with `#`, lines starting with `//`, and everything between `/*` and `*/` (can span multiple lines)
+    - `# only` / `// only` / `/* */ only`: Remove only that style
+    - `None`: Do nothing (default)
 
-> The transformations run in this order: remove duplicate tags → convert line breaks → convert underscores → remove extra commas → normalize commas → strip trailing comma. Any `,,` left behind by `remove_duplicate_tags` is cleaned up by `remove_extra_comma`, so turning both on gives a tidy result.
+> The transformations run in this order: remove comments → remove duplicate tags → convert line breaks → convert underscores → remove extra commas → normalize commas → strip trailing comma. Any `,,` left behind by `remove_duplicate_tags` is cleaned up by `remove_extra_comma`, so turning both on gives a tidy result.
 
 ---
 
@@ -337,6 +341,7 @@ Output text
     - `object`: Draw an object, a person, etc.
     - `text`: Draw text
 - `caption`: Description of how the element looks (size, style, position, etc.)
+    - You can comment out text the same way as in `D2 Prompt` (lines starting with `#` / `//`, `/*` … `*/`)
 - `text`: The text to draw. Used only when `label` is `text`
     - To insert a line break, type `\n` or connect another node (such as `D2 Prompt`)
 
@@ -354,6 +359,7 @@ Output text
     - Examples: `poster` / `photograph` / `illustration, anime`
 - `canvas_type`: Usually leave it as `single`
 - `summary_caption`: Description of the scene and art style of the whole image
+    - Comments can be used the same way as in `caption`
 - `item_count`: Number of `moss_item` inputs
 - `moss_item_{number}`: Connect `D2 Moss Item`
 

@@ -22,6 +22,7 @@
     - `object`：物や人物などを描かせる
     - `text`：文字を描かせる
 - `caption`：要素の見た目の説明（大きさ・スタイル・位置など）
+    - `D2 Prompt` と同じ書き方でコメントアウトできる（行頭の `#` / `//`、`/*` 〜 `*/`）
 - `text`：描かせる文字。`label` が `text` のときだけ使う
     - 改行したいときは `\n` と入力するか、または他のノード（`D2 Prompt` など）を接続する
 
@@ -39,6 +40,7 @@
     - 例：`poster` / `photograph` / `illustration, anime`
 - `canvas_type`：通常は `single` のままでよい
 - `summary_caption`：画像全体のシーンや画風の説明
+    - `caption` と同じくコメントアウトできる
 - `item_count`：`moss_item` の入力数
 - `moss_item_{数字}`：`D2 Moss Item` を接続する
 

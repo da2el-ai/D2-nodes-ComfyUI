@@ -318,7 +318,7 @@ Output text
 - 將 `_`（底線）轉換為半形空格（`long_hair` → `long hair`）
 - 在每個 `,`（逗號）之後確保有一個半形空格，並整理前後多餘的空白（`a ,  b` → `a, b`）
 - 合併多餘的連續逗號，並刪除行首的逗號（`a,, ,b` → `a, b`）
-- 也可以轉換換行、刪除重複的標籤
+- 也可以轉換換行、刪除重複的標籤、刪除註解
 - 各項處理皆可獨立切換開關
 
 #### Input
@@ -336,8 +336,12 @@ Output text
     - `remove`：刪除換行（`1girl\nsmile` → `1girlsmile`；適合結合日文文字）
 - `remove_duplicate_tags`：刪除重複的標籤（保留先出現的；比較時忽略 `_` 與半形空格的差異、以及大小寫）
 - `strip_trailing_comma`：刪除整個字串結尾的逗號（適合與 `add_comma` 搭配使用）
+- `comment_type`：要刪除的註解寫法。與 `D2 Prompt` 相同
+    - `# + // + /**/`：刪除行首為 `#` 的行、行首為 `//` 的行，以及 `/*` 〜 `*/` 之間的內容（可跨多行）
+    - `# only` / `// only` / `/* */ only`：只刪除該種寫法
+    - `None`：不做任何處理（預設值）
 
-> 處理順序為「刪除重複標籤 → 轉換換行 → 轉換底線 → 移除多餘逗號 → 整理逗號 → 刪除結尾逗號」。`remove_duplicate_tags` 殘留的 `,,` 會由 `remove_extra_comma` 清理，因此兩者都開啟即可整理得乾淨。
+> 處理順序為「刪除註解 → 刪除重複標籤 → 轉換換行 → 轉換底線 → 移除多餘逗號 → 整理逗號 → 刪除結尾逗號」。`remove_duplicate_tags` 殘留的 `,,` 會由 `remove_extra_comma` 清理，因此兩者都開啟即可整理得乾淨。
 
 ---
 
@@ -365,6 +369,7 @@ Output text
     - `object`：繪製物品或人物等
     - `text`：繪製文字
 - `caption`：元素外觀的說明（大小、風格、位置等）
+    - 可用與 `D2 Prompt` 相同的寫法註解掉文字（行首的 `#` / `//`、`/*` 〜 `*/`）
 - `text`：要繪製的文字。僅在 `label` 為 `text` 時使用
     - 想換行時請輸入 `\n`，或連接其他節點（如 `D2 Prompt`）
 
@@ -382,6 +387,7 @@ Output text
     - 例：`poster` / `photograph` / `illustration, anime`
 - `canvas_type`：通常維持 `single` 即可
 - `summary_caption`：整張圖像的場景與畫風說明
+    - 與 `caption` 相同，可以使用註解
 - `item_count`：`moss_item` 的輸入數量
 - `moss_item_{數字}`：連接 `D2 Moss Item`
 

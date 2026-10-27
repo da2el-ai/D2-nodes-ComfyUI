@@ -22,6 +22,7 @@
     - `object`: Draw an object, a person, etc.
     - `text`: Draw text
 - `caption`: Description of how the element looks (size, style, position, etc.)
+    - You can comment out text the same way as in `D2 Prompt` (lines starting with `#` / `//`, `/*` … `*/`)
 - `text`: The text to draw. Used only when `label` is `text`
     - To insert a line break, type `\n` or connect another node (such as `D2 Prompt`)
 
@@ -39,6 +40,7 @@
     - Examples: `poster` / `photograph` / `illustration, anime`
 - `canvas_type`: Usually leave it as `single`
 - `summary_caption`: Description of the scene and art style of the whole image
+    - Comments can be used the same way as in `caption`
 - `item_count`: Number of `moss_item` inputs
 - `moss_item_{number}`: Connect `D2 Moss Item`
 

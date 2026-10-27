@@ -216,6 +216,7 @@
 **2026.10.19**
 
 - `D2_MossItem` / `D2_MossPrompt`: 新增從遮罩建立 MOSS-Image 版面提示詞（JSON）的節點
+- `D2_PromptSanitizer`: 新增 `comment_type`，可與 `D2 Prompt` 相同方式刪除註解
 
 **2026.09.22**
 

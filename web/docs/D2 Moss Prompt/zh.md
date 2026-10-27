@@ -22,6 +22,7 @@
     - `object`：繪製物品或人物等
     - `text`：繪製文字
 - `caption`：元素外觀的說明（大小、風格、位置等）
+    - 可用與 `D2 Prompt` 相同的寫法註解掉文字（行首的 `#` / `//`、`/*` 〜 `*/`）
 - `text`：要繪製的文字。僅在 `label` 為 `text` 時使用
     - 想換行時請輸入 `\n`，或連接其他節點（如 `D2 Prompt`）
 
@@ -39,6 +40,7 @@
     - 例：`poster` / `photograph` / `illustration, anime`
 - `canvas_type`：通常維持 `single` 即可
 - `summary_caption`：整張圖像的場景與畫風說明
+    - 與 `caption` 相同，可以使用註解
 - `item_count`：`moss_item` 的輸入數量
 - `moss_item_{數字}`：連接 `D2 Moss Item`
 
