@@ -46,6 +46,9 @@
 </figure>
 
 - 用於 `NovelAI` 和 `StableDiffusion` 權重互相轉換的對話框
+- 可切換 `number`（數值格式 `1.2::aaa ::`）與 `brace`（括號格式 `{{aaa}}`）
+- 開啟 `Remove negative` 時，在 NovelAI → StableDiffusion 的數值格式轉換中刪除負權重的標籤（預設開啟）
+- 轉換規則與 <a href="node_text.md#D2-Convert-NAI-Prompt">`D2 Convert NAI Prompt`</a> 相同
 - 從 `Prompt convert` 按鈕開啟
 - 初始狀態為隱藏
 - 啟用 `settings > D2 > Show prompt convert button` 後顯示

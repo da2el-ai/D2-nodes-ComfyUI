@@ -54,6 +54,9 @@ Node
 </figure>
 
 - NovelAI と StableDiffusion の weight を相互変換するダイアログ
+- `number`（数値方式 `1.2::aaa ::`）と `brace`（ブレース方式 `{{aaa}}`）を切り替えられる
+- `Remove negative` を ON にすると、NovelAI → StableDiffusion の数値方式の変換でマイナス weight のタグを削除する（初期値 ON）
+- 変換ルールは <a href="node_text.md#D2-Convert-NAI-Prompt">`D2 Convert NAI Prompt`</a> と同じ
 - `Prompt convert` ボタンから開く
 - 初期状態では非表示になっている
 - `settings > D2 > Show prompt convert button` を有効にすると表示する

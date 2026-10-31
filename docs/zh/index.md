@@ -107,6 +107,8 @@
   - 具有刪除註解功能和顯示令牌數量的文字節點
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - 整理提示詞字串（將 `_` 轉換為空格、逗號後插入空格）
+- <a href="node_text.md#D2-Convert-NAI-Prompt">`D2 Convert NAI Prompt`</a>
+  - 在 StableDiffusion 與 NovelAI 之間互相轉換提示詞權重
 - <a href="node_text.md#D2-Moss-Item">`D2 Moss Item / D2 Moss Prompt`</a>
   - 從遮罩建立 MOSS-Image 的版面提示詞（JSON）
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
@@ -208,6 +210,12 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.10.31**
+
+- `D2_ConvertNaiPrompt`：新增在 StableDiffusion 與 NovelAI 之間互相轉換提示詞權重的節點
+- `Prompt convert dialog`：新增刪除負權重標籤的 `Remove negative`。將格式名稱改為 `number` / `brace`
+- `Prompt convert dialog`：修正數值格式中忘記加上結尾 `::` 與負權重無法正確轉換的問題。SD → NAI 時改為在結尾 `::` 前加入空格
 
 **2026.10.27**
 

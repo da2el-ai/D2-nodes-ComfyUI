@@ -355,6 +355,40 @@ Output text
 
 ---
 
+### D2 Convert NAI Prompt
+
+<figure>
+  <img src="../img/convert_nai_prompt.png">
+</figure>
+
+- StableDiffusion と NovelAI のプロンプトの weight を相互変換するノード
+- <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a> と同じ変換をワークフロー内で行える
+- weight の範囲は改行で区切られる（改行をまたいで変換しない）
+- 重複したカンマや空白の整形は行わない。必要なら `D2 Prompt Sanitizer` を後ろにつなぐ
+
+#### Input
+
+- `prompt`：変換するプロンプト（入力専用）
+- `convert`：変換の向き
+    - `sd_to_nai`：StableDiffusion 方式 → NovelAI 方式
+    - `nai_to_sd`：NovelAI 方式 → StableDiffusion 方式
+- `mode`：NovelAI 側の weight の書き方
+    - `number`：数値方式（`1.2::aaa ::`）
+    - `brace`：ブレース方式（`{{aaa}}` / `[[aaa]]`）。weight が 0 以下のタグはブレースで表せないため、そのタグだけ数値方式で出力する
+- `remove_negative`：`nai_to_sd` かつ `number` のときだけ有効。マイナス weight のタグを削除する
+    - 削除したタグの前後のカンマは残る（`-2::aaa::, 1.2::bbb::` → `, (bbb:1.2)`）
+    - weight が 0 のタグは削除しない（0 でも生成結果に影響があるため）
+
+#### 数値方式の変換ルール
+
+- `sd_to_nai` では閉じ `::` の前に必ず半角スペースを入れる（`(aaa5:1.2)` → `1.2::aaa5 ::`）。`aaa5::` の `5::` が weight の開始と誤解釈されるのを防ぐため
+- `nai_to_sd` では `::` の閉じ忘れにも対応する。閉じ忘れた weight は、次の weight の開始か行末までを範囲とする
+    - `1.2::blonde hair, 1.3::from side::` → `(blonde hair:1.2), (from side:1.3)`
+    - `1.2::aaa, bbb::` → `(aaa, bbb:1.2)`（複数タグをまとめた指定はそのまま）
+- マイナス weight は `(aaa:-2)` のように数値の前にマイナスを付ける
+
+---
+
 ### D2 Moss Item / D2 Moss Prompt
 
 <figure>

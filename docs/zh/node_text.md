@@ -345,6 +345,40 @@ Output text
 
 ---
 
+### D2 Convert NAI Prompt
+
+<figure>
+  <img src="../img/convert_nai_prompt.png">
+</figure>
+
+- 在 StableDiffusion 與 NovelAI 之間互相轉換提示詞權重的節點
+- 可在工作流程中進行與 <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a> 相同的轉換
+- 權重的範圍以換行為界（不會跨行轉換）
+- 不會整理重複的逗號或空白。需要時請在後方連接 `D2 Prompt Sanitizer`
+
+#### Input
+
+- `prompt`：要轉換的提示詞（僅限連接輸入）
+- `convert`：轉換方向
+    - `sd_to_nai`：StableDiffusion 格式 → NovelAI 格式
+    - `nai_to_sd`：NovelAI 格式 → StableDiffusion 格式
+- `mode`：NovelAI 側的權重寫法
+    - `number`：數值格式（`1.2::aaa ::`）
+    - `brace`：括號格式（`{{aaa}}` / `[[aaa]]`）。權重為 0 以下的標籤無法以括號表示，因此只有這些標籤以數值格式輸出
+- `remove_negative`：僅在 `nai_to_sd` 且 `number` 時有效。刪除負權重的標籤
+    - 被刪除標籤前後的逗號會保留（`-2::aaa::, 1.2::bbb::` → `, (bbb:1.2)`）
+    - 權重為 0 的標籤不會刪除（權重 0 仍會影響生成結果）
+
+#### 數值格式的轉換規則
+
+- `sd_to_nai` 一定會在結尾 `::` 前加入半形空格（`(aaa5:1.2)` → `1.2::aaa5 ::`），以避免 `aaa5::` 的 `5::` 被誤判為權重的開始
+- `nai_to_sd` 也能處理忘記加上結尾 `::` 的情況。未結束的權重範圍持續到下一個權重的開始或行尾
+    - `1.2::blonde hair, 1.3::from side::` → `(blonde hair:1.2), (from side:1.3)`
+    - `1.2::aaa, bbb::` → `(aaa, bbb:1.2)`（對多個標籤一起指定的權重維持原樣）
+- 負權重會像 `(aaa:-2)` 這樣把負號加在數值前面
+
+---
+
 ### D2 Moss Item / D2 Moss Prompt
 
 <figure>

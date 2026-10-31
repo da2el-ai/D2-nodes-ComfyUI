@@ -107,6 +107,8 @@ D2 Nodes ComfyUI
   - テキストのコメントを削除やトークン数の表示があるテキストノード
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - プロンプト文字列を整形する（`_` を空白に変換、カンマ後に空白を挿入）
+- <a href="node_text.md#D2-Convert-NAI-Prompt">`D2 Convert NAI Prompt`</a>
+  - StableDiffusion と NovelAI のプロンプトの weight を相互変換する
 - <a href="node_text.md#D2-Moss-Item">`D2 Moss Item / D2 Moss Prompt`</a>
   - MOSS-Image のレイアウトプロンプト（JSON）をマスクから作る
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
@@ -209,6 +211,12 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.10.31**
+
+- `D2_ConvertNaiPrompt`: StableDiffusion と NovelAI のプロンプトの weight を相互変換するノードを新規追加
+- `Prompt convert dialog`: マイナス weight のタグを削除する `Remove negative` を追加。方式の表記を `number` / `brace` に変更
+- `Prompt convert dialog`: 数値方式で `::` の閉じ忘れ・マイナス weight が正しく変換されない問題を修正。SD → NAI で閉じ `::` の前に空白を入れるように変更
 
 **2026.10.27**
 

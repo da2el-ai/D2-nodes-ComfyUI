@@ -105,6 +105,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Text node with comment deletion function and token count display
 - <a href="node_text.md#D2-Prompt-Sanitizer">`D2 Prompt Sanitizer`</a>
   - Cleans up prompt strings (convert `_` to space, add a space after commas)
+- <a href="node_text.md#D2-Convert-NAI-Prompt">`D2 Convert NAI Prompt`</a>
+  - Converts prompt weights between StableDiffusion and NovelAI
 - <a href="node_text.md#D2-Moss-Item">`D2 Moss Item / D2 Moss Prompt`</a>
   - Builds MOSS-Image layout prompts (JSON) from masks
 - <a href="node_text.md#D2-Load-Text">`D2 Load Text`</a>
@@ -206,6 +208,12 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.10.31**
+
+- `D2_ConvertNaiPrompt`: Added a new node that converts prompt weights between StableDiffusion and NovelAI
+- `Prompt convert dialog`: Added `Remove negative` to remove tags with a negative weight. Renamed the format options to `number` / `brace`
+- `Prompt convert dialog`: Fixed numeric format conversion of missing closing `::` and negative weights. SD → NAI now puts a space before the closing `::`
 
 **2026.10.27**
 

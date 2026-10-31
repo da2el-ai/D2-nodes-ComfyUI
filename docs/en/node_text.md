@@ -317,6 +317,40 @@ Output text
 
 ---
 
+### D2 Convert NAI Prompt
+
+<figure>
+  <img src="../img/convert_nai_prompt.png">
+</figure>
+
+- Converts prompt weights between StableDiffusion and NovelAI
+- Performs the same conversion as the <a href="node_float.md#Prompt-convert-dialog">`Prompt convert dialog`</a> inside a workflow
+- A weight's range ends at a line break (conversion never spans lines)
+- Does not tidy up duplicate commas or whitespace. Connect `D2 Prompt Sanitizer` after it if needed
+
+#### Input
+
+- `prompt`: The prompt to convert (input only)
+- `convert`: Conversion direction
+    - `sd_to_nai`: StableDiffusion format → NovelAI format
+    - `nai_to_sd`: NovelAI format → StableDiffusion format
+- `mode`: NovelAI weight notation
+    - `number`: Numeric format (`1.2::aaa ::`)
+    - `brace`: Brace format (`{{aaa}}` / `[[aaa]]`). Tags with a weight of 0 or less cannot be expressed with braces, so only those tags are output in numeric format
+- `remove_negative`: Only effective with `nai_to_sd` and `number`. Removes tags with a negative weight
+    - Commas around removed tags are kept (`-2::aaa::, 1.2::bbb::` → `, (bbb:1.2)`)
+    - Tags with a weight of 0 are not removed (a weight of 0 still affects the generated image)
+
+#### Numeric format conversion rules
+
+- `sd_to_nai` always puts a space before the closing `::` (`(aaa5:1.2)` → `1.2::aaa5 ::`). This prevents the `5::` in `aaa5::` from being misread as the start of a weight
+- `nai_to_sd` also handles a missing closing `::`. An unclosed weight extends until the start of the next weight or the end of the line
+    - `1.2::blonde hair, 1.3::from side::` → `(blonde hair:1.2), (from side:1.3)`
+    - `1.2::aaa, bbb::` → `(aaa, bbb:1.2)` (a weight applied to multiple tags is kept as is)
+- Negative weights are written with the minus sign before the number, like `(aaa:-2)`
+
+---
+
 ### D2 Moss Item / D2 Moss Prompt
 
 <figure>

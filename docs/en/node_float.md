@@ -44,6 +44,9 @@
 </figure>
 
 - Dialog for converting weights between NovelAI and StableDiffusion
+- Switch between `number` (numeric format `1.2::aaa ::`) and `brace` (brace format `{{aaa}}`)
+- When `Remove negative` is ON, tags with a negative weight are removed in NovelAI → StableDiffusion numeric conversion (ON by default)
+- Uses the same conversion rules as <a href="node_text.md#D2-Convert-NAI-Prompt">`D2 Convert NAI Prompt`</a>
 - Open from `Prompt convert` button
 - Hidden by default
 - Enable display by activating `settings > D2 > Show prompt convert button`
