@@ -29,6 +29,7 @@ from .modules import caption_util
 from .modules import text_util
 from .modules import csv_util
 from .modules import moss_util
+from .modules import nai_prompt_util
 from .modules.util import AnyType, delete_comment, D2_TMossItem
 # from .modules import checkpoint_util
 # from .modules import pnginfo_util
@@ -695,6 +696,41 @@ class D2_PromptSanitizer(io.ComfyNode):
 
 """
 
+D2 Convert NAI Prompt
+StableDiffusion 方式と NovelAI 方式のプロンプト weight を相互変換する
+
+"""
+class D2_ConvertNaiPrompt(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 Convert NAI Prompt",
+            display_name="D2 Convert NAI Prompt",
+            category="D2/Text",
+            inputs=[
+                io.String.Input("prompt", force_input=True),
+                io.Combo.Input("convert", options=nai_prompt_util.CONVERT_TYPES, default="sd_to_nai"),
+                io.Combo.Input("mode", options=nai_prompt_util.MODES, default="number"),
+                io.Boolean.Input("remove_negative", default=True),
+            ],
+            outputs=[
+                io.String.Output(display_name="prompt"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, prompt, convert="sd_to_nai", mode="number", remove_negative=True) -> io.NodeOutput:
+        if convert == "sd_to_nai":
+            text = nai_prompt_util.convert_to_nai(prompt, mode)
+        else:
+            text = nai_prompt_util.convert_to_sd(prompt, mode, remove_negative)
+        return io.NodeOutput(text)
+
+
+
+
+"""
+
 D2 Load Text
 テキストファイルを読み込む汎用ノード
 キャプション編集ではファイルパスを D2 Folder Image Queue から受け取る想定
@@ -994,6 +1030,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Filename Template2": D2_FilenameTemplate2,
     "D2 Prompt": D2_Prompt,
     "D2 Prompt Sanitizer": D2_PromptSanitizer,
+    "D2 Convert NAI Prompt": D2_ConvertNaiPrompt,
     "D2 Load Text": D2_LoadText,
     "D2 Load CSV": D2_LoadCSV,
     "D2 Save Caption": D2_SaveCaption,

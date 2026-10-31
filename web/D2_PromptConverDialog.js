@@ -5,114 +5,131 @@ import { loadCssFile } from "./modules/utils.js";
 
 /**
  * プロンプト変換
+ * nodes/modules/nai_prompt_util.py にも同じロジックがあるので、変更するときは両方を揃える
  */
 
 class D2_PromptConvert {
+    // ブレース1個あたりの倍率
     static RATE = 1.05;
+    // SD 方式の weight 指定 (text:1.2)
+    static SD_WEIGHT_PATTERN = /\(([^)]+):\s*(-?\d*\.?\d+)\s*\)/g;
+    // NAI 方式の weight 開始 1.2:: と閉じ ::
+    // 直前が英数字・_・. のときは aaa5:: や 2girls:: の語の一部なので weight 開始とみなさない
+    static NAI_NUMBER_TOKEN_PATTERN = /(?<![\w.])(-?\d*\.?\d+)::|::/g;
+    // NAI 方式のブレース {{aaa}} [[aaa]]
+    static NAI_BRACE_PATTERN = /[\[{]+[^\]}]+[\]}]+/g;
+    // weight 本文を 先頭の空白 / 中身 / 末尾の空白・カンマ に分ける
+    static BODY_PATTERN = /^(\s*)([\s\S]*?)([\s,]*)$/;
+
+    /**
+     * 行ごとに変換関数を適用する（weight の範囲は改行を越えない）
+     */
+    static $_convertLines (prompt, convertLine) {
+        return prompt.split("\n").map(convertLine).join("\n");
+    }
 
     /**
      * StableDiffusionのweightをNAI方式に変換
      */
-    static convertToNai (srcPrompt, convertType = "old") {
-        // 改行位置を記録するためのプレースホルダーを使用
-        const lineBreakPlaceholder = '___LINEBREAK___';
-        const tempPrompt = srcPrompt.replace(/\n/g, lineBreakPlaceholder);
-
-        const convertedPrompt = tempPrompt.replace(/\([^)]+:\s*[0-9.]+\s*\)/g, (match) => {
-            return D2_PromptConvert.$_convertToNai(match, convertType);
+    static convertToNai (srcPrompt, convertType = "number") {
+        return D2_PromptConvert.$_convertLines(srcPrompt, (line) => {
+            return line.replace(D2_PromptConvert.SD_WEIGHT_PATTERN, (match, text, weightStr) => {
+                return D2_PromptConvert.$_convertToNai(text.trim(), parseFloat(weightStr), convertType);
+            });
         });
-
-        // 改行を復元
-        return convertedPrompt.replace(new RegExp(lineBreakPlaceholder, 'g'), '\n');
     }
 
-    static $_convertToNai (prompt, convertType = "old") {
-        const parts = prompt.substring(1, prompt.length - 1).split(':');
-        const text = parts.slice(0, -1).join(':').trim();
-        const weightStr = parts[parts.length - 1].trim();
-        const weight = parseFloat(weightStr);
-
-        if (convertType === "new") {
-            // 新方式: 1.2::aaa:: という変換
-            return `${weight}::${text}::`;
-        } else {
-            // 旧方式: (aaa:1.2) を {{{aaa}}} という変換
-            const n = Math.round(Math.log(weight) / Math.log(D2_PromptConvert.RATE));
-            const count = Math.abs(n);
-
-            let openBra, closeBra;
-            if (weight < 1) {
-                openBra = '[';
-                closeBra = ']';
-            } else {
-                openBra = '{';
-                closeBra = '}';
-            }
-
-            return openBra.repeat(count) + text + closeBra.repeat(count);
+    static $_convertToNai (text, weight, convertType = "number") {
+        // ブレース方式は weight 0 以下を log で表せないので数値方式で出す
+        if (convertType === "number" || weight <= 0) {
+            // 閉じ :: の直前が数字だと aaa5:: の 5:: が weight 開始と誤解釈されるので空白を入れる
+            return `${weight}::${text} ::`;
         }
+
+        const count = Math.abs(Math.round(Math.log(weight) / Math.log(D2_PromptConvert.RATE)));
+        if (weight < 1) {
+            return "[".repeat(count) + text + "]".repeat(count);
+        }
+        return "{".repeat(count) + text + "}".repeat(count);
     }
 
     /**
      * NAIのweightをStableDiffusion方式に変換
      */
-    static convertToSd (srcPrompt, convertType = "old") {
-        // 改行位置を記録するためのプレースホルダーを使用
-        const lineBreakPlaceholder = '___LINEBREAK___';
-        let tempPrompt = srcPrompt.replace(/\n/g, lineBreakPlaceholder);
-
-        if (convertType === "new") {
-            // 新方式: 1.2::aaa:: を (aaa:1.2) に変換
-            tempPrompt = tempPrompt.replace(/([0-9.]+)::(.+?)::/g, (match) => {
-                return D2_PromptConvert.$_convertToSd(match, convertType);
-            });
-        } else {
-            // 旧方式: {{{aaa}}} を (aaa:1.2) に変換
-            tempPrompt = tempPrompt.replace(/[\[{]+[^\]}]+[\]}]+/g, (match) => {
-                return D2_PromptConvert.$_convertToSd(match, convertType);
+    static convertToSd (srcPrompt, convertType = "number", removeNegative = true) {
+        if (convertType === "number") {
+            return D2_PromptConvert.$_convertLines(srcPrompt, (line) => {
+                return D2_PromptConvert.$_convertNumberLineToSd(line, removeNegative);
             });
         }
-
-        // 改行を復元
-        return tempPrompt.replace(new RegExp(lineBreakPlaceholder, 'g'), '\n');
+        return D2_PromptConvert.$_convertLines(srcPrompt, (line) => {
+            return line.replace(D2_PromptConvert.NAI_BRACE_PATTERN, (match) => {
+                return D2_PromptConvert.$_convertBraceToSd(match);
+            });
+        });
     }
 
-    static $_convertToSd (prompt, convertType = "old") {
-        if (convertType === "new") {
-            // 新方式: 1.2::aaa:: を (aaa:1.2) に変換
-            const match = prompt.match(/([0-9.]+)::(.+?)::/);
-            if (match) {
-                const weight = parseFloat(match[1]);
-                const text = match[2].trim();
-                return `(${text}:${weight})`;
-            }
-            return prompt;
-        } else {
-            // 旧方式: {{{aaa}}} を (aaa:1.2) に変換
-            const braType = prompt.substring(0, 1);
-            const braCount = (prompt.match(/[\[{]/g) || []).length;
-            let weight = 0;
+    /**
+     * 数値方式の1行を SD 方式に変換する
+     * weight 開始と閉じ :: を先頭から順に拾い、閉じ忘れは次の weight 開始か行末で閉じる
+     */
+    static $_convertNumberLineToSd (line, removeNegative) {
+        const result = [];
+        let pos = 0;
+        let openWeight = null;
 
-            if (braType === '{') {
-                weight = 1 * Math.pow(D2_PromptConvert.RATE, braCount);
+        for (const m of line.matchAll(D2_PromptConvert.NAI_NUMBER_TOKEN_PATTERN)) {
+            let body = line.substring(pos, m.index);
+            if (m[1] === undefined && openWeight !== null) {
+                // 閉じ :: 直前の空白は convertToNai が誤解釈防止で入れたものなので捨てる
+                body = body.trimEnd();
+            }
+            result.push(D2_PromptConvert.$_closeWeight(body, openWeight, removeNegative));
+            if (m[1] !== undefined) {
+                openWeight = parseFloat(m[1]);
+            } else if (openWeight !== null) {
+                openWeight = null;
             } else {
-                weight = 1 * Math.pow(1 / D2_PromptConvert.RATE, braCount);
+                // 対応する weight 開始がない :: は文字として残す
+                result.push("::");
             }
-
-            let weightAdjust;
-
-            // 四捨五入して小数点２位にするか、
-            // 四捨五入せず小数点３位で切り捨てるか
-            weightAdjust = Math.round(weight * 10) / 10;
-            // if (opts.d2_npc_enable_rounding) {
-            //     weightAdjust = Math.round(weight * 10) / 10;
-            // } else {
-            //     weightAdjust = Math.floor(weight * 100) / 100;
-            // }
-
-            const text = prompt.replace(/[\[\]{}]+/g, '');
-            return `(${text}:${weightAdjust})`;
+            pos = m.index + m[0].length;
         }
+
+        result.push(D2_PromptConvert.$_closeWeight(line.substring(pos), openWeight, removeNegative));
+        return result.join("");
+    }
+
+    /**
+     * weight の本文を (text:weight) にする。weight が開いていなければ本文をそのまま返す
+     */
+    static $_closeWeight (body, weight, removeNegative) {
+        if (weight === null) {
+            return body;
+        }
+
+        const [, lead, text, trail] = body.match(D2_PromptConvert.BODY_PATTERN);
+        if (text === "" || (weight < 0 && removeNegative)) {
+            return lead + trail;
+        }
+        return `${lead}(${text}:${weight})${trail}`;
+    }
+
+    /**
+     * ブレース方式 {{aaa}} [[aaa]] 1個を SD 方式に変換する
+     */
+    static $_convertBraceToSd (prompt) {
+        const braCount = (prompt.match(/[\[{]/g) || []).length;
+        let weight;
+        if (prompt[0] === "{") {
+            weight = Math.pow(D2_PromptConvert.RATE, braCount);
+        } else {
+            weight = Math.pow(1 / D2_PromptConvert.RATE, braCount);
+        }
+
+        const weightAdjust = Math.round(weight * 10) / 10;
+        const text = prompt.replace(/[\[\]{}]+/g, "");
+        return `(${text}:${weightAdjust})`;
     }
 }
 
@@ -127,7 +144,8 @@ class D2_PromptConvertDialog {
     static CSS_FILEPATH = "/D2/assets/css/D2_PromptConvertDialog.css";
 
     container = undefined;
-    convertType = "new"; // デフォルト値
+    convertType = "number"; // デフォルト値
+    removeNegative = true;
 
     constructor() {
         this._createDialog();
@@ -168,7 +186,7 @@ class D2_PromptConvertDialog {
         // NAI > SD 変換ボタン
         const naiToSdBtn = D2_PromptConvertDialog.createButton("SD 👈 NAI", () => {
             const prompt = naiPrompt.value;
-            const newPrompt = D2_PromptConvert.convertToSd(prompt, this.convertType);
+            const newPrompt = D2_PromptConvert.convertToSd(prompt, this.convertType, this.removeNegative);
             sdPrompt.value = newPrompt;
         });
         content.appendChild(naiToSdBtn);
@@ -249,52 +267,72 @@ class D2_PromptConvertDialog {
             grid-column: span 2;
         `;
 
-        const oldTypeLabel = document.createElement("label");
-        oldTypeLabel.htmlFor = "oldType";
-        oldTypeLabel.textContent = "Old Type";
-        oldTypeLabel.style.cssText = `
+        const braceTypeLabel = document.createElement("label");
+        braceTypeLabel.htmlFor = "braceType";
+        braceTypeLabel.textContent = "brace";
+        braceTypeLabel.style.cssText = `
             margin-left: 5px;
             cursor: pointer;
             color: var(--input-text);
         `;
 
-        const oldTypeRadio = document.createElement("input");
-        oldTypeRadio.type = "radio";
-        oldTypeRadio.name = "convertType";
-        oldTypeRadio.id = "oldType";
-        oldTypeRadio.value = "old";
-        oldTypeRadio.checked = false;
-        oldTypeRadio.addEventListener("change", () => {
-            if (oldTypeRadio.checked) {
-                this.convertType = "old";
+        const braceTypeRadio = document.createElement("input");
+        braceTypeRadio.type = "radio";
+        braceTypeRadio.name = "convertType";
+        braceTypeRadio.id = "braceType";
+        braceTypeRadio.value = "brace";
+        braceTypeRadio.checked = false;
+        braceTypeRadio.addEventListener("change", () => {
+            if (braceTypeRadio.checked) {
+                this.convertType = "brace";
             }
         });
-        oldTypeLabel.prepend(oldTypeRadio);
+        braceTypeLabel.prepend(braceTypeRadio);
 
-        const newTypeLabel = document.createElement("label");
-        newTypeLabel.htmlFor = "newType";
-        newTypeLabel.textContent = "New Type";
-        newTypeLabel.style.cssText = `
+        const numberTypeLabel = document.createElement("label");
+        numberTypeLabel.htmlFor = "numberType";
+        numberTypeLabel.textContent = "number";
+        numberTypeLabel.style.cssText = `
             margin-left: 5px;
             cursor: pointer;
             color: var(--input-text);
         `;
 
-        const newTypeRadio = document.createElement("input");
-        newTypeRadio.type = "radio";
-        newTypeRadio.name = "convertType";
-        newTypeRadio.id = "newType";
-        newTypeRadio.value = "new";
-        newTypeRadio.checked = true;
-        newTypeRadio.addEventListener("change", () => {
-            if (newTypeRadio.checked) {
-                this.convertType = "new";
+        const numberTypeRadio = document.createElement("input");
+        numberTypeRadio.type = "radio";
+        numberTypeRadio.name = "convertType";
+        numberTypeRadio.id = "numberType";
+        numberTypeRadio.value = "number";
+        numberTypeRadio.checked = true;
+        numberTypeRadio.addEventListener("change", () => {
+            if (numberTypeRadio.checked) {
+                this.convertType = "number";
             }
         });
-        newTypeLabel.prepend(newTypeRadio);
+        numberTypeLabel.prepend(numberTypeRadio);
 
-        radioContainer.appendChild(newTypeLabel);
-        radioContainer.appendChild(oldTypeLabel);
+        // NAI > SD の number 方式でだけ効く
+        const removeNegativeLabel = document.createElement("label");
+        removeNegativeLabel.htmlFor = "removeNegative";
+        removeNegativeLabel.textContent = "Remove negative";
+        removeNegativeLabel.style.cssText = `
+            margin-left: 5px;
+            cursor: pointer;
+            color: var(--input-text);
+        `;
+
+        const removeNegativeCheckbox = document.createElement("input");
+        removeNegativeCheckbox.type = "checkbox";
+        removeNegativeCheckbox.id = "removeNegative";
+        removeNegativeCheckbox.checked = this.removeNegative;
+        removeNegativeCheckbox.addEventListener("change", () => {
+            this.removeNegative = removeNegativeCheckbox.checked;
+        });
+        removeNegativeLabel.prepend(removeNegativeCheckbox);
+
+        radioContainer.appendChild(numberTypeLabel);
+        radioContainer.appendChild(braceTypeLabel);
+        radioContainer.appendChild(removeNegativeLabel);
 
         return radioContainer;
     }
