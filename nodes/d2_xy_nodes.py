@@ -601,13 +601,14 @@ class D2_XYModelList(io.ComfyNode):
             outputs=[
                 io.String.Output(display_name="x / y_list"),
                 io.Custom("LIST").Output(display_name="LIST"),
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
         )
 
     @classmethod
     def execute(cls, model_type, filter="", mode="simple", sort_by="Name", order_by="A-Z", get_list=None, model_list="") -> io.NodeOutput:
         list_list = model_list.split("\n")
-        return io.NodeOutput(model_list, list_list)
+        return io.NodeOutput(model_list, list_list, list_list)
 
 
 
@@ -864,13 +865,14 @@ class D2_XYListToPlot(io.ComfyNode):
             ],
             outputs=[
                 io.String.Output(display_name="x / y_list"),
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
         )
 
     @classmethod
     def execute(cls, LIST) -> io.NodeOutput:
         output = util.list_to_text(LIST, util.LINE_BREAK)
-        return io.NodeOutput(output)
+        return io.NodeOutput(output, LIST)
 
 
 """
@@ -891,6 +893,8 @@ class D2_XYStringToPlot(io.ComfyNode):
             ],
             outputs=[
                 io.String.Output(display_name="x / y_list"),
+                io.Custom("LIST").Output(display_name="LIST"),
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
             # JS が string_1..N を addInput で動的追加するため **kwargs で受ける
             accept_all_inputs=True,
@@ -911,9 +915,10 @@ class D2_XYStringToPlot(io.ComfyNode):
             cleaned = [s.replace('\n', '') for s in string_list]
             result = '\n'.join(cleaned)
 
-            return io.NodeOutput(result)
+            # LIST / BATCH は Loop 等で複数行プロンプトをそのまま使えるよう改行を残す
+            return io.NodeOutput(result, string_list, string_list)
 
-        return io.NodeOutput(None)
+        return io.NodeOutput(None, [], [])
 
 
 """
@@ -943,6 +948,7 @@ class D2_XYFolderImages(io.ComfyNode):
                 io.String.Output(display_name="x / y_list"),
                 io.Custom("LIST").Output(display_name="LIST"),
                 io.Int.Output(display_name="image_count"),
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
         )
 
@@ -952,7 +958,7 @@ class D2_XYFolderImages(io.ComfyNode):
         output = util.list_to_text(files, util.LINE_BREAK)
 
         return io.NodeOutput(
-            output, files, len(files),
+            output, files, len(files), files,
             ui={"image_count": (len(files),)},
         )
 
@@ -979,6 +985,7 @@ class D2_XYUploadImage(io.ComfyNode):
                 io.Custom("LIST").Output(display_name="LIST"),
                 io.String.Output(display_name="x / y_list"),
                 io.Int.Output(display_name="image_count"),
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
         )
 
@@ -988,7 +995,7 @@ class D2_XYUploadImage(io.ComfyNode):
         image_batch = image_list.strip().split('\n')
 
         return io.NodeOutput(
-            image_batch, image_list, image_count,
+            image_batch, image_list, image_count, image_batch,
             ui={"image_count": (len(image_batch),)},
         )
 

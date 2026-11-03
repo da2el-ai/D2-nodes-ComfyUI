@@ -285,6 +285,8 @@ class D2_MultiOutput(io.ComfyNode):
             outputs=[
                 io.Custom("LIST").Output(display_name="LIST"),
                 io.String.Output(display_name="x / y_list"),
+                # 要素ごとの出力リスト。Start Loop の List モード等で要素ごとに実行させる
+                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
         )
 
@@ -306,7 +308,7 @@ class D2_MultiOutput(io.ComfyNode):
             else:
                 output_list.append(option)
 
-        return io.NodeOutput(output_list, parameter)
+        return io.NodeOutput(output_list, parameter, output_list)
 
 
 

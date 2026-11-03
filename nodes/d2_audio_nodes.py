@@ -30,9 +30,11 @@ class D2_SaveAudioEagle(io.ComfyNode):
                 # これがないと再生UIが表示されない
                 io.Custom("AUDIO_UI").Input("audioUI"),
             ],
-            # V1 は RETURN_TYPES=("STRING")（カンマ無し＝文字列）で実体は result を返さない
-            # 出力ノードだったので、出力なし（ui のみ）として移行する
-            outputs=[],
+            # End Loop の termination 等へ繋げられるよう入力音声と保存先パスを返す
+            outputs=[
+                io.Audio.Output(display_name="audio"),
+                io.Custom("LIST").Output(display_name="filename"),
+            ],
             hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
         )
 
@@ -59,11 +61,13 @@ class D2_SaveAudioEagle(io.ComfyNode):
         saved_dict = saved.as_dict()
 
         # 1ファイルずつEagleに保存
+        file_paths = []
         for file_obj in saved_dict.get("audio", []):
             file_path = os.path.join(output_dir, file_obj["subfolder"], file_obj["filename"])
             send_to_eagle(eagle_api, folder_id, file_path, memo_text)
+            file_paths.append(file_path)
 
-        return io.NodeOutput(ui=saved_dict)
+        return io.NodeOutput(audio, file_paths, ui=saved_dict)
 
 
 NODE_CLASS_MAPPINGS = {

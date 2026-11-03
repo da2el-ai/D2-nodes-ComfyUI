@@ -69,6 +69,8 @@ class D2_SaveImage(io.ComfyNode):
             ],
             outputs=[
                 io.Custom("LIST").Output(display_name="filenames"),
+                # End Loop の termination 等へ繋げられるよう入力画像をそのまま返す
+                io.Image.Output(display_name="images"),
             ],
             hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
             is_output_node=True,
@@ -183,7 +185,7 @@ class D2_SaveImage(io.ComfyNode):
             images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps,
             prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
         )
-        return io.NodeOutput(file_paths, ui=ui)
+        return io.NodeOutput(file_paths, images, ui=ui)
 
 
 """
@@ -218,6 +220,7 @@ class D2_SaveImageEagle(D2_SaveImage):
             ],
             outputs=[
                 io.Custom("LIST").Output(display_name="filenames"),
+                io.Image.Output(display_name="images"),
             ],
             hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
             is_output_node=True,
@@ -242,7 +245,7 @@ class D2_SaveImageEagle(D2_SaveImage):
         for single_path in file_paths:
             send_to_eagle(eagle_api, folder_id, single_path, memo_text)
 
-        return io.NodeOutput(file_paths, ui=ui)
+        return io.NodeOutput(file_paths, images, ui=ui)
 
 """
 
@@ -301,7 +304,10 @@ class D2_PreviewImage(io.ComfyNode):
                 io.Image.Input("images"),
                 io.Custom("D2_BUTTON").Input("popup_image", optional=True),
             ],
-            outputs=[],
+            # End Loop の termination 等へ繋げられるよう入力画像をそのまま返す
+            outputs=[
+                io.Image.Output(display_name="images"),
+            ],
             hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
             is_output_node=True,
         )
@@ -315,7 +321,7 @@ class D2_PreviewImage(io.ComfyNode):
         saver.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
         saver.compress_level = 1
         res = saver.save_images(images)
-        return io.NodeOutput(ui=res["ui"])
+        return io.NodeOutput(images, ui=res["ui"])
 
 
 
