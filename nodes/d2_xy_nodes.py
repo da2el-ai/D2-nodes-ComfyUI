@@ -84,10 +84,10 @@ class D2_XYPlot(io.ComfyNode):
             inputs=[
                 io.Combo.Input("x_type", options=["STRING", "INT", "FLOAT"]),
                 io.String.Input("x_title", default=""),
-                io.String.Input("x_list", multiline=True),
+                io.String.Input("x_items", multiline=True),
                 io.Combo.Input("y_type", options=["STRING", "INT", "FLOAT"]),
                 io.String.Input("y_title", default=""),
-                io.String.Input("y_list", multiline=True),
+                io.String.Input("y_items", multiline=True),
                 io.Boolean.Input("auto_queue", default=True),
                 io.Int.Input("start_index", default=0, max=65535),
                 io.Custom("D2_BUTTON").Input("reset", optional=True),
@@ -108,11 +108,11 @@ class D2_XYPlot(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, x_type, x_title, x_list, y_type, y_title, y_list, auto_queue, start_index, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
+    def execute(cls, x_type, x_title, x_items, y_type, y_title, y_items, auto_queue, start_index, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
         if index is None:
             index = 0
-        x_annotation = D2_XYAnnotation.get_annotation(x_title, x_list)
-        y_annotation = D2_XYAnnotation.get_annotation(y_title, y_list)
+        x_annotation = D2_XYAnnotation.get_annotation(x_title, x_items)
+        y_annotation = D2_XYAnnotation.get_annotation(y_title, y_items)
 
         x_array = cls.change_type(x_type, x_annotation.values)
         y_array = cls.change_type(y_type, y_annotation.values)
@@ -193,9 +193,9 @@ class D2_XYPlotEasy(io.ComfyNode):
             io.Combo.Input("scheduler", options=comfy.samplers.KSampler.SCHEDULERS),
             io.Float.Input("denoise", default=1.0, min=0.0, max=1.0, step=0.01),
             io.Combo.Input("x_type", options=cls.XY_INPUT_TYPES),
-            io.String.Input("x_list", multiline=True),
+            io.String.Input("x_items", multiline=True),
             io.Combo.Input("y_type", options=cls.XY_INPUT_TYPES),
-            io.String.Input("y_list", multiline=True),
+            io.String.Input("y_items", multiline=True),
             io.Boolean.Input("auto_queue", default=True),
             io.Int.Input("start_index", default=0, max=65535),
             io.Custom("D2_BUTTON").Input("reset", optional=True),
@@ -237,14 +237,14 @@ class D2_XYPlotEasy(io.ComfyNode):
 
     @classmethod
     def execute(cls, positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
+            x_type, x_items, y_type, y_items, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
         return cls._run_xy(positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "full")
+            x_type, x_items, y_type, y_items, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "full")
 
 
     @classmethod
     def _run_xy(cls, positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None, mode="full") -> io.NodeOutput:
+            x_type, x_items, y_type, y_items, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None, mode="full") -> io.NodeOutput:
         if index is None:
             index = 0
 
@@ -266,8 +266,8 @@ class D2_XYPlotEasy(io.ComfyNode):
         # (ComfyUIはインスタンスを再生成することがあるため。状態は unique_id 毎に保持)
         state = cls._anno_state.get(cls.hidden.unique_id)
         if index == 0 or state is None:
-            x_array = D2_XYPlot.change_type(x_type, x_list.strip().split('\n'))
-            y_array = D2_XYPlot.change_type(y_type, y_list.strip().split('\n'))
+            x_array = D2_XYPlot.change_type(x_type, x_items.strip().split('\n'))
+            y_array = D2_XYPlot.change_type(y_type, y_items.strip().split('\n'))
             x_annotation = D2_TAnnotation(x_type, x_array)
             y_annotation = D2_TAnnotation(y_type, y_array)
             cls._anno_state[cls.hidden.unique_id] = {"x": x_annotation, "y": y_annotation}
@@ -409,9 +409,9 @@ class D2_XYPlotEasyMini(D2_XYPlotEasy):
 
     @classmethod
     def execute(cls, positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
+            x_type, x_items, y_type, y_items, auto_queue, start_index=0, reset=None, index=0, remaining_time=None, xy_seed=None, progress_bar=None) -> io.NodeOutput:
         return cls._run_xy(positive, negative, ckpt_name, unet_name, ckpt_type, seed, steps, cfg, sampler_name, scheduler, denoise,
-            x_type, x_list, y_type, y_list, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "mini")
+            x_type, x_items, y_type, y_items, auto_queue, start_index, reset, index, remaining_time, xy_seed, progress_bar, "mini")
 
 
 """
@@ -599,9 +599,9 @@ class D2_XYModelList(io.ComfyNode):
                 io.String.Input("model_list", multiline=True, optional=True),
             ],
             outputs=[
-                io.String.Output(display_name="x / y_list"),
-                io.Custom("LIST").Output(display_name="LIST"),
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
             ],
         )
 
@@ -699,8 +699,9 @@ class D2_XYPromptSR(io.ComfyNode):
                 io.String.Input("replace", multiline=True, default=""),
             ],
             outputs=[
-                io.String.Output(display_name="x / y_list"),
-                io.Custom("LIST").Output(display_name="LIST"),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
             ],
         )
 
@@ -719,7 +720,7 @@ class D2_XYPromptSR(io.ComfyNode):
 
         output_xy = "\n".join([prompt.replace('\n','') for prompt in output_list])
 
-        return io.NodeOutput(output_xy, output_list)
+        return io.NodeOutput(output_xy, output_list, output_list)
 
 
 
@@ -771,10 +772,9 @@ class D2_XYSeed(io.ComfyNode):
                 io.String.Input("seeds", multiline=True, default="-1\n-1"),
             ],
             outputs=[
-                io.String.Output(display_name="x / y_list"),
-                io.Custom("LIST").Output(display_name="LIST"),
-                # V1 の OUTPUT_IS_LIST=(False, False, True) を踏襲。BATCH はリスト出力
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
             ],
         )
 
@@ -811,10 +811,9 @@ class D2_XYSeed2(io.ComfyNode):
                 io.Combo.Input("mode", options=["fixed", "increment", "decrement", "randomize"], default="randomize"),
             ],
             outputs=[
-                io.String.Output(display_name="x / y_list"),
-                io.Custom("LIST").Output(display_name="LIST"),
-                # V1 の OUTPUT_IS_LIST=(False, False, True) を踏襲。BATCH はリスト出力
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
             ],
         )
 
@@ -861,18 +860,20 @@ class D2_XYListToPlot(io.ComfyNode):
             display_name="D2 XY List To Plot",
             category="D2/XY Plot",
             inputs=[
-                io.Custom("LIST").Input("LIST"),
+                io.Array.Input("ARRAY"),
             ],
             outputs=[
-                io.String.Output(display_name="x / y_list"),
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
             ],
+            # D2 List Converter に置き換え。古いワークフローを読み込めるよう残す
+            is_deprecated=True,
         )
 
     @classmethod
-    def execute(cls, LIST) -> io.NodeOutput:
-        output = util.list_to_text(LIST, util.LINE_BREAK)
-        return io.NodeOutput(output, LIST)
+    def execute(cls, ARRAY) -> io.NodeOutput:
+        output = util.list_to_text(ARRAY, util.LINE_BREAK)
+        return io.NodeOutput(output, ARRAY)
 
 
 """
@@ -892,9 +893,9 @@ class D2_XYStringToPlot(io.ComfyNode):
                 io.Int.Input("string_count", default=3, min=1, max=50, step=1),
             ],
             outputs=[
-                io.String.Output(display_name="x / y_list"),
-                io.Custom("LIST").Output(display_name="LIST"),
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
             ],
             # JS が string_1..N を addInput で動的追加するため **kwargs で受ける
             accept_all_inputs=True,
@@ -915,7 +916,7 @@ class D2_XYStringToPlot(io.ComfyNode):
             cleaned = [s.replace('\n', '') for s in string_list]
             result = '\n'.join(cleaned)
 
-            # LIST / BATCH は Loop 等で複数行プロンプトをそのまま使えるよう改行を残す
+            # LIST / ARRAY は Loop 等で複数行プロンプトをそのまま使えるよう改行を残す
             return io.NodeOutput(result, string_list, string_list)
 
         return io.NodeOutput(None, [], [])
@@ -945,10 +946,10 @@ class D2_XYFolderImages(io.ComfyNode):
                 io.Custom("D2_BUTTON").Input("refresh_btn", optional=True),
             ],
             outputs=[
-                io.String.Output(display_name="x / y_list"),
-                io.Custom("LIST").Output(display_name="LIST"),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
                 io.Int.Output(display_name="image_count"),
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
         )
 
@@ -958,7 +959,7 @@ class D2_XYFolderImages(io.ComfyNode):
         output = util.list_to_text(files, util.LINE_BREAK)
 
         return io.NodeOutput(
-            output, files, len(files), files,
+            output, files, files, len(files),
             ui={"image_count": (len(files),)},
         )
 
@@ -982,10 +983,10 @@ class D2_XYUploadImage(io.ComfyNode):
                 io.Custom("D2_SIMPLE_TEXT").Input("status", optional=True),
             ],
             outputs=[
-                io.Custom("LIST").Output(display_name="LIST"),
-                io.String.Output(display_name="x / y_list"),
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
                 io.Int.Output(display_name="image_count"),
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
             ],
         )
 
@@ -995,7 +996,7 @@ class D2_XYUploadImage(io.ComfyNode):
         image_batch = image_list.strip().split('\n')
 
         return io.NodeOutput(
-            image_batch, image_list, image_count, image_batch,
+            image_list, image_batch, image_batch, image_count,
             ui={"image_count": (len(image_batch),)},
         )
 
@@ -1028,7 +1029,8 @@ class D2_XYListCollector(io.ComfyNode):
                 io.Custom("D2_TGridPipe").Input("grid_pipe", optional=True),
             ],
             outputs=[
-                io.AnyType.Output(display_name="output"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
             ],
             hidden=[io.Hidden.unique_id],
         )
@@ -1058,9 +1060,9 @@ class D2_XYListCollector(io.ComfyNode):
         if xy_status == "FINISH":
             output = state["items"]
             state["items"] = []
-            return io.NodeOutput(output)
+            return io.NodeOutput(output, output)
 
-        return io.NodeOutput(ExecutionBlocker(None))
+        return io.NodeOutput(ExecutionBlocker(None), ExecutionBlocker(None))
 
     """
     値が空（falsy）かどうか判定する

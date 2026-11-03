@@ -283,10 +283,10 @@ class D2_MultiOutput(io.ComfyNode):
                 io.Custom("D2_BUTTON").Input("create_seed", optional=True),
             ],
             outputs=[
-                io.Custom("LIST").Output(display_name="LIST"),
-                io.String.Output(display_name="x / y_list"),
+                io.String.Output(display_name="x / y_items"),
                 # 要素ごとの出力リスト。Start Loop の List モード等で要素ごとに実行させる
-                io.AnyType.Output(display_name="BATCH", is_output_list=True),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
             ],
         )
 
@@ -308,7 +308,7 @@ class D2_MultiOutput(io.ComfyNode):
             else:
                 output_list.append(option)
 
-        return io.NodeOutput(output_list, parameter, output_list)
+        return io.NodeOutput(parameter, output_list, output_list)
 
 
 
@@ -510,18 +510,60 @@ class D2_ListToString(io.ComfyNode):
             display_name="D2 List To String",
             category="D2/Text",
             inputs=[
-                io.Custom("LIST").Input("LIST"),
+                io.Array.Input("ARRAY"),
                 io.Combo.Input("separator", options=util.SEPARATOR, default=util.LINE_BREAK),
             ],
             outputs=[
                 io.String.Output(display_name="STRING"),
             ],
+            # D2 List Converter に置き換え。古いワークフローを読み込めるよう残す
+            is_deprecated=True,
         )
 
     @classmethod
-    def execute(cls, LIST, separator) -> io.NodeOutput:
-        output = util.list_to_text(LIST, separator)
+    def execute(cls, ARRAY, separator) -> io.NodeOutput:
+        output = util.list_to_text(ARRAY, separator)
         return io.NodeOutput(output)
+
+
+"""
+
+D2 List Converter
+LIST（ComfyUI の list）/ ARRAY（Python の list）を相互に変換し、文字列にもする
+
+"""
+class D2_ListConverter(io.ComfyNode):
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="D2 List Converter",
+            display_name="D2 List Converter",
+            category="D2/Text",
+            # LIST 入力を要素ごとではなくまとめて受け取るため。他の入力もリストに包まれて届く
+            is_input_list=True,
+            inputs=[
+                io.AnyType.Input("LIST", optional=True),
+                io.Array.Input("ARRAY", optional=True),
+                io.Combo.Input("separator", options=util.SEPARATOR, default=util.LINE_BREAK),
+            ],
+            outputs=[
+                io.String.Output(display_name="x / y_items"),
+                io.AnyType.Output(display_name="LIST", is_output_list=True),
+                io.Array.Output(display_name="ARRAY"),
+                io.String.Output(display_name="STRING"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, separator, LIST=None, ARRAY=None) -> io.NodeOutput:
+        items = list(LIST or []) + list(ARRAY[0] if ARRAY else [])
+        texts = [str(item) for item in items]
+
+        # xy_plot は改行でアイテムを区切っているので、各アイテムの改行を消す
+        output_xy = util.list_to_text([text.replace('\n', '') for text in texts], util.LINE_BREAK)
+        output_str = util.list_to_text(texts, separator[0])
+
+        return io.NodeOutput(output_xy, items, items, output_str)
 
 
 """
@@ -1027,6 +1069,7 @@ NODE_CLASS_MAPPINGS = {
     "D2 Token Counter": D2_TokenCounter,
     "D2 Multi Output": D2_MultiOutput,
     "D2 List To String": D2_ListToString,
+    "D2 List Converter": D2_ListConverter,
     "D2 Text Concat": D2_TextConcat,
     "D2 Filename Template": D2_FilenameTemplate,
     "D2 Filename Template2": D2_FilenameTemplate2,

@@ -32,8 +32,8 @@ class D2_SaveAudioEagle(io.ComfyNode):
             ],
             # End Loop の termination 等へ繋げられるよう入力音声と保存先パスを返す
             outputs=[
-                io.Audio.Output(display_name="audio"),
-                io.Custom("LIST").Output(display_name="filename"),
+                io.Audio.Output(display_name="audios"),
+                io.Array.Output(display_name="filenames"),
             ],
             hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
         )

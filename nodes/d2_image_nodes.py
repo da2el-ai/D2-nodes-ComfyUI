@@ -68,9 +68,9 @@ class D2_SaveImage(io.ComfyNode):
                 io.Custom("D2_BUTTON").Input("popup_image", optional=True),
             ],
             outputs=[
-                io.Custom("LIST").Output(display_name="filenames"),
                 # End Loop の termination 等へ繋げられるよう入力画像をそのまま返す
                 io.Image.Output(display_name="images"),
+                io.Array.Output(display_name="filenames"),
             ],
             hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
             is_output_node=True,
@@ -185,7 +185,7 @@ class D2_SaveImage(io.ComfyNode):
             images, d2_pipe, filename_prefix, preview_only, format, lossless, quality, fps,
             prompt=cls.hidden.prompt, extra_pnginfo=cls.hidden.extra_pnginfo,
         )
-        return io.NodeOutput(file_paths, images, ui=ui)
+        return io.NodeOutput(images, file_paths, ui=ui)
 
 
 """
@@ -219,8 +219,8 @@ class D2_SaveImageEagle(D2_SaveImage):
                 io.Custom("D2_BUTTON").Input("popup_image", optional=True),
             ],
             outputs=[
-                io.Custom("LIST").Output(display_name="filenames"),
                 io.Image.Output(display_name="images"),
+                io.Array.Output(display_name="filenames"),
             ],
             hidden=[io.Hidden.prompt, io.Hidden.extra_pnginfo],
             is_output_node=True,
@@ -245,7 +245,7 @@ class D2_SaveImageEagle(D2_SaveImage):
         for single_path in file_paths:
             send_to_eagle(eagle_api, folder_id, single_path, memo_text)
 
-        return io.NodeOutput(file_paths, images, ui=ui)
+        return io.NodeOutput(images, file_paths, ui=ui)
 
 """
 
@@ -265,7 +265,10 @@ class D2_SendFileEagle(io.ComfyNode):
                 io.String.Input("eagle_folder", default=""),
                 io.String.Input("memo_text", multiline=True),
             ],
-            outputs=[],
+            # End Loop の termination 等へ繋げられるよう入力パスをそのまま返す
+            outputs=[
+                io.AnyType.Output(display_name="file_path"),
+            ],
             is_output_node=True,
         )
 
@@ -283,7 +286,7 @@ class D2_SendFileEagle(io.ComfyNode):
         else:
             raise ValueError(f"Unsupported file_path type: {type(file_path)}")
 
-        return io.NodeOutput()
+        return io.NodeOutput(file_path)
 
 
 
