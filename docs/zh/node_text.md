@@ -163,33 +163,58 @@ Output text
 
 ### Output
 
-- `LIST`
-  - 以換行分解並以陣列形式輸出
-- `x/y_list`
+- `x / y_items`
   - 普通的換行分隔文字
   - 用於 `D2 XY Plot`、`D2 XY Plot Easy`、`D2 XY Plot Easy Mini`
+- `LIST`
+  - 以換行分解並逐一輸出。連接的節點會依元素數量執行
+- `ARRAY`
+  - 以換行分解並以陣列形式輸出
 
 
 ---
 
-### D2 List To String
+### D2 List Converter
 
 <figure>
-  <img src="../img/list_to_string.png">
+  <img src="../img/list_converter.png">
 </figure>
 
-- 將陣列（LIST）結合成單一字串的節點
-- 以 `separator` 選擇分隔字元
+- 將 `LIST`（逐一輸出元素的 ComfyUI list）與 `ARRAY`（將陣列作為單一值輸出的 ComfyUI 內建 Array 型別）互相轉換，也能轉換為字串的節點
+- 整合了 `D2 List To String` 與 `D2 XY List To Plot` 的功能
 
 #### Input
 
+- `LIST` / `ARRAY`
+  - 要轉換的值。連接其中一個即可
+  - 兩者都連接時，依 `LIST` → `ARRAY` 的順序串接
 - `separator`
+    - `STRING` 輸出的分隔字元
     - `Comma + Space`: 以 `, ` 結合
     - `Comma`: 以 `,` 結合
     - `Line break`: 以換行結合
     - `Semicolon`: 以 `;` 結合
     - `Space`: 以半形空格結合
     - `None`: 不使用分隔字元結合
+
+#### Output
+
+- `x / y_items`
+  - 換行分隔的文字。用於 `D2 XY Plot`
+  - 會去除元素中的換行後輸出
+- `LIST`
+  - 逐一輸出元素
+- `ARRAY`
+  - 以陣列輸出
+- `STRING`
+  - 以 `separator` 結合的文字
+  - 保留元素中的換行
+
+---
+
+### D2 List To String
+
+已不建議使用。今後請改用 <a href="#D2-List-Converter">`D2 List Converter`</a>。
 
 ---
 

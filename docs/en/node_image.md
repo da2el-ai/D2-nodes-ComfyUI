@@ -24,6 +24,10 @@
 
 - Click the `Popup Image` button to display the full-screen gallery
 
+#### Output
+
+- `images`: Outputs the input images as they are
+
 ---
 
 ### D2 Save Image
@@ -61,7 +65,8 @@
 
 #### Output
 
-- `filenames`: Array of full paths of saved image files
+- `images`: Outputs the input images as they are
+- `filenames`: Array of full paths of saved image files (`ARRAY`)
 
 ---
 
@@ -146,6 +151,7 @@ Steps: 20, Sampler: euler_ancestral simple, CFG scale: 5.000000000000001, Seed: 
 - Registers files at the path input in `file_path` to <a href="https://eagle.cool/" target="_blank">Eagle</a>
 - Created to register output files from `Video Combine` to Eagle
 - Can also save video generation parameters by using `D2 File Template2` for `memo_text` input
+- The `file_path` output outputs the input `file_path` as it is
 
 ##### About file_path
 

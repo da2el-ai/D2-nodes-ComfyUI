@@ -95,8 +95,8 @@
   - 可進行字串連接
 - <a href="node_text.md#D2-Multi-Output">`D2 Multi Output`</a>
   - 以列表形式輸出 SEED / STRING / INT / FLOAT
-- <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
-  - 將陣列轉換為字串
+- <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a>
+  - 將 LIST / ARRAY 互相轉換，也能轉換為字串
 - <a href="node_text.md#D2-Text-Concat">`D2 Text Concat`</a>
   - 可調整輸入數量的文字結合節點
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
@@ -188,13 +188,11 @@
 - <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
   - 輸出 Checkpoint / Lora 列表
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
-  - 輸出資料夾內文件列表
+  - 輸出資料夾內文件列表（也支援圖片以外的檔案）
 - <a href="node_xy.md#D2-XY-Upload-Image">`D2 XY Upload Image`</a>
   - 通過拖放上傳多個圖像
 - <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
   - 創建在 `D2 Grid Image` 顯示的標題文字
-- <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
-  - 將陣列轉換為 `D2 XY Plot` 用列表
 - <a href="node_xy.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
   - 將包含換行符的文本轉換為 `D2 XY Plot` 可用的列表格式
 
@@ -210,6 +208,22 @@
 
 
 ## :blossom: 更新日誌
+
+**2026.11.04**
+
+- ⚠️ 為了支援 ComfyUI 內建的 `Start Loop` / `End Loop`，變更了許多節點輸入/輸出的名稱、型別與順序。舊的工作流程需要重新連接節點
+- 將以單一值輸出陣列的 `LIST` 變更為 ComfyUI 內建的 Array 型別 `ARRAY`
+- 將逐一輸出元素的 `BATCH` 更名為 `LIST`
+- 輸出順序統一為 `x / y_items` → `LIST` → `ARRAY`
+  - `D2_MultiOutput` / `D2_XYModelList` / `D2_XYPromptSR` / `D2_XYSeed` / `D2_XYSeed2` / `D2_XYStringToPlot` / `D2_XYFolderImages` / `D2_XYUploadImage` / `D2_XYListCollector`
+- 將 `x / y_list`、`x_list`、`y_list` 更名為 `x / y_items`、`x_items`、`y_items`
+  - `D2_XYPlot` / `D2_XYPlotEasy` / `D2_XYPlotEasyMini` 等
+- `D2_ListConverter`: 新增將 LIST / ARRAY 互相轉換、也能轉換為字串的節點
+- `D2_ListToString` / `D2_XYListToPlot`: 變更為不建議使用。今後請改用 `D2_ListConverter`
+- `D2_SaveImage` / `D2_SaveImageEagle` / `D2_PreviewImage`: 新增將輸入圖像原樣輸出的 `images` 輸出。`filenames` 變更為 `ARRAY`，並移至 `images` 之後
+- `D2_SaveAudioEagle`: 新增將輸入音頻原樣輸出的 `audios` 輸出，以及保存路徑的 `filenames` 輸出
+- `D2_SendFileEagle`: 新增將輸入路徑原樣輸出的 `file_path` 輸出
+- `D2_XYFolderImages`: 在文件中註明也能處理圖片以外的檔案
 
 **2026.10.31**
 

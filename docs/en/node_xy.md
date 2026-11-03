@@ -20,9 +20,14 @@
 
 - Please refer to the <a href="./workflow.md#card_index_dividers-xy-plot-checkpoint--prompt-sr">sample workflow</a>.
 
-- The processing order is `x_list` > `y_list`. When the order matters, such as for prompt rewriting, make sure it is arranged as x > y.
+- The processing order is `x_items` > `y_items`. When the order matters, such as for prompt rewriting, make sure it is arranged as x > y.
 
-- All of `x_list` is processed before moving on to the next `y_list`. For heavy processes such as loading a Checkpoint, it is recommended to use `y_list`.
+- All of `x_items` is processed before moving on to the next `y_items`. For heavy processes such as loading a Checkpoint, it is recommended to use `y_items`.
+
+- Nodes that output lists have the following three outputs.
+  - `x / y_items`: Newline-separated text. Connect it to `x_items` / `y_items` of `D2 XY Plot`
+  - `LIST`: Outputs items one by one (ComfyUI's list). The connected node runs once per item. Connect it to ComfyUI's built-in `Start Loop` (List mode) to loop
+  - `ARRAY`: Outputs the array as a single value (ComfyUI's built-in Array type). It can be converted to other formats with <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a>
 
 
 ---
@@ -55,7 +60,7 @@
 - `x_type` / `y_type`
   - Specify items to execute in XY Plot
   - When `STRING`, `INT`, or `FLOAT` is specified, output will be from `x_other`, `y_other`
-- `x_list` / `y_list`
+- `x_items` / `y_items`
   - XY Plot modification contents
   - Since it's newline-separated text, input from other nodes is possible
 - `auto_queue`
@@ -100,10 +105,10 @@
 #### Input
 
 - `x_type` / `y_type`
-  - Specify data type of `x_list` `y_list` from `STRING` `INT` `FLOAT`
+  - Specify data type of `x_items` `y_items` from `STRING` `INT` `FLOAT`
 - `x_title` / `y_title`
   - Text to add to header text
-- `x_list` / `y_list`
+- `x_items` / `y_items`
   - XY Plot change contents
   - Newline-separated text that can be input using other nodes
 - `auto_queue`
@@ -115,7 +120,7 @@
 #### Output
 
 - `X` / `Y`
-  - Elements retrieved from `x_list` `y_list`
+  - Elements retrieved from `x_items` `y_items`
 - `x_annotation` / `y_annotation`
   - Header text to connect to `D2 XY Grid Image`
 - `status`
@@ -209,9 +214,11 @@ Y: steps
 
 #### Output
 
-- `output`
-  - Array of the accumulated data
-  - Accepts any data type
+- `LIST`
+  - Outputs the accumulated data one by one. The connected node runs once per item
+- `ARRAY`
+  - Outputs the accumulated data as an array
+- Both accept any data type
 
 ---
 
@@ -237,10 +244,10 @@ Y: steps
 
 #### Output
 
-- `x / y_list`
+- `x / y_items`
   - Connect to `D2 XY Plot`
-- `LIST`
-  - Output replaced text as list
+- `LIST` / `ARRAY`
+  - Outputs the replaced text (see <a href="#TIPS">TIPS</a>)
 
 ---
 
@@ -274,6 +281,7 @@ Y: steps
 - Outputs random number when `-1` is specified
 - Other numbers are output as-is
 - Must set `x/y_type` to `INT` on `D2 XY Plot` side
+- Outputs are `x / y_items` / `LIST` / `ARRAY` (see <a href="#TIPS">TIPS</a>)
 
 
 ---
@@ -286,6 +294,7 @@ Y: steps
 </figure>
 
 - A node that outputs a specified number of seed values
+- Outputs are `x / y_items` / `LIST` / `ARRAY` (see <a href="#TIPS">TIPS</a>)
 
 #### input
 - `initial_number`
@@ -315,6 +324,7 @@ Removed. Please use `D2 XY Model List` instead.
 - A node that passes Checkpoint/Lora to `D2 XY Plot`
 - Useful when you want to get a large list of models but don't want to select them one by one in `D2 Checkpoint List`
 - Click `get_list` to retrieve the model list, then edit it to keep only the ones you need
+- Outputs are `x / y_items` / `LIST` / `ARRAY` (see <a href="#TIPS">TIPS</a>)
 
 #### input
 - `model_type`
@@ -341,6 +351,7 @@ Removed. Please use `D2 XY Model List` instead.
 - Files can be uploaded to a temporary folder by drag and drop
 - The paths of uploaded files are displayed in the text area
 - Designed to be connected to `D2 Load Image` via `D2 XY Plot Easy`
+- Outputs are `x / y_items` / `LIST` / `ARRAY` (see <a href="#TIPS">TIPS</a>) and the file count `image_count`
 
 
 ---
@@ -352,9 +363,11 @@ Removed. Please use `D2 XY Model List` instead.
 <img src="../img/xy_folder_images.png">
 </figure>
 
-- Node to pass image paths from specified folder to `D2 XY Plot`
-- Set `include_subfolders` to `true` to also include images in subfolders (you can also write `**` directly in `folder`)
+- Node to pass file paths from specified folder to `D2 XY Plot`
+- Despite the name "Images", it is not limited to images. By setting `extension`, it can handle any kind of file, such as text or video
+- Set `include_subfolders` to `true` to also include files in subfolders (you can also write `**` directly in `folder`)
 - `extension` can specify multiple extensions comma-separated, like `*.png, *.jpg, *.webp`
+- Outputs are `x / y_items` / `LIST` / `ARRAY` (see <a href="#TIPS">TIPS</a>) and the file count `image_count`
 
 ---
 
@@ -370,13 +383,7 @@ Removed. Please use `D2 XY Model List` instead.
 
 ### D2 XY List To Plot
 
-<figure>
-  <img src="../img/xy_list_to_plot.png?2">
-</figure>
-
-- Converts output from list nodes to be compatible with `D2 XY Plot`
-- Internally, it simply performs `"\n".join(list)`, so if the list contents include line breaks, it may not work as intended
-- Use `D2 XY String To Plot` when working with text that contains line breaks
+Deprecated. Please use <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a> instead.
 
 ---
 
@@ -389,3 +396,4 @@ Removed. Please use `D2 XY Model List` instead.
 - Converts multiline text to be compatible with `D2 XY Plot` / `D2 XY Plot Easy`
 - Used when you want to perform XY Plot comparisons of entire prompts
 - When using with `D2 XY Plot Easy` for prompt comparison, set `x/y_type` to `STRING` and connect `x/y_other` to the `positive` input of `D2 KSampler`
+- `x / y_items` outputs each text with its line breaks removed. `LIST` / `ARRAY` output the text with line breaks kept (see <a href="#TIPS">TIPS</a>)

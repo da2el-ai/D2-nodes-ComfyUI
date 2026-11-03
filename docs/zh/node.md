@@ -618,3 +618,10 @@ Illustrious;20;5.0
   - `format` 為 `Opus` 時使用的位元率
 - `memo_text`
   - 保存到 Eagle 備註欄的文字
+
+#### Output
+
+- `audios`
+  - 將輸入的音頻原樣輸出
+- `filenames`
+  - 保存的音頻文件完整路徑陣列（`ARRAY`）

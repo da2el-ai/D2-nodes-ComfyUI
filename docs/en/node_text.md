@@ -138,32 +138,57 @@ Output text
 
 ### Output
 
-- `LIST`
-  - Splits by line break and outputs as an array
-- `x/y_list`
+- `x / y_items`
   - Plain line-break separated text
   - Used with `D2 XY Plot`, `D2 XY Plot Easy`, `D2 XY Plot Easy Mini`
+- `LIST`
+  - Splits by line break and outputs the items one by one. The connected node runs once per item
+- `ARRAY`
+  - Splits by line break and outputs as an array
 
 ---
 
-### D2 List To String
+### D2 List Converter
 
 <figure>
-  <img src="../img/list_to_string.png">
+  <img src="../img/list_converter.png">
 </figure>
 
-- Node that joins an array (LIST) into a single string
-- Choose the delimiter with `separator`
+- A node that converts between `LIST` (ComfyUI's list, which outputs items one by one) and `ARRAY` (ComfyUI's built-in Array type, which outputs an array as a single value), and also converts them to a string
+- Combines the features of `D2 List To String` and `D2 XY List To Plot`
 
 #### Input
 
+- `LIST` / `ARRAY`
+  - Value to convert. Connect either one
+  - When both are connected, they are joined in the order `LIST` → `ARRAY`
 - `separator`
+    - Delimiter for the `STRING` output
     - `Comma + Space`: Join with `, `
     - `Comma`: Join with `,`
     - `Line break`: Join with line breaks
     - `Semicolon`: Join with `;`
     - `Space`: Join with a space
     - `None`: Join with no delimiter
+
+#### Output
+
+- `x / y_items`
+  - Line-break separated text. Used with `D2 XY Plot`
+  - Line breaks inside each item are removed
+- `LIST`
+  - Outputs the items one by one
+- `ARRAY`
+  - Outputs as an array
+- `STRING`
+  - Text joined with `separator`
+  - Line breaks inside each item are kept
+
+---
+
+### D2 List To String
+
+Deprecated. Please use <a href="#D2-List-Converter">`D2 List Converter`</a> instead.
 
 ---
 

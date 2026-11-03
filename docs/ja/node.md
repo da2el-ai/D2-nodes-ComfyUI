@@ -645,3 +645,10 @@ Illustrious;20;5.0
 - `memo_text`
   - Eagleのメモ欄に保存するテキスト
 
+#### Output
+
+- `audios`
+  - 入力された音声をそのまま出力する
+- `filenames`
+  - 保存した音声ファイルのフルパス配列（`ARRAY`）
+

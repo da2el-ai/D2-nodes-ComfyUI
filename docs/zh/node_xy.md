@@ -21,9 +21,14 @@
 
 - 請參考<a href="./workflow.md#card_index_dividers-xy-plot-checkpoint--prompt-sr">範例工作流程</a>。
 
-- 處理順序為 `x_list` > `y_list`。當順序很重要時（例如提示詞的改寫），請確保排列為 x > y。
+- 處理順序為 `x_items` > `y_items`。當順序很重要時（例如提示詞的改寫），請確保排列為 x > y。
 
-- 會先處理完所有 `x_list` 後再進入下一個 `y_list`。對於 Checkpoint 載入等較重的處理，建議使用 `y_list`。
+- 會先處理完所有 `x_items` 後再進入下一個 `y_items`。對於 Checkpoint 載入等較重的處理，建議使用 `y_items`。
+
+- 輸出列表的節點具有以下 3 種輸出。
+  - `x / y_items`：換行分隔的文字。連接到 `D2 XY Plot` 的 `x_items` / `y_items`
+  - `LIST`：逐一輸出每個元素（ComfyUI 的 list）。連接的節點會依元素數量執行。連接到 ComfyUI 內建的 `Start Loop`（List 模式）即可循環
+  - `ARRAY`：將陣列作為單一值輸出（ComfyUI 內建的 Array 型別）。可用 <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a> 轉換為其他格式
 
 
 ---
@@ -56,7 +61,7 @@
 - `x_type` / `y_type`
   - 指定要在 XY Plot 中執行的項目
   - 當指定為 `STRING`、`INT`、`FLOAT` 時，將從 `x_other`、`y_other` 輸出
-- `x_list` / `y_list`
+- `x_items` / `y_items`
   - XY Plot 的變更內容
   - 因為是換行分隔的文字，所以也可以使用其他節點輸入
 - `auto_queue`
@@ -101,10 +106,10 @@
 #### Input
 
 - `x_type` / `y_type`
-  - 從 `STRING` `INT` `FLOAT` 中指定 `x_list` `y_list` 的數據類型
+  - 從 `STRING` `INT` `FLOAT` 中指定 `x_items` `y_items` 的數據類型
 - `x_title` / `y_title`
   - 添加到標題文字的文字
-- `x_list` / `y_list`
+- `x_items` / `y_items`
   - XY Plot 的變更內容
   - 為換行分隔文字，可使用其他節點輸入
 - `auto_queue`
@@ -116,7 +121,7 @@
 #### Output
 
 - `X` / `Y`
-  - 從 `x_list` `y_list` 獲取的元素
+  - 從 `x_items` `y_items` 獲取的元素
 - `x_annotation` / `y_annotation`
   - 連接到 `D2 XY Grid Image` 的標題文字
 - `status`
@@ -210,9 +215,11 @@ Y: steps
 
 #### Output
 
-- `output`
-  - 累積資料的陣列
-  - 可接受任何資料型別
+- `LIST`
+  - 逐一輸出累積的資料。連接的節點會依元素數量執行
+- `ARRAY`
+  - 以陣列輸出累積的資料
+- 兩者皆可接受任何資料型別
 
 ---
 
@@ -238,10 +245,10 @@ Y: steps
 
 #### Output
 
-- `x / y_list`
+- `x / y_items`
   - 連接到 `D2 XY Plot`
-- `LIST`
-  - 以列表形式輸出替換後的文字
+- `LIST` / `ARRAY`
+  - 輸出替換後的文字（參見 <a href="#TIPS">TIPS</a>）
 
 ---
 
@@ -275,6 +282,7 @@ Y: steps
 - 指定 `-1` 時輸出隨機數值
 - 其他數值直接輸出
 - `D2 XY Plot` 側需要將 `x/y_type` 設為 `INT`
+- 輸出為 `x / y_items` / `LIST` / `ARRAY`（參見 <a href="#TIPS">TIPS</a>）
 
 ---
 
@@ -291,6 +299,7 @@ Y: steps
 </figure>
 
 - 輸出指定數量種子值的節點
+- 輸出為 `x / y_items` / `LIST` / `ARRAY`（參見 <a href="#TIPS">TIPS</a>）
 
 #### input
 - `initial_number`
@@ -317,6 +326,7 @@ Y: steps
 - 將 Checkpoint/Lora 傳遞給 `D2 XY Plot` 的節點
 - 當你想獲取大量模型列表，但不想在 `D2 Checkpoint List` 中一個一個選擇時使用
 - 點擊 `get_list` 獲取模型列表，然後編輯保留需要的部分
+- 輸出為 `x / y_items` / `LIST` / `ARRAY`（參見 <a href="#TIPS">TIPS</a>）
 
 #### input
 - `model_type`
@@ -342,6 +352,7 @@ Y: steps
 - 可以通過拖放文件將其上傳到臨時文件夾
 - 上傳文件的路徑顯示在文本區域中
 - 設計為通過 `D2 XY Plot Easy` 連接到 `D2 Load Image`
+- 輸出為 `x / y_items` / `LIST` / `ARRAY`（參見 <a href="#TIPS">TIPS</a>），以及檔案數量 `image_count`
 
 
 ---
@@ -353,9 +364,11 @@ Y: steps
 <img src="../img/xy_folder_images.png">
 </figure>
 
-- 傳遞指定資料夾內圖像路徑到 `D2 XY Plot` 的節點
-- 將 `include_subfolders` 設為 `true` 可同時處理子資料夾內的圖像（也可在 `folder` 中直接寫入 `**`）
+- 傳遞指定資料夾內檔案路徑到 `D2 XY Plot` 的節點
+- 名稱雖為 Images，但並非僅限圖片。只要設定 `extension`，文字、影片等任何檔案皆可處理
+- 將 `include_subfolders` 設為 `true` 可同時處理子資料夾內的檔案（也可在 `folder` 中直接寫入 `**`）
 - `extension` 可以 `*.png, *.jpg, *.webp` 這樣以逗號分隔指定多個副檔名
+- 輸出為 `x / y_items` / `LIST` / `ARRAY`（參見 <a href="#TIPS">TIPS</a>），以及檔案數量 `image_count`
 
 ---
 
@@ -371,13 +384,7 @@ Y: steps
 
 ### D2 XY List To Plot
 
-<figure>
-  <img src="../img/xy_list_to_plot.png?2">
-</figure>
-
-- 將列表輸出節點的內容轉換為可用於 `D2 XY Plot` 的格式
-- 內部僅執行 `"\n".join(list)`，因此如果列表內容包含換行符，可能無法按預期工作
-- 處理包含換行符的文本時，請使用 `D2 XY String To Plot`
+已不建議使用。今後請改用 <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a>。
 
 ---
 
@@ -390,3 +397,4 @@ Y: steps
 - 將多行文本轉換為可用於 `D2 XY Plot` / `D2 XY Plot Easy` 的格式
 - 當需要比較整個提示詞時使用
 - 在 `D2 XY Plot Easy` 中進行提示詞比較時，將 `x/y_type` 設置為 `STRING`，並將 `x/y_other` 連接到 `D2 KSampler` 的 `positive` 輸入
+- `x / y_items` 會去除每段文字中的換行後輸出。`LIST` / `ARRAY` 則保留換行輸出（參見 <a href="#TIPS">TIPS</a>）

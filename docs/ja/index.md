@@ -95,8 +95,8 @@ D2 Nodes ComfyUI
   - 文字列結合も行える
 - <a href="node_text.md#D2-Multi-Output">`D2 Multi Output`</a>
   - SEED / STRING / INT / FLOAT をリスト出力する
-- <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
-  - 配列を文字列に変換する
+- <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a>
+  - LIST / ARRAY を相互に変換し、文字列にもする
 - <a href="node_text.md#D2-Text-Concat">`D2 Text Concat`</a>
   - 入力数を調整できるテキスト結合ノード
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
@@ -185,13 +185,11 @@ D2 Nodes ComfyUI
 - <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
   - Checkpoint / Lora のリストを出力する
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
-  - フォルダ内ファイルのリストを出力する
+  - フォルダ内ファイルのリストを出力する（画像以外のファイルも可）
 - <a href="node_xy.md#D2-XY-Upload-Image">`D2 XY Upload Image`</a>
   - 複数画像をドラッグ・ドロップでアップロードする
 - <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
   - D2 Grid Image で表示する見出しテキストを作成
-- <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
-  - 配列を D2 XY Plot 用リストに変換する
 - <a href="node_xy.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
   - 改行を含むテキストを `D2 XY Plot` 用リストに変換する
 
@@ -211,6 +209,22 @@ D2 Nodes ComfyUI
 
 ## :blossom: Changelog
 
+
+**2026.11.04**
+
+- ⚠️ ComfyUI 標準の `Start Loop` / `End Loop` に対応するため、多数のノードの入出力の名前・型・並び順を変更しました。古いワークフローではノードの再接続が必要です
+- 配列を1つの値として出力する `LIST` を ComfyUI 標準の Array 型 `ARRAY` に変更
+- 要素を1つずつ出力する `BATCH` を `LIST` に改名
+- 出力の並びを `x / y_items` → `LIST` → `ARRAY` に統一
+  - `D2_MultiOutput` / `D2_XYModelList` / `D2_XYPromptSR` / `D2_XYSeed` / `D2_XYSeed2` / `D2_XYStringToPlot` / `D2_XYFolderImages` / `D2_XYUploadImage` / `D2_XYListCollector`
+- `x / y_list`・`x_list`・`y_list` を `x / y_items`・`x_items`・`y_items` に改名
+  - `D2_XYPlot` / `D2_XYPlotEasy` / `D2_XYPlotEasyMini` ほか
+- `D2_ListConverter`: LIST / ARRAY を相互に変換し、文字列にもするノードを新規追加
+- `D2_ListToString` / `D2_XYListToPlot`: 非推奨に変更。今後は `D2_ListConverter` を使用
+- `D2_SaveImage` / `D2_SaveImageEagle` / `D2_PreviewImage`: 入力画像をそのまま返す `images` 出力を追加。`filenames` は `ARRAY` に変更し、`images` の後ろに移動
+- `D2_SaveAudioEagle`: 入力音声をそのまま返す `audios` 出力と、保存先パスの `filenames` 出力を追加
+- `D2_SendFileEagle`: 入力パスをそのまま返す `file_path` 出力を追加
+- `D2_XYFolderImages`: 画像以外のファイルも扱えることをドキュメントに明記
 
 **2026.10.31**
 

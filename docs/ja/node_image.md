@@ -26,6 +26,10 @@ Node
 
 - `Popup Image`: ボタンをクリックすると全画面ギャラリーが表示される
 
+#### Output
+
+- `images`: 入力された画像をそのまま出力する
+
 ---
 
 ### D2 Save Image
@@ -65,7 +69,8 @@ Node
 
 #### Output
 
-- `filenames`: 保存した画像ファイルのフルパス配列
+- `images`: 入力された画像をそのまま出力する
+- `filenames`: 保存した画像ファイルのフルパス配列（`ARRAY`）
 
 ---
 
@@ -140,6 +145,7 @@ Steps: 20, Sampler: euler_ancestral simple, CFG scale: 5.000000000000001, Seed: 
 - `file_path` で入力されたパスのファイルを<a href="https://eagle.cool/" target="_blank">Eagle</a>に登録する
 - `Video Combine` の出力ファイルをEagleに登録するために作りました
 - `D2 File Template2` を使って `memo_text` に入力すれば動画生成パラメーターの保存も可能
+- 出力 `file_path` は入力された `file_path` をそのまま出力する
 
 ##### file_path について
 

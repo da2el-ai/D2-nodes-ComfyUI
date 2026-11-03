@@ -93,8 +93,8 @@ If you have installed any of the following custom nodes previously, please remov
   - Can also perform string concatenation
 - <a href="node_text.md#D2-Multi-Output">`D2 Multi Output`</a>
   - Outputs SEED / STRING / INT / FLOAT as lists
-- <a href="node_text.md#D2-List-To-String">`D2 List To String`</a>
-  - Converts arrays to strings
+- <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a>
+  - Converts between LIST / ARRAY and also to a string
 - <a href="node_text.md#D2-Text-Concat">`D2 Text Concat`</a>
   - Text concatenation node with an adjustable number of inputs
 - <a href="node_text.md#D2-Filename-Template">`D2 Filename Template`</a>
@@ -185,13 +185,11 @@ If you have installed any of the following custom nodes previously, please remov
 - <a href="node_xy.md#D2-XY-Model-List">`D2 XY Model List`</a>
   - Outputs a list of Checkpoints / Loras
 - <a href="node_xy.md#D2-XY-Folder-Images">`D2 XY Folder Images`</a>
-  - Outputs list of files in folder
+  - Outputs list of files in folder (non-image files are also supported)
 - <a href="node_xy.md#D2-XY-Upload-Image">`D2 XY Upload Image`</a>
   - Upload multiple images by drag and drop
 - <a href="node_xy.md#D2-XY-Annotation">`D2 XY Annotation`</a>
   - Creates header text for display in D2 Grid Image
-- <a href="node_xy.md#D2-XY-List-To-Plot">`D2 XY List To Plot`</a>
-  - Converts arrays to D2 XY Plot lists
 - <a href="node_xy.md#D2-XY-String-To-Plot">`D2 XY String To Plot`</a>
   - Converts text containing line breaks into a list format for `D2 XY Plot`
 
@@ -208,6 +206,22 @@ If you have installed any of the following custom nodes previously, please remov
 
 
 ## :blossom: Changelog
+
+**2026.11.04**
+
+- ⚠️ To support ComfyUI's built-in `Start Loop` / `End Loop`, the names, types and order of inputs/outputs of many nodes have changed. Nodes in older workflows need to be reconnected
+- Changed `LIST`, which outputs an array as a single value, to ComfyUI's built-in Array type `ARRAY`
+- Renamed `BATCH`, which outputs items one by one, to `LIST`
+- Unified the output order to `x / y_items` → `LIST` → `ARRAY`
+  - `D2_MultiOutput` / `D2_XYModelList` / `D2_XYPromptSR` / `D2_XYSeed` / `D2_XYSeed2` / `D2_XYStringToPlot` / `D2_XYFolderImages` / `D2_XYUploadImage` / `D2_XYListCollector`
+- Renamed `x / y_list`, `x_list`, `y_list` to `x / y_items`, `x_items`, `y_items`
+  - `D2_XYPlot` / `D2_XYPlotEasy` / `D2_XYPlotEasyMini` and others
+- `D2_ListConverter`: Added a new node that converts between LIST / ARRAY and also to a string
+- `D2_ListToString` / `D2_XYListToPlot`: Deprecated. Please use `D2_ListConverter` instead
+- `D2_SaveImage` / `D2_SaveImageEagle` / `D2_PreviewImage`: Added an `images` output that returns the input images as they are. `filenames` is now `ARRAY` and moved after `images`
+- `D2_SaveAudioEagle`: Added an `audios` output that returns the input audio as it is, and a `filenames` output with the saved paths
+- `D2_SendFileEagle`: Added a `file_path` output that returns the input path as it is
+- `D2_XYFolderImages`: Documented that it can handle non-image files as well
 
 **2026.10.31**
 

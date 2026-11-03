@@ -174,33 +174,58 @@ Output text
 
 ### Output
 
-- `LIST`
-  - 改行で分解して配列で出力する
-- `x/y_list`
+- `x / y_items`
   - 普通の改行区切りテキスト
   - `D2 XY Plot`、`D2 XY Plot Easy`、`D2 XY Plot Easy Mini` で使用する
+- `LIST`
+  - 改行で分解して1つずつ出力する。繋いだ先のノードは要素の数だけ実行される
+- `ARRAY`
+  - 改行で分解して配列で出力する
 
 
 ---
 
-### D2 List To String
+### D2 List Converter
 
 <figure>
-  <img src="../img/list_to_string.png">
+  <img src="../img/list_converter.png">
 </figure>
 
-- 配列（LIST）を1つの文字列に結合するノード
-- `separator` で区切り文字を選択する
+- `LIST`（要素を1つずつ出力する ComfyUI の list）と `ARRAY`（配列を1つの値として出力する ComfyUI 標準の Array 型）を相互に変換し、文字列にもするノード
+- `D2 List To String` と `D2 XY List To Plot` の機能をまとめたもの
 
 #### Input
 
+- `LIST` / `ARRAY`
+  - 変換する値。どちらか一方を繋ぐ
+  - 両方繋いだ時は `LIST` → `ARRAY` の順に連結する
 - `separator`
+    - `STRING` 出力の区切り文字
     - `Comma + Space`: `, ` で結合
     - `Comma`: `,` で結合
     - `Line break`: 改行で結合
     - `Semicolon`: `;` で結合
     - `Space`: 半角スペースで結合
     - `None`: 区切り文字なしで結合
+
+#### Output
+
+- `x / y_items`
+  - 改行区切りテキスト。`D2 XY Plot` に使う
+  - 要素の中の改行は消して出力する
+- `LIST`
+  - 要素を1つずつ出力する
+- `ARRAY`
+  - 配列として出力する
+- `STRING`
+  - `separator` で結合したテキスト
+  - 要素の中の改行はそのまま残す
+
+---
+
+### D2 List To String
+
+非推奨になりました。今後は <a href="#D2-List-Converter">`D2 List Converter`</a> をご利用ください。
 
 ---
 

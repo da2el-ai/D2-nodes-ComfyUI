@@ -617,3 +617,10 @@ In the example above, selecting `Anima` outputs `steps`=15 and `cfg`=1.5.
   - Bitrate used when `format` is `Opus`
 - `memo_text`
   - Text to save in Eagle's memo field
+
+#### Output
+
+- `audios`
+  - Outputs the input audio as it is
+- `filenames`
+  - Array of full paths of saved audio files (`ARRAY`)

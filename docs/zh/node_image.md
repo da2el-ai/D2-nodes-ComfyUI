@@ -26,6 +26,10 @@
 
 - 點擊 `Popup Image` 按鈕可顯示全螢幕圖庫
 
+#### Output
+
+- `images`: 將輸入的圖像原樣輸出
+
 ---
 
 ### D2 Save Image
@@ -63,7 +67,8 @@
 
 #### Output
 
-- `filenames`: 保存的圖像文件完整路徑陣列
+- `images`: 將輸入的圖像原樣輸出
+- `filenames`: 保存的圖像文件完整路徑陣列（`ARRAY`）
 
 ---
 
@@ -148,6 +153,7 @@ Steps: 20, Sampler: euler_ancestral simple, CFG scale: 5.000000000000001, Seed: 
 - 將 `file_path` 輸入的路徑文件註冊到 <a href="https://eagle.cool/" target="_blank">Eagle</a>
 - 為了將 `Video Combine` 的輸出文件註冊到Eagle而創建
 - 通過使用 `D2 File Template2` 輸入 `memo_text` 也可以保存視頻生成參數
+- 輸出 `file_path` 會將輸入的 `file_path` 原樣輸出
 
 ##### 關於 file_path
 

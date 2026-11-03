@@ -21,9 +21,14 @@ Node
 
 - <a href="./workflow.md#card_index_dividers-xy-plot-checkpoint--prompt-sr">サンプルワークフロー</a>を参考にしてください。
 
-- 処理の順番は `x_list` > `y_list` となっています。プロンプトの書き換えなどで順番が重要になる時は x > y になるようにしてください。
+- 処理の順番は `x_items` > `y_items` となっています。プロンプトの書き換えなどで順番が重要になる時は x > y になるようにしてください。
 
-- `x_list` を全て処理してから次の `y_list` に移ります。Checkpoint の読み込みなど重い処理は `y_list` を使うのがおすすめです。
+- `x_items` を全て処理してから次の `y_items` に移ります。Checkpoint の読み込みなど重い処理は `y_items` を使うのがおすすめです。
+
+- リストを出力するノードは、次の3種類の出力を持っています。
+  - `x / y_items`: 改行区切りテキスト。`D2 XY Plot` の `x_items` / `y_items` に繋ぐ
+  - `LIST`: 要素を1つずつ出力する（ComfyUI の list）。繋いだ先のノードは要素の数だけ実行される。ComfyUI 標準の `Start Loop`（List モード）に繋ぐとループできる
+  - `ARRAY`: 配列を1つの値として出力する（ComfyUI 標準の Array 型）。<a href="node_text.md#D2-List-Converter">`D2 List Converter`</a> で他の形式に変換できる
 
 
 ---
@@ -56,7 +61,7 @@ Node
 - `x_type` / `y_type`
   - XY Plot を実行する項目を指定
   - `STRING`、`INT`、`FLOAT` を指定すると `x_other`、`y_other` から出力する
-- `x_list` / `y_list`
+- `x_items` / `y_items`
   - XY Plot の変更内容
   - 改行区切りテキストなので他のノードを使って入力することも可能
 - `auto_queue`
@@ -102,10 +107,10 @@ Node
 #### Input
 
 - `x_type` / `y_type`
-  - `x_list` `y_list` のデータ型を `STRING` `INT` `FLOAT` から指定する
+  - `x_items` `y_items` のデータ型を `STRING` `INT` `FLOAT` から指定する
 - `x_title` / `y_title`
   - 見出しテキストに追加するテキスト
-- `x_list` / `y_list`
+- `x_items` / `y_items`
   - XY Plot の変更内容
   - 改行区切りテキストなので他のノードを使って入力することも可能
 - `auto_queue`
@@ -117,7 +122,7 @@ Node
 #### Output
 
 - `X` / `Y`
-  - `x_list` `x_list` から取得した要素
+  - `x_items` `y_items` から取得した要素
 - `x_annotation` / `y_annotation`
   - `D2 XY Grid Image` に接続する見出しテキスト
 - `status`
@@ -214,9 +219,11 @@ Y: steps
 
 #### Output
 
-- `output`
-  - 蓄積したデータの配列
-  - あらゆるデータ型を受け入れ可能
+- `LIST`
+  - 蓄積したデータを1つずつ出力する。繋いだ先のノードは要素の数だけ実行される
+- `ARRAY`
+  - 蓄積したデータを配列として出力する
+- どちらもあらゆるデータ型を受け入れ可能
 
 ---
 
@@ -243,10 +250,10 @@ Y: steps
 
 #### Output
 
-- `x / y_list`
+- `x / y_items`
   - `D2 XY Plot` に接続する
-- `LIST`
-  - 置換後のテキストをリスト形式で出力
+- `LIST` / `ARRAY`
+  - 置換後のテキストを出力する（<a href="#TIPS">TIPS</a> 参照）
 
 
 ---
@@ -283,6 +290,7 @@ Y: steps
 - `-1` を指定するとランダム数値を出力する
 - それ以外の数値はそのまま出力する
 - `D2 XY Plot` 側は `x / y_type` を `INT` にする必要がある
+- 出力は `x / y_items` / `LIST` / `ARRAY`（<a href="#TIPS">TIPS</a> 参照）
 
 
 ---
@@ -295,6 +303,7 @@ Y: steps
 </figure>
 
 - seed値を指定個数出力するノード
+- 出力は `x / y_items` / `LIST` / `ARRAY`（<a href="#TIPS">TIPS</a> 参照）
 
 #### input
 - `initial_number`
@@ -327,6 +336,7 @@ Y: steps
 - Checkpoint / Lora を `D2 XY Plot` に渡すノード
 - 大量のモデルリストを取得したいけど `D2 Checkpoint List` で1個ずつ選ぶのが面倒くさい、という時に遣う
 - `get_list` をクリックするとモデル一覧を取得するので、編集して必要なものだけ残して利用してください
+- 出力は `x / y_items` / `LIST` / `ARRAY`（<a href="#TIPS">TIPS</a> 参照）
 
 #### input
 - `model_type`
@@ -353,6 +363,7 @@ Y: steps
 - ファイルをドラッグ・ドロップするとテンポラリフォルダーにアップロードできる
 - アップロードされたファイルのパスがテキストエリアに表示される
 - `D2 XY Plot Easy` を経由して `D2 Load Image` に繋ぐことを前提にしている
+- 出力は `x / y_items` / `LIST` / `ARRAY`（<a href="#TIPS">TIPS</a> 参照）と、ファイル数の `image_count`
 
 
 
@@ -366,9 +377,11 @@ Y: steps
   <img src="../img/xy_folder_images.png">
 </figure>
 
-- 指定したフォルダー内の画像パスを `D2 XY Plot` に渡すノード
-- `include_subfolders` を `true` にするとサブフォルダー内の画像も対象にする（`folder` に `**` を直接書いてもよい）
+- 指定したフォルダー内のファイルパスを `D2 XY Plot` に渡すノード
+- 名前は Images だが画像専用ではない。`extension` を指定すればテキストや動画など、どんなファイルでも扱える
+- `include_subfolders` を `true` にするとサブフォルダー内のファイルも対象にする（`folder` に `**` を直接書いてもよい）
 - `extension` は `*.png, *.jpg, *.webp` のようにカンマ区切りで複数の拡張子を指定できる
+- 出力は `x / y_items` / `LIST` / `ARRAY`（<a href="#TIPS">TIPS</a> 参照）と、ファイル数の `image_count`
 
 
 
@@ -389,13 +402,7 @@ Y: steps
 
 ### D2 XY List To Plot
 
-<figure>
-  <img src="../img/xy_list_to_plot.png?2">
-</figure>
-
-- リストを出力するノードから `D2 XY Plot` に使えるように変換する
-- 内部的には `"\n".join(list)` をしているだけなので、リストの内容に改行が含まれていると意図しない動作になります
-- 改行を含むテキストを使う時は `D2 XY String To Plot` を使う
+非推奨になりました。今後は <a href="node_text.md#D2-List-Converter">`D2 List Converter`</a> をご利用ください。
 
 
 ---
@@ -409,6 +416,7 @@ Y: steps
 - 複数行のテキストを `D2 XY Plot` / `D2 XY Plot Easy` に使えるように変換する
 - プロンプト全体を比較する XY Plot を実行したい時に使う
 - `D2 XY Plot Easy` でプロンプト比較に使う時は `x/y_type` を `STRING` にし、`x/y_other` を `D2 KSampler` の `positive` に繋げる
+- `x / y_items` は各テキストの改行を消して出力する。`LIST` / `ARRAY` は改行を残したまま出力する（<a href="#TIPS">TIPS</a> 参照）
 
 
 
