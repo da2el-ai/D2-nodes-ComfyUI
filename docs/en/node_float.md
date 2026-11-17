@@ -26,6 +26,7 @@
 - Drag the palette and drop it onto the actionbar at the top of the screen to dock it there
 - Drag the handle slightly out of the dock to return it to a floating (free-moving) state
 - The docked/floating state is remembered and restored on the next launch
+- When multiple palettes are docked, the one docked later is placed further to the right (shared with the `Prompt convert` button)
 
 <figure>
 <img src="../img/queue_button_setting.png">
@@ -50,6 +51,7 @@
 - Open from `Prompt convert` button
 - Hidden by default
 - Enable display by activating `settings > D2 > Show prompt convert button`
+- Like <a href="#D2-Queue-Button">`D2 Queue Button`</a>, the `Prompt convert` button can be dragged and docked in the actionbar at the top of the screen
 
 ---
 

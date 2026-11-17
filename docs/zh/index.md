@@ -209,6 +209,11 @@
 
 ## :blossom: 更新日誌
 
+**2026.11.17**
+
+- `Prompt convert dialog`：`Prompt convert` 按鈕現在可透過拖放收納到畫面上方的動作列（actionbar）
+- `D2_QueueButton` / `Prompt convert dialog`：在動作列收納多個面板時，較晚收納的會排在右邊
+
 **2026.11.04**
 
 - ⚠️ 為了支援 ComfyUI 內建的 `Start Loop` / `End Loop`，變更了許多節點輸入/輸出的名稱、型別與順序。舊的工作流程需要重新連接節點

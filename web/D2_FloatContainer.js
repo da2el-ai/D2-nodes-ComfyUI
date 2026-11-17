@@ -21,12 +21,15 @@ class D2_FloatContainer {
     frame = undefined;
     body = undefined;
     cookieNameBase = "";
+    defaultLeft = 50;
+    defaultTop = 50;
 
     // ドック機能
     enableDock = false;
     mode = "float";        // "float" | "dock"
     visible = true;
     dockGroup = null;      // アクションバーへ挿入する ComfyButtonGroup（ドック先＆ドロップ枠を兼ねる）
+    dockOrder = 0;         // ドックした時刻。複数パネルの並び順（小さいほど左）に使う
 
     /**
      * @param {string} cookieNameBase cookie キーの接頭辞
@@ -36,6 +39,9 @@ class D2_FloatContainer {
      */
     constructor(cookieNameBase, default_left = 50, default_top = 50, options = {}) {
         this.cookieNameBase = cookieNameBase;
+        // dock から float へ戻るときの既定位置にも使う
+        this.defaultLeft = default_left;
+        this.defaultTop = default_top;
         this.enableDock = options.enableDock === true;
         loadCssFile(D2_FloatContainer.CSS_FILEPATH);
         this._createContainer();
@@ -146,6 +152,7 @@ class D2_FloatContainer {
      */
     _saveMode() {
         setCookie(`${this.cookieNameBase}_dock`, this.mode === "dock");
+        setCookie(`${this.cookieNameBase}_dock_order`, this.dockOrder);
     }
 
     /**
@@ -153,6 +160,14 @@ class D2_FloatContainer {
      */
     _getSavedDock() {
         return getCookie(`${this.cookieNameBase}_dock`) === true;
+    }
+
+    /**
+     * 保存されたドック順（ドックした時刻）を取得。未保存なら 0
+     */
+    _getSavedDockOrder() {
+        const order = Number(getCookie(`${this.cookieNameBase}_dock_order`));
+        return Number.isFinite(order) ? order : 0;
     }
 
     ///////////////////////////////////////////////
@@ -194,7 +209,33 @@ class D2_FloatContainer {
      */
     _showDropTarget() {
         if (!this.dockGroup) return;
+        // ドロップ後に位置が飛ばないよう、枠を先に右端（最後にドックした位置）へ移しておく
+        this._placeDockGroup(Date.now());
         this.dockGroup.element.classList.add("border-dashed", "d2-dock-drop-target");
+    }
+
+    /**
+     * ドック順に従って dockGroup を並べ直す
+     * ドック中の他の D2 の枠と比べ、自分より後にドックした枠の手前に入れる。
+     * なければドック中の D2 の枠の右端へ。他にドック中の枠がなければ位置は変えない
+     * @param {number} order ドックした時刻
+     */
+    _placeDockGroup(order) {
+        if (!this.dockGroup) return;
+        const el = this.dockGroup.element;
+        el.dataset.d2DockOrder = String(order);
+
+        const others = [...document.querySelectorAll(".d2-dock-group.d2-dock-active")]
+            .filter((e) => e !== el);
+        if (others.length === 0) return;
+
+        // others は DOM 順（＝ドック順に並んでいる）なので、最初に見つかった後発の枠の手前に入れる
+        const later = others.find((e) => Number(e.dataset.d2DockOrder) > order);
+        if (later) {
+            later.before(el);
+        } else {
+            others[others.length - 1].after(el);
+        }
     }
 
     /**
@@ -226,11 +267,14 @@ class D2_FloatContainer {
     /**
      * float ⇔ dock の切り替え
      * @param {boolean} bool true で dock、false で float
+     * @param {number} [order] ドック順（ドックした時刻）。省略時は現在時刻＝右端に入る
      */
-    setDock(bool) {
+    setDock(bool, order = Date.now()) {
         if (bool) {
             if (!this._canDock()) return;
+            this.dockOrder = order;
             this.dockGroup.element.appendChild(this.frame);
+            this._placeDockGroup(order);
             this.dockGroup.element.classList.add("d2-dock-active");
             this._hideDropTarget();
             this.mode = "dock";
@@ -241,7 +285,7 @@ class D2_FloatContainer {
             }
             this.mode = "float";
             // 位置を復元
-            const pos = this._getPosition(50, 50);
+            const pos = this._getPosition(this.defaultLeft, this.defaultTop);
             this.container.style.left = pos[0] + "px";
             this.container.style.top = pos[1] + "px";
             this.resizeSetting();
@@ -258,7 +302,8 @@ class D2_FloatContainer {
         let tries = 0;
         const tryDock = () => {
             if (this._canDock()) {
-                this.setDock(true);
+                // 保存したドック順で並べ直す（再読み込み後も格納順を保つ）
+                this.setDock(true, this._getSavedDockOrder());
                 return;
             }
             if (tries++ < 60) {

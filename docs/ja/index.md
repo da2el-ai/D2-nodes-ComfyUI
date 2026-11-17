@@ -210,6 +210,11 @@ D2 Nodes ComfyUI
 ## :blossom: Changelog
 
 
+**2026.11.17**
+
+- `Prompt convert dialog`: `Prompt convert` ボタンを、画面上部のアクションバーへドラッグ＆ドロップで収納できるように
+- `D2_QueueButton` / `Prompt convert dialog`: アクションバーに複数収納したとき、後から収納したものが右に並ぶように
+
 **2026.11.04**
 
 - ⚠️ ComfyUI 標準の `Start Loop` / `End Loop` に対応するため、多数のノードの入出力の名前・型・並び順を変更しました。古いワークフローではノードの再接続が必要です

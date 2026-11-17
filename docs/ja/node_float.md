@@ -31,6 +31,7 @@ Node
 - パレットをドラッグして画面上部のアクションバーへドロップすると、アクションバーに収納できる
 - 収納状態からドラッグハンドルを少し動かすと、フロート（自由移動）に戻る
 - 収納／フロートの状態は記憶され、次回起動時に復元される
+- 複数のパレットを収納すると、後から収納したものほど右に並ぶ（`Prompt convert` ボタンと共通）
 
 <figure>
   <img src="../img/queue_button_setting.png">
@@ -60,6 +61,7 @@ Node
 - `Prompt convert` ボタンから開く
 - 初期状態では非表示になっている
 - `settings > D2 > Show prompt convert button` を有効にすると表示する
+- `Prompt convert` ボタンは <a href="#D2-Queue-Button">`D2 Queue Button`</a> と同じように、ドラッグして画面上部のアクションバーへ収納できる
 
 
 

@@ -28,6 +28,7 @@
 - 將面板拖動並放置到畫面上方的動作列（actionbar）即可收納其中
 - 從收納狀態將拖動把手稍微移動，即可恢復為浮動（自由移動）狀態
 - 收納／浮動的狀態會被記住，並在下次啟動時還原
+- 收納多個面板時，越晚收納的會排在越右邊（與 `Prompt convert` 按鈕共通）
 
 <figure>
 <img src="../img/queue_button_setting.png">
@@ -52,6 +53,7 @@
 - 從 `Prompt convert` 按鈕開啟
 - 初始狀態為隱藏
 - 啟用 `settings > D2 > Show prompt convert button` 後顯示
+- `Prompt convert` 按鈕與 <a href="#D2-Queue-Button">`D2 Queue Button`</a> 相同，可拖動並收納到畫面上方的動作列（actionbar）
 
 ---
 

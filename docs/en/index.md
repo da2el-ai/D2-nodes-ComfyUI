@@ -207,6 +207,11 @@ If you have installed any of the following custom nodes previously, please remov
 
 ## :blossom: Changelog
 
+**2026.11.17**
+
+- `Prompt convert dialog`: The `Prompt convert` button can now be docked in the actionbar at the top of the screen by drag & drop
+- `D2_QueueButton` / `Prompt convert dialog`: When multiple palettes are docked in the actionbar, the one docked later is now placed to the right
+
 **2026.11.04**
 
 - ⚠️ To support ComfyUI's built-in `Start Loop` / `End Loop`, the names, types and order of inputs/outputs of many nodes have changed. Nodes in older workflows need to be reconnected

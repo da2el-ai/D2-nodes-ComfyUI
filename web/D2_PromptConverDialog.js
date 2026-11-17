@@ -350,8 +350,9 @@ class D2_PromptConvertButton {
     dialog = undefined;
 
     constructor() {
-        // フロートコンテナ
-        this.floatContainer = new D2_FloatContainer("D2_PromptConvertBUtton", 50, 100);
+        // フロートコンテナ（アクションバー収納を有効化）
+        // cookie 名の BUtton は既存の保存位置を引き継ぐためそのままにする
+        this.floatContainer = new D2_FloatContainer("D2_PromptConvertBUtton", 50, 100, { enableDock: true });
         // ダイアログ
         this.dialog = new D2_PromptConvertDialog();
 
