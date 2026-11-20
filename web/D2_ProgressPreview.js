@@ -81,7 +81,7 @@ class D2_ProgressPreview {
           const output = data[promptId].outputs[nodeId];
           if (output.images) {
             for (const image of output.images) {
-              const imageUrl = getImageUrlFromApi(image.filename, image.type);
+              const imageUrl = getImageUrlFromApi(image.filename, image.type, image.subfolder);
               // imageUrl が既にリストに存在しないかチェック
               if (!this.images.includes(imageUrl)) {
                 this.images.push(imageUrl);
